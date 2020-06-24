@@ -1,0 +1,30 @@
+<project name="MyProject" default="dist" basedir=".">
+
+<target name="cpd">
+    <taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpath="lib/pmd-4.2.4.jar"/>
+    <cpd minimumTokenCount="100" outputFile="${out}" format="xml">
+        <fileset dir="${in}">
+            <include name="**/*.java"/>
+        	<include name="**/*.c"/>
+        	<include name="**/*.cpp"/>
+        	<include name="**/*.h"/>
+        </fileset>
+    </cpd>
+</target>
+
+<target name="run">   
+	<taskdef uri="antlib:net.sf.antcontrib" resource="net/sf/antcontrib/antlib.xml" classpath="C:/ant-contrib/libant-contrib-1.0b3.jar"/>
+   <foreach target="loop" param="loop.param">      
+      <dirset dir="L:/ivy">   
+		<include name="*"/>
+	  </dirset>
+   </foreach>
+</target>
+
+<target name="loop">   
+   <echo message="${loop.param}"/>
+   <basename property="dir.name" file="${loop.param}"/>
+   <echo message="${dir.name}"/>
+</target>
+
+</project>
