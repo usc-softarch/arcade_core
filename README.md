@@ -1,3 +1,7 @@
+# ARCADE Repository Port
+
+This repository has been imported from ARCADE's original repository: https://bitbucket.org/joshuaga/arcade. All commit history has been wiped; for the history prior to the first commit here, see the original repository.
+
 # Are you using ARCADE? Please let us know!
 
 We'd love to know more about the project you use ARCADE for. This information allows us to apply for more funding that can support future development and maintenance of ARCADE. Feel free to contact either [Nenad Medvidović](mailto:neno@usc.edu) or [Joshua Garcia](mailto:joshug4@uci.edu) to let us know more about how you use ARCADE.
