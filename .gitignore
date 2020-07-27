@@ -49,3 +49,5 @@ hs_err_pid6970.log
 hs_err_pid7033.log
 hs_err_pid9065.log
 /tmp/
+
+target/*
