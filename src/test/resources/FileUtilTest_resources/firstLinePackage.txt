@@ -1,0 +1,4 @@
+package pkg.test.package;
+more text
+more text2
+more text3

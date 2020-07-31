@@ -31,6 +31,13 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.github.stefanbirkner/system-rules -->
+    <dependency>
+      <groupId>com.github.stefanbirkner</groupId>
+      <artifactId>system-rules</artifactId>
+      <version>1.2.0</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.soot-oss</groupId>
       <artifactId>soot</artifactId>

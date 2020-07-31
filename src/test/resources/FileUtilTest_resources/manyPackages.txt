@@ -1,0 +1,6 @@
+package pkg.test.package;
+package test.more.packages;
+package many.packages
+text
+more text
+package yet.another.package;

@@ -1,0 +1,8 @@
+import this;
+import that;
+syntax error ((((
+package pkg.test.package;
+more things
+{
+    indented things
+}

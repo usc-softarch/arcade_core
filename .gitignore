@@ -50,4 +50,9 @@ hs_err_pid7033.log
 hs_err_pid9065.log
 /tmp/
 
-target/*
+target
+.project
+.classpath
+.factorypath
+.settings
+.vscode
