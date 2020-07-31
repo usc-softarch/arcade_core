@@ -1,0 +1,6 @@
+Hello world
+This is
+a text file
+
+with 123 numbers
+and !@# special characters
