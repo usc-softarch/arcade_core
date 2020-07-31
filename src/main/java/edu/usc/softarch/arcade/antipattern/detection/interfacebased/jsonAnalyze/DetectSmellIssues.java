@@ -2,11 +2,11 @@ package edu.usc.softarch.arcade.antipattern.detection.interfacebased.jsonAnalyze
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.json.simple.JSONArray;
@@ -14,10 +14,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import net.sourceforge.pmd.lang.java.rule.coupling.CouplingBetweenObjectsRule;
-
 public class DetectSmellIssues {
-	public static void main(String[] args) throws FileNotFoundException, IOException, ParseException{
+	public static void main(String[] args) throws IOException, ParseException{
 		String issue_json = "F:\\hadoop_data\\hadoop_pkg_full_shorted_removed_dc.json";
 		String merged_output_file = "F:\\hadoop_data\\hadoop_pkg_all";
 		
@@ -51,12 +49,9 @@ public class DetectSmellIssues {
 				smell_issues.add(issue);
 			else
 				if (!((String) issue.get("affect")).equals("")){
-					//System.out.println(issue.get("affect"));
 					non_smell_issues.add(issue);
 				}
-				
 		}
-		
 		
 		File json_file = new File(merged_output_file+"_smell.json");
 		// if file doesnt exists, then create it
@@ -82,28 +77,25 @@ public class DetectSmellIssues {
 		
 		//count priority
 		System.out.println("smell issues");
-		//Count_Critical(smell_issues);
 		Count_Issues_Type(smell_issues);
 		
 		System.out.println();
 		System.out.println("non_smell issues");
-		//Count_Critical(non_smell_issues);
 		Count_Issues_Type(non_smell_issues);
 	}
 	
 	public static void Count_Critical(JSONArray issues){
-		
-		HashMap<String, Integer> counter = new HashMap<String, Integer>();
-		Vector<String> Blocker = new Vector<String>();
-		Vector<String> Critical = new Vector<String>();
-		Vector<String> Major = new Vector<String>();
-		Vector<String> Minor = new Vector<String>();
-		Vector<String> Trivial = new Vector<String>();
+		Map<String, Integer> counter = new HashMap<>();
+		Vector<String> Blocker = new Vector<>();
+		Vector<String> Critical = new Vector<>();
+		Vector<String> Major = new Vector<>();
+		Vector<String> Minor = new Vector<>();
+		Vector<String> Trivial = new Vector<>();
 		
 		for (int i = 0; i < issues.size(); i ++){
 			JSONObject issue = (JSONObject) issues.get(i);
 			String priority = (String) issue.get("priority");
-			String time = String.valueOf(((Long) issue.get("time")));
+			String time = String.valueOf((issue.get("time")));
 			
 			switch (priority) {
 			case "Blocker":
@@ -139,40 +131,9 @@ public class DetectSmellIssues {
 			counter.put(priority, tmp);
 		}
 		
-		
 		for (String priority : counter.keySet()){
 			System.out.printf(priority + "," + counter.get(priority) + ",%.2f\n", (float) counter.get(priority)/issues.size());
 		}
-		
-//		System.out.print("Blocker,");
-//		for (String s : Blocker){
-//			System.out.print(s+",");
-//		}
-//		System.out.println();
-//		
-//		System.out.print("Critical,");
-//		for (String s : Critical){
-//			System.out.print(s+",");
-//		}
-//		System.out.println();
-//		
-//		System.out.print("Major,");
-//		for (String s : Major){
-//			System.out.print(s+",");
-//		}
-//		System.out.println();
-//		
-//		System.out.print("Minor,");
-//		for (String s : Minor){
-//			System.out.print(s+",");
-//		}
-//		System.out.println();
-//		
-//		System.out.print("Trivial,");
-//		for (String s : Trivial){
-//			System.out.print(s+",");
-//		}
-//		System.out.println();
 		
 		long high_threshold = 90000;
 		long log_threshold = 70000;
@@ -186,7 +147,7 @@ public class DetectSmellIssues {
 	public static void countPercentage(Vector<String> values, long high_threshold, long low_threshold) {
 		int counter = 0;
 		for (String s: values){
-			long time = Long.valueOf(s);
+			long time = Long.parseLong(s);
 			if (time < high_threshold && time > low_threshold){
 				counter ++;
 			}
@@ -196,18 +157,18 @@ public class DetectSmellIssues {
 
 	public static void Count_Issues_Type(JSONArray issues){
 		
-		HashMap<String, Integer> counter = new HashMap<String, Integer>();
-		Vector<String> All = new Vector<String>();
-		Vector<String> Bug = new Vector<String>();
-		Vector<String> Improvement = new Vector<String>();
-		Vector<String> Task = new Vector<String>();
-		Vector<String> SubTask = new Vector<String>();
-		Vector<String> NewFeature = new Vector<String>();
+		Map<String, Integer> counter = new HashMap<>();
+		Vector<String> All = new Vector<>();
+		Vector<String> Bug = new Vector<>();
+		Vector<String> Improvement = new Vector<>();
+		Vector<String> Task = new Vector<>();
+		Vector<String> SubTask = new Vector<>();
+		Vector<String> NewFeature = new Vector<>();
 		
 		for (int i = 0; i < issues.size(); i ++){
 			JSONObject issue = (JSONObject) issues.get(i);
 			String type = (String) issue.get("type");
-			String time = String.valueOf(((Long) issue.get("time")));
+			String time = String.valueOf((issue.get("time")));
 			
 			switch (type) {
 			case "Bug":
@@ -243,7 +204,6 @@ public class DetectSmellIssues {
 			counter.put(type, tmp);
 		}
 		
-		
 		for (String type : counter.keySet()){
 			System.out.printf(type + "," + counter.get(type) + ",%.2f\n", (float) counter.get(type)/issues.size());
 		}
@@ -263,6 +223,4 @@ public class DetectSmellIssues {
 		countPercentage(SubTask, high_threshold, log_threshold);
 		countPercentage(All, high_threshold, log_threshold);
 	}
-	
-	
 }

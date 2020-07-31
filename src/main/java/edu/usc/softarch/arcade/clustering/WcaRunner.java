@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.SimMeasure;
@@ -15,18 +14,12 @@ import edu.usc.softarch.arcade.util.StopWatch;
 public class WcaRunner extends ClusteringAlgoRunner {
 	
 	private static Logger logger = Logger.getLogger(WcaRunner.class);
-	
-	private static int arbitraryDecisions = 0;
 
 	public static void computeClustersWithPQAndWCA(
 			StoppingCriterion stopCriterion) {
 		StopWatch loopSummaryStopwatch = new StopWatch();
-		
-		arbitraryDecisions = 0;
 
 		initializeClusters(null);
-
-		// SimCalcUtil.verifySymmetricClusterOrdering(clusters);
 
 		loopSummaryStopwatch.start();
 		
@@ -49,10 +42,8 @@ public class WcaRunner extends ClusteringAlgoRunner {
 				checkAndUpdateClusterGain(clusterGain);
 			}
 
-			//runClusterStepForWCA();
 			StopWatch timer = new StopWatch();
 			timer.start();
-			//identifyMostSimClustersForConcernsMultiThreaded(data);
 			MaxSimData data  = identifyMostSimClusters(simMatrix);
 			
 			timer.stop();
@@ -96,7 +87,6 @@ public class WcaRunner extends ClusteringAlgoRunner {
 	
 	private static void updateFastClustersAndSimMatrixToReflectMergedCluster(MaxSimData data,
 			FastCluster newCluster, List<List<Double>> simMatrix) {
-		
 		FastCluster cluster = fastClusters.get(data.rowIndex);
 		FastCluster otherCluster = fastClusters.get(data.colIndex);
 		
@@ -128,7 +118,7 @@ public class WcaRunner extends ClusteringAlgoRunner {
 		
 		fastClusters.add(newCluster);
 		
-		List<Double> newRow = new ArrayList<Double>(fastClusters.size());
+		List<Double> newRow = new ArrayList<>(fastClusters.size());
 		
 		for (int i=0;i<fastClusters.size();i++) {
 			newRow.add(Double.MAX_VALUE);
@@ -166,10 +156,6 @@ public class WcaRunner extends ClusteringAlgoRunner {
 			simMatrix.get(fastClusters.size()-1).set(i, currSimMeasure);
 			simMatrix.get(i).set(fastClusters.size()-1, currSimMeasure);
 		}
-		
-		
-		// SimCalcUtil.verifySymmetricClusterOrdering(clusters);
-		// newCluster.addClustersToPriorityQueue(clusters);
 	}
 	
 	protected static void printTwoMostSimilarClustersUsingStructuralData(
@@ -186,7 +172,6 @@ public class WcaRunner extends ClusteringAlgoRunner {
 			logger.debug("\n");
 
 			logger.debug("before merge, clusters size: " + fastClusters.size());
-			
 		}
 	}
 	
@@ -222,23 +207,18 @@ public class WcaRunner extends ClusteringAlgoRunner {
 		if (!foundMoreSimilarMeasure) {
 			String couldNotFindMoreSimilarMeasureMsg = "Cannot find any similar entities...making arbitrary decision at " + fastClusters.size() + " clusters...";
 			logger.debug(couldNotFindMoreSimilarMeasureMsg);
-			//System.out.println(couldNotFindMoreSimilarMeasureMsg);
 			msData.foundMoreSimilarMeasure = foundMoreSimilarMeasure;
-			arbitraryDecisions++;
 		}
 		msData.currentMaxSim = greatestUnbiasedEllenberg;
 		return msData;
 	}
 
 	private static List<List<Double>> createSimilarityMatrix(
-			ArrayList<FastCluster> clusters) {
-
-		//HashMap<HashSet<String>, Double> map = new HashMap<HashSet<String>, Double>();
-		
-		List<List<Double>> simMatrixObj = new ArrayList<List<Double>>(clusters.size());
+			List<FastCluster> clusters) {
+		List<List<Double>> simMatrixObj = new ArrayList<>(clusters.size());
 		
 		for (int i=0;i<clusters.size();i++) {
-			simMatrixObj.add(new ArrayList<Double>(clusters.size()));
+			simMatrixObj.add(new ArrayList<>(clusters.size()));
 		}
 
 		for (int i=0;i<clusters.size();i++) {
@@ -261,12 +241,8 @@ public class WcaRunner extends ClusteringAlgoRunner {
 				
 				simMatrixObj.get(i).add(currSimMeasure);
 			}
-
 		}
 		
 		return simMatrixObj;
 	}
-
-	
-
 }

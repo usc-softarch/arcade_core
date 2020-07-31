@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +21,9 @@ import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class GroundTruthFileParser {
-	
-	static Logger logger = Logger.getLogger(GroundTruthFileParser.class);
-	private static Set<ConcernCluster> clusters = new HashSet<ConcernCluster>();
-	private static Map<String,ConcernCluster> clusterMap = new HashMap<String,ConcernCluster>();
+	private static Logger logger = Logger.getLogger(GroundTruthFileParser.class);
+	private static Set<ConcernCluster> clusters = new HashSet<>();
+	private static Map<String,ConcernCluster> clusterMap = new HashMap<>();
 
 	public static Map<String,ConcernCluster> getClusterMap() {
 		return clusterMap;
@@ -36,10 +34,9 @@ public class GroundTruthFileParser {
 	}
 	
 	public static void parseBashStyle(String groundTruthFile) {
-		clusters = new HashSet<ConcernCluster>();
-		clusterMap = new HashMap<String,ConcernCluster>();
-		try {
-			FileInputStream fstream = new FileInputStream(groundTruthFile);
+		clusters = new HashSet<>();
+		clusterMap = new HashMap<>();
+		try (FileInputStream fstream = new FileInputStream(groundTruthFile)) {
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
@@ -77,18 +74,15 @@ public class GroundTruthFileParser {
 			}
 			in.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	public static void parseHadoopStyle(String groundTruthFile) {
 		clusters = new HashSet<ConcernCluster>();
-		try {
-			FileInputStream fstream = new FileInputStream(groundTruthFile);
+		try (FileInputStream fstream = new FileInputStream(groundTruthFile)) {
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
@@ -96,7 +90,6 @@ public class GroundTruthFileParser {
 			String titleClusterPattern = "\\d+[a-z]*:\\s*.+"; 
 			// Ends with .java
 			String javaClassPattern = "^.+\\.java$";
-			//String cleanJavaClassPatternStr = "org/.+\\.java$";
 			String cleanJavaClassPatternStr = ".*(org/.+)\\.java$";
 			ConcernCluster newCluster = null;
 			while ((strLine = br.readLine()) != null) {
@@ -127,18 +120,14 @@ public class GroundTruthFileParser {
 			}
 			in.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	public static void parseRsf(String groundTruthFile) {
-		
-		clusterMap = new HashMap<String,ConcernCluster>();
+		clusterMap = new HashMap<>();
 		RsfReader.loadRsfDataFromFile(groundTruthFile);
 		
 		for (List<String> fact : RsfReader.unfilteredFacts) {
@@ -159,12 +148,10 @@ public class GroundTruthFileParser {
 					currCluster = clusterMap.get(clusterName);
 					currCluster.addEntity(containedClass);
 				}
-
 			}
-
 		}
 		
-		clusters = new HashSet<ConcernCluster>(clusterMap.values());
+		clusters = new HashSet<>(clusterMap.values());
 		
 		logger.debug("Printing out read in ground truth clusters...");
 		
@@ -174,7 +161,5 @@ public class GroundTruthFileParser {
 				logger.debug(entity);
 			}
 		}
-		
 	}
-
 }

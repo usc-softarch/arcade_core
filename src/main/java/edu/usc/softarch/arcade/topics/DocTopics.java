@@ -4,11 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -20,20 +19,19 @@ import cc.mallet.pipe.Pipe;
 import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.TokenSequence2FeatureSequence;
 import cc.mallet.pipe.TokenSequenceRemoveStopwords;
-import cc.mallet.topics.ParallelTopicModel;
 import cc.mallet.topics.TopicInferencer;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
+import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 /**
  * @author joshua
- *
  */
 public class DocTopics {
-	ArrayList<DocTopicItem> dtItemList = new ArrayList<DocTopicItem>();
+	List<DocTopicItem> dtItemList = new ArrayList<>();
 	private Logger logger = Logger.getLogger(DocTopics.class);
 	
 	public DocTopics() {
@@ -112,77 +110,18 @@ public class DocTopics {
 			}
 		}
 		
-//		
-//		InstanceList previousInstances;
-//		File preIns = new File("tmp/int.data");
-//		if (preIns.exists()){
-//			previousInstances = InstanceList.load(preIns);
-//		}else
-//		{
-//			previousInstances = instances;
-//		}
-//		//save for next time
-//		instances.save(new File("tmp/int.data"));
 		InstanceList previousInstances = InstanceList.load(new File(artifactsDir+"/output.pipe"));
-		
-		/*
-		 * Reader fileReader = new InputStreamReader(new FileInputStream(new
-		 * File( args[0])), "UTF-8"); instances.addThruPipe(new
-		 * CsvIterator(fileReader, Pattern
-		 * .compile("^(\\S*)[\\s,]*(\\S*)[\\s,]*(.*)$"), 3, 2, 1)); // data, //
-		 * label, // name // fields
-		 */
-		// Create a model with 100 topics, alpha_t = 0.01, beta_w = 0.01
-		// Note that the first parameter is passed as the sum over topics, while
-		// the second is
-		//int numTopics = 40;
-		double alpha = (double) 50 / (double) numTopics;
-		double beta = .01;
-		ParallelTopicModel model = null ;
-		File topicModelFile = new File(topicModelFilename);
-		File docTopicsFile = new File(docTopicsFilename);
-		File topWordsFile = new File(topWordsFilename);
 		
 		TopicInferencer inferencer = 
 				TopicInferencer.read(new File(artifactsDir+"/infer.mallet"));
-		
-//		if (topicModelFile.exists()) {
-//			try {
-//				model = ParallelTopicModel.read(topicModelFile);
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		} else {
-//			model = new ParallelTopicModel(numTopics, alpha, beta);
-//			model.addInstances(instances);
-//			
-//			// Use two parallel samplers, which each look at one half the corpus and
-//			// combine
-//			// statistics after every iteration.
-//			model.setNumThreads(2);
-//
-//			// Run the model for 50 iterations and stop (this is for testing only,
-//			// for real applications, use 1000 to 2000 iterations)
-//			int numIterations = 1000;
-//			model.setNumIterations(numIterations);
-//			model.setRandomSeed(10);
-//			model.estimate();
-//			model.write(topicModelFile);
-//			model.printDocumentTopics(docTopicsFile);
-//			boolean useNewLines = false;
-//			int numTopWords = 20;
-//			model.printTopWords(topWordsFile, numTopWords, useNewLines);
-//		}
 		
 		for (int instIndex = 0; instIndex < previousInstances.size(); instIndex++) {
 			DocTopicItem dtItem = new DocTopicItem();
 			dtItem.doc = instIndex;
 			dtItem.source = (String) previousInstances.get(instIndex).getName();
 
-			dtItem.topics = new ArrayList<TopicItem>();
+			dtItem.topics = new ArrayList<>();
 
-//			double[] topicDistribution = model.getTopicProbabilities(instIndex);
 			double[] topicDistribution = inferencer.getSampledDistribution(previousInstances.get(instIndex), 1000, 10, 10);
 			for (int topicIdx = 0; topicIdx < numTopics; topicIdx++) {
 				TopicItem t = new TopicItem();
@@ -191,9 +130,7 @@ public class DocTopics {
 				dtItem.topics.add(t);
 			}
 			dtItemList.add(dtItem);
-
 		}
-		
 	}
 	
 	/**
@@ -207,10 +144,7 @@ public class DocTopics {
 	public DocTopicItem getDocTopicItemForJava(String name) {
 		for (DocTopicItem dti : dtItemList) {
 			String altName = name.replaceAll("/", ".").replaceAll(".java", "").trim();
-			if (dti.source.endsWith(name)) {
-				return dti;
-			}
-			else if (altName.equals(dti.source.trim())) {
+			if (dti.source.endsWith(name) || altName.equals(dti.source.trim())) {
 				return dti;
 			}
 		}
@@ -233,7 +167,6 @@ public class DocTopics {
 					|| dti.source.endsWith(".hpp")
 					|| dti.source.endsWith(".icc")
 					|| dti.source.endsWith(".ia")) {
-				//strippedSource = dti.source.substring(dti.source.lastIndexOf('/')+1,dti.source.length());
 				nameWithoutQuotations = name.replaceAll("\"", "");
 				if (dti.source.endsWith(nameWithoutQuotations)) {
 					return dti;
@@ -246,30 +179,22 @@ public class DocTopics {
 					return dti;
 				}
 			}
-			else {
-				//System.err.println("Unknown file type for " + dti.source);
-				//System.exit(1);
-				//return dti;
-				continue;
-			}
-			
 		}
 		logger.error("Cannot find doc topic for: " + name);
 		return null;
 	}
 	
-	public ArrayList<DocTopicItem> getDocTopicItemList() {
+	public List<DocTopicItem> getDocTopicItemList() {
 		return dtItemList;
 	}
 
 	public void loadFromFile(String filename) throws FileNotFoundException {
 		logger.debug("Loading DocTopics from file...");
-		boolean localDebug = false;
 		File f = new File(filename);
 
 		Scanner s = new Scanner(f);
 
-		dtItemList = new ArrayList<DocTopicItem>();
+		dtItemList = new ArrayList<>();
 		
 		while (s.hasNext()) {
 			String line = s.nextLine();
@@ -279,34 +204,31 @@ public class DocTopics {
 			String[] items = line.split("\\s+");
 
 			DocTopicItem dtItem = new DocTopicItem();
-			dtItem.doc = (new Integer(items[0])).intValue();
+			dtItem.doc = (Integer.valueOf(items[0])).intValue();
 			dtItem.source = items[1];
 
-			dtItem.topics = new ArrayList<TopicItem>();
+			dtItem.topics = new ArrayList<>();
 
 			TopicItem t = new TopicItem();
 			for (int i = 2; i < items.length; i++) {
 				if (i % 2 == 0) {
-					t.topicNum = (new Integer(items[i])).intValue();
+					t.topicNum = (Integer.valueOf(items[i])).intValue();
 				} else {
-					t.proportion = (new Double(items[i])).doubleValue();
+					t.proportion = (Double.valueOf(items[i])).doubleValue();
 					dtItem.topics.add(t);
 					t = new TopicItem();
 				}
 			}
 			dtItemList.add(dtItem);
-			if (localDebug)
+			if (Constants._DEBUG)
 				logger.debug(line);
-
 		}
 		
-		if (localDebug)
+		if (Constants._DEBUG)
 			logger.debug("\n");
 		for (DocTopicItem dtItem : dtItemList) {
-			if (localDebug)
+			if (Constants._DEBUG)
 				logger.debug(dtItem);
 		}
-
 	}	
-
 }

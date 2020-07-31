@@ -18,9 +18,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import edu.usc.softarch.arcade.MetricsDriver;
 import edu.usc.softarch.arcade.config.Config;
-
 
 public class MakeDepReader {
 	static Logger logger = Logger.getLogger(MakeDepReader.class);
@@ -40,10 +38,9 @@ public class MakeDepReader {
 			}
 		}
 
-		//String filename = "/home/joshua/recovery/subject_systems/linux/make.dep";
 		String filename = args[0];
 		Scanner scanner = new Scanner(new FileInputStream(filename));
-		Map<String,List<String>> depMap = new HashMap<String,List<String>>();
+		Map<String,List<String>> depMap = new HashMap<>();
 		String currDotCFile = "";
 		
 		while (scanner.hasNextLine()) {
@@ -61,7 +58,7 @@ public class MakeDepReader {
 						deps = depMap.get(currDotCFile);
 					}
 					else {
-						deps = new ArrayList<String>();
+						deps = new ArrayList<>();
 					}
 					deps.add(trimmedToken);
 					depMap.put(currDotCFile,deps);
@@ -71,7 +68,6 @@ public class MakeDepReader {
 					currDotCFile = trimmedToken.replace(".o",".c");
 				}
 				logger.debug(trimmedToken + "");
-
 				
 			}
 			logger.debug("\n");
@@ -86,10 +82,8 @@ public class MakeDepReader {
 			}
 		}
 		
-		//String outRsfFile = "linux_facts.rsf";
 		String outRsfFile = args[1];
-		try {
-			FileWriter fstream = new FileWriter(outRsfFile);
+		try (FileWriter fstream = new FileWriter(outRsfFile)) {
 			BufferedWriter out = new BufferedWriter(fstream);
 			for (String cFile : cFiles) {
 				List<String> deps = depMap.get(cFile);
@@ -99,9 +93,7 @@ public class MakeDepReader {
 			}
 			out.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 }

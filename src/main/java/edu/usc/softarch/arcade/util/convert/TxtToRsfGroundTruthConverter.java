@@ -3,7 +3,6 @@ package edu.usc.softarch.arcade.util.convert;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.PropertyConfigurator;
 
@@ -24,11 +23,7 @@ public class TxtToRsfGroundTruthConverter {
 		
 		GroundTruthFileParser.parseBashStyle(txtFilename);
 		
-		Set<ConcernCluster> clusters = GroundTruthFileParser.getClusters();
-		
-		try {
-			FileWriter out = new FileWriter(rsfFilename);
-			
+		try (FileWriter out = new FileWriter(rsfFilename)) {
 			Map<String,ConcernCluster> clusterMap = GroundTruthFileParser.getClusterMap();
 			
 			for (String clusterName : clusterMap.keySet()) {
@@ -37,13 +32,8 @@ public class TxtToRsfGroundTruthConverter {
 					out.write("contain " + cluster.getName() + " " + entity + "\n");
 				}
 			}
-			
-			out.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
-
 }

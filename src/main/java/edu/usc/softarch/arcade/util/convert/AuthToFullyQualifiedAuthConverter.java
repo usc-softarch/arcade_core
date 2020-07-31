@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import com.google.common.base.Joiner;
 
@@ -30,13 +29,13 @@ public class AuthToFullyQualifiedAuthConverter {
 		RsfReader.loadRsfDataFromFile(clustersFilename);
 		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
 
-		Map<String,Set<String>> clusterMap = new HashMap<String,Set<String>>();
+		Map<String,Set<String>> clusterMap = new HashMap<>();
 
 		for (List<String> fact : clusterFacts) {
 			String clusterName = fact.get(1);
 			String entity = fact.get(2);
 			if (clusterMap.get(clusterName) == null) {
-				Set<String> entities = new HashSet<String>();
+				Set<String> entities = new HashSet<>();
 				entities.add(entity);
 				clusterMap.put(clusterName,entities);
 			}
@@ -48,13 +47,13 @@ public class AuthToFullyQualifiedAuthConverter {
 		}
 
 		// maps an entity to all of the possible classes it may match
-		Map<String,Set<String>> matchingClassesMap = new HashMap<String,Set<String>>();
+		Map<String,Set<String>> matchingClassesMap = new HashMap<>();
 
 		findMatchingClasses(depFacts, clusterMap, matchingClassesMap);
 		
 		System.out.println(Joiner.on("\n").withKeyValueSeparator(":").join(matchingClassesMap));
 		
-		Set<String> unmatchedEntities = new HashSet<String>();
+		Set<String> unmatchedEntities = new HashSet<>();
 		
 		
 		for (String clusterName : clusterMap.keySet()) {
@@ -78,15 +77,11 @@ public class AuthToFullyQualifiedAuthConverter {
 			}
 			out.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-
 	}
 
 	/**
-	 * 
 	 * Fills {@code matchingClassesMap} with all the classes that the entity key may refer to 
 	 * 
 	 * @param depFacts
@@ -113,9 +108,8 @@ public class AuthToFullyQualifiedAuthConverter {
 							matchingClass = target;
 						}
 
-
 						if (matchingClassesMap.get(entity) == null) {
-							Set<String> classes = new HashSet<String>();
+							Set<String> classes = new HashSet<>();
 							classes.add(matchingClass);
 							matchingClassesMap.put(entity.trim(),classes);
 						}
@@ -124,11 +118,9 @@ public class AuthToFullyQualifiedAuthConverter {
 							classes.add(matchingClass);
 							matchingClassesMap.put(entity.trim(), classes);
 						}
-
 					}
 				}
 			}
 		}
 	}
-
 }

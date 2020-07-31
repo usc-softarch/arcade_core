@@ -2,21 +2,19 @@ package edu.usc.softarch.arcade.topics;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
+
+import edu.usc.softarch.arcade.Constants;
 
 /**
  * @author joshua
- *
  */
 public class TopicKeySet {
-	public HashSet<TopicKey> set;
-	boolean DEBUG = false;
+	public Set<TopicKey> set;
 
-	public TopicKeySet() {
-		super();
-	}
+	public TopicKeySet() { super(); }
 	
 	public TopicKey getTopicKeyByID(int topicNum) {
 		for (TopicKey topicKey : set) {
@@ -33,7 +31,7 @@ public class TopicKeySet {
 	}
 	
 	public TopicKeySet(String filename) throws FileNotFoundException {
-		set = new HashSet<TopicKey>();
+		set = new HashSet<>();
 		loadFromFile(filename);
 	}
 
@@ -49,8 +47,8 @@ public class TopicKeySet {
 			
 			TopicKey tk = new TopicKey();
 			
-			tk.topicNum = (new Integer(items[0])).intValue();
-			tk.alpha = (new Double(items[1])).doubleValue();
+			tk.topicNum = (Integer.valueOf(items[0])).intValue();
+			tk.alpha = (Double.valueOf(items[1])).doubleValue();
 			
 			for (int i=2;i<items.length;i++) {
 				tk.words.add(items[i]);
@@ -58,7 +56,7 @@ public class TopicKeySet {
 			
 			set.add(tk);
 			
-			if (DEBUG)
+			if (Constants._DEBUG)
 				printStringArray(items);
 		}
 		
@@ -66,9 +64,6 @@ public class TopicKeySet {
 		for (TopicKey tk : set) {
 			System.out.println(tk);
 		}
-		
-
-		
 	}
 
 	private void printStringArray(String[] items) {
@@ -77,5 +72,4 @@ public class TopicKeySet {
 		}
 		System.out.println();
 	}
-	
 }

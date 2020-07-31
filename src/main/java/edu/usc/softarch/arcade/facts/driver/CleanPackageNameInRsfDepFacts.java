@@ -18,8 +18,7 @@ public class CleanPackageNameInRsfDepFacts {
 		List<List<String>> depFacts = RsfReader.unfilteredFacts;
 		
 		
-		try {
-			FileWriter out = new FileWriter(cleanDepsFilename);
+		try (FileWriter out = new FileWriter(cleanDepsFilename)) {
 			for (List<String> fact : depFacts) {
 				String rel = fact.get(0);
 				String source = fact.get(1);
@@ -40,12 +39,7 @@ public class CleanPackageNameInRsfDepFacts {
 			
 			out.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-
 	}
-
 }

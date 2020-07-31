@@ -1,7 +1,6 @@
 package edu.usc.softarch.arcade.jira;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -19,10 +18,9 @@ public class JiraUtil {
 		try {
 			xml = FileUtil.readFile(filename,StandardCharsets.UTF_8);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		List<Issue> issuesList = (List<Issue>)xstream.fromXML(xml);
-		return issuesList;
+		// issuesList
+		return (List<Issue>)xstream.fromXML(xml);
 	}
 }

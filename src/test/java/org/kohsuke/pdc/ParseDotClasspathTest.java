@@ -1,7 +1,5 @@
 package org.kohsuke.pdc;
 
-import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +22,6 @@ public class ParseDotClasspathTest {
 		try {
 			ParseDotClasspath.main(pushPullClasspath);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -35,9 +32,7 @@ public class ParseDotClasspathTest {
 		try {
 			ParseDotClasspath.main(hadoopClasspath);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
 }

@@ -1,59 +1,57 @@
 package edu.usc.softarch.arcade.classgraphs;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import edu.usc.softarch.arcade.Constants;
 
 /**
  * @author joshua
- *
  */
 public class StringEdge implements Serializable {
-
-	/**
-	 * 
-	 */
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -4787247799445316839L;
 	public ArchElemType srcType = null;
 	public ArchElemType tgtType = null;
 	public String srcStr = "";
 	public String tgtStr = "";
 	public String type = "";
+	private static Logger logger = LogManager.getLogger(StringEdge.class);
+	// #endregion FIELDS ---------------------------------------------------------
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public StringEdge() {
-		super();
-	}
+	// #region CONSTRUCTORS ------------------------------------------------------
+	public StringEdge() { super(); }
 
 	public StringEdge(String srcStr, String tgtStr) {
 		this.srcStr = srcStr;
 		this.tgtStr = tgtStr;
 	}
-	
+	// #endregion CONSTRUCTORS ---------------------------------------------------
+
+	// #region ACCESSORS ---------------------------------------------------------
+	public String getType() { return type; }
+
+	public void setType(String type) { this.type = type; }
+	// #endregion ACCESSORS ------------------------------------------------------
+
+	// #region PROCESSING --------------------------------------------------------
 	public boolean equals(Object o) {
-		boolean localDebug = false;
+		if(!(o instanceof StringEdge))
+			return false;
 		
 		StringEdge e = (StringEdge) o;
 		
-		if (localDebug) {
-			System.out.println("e.srcStr: " + e.srcStr);
-			System.out.println("this.srcStr: " + this.srcStr);
-			System.out.println("e.tgtStr: " + e.tgtStr);
-			System.out.println("this.tgtStr: " + this.tgtStr);
+		if (Constants._DEBUG) {
+			logger.info("e.srcStr: " + e.srcStr);
+			logger.info("this.srcStr: " + this.srcStr);
+			logger.info("e.tgtStr: " + e.tgtStr);
+			logger.info("this.tgtStr: " + this.tgtStr);
 		}
-		if (e.srcStr.equals(this.srcStr) &&
-				    e.tgtStr.equals(this.tgtStr)) {
-			return true;
-		}
-		else {
-			return false;
-		}
+
+		return (e.srcStr.equals(this.srcStr) && e.tgtStr.equals(this.tgtStr));
 	}
 	
 	/**
@@ -65,30 +63,22 @@ public class StringEdge implements Serializable {
 	public int hashCode() {
 		int result = srcStr.hashCode();
 		result = 37 * result + tgtStr.hashCode();
-		// etc for all fields in the object
-		// This will only work for 5 fields before you overflow and lose input
-		// from the first field.
-		// The optimal prime multiplier is near Math.exp( Math.log(
-		// Integer.MAX_VALUE ) / numberOfFields) )
-		// This technique samples output from all the component Objects but
-		// mushes it together with information form the other fields.
 		return result;
 	}
 	
+	@Override
 	public String toString() {
 		return "(" + srcStr + "," + tgtStr + ")";
 	}
 	
 	public String toDotString() {
-		if (type.equals("extends")) {
-			return "\t\"" + srcStr + "\" -> \"" + tgtStr + "\"[arrowhead=\"empty\"];";
-		}
-		
-			return "\t\"" + srcStr + "\" -> \"" + tgtStr + "\";";
+		String result = "\t\"" + srcStr + "\" -> \"" + tgtStr + "\"";
+		result += type.equals("extends") ? "[arrowhead=\"empty\"];" : ";";
+		return result;
 	}
 
-	public String toNumberedNodeDotString(HashMap<String,Integer> map) {
+	public String toNumberedNodeDotString(Map<String,Integer> map) {
 		return "\t\"" + map.get(srcStr) + "\" -> \"" + map.get(tgtStr) + "\";";
 	}
-
+	// #endregion PROCESSING -----------------------------------------------------
 }

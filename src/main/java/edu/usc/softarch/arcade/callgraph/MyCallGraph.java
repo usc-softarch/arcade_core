@@ -6,25 +6,17 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
-
-import edu.usc.softarch.arcade.callgraph.MethodEdge;
-import edu.usc.softarch.arcade.classgraphs.StringEdge;
-
+import java.util.Set;
 
 /**
  * @author joshua
- *
  */
 public class MyCallGraph implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7989577593008055517L;
-	HashSet<MethodEdge> edges = new HashSet<MethodEdge>();
+	HashSet<MethodEdge> edges = new HashSet<>();
 	
-	public HashSet<MethodEdge> getEdges() {
-		HashSet<MethodEdge> copyEdges = new HashSet<MethodEdge>(edges);
+	public Set<MethodEdge> getEdges() {
+		HashSet<MethodEdge> copyEdges = new HashSet<>(edges);
 		return copyEdges;
 	}
 	
@@ -58,7 +50,7 @@ public class MyCallGraph implements Serializable {
 		
 		int edgeCount = 0;
 		while(iter.hasNext()) {
-			MethodEdge e = (MethodEdge) iter.next();
+			MethodEdge e = iter.next();
 			str += edgeCount + ": " + e.toString();
 			if(iter.hasNext()) {
 				str+="\n";
@@ -82,8 +74,8 @@ public class MyCallGraph implements Serializable {
 		obj_out.writeObject ( this );
 	}
 
-	public HashSet<MyMethod> getTargetEdges(MyMethod src) {
-		HashSet<MyMethod> targetMethods = new HashSet<MyMethod>();
+	public Set<MyMethod> getTargetEdges(MyMethod src) {
+		Set<MyMethod> targetMethods = new HashSet<>();
 		for (MethodEdge me : edges) {
 			if ( me.src.equals(src) ) {
 				targetMethods.add(me.tgt);

@@ -1,8 +1,5 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +20,7 @@ public class ConcernClusterRsf {
 	public static Set<ConcernCluster> extractConcernClustersFromRsfFile(String rsfFilename) {
 		RsfReader.loadRsfDataFromFile(rsfFilename);
 		Iterable<List<String>> clusterFacts = RsfReader.filteredRoutineFacts;
-		Set<ConcernCluster> clusters = new HashSet<ConcernCluster>();
+		Set<ConcernCluster> clusters = new HashSet<>();
 		for (List<String> fact : clusterFacts) {
 			String clusterName = fact.get(1).trim();
 			String element = fact.get(2).trim();
@@ -43,6 +40,4 @@ public class ConcernClusterRsf {
 		}
 		return clusters;
 	}
-
-	
 }

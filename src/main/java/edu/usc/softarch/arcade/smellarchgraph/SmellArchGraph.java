@@ -6,9 +6,10 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,26 +24,19 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import edu.usc.softarch.arcade.classgraphs.StringEdge;
 import edu.usc.softarch.arcade.clustering.Cluster;
-import edu.usc.softarch.arcade.config.Config;
 
 
 /**
  * @author joshua
- *
  */
 public class SmellArchGraph implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8029563985930798840L;
-	HashSet<ClusterEdge> edges;
+	Set<ClusterEdge> edges;
 	
 	public SmellArchGraph() {
 		super();
-		edges = new HashSet<ClusterEdge>();
+		edges = new HashSet<>();
 	}
 	
 	public void addEdge(Cluster src, Cluster tgt) {
@@ -75,7 +69,7 @@ public class SmellArchGraph implements Serializable {
 		
 		int edgeCount = 0;
 		while(iter.hasNext()) {
-			ClusterEdge e = (ClusterEdge) iter.next();
+			ClusterEdge e = iter.next();
 			str += edgeCount + ": " + e.toDotString();
 			if(iter.hasNext()) {
 				str+="\n";
@@ -86,15 +80,13 @@ public class SmellArchGraph implements Serializable {
 		return str;
 	}
 	
-	public void writeDotFile(String filename) throws FileNotFoundException, UnsupportedEncodingException {
+	public void writeDotFile(String filename) throws FileNotFoundException {
 		File f = new File(filename);
-		if (f.getParentFile() != null) {
-			if (!f.getParentFile().exists()) {
-				f.getParentFile().mkdirs();
-			}
+		if (f.getParentFile() != null && !f.getParentFile().exists()) {
+			f.getParentFile().mkdirs();
 		}
 		FileOutputStream fos = new FileOutputStream(f);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8"); 
+		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8); 
 		PrintWriter out = new PrintWriter(osw);
 		
 		Iterator<ClusterEdge> iter = edges.iterator();
@@ -102,7 +94,7 @@ public class SmellArchGraph implements Serializable {
 		out.println("digraph G {");
 		
 		while(iter.hasNext()) {
-			ClusterEdge e = (ClusterEdge) iter.next();
+			ClusterEdge e = iter.next();
 			out.println(e.toDotString());
 		}
 		
@@ -143,6 +135,5 @@ public class SmellArchGraph implements Serializable {
 		  System.out.println("In " + Thread.currentThread().getStackTrace()[1].getClassName() 
 				  + ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
 				  + ", Wrote " + filename);
-		
 	}
 }

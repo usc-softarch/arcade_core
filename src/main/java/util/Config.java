@@ -8,7 +8,6 @@ public class Config {
 
 	Properties prop = null;
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 
 		Config config = new Config("config/hadoop.properties");
 		System.out.println(config.getValue("DEP_CON_ACDC"));
@@ -21,7 +20,6 @@ public class Config {
 			try {
 				prop.load(inputStream);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}else{

@@ -1,14 +1,9 @@
 package edu.usc.softarch.arcade.topics;
 
-import java.util.Iterator;
-import java.util.Vector;
-
 import edu.usc.softarch.arcade.util.Stemmer;
-
 
 /**
  * @author joshua
- *
  */
 public class StringPreProcessor {
 	
@@ -33,7 +28,6 @@ public class StringPreProcessor {
 	public static String camelCaseSeparate(String str) {
 		char prevChar = '\0';
 		String camelCaseSepStr = "";
-		Vector<Integer> splitPositions = new Vector<Integer>();
 		for (int i=0;i<str.length();i++) {
 			char currChar = str.charAt(i);
 			if (!Character.isLetter(currChar)) {
@@ -49,8 +43,6 @@ public class StringPreProcessor {
 		}
 		
 		camelCaseSepStr = camelCaseSepStr.toLowerCase();
-		//System.out.println(camelCaseSepStr);
 		return camelCaseSepStr;
-		
 	}
 }

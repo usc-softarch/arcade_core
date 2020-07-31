@@ -13,9 +13,6 @@ import net.rcarz.jiraclient.JiraException;
 
 
 public class JiraClientExample {
-
-	private static final String JIRA_URL = "https://issues.apache.org/jira";
-	
 	public static void main(String[] args) throws Exception {
 
         BasicCredentials creds = new BasicCredentials("batman", "pow! pow!");
@@ -137,7 +134,7 @@ public class JiraClientExample {
             newIssue.link("TEST-123", "Dependency");
 
             /* Create sub-task */
-            Issue subtask = newIssue.createSubtask()
+            newIssue.createSubtask()
                 .field(Field.SUMMARY, "replace lightbulb")
                 .execute();
 

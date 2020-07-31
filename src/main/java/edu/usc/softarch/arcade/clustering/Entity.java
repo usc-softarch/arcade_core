@@ -3,8 +3,8 @@ package edu.usc.softarch.arcade.clustering;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-
 
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 
@@ -13,7 +13,7 @@ public class Entity
 	public String name;
 	public Set <String> featureSet = new HashSet<String>();
 	public BitSet featureVector = new BitSet();
-	public HashMap<Integer,Double> nonZeroFeatureMap = new HashMap<Integer,Double>();
+	public Map<Integer,Double> nonZeroFeatureMap = new HashMap<>();
 	public int numOfEntities = 1;
 	public DocTopicItem docTopicItem;
 	public int getNumEntities()
@@ -26,7 +26,7 @@ public class Entity
 	}
 	public void initializeNonZeroFeatureMap(int bitSetSize)
 	{
-		nonZeroFeatureMap = new HashMap<Integer,Double>();
+		nonZeroFeatureMap = new HashMap<>();
 		for (int i=0;i<bitSetSize;i++) 
 		{
 			if (featureVector.get(i))
@@ -45,14 +45,14 @@ public class Entity
 			
 			Double newFeatureValue = null;
 			if (c1Value == null && c2Value != null) {
-				newFeatureValue = new Double( (c2Value*c2.getNumEntities()) /(c1.getNumEntities()+c2.getNumEntities()));
+				newFeatureValue = Double.valueOf( (c2Value*c2.getNumEntities()) /(c1.getNumEntities()+c2.getNumEntities()));
 				
 			}
 			else if (c2Value == null && c1Value != null) {
-				newFeatureValue = new Double((c1Value*c1.getNumEntities())/(c1.getNumEntities()+c2.getNumEntities()));
+				newFeatureValue = Double.valueOf((c1Value*c1.getNumEntities())/(c1.getNumEntities()+c2.getNumEntities()));
 			}
 			else if (c1Value != null && c2Value != null) {
-				newFeatureValue = new Double((c1Value*c1.getNumEntities()+ c2Value*c2.getNumEntities())/(c1.getNumEntities()+c2.getNumEntities()));
+				newFeatureValue = Double.valueOf((c1Value*c1.getNumEntities()+ c2Value*c2.getNumEntities())/(c1.getNumEntities()+c2.getNumEntities()));
 			}
 			
 			if (newFeatureValue != null)

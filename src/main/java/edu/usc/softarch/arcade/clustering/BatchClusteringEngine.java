@@ -1,11 +1,9 @@
-
 package edu.usc.softarch.arcade.clustering;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -14,7 +12,6 @@ import org.apache.log4j.PropertyConfigurator;
 
 import com.google.common.base.Joiner;
 
-import edu.usc.softarch.arcade.DriverEngine;
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
@@ -62,16 +59,6 @@ public class BatchClusteringEngine {
 			logger.debug("Processing directory: " + folder.getName());
 			String revisionNumber = folder.getName();
 			String fullClassesDir = folder.getAbsolutePath() + File.separatorChar + inClassesDir;
-			//			Handle classes for cxf
-//			String fullClassesDir = folder.getAbsolutePath().substring(0, folder.getAbsolutePath().length()-4).replace("src", "binary") + File.separatorChar + inClassesDir;
-			//			Handle classes for camel
-//			String fullClassesDir = folder.getAbsolutePath().replace("src", "bin") + File.separatorChar + inClassesDir;
-			// Handle calasses for  wicket 6.0
-//			String fullClassesDir = folder.getAbsolutePath().replace("src_2", "bin") + "-bin" + File.separatorChar + inClassesDir;		
-			// Handle calasses for  nutch 
-//			String fullClassesDir = folder.getAbsolutePath().replace("src", "bin") + "-bin" + File.separatorChar + inClassesDir;
-			// Handle calasses for  openjpa 
-//			String fullClassesDir = folder.getAbsolutePath().replace("src", "bin").replace("-source", "") + File.separatorChar + inClassesDir;
 			
 			File classesDirFile = new File(fullClassesDir);
 			if (!classesDirFile.exists()) {
@@ -79,7 +66,6 @@ public class BatchClusteringEngine {
 			}
 
 			String depsRsfFilename = outputDirName + File.separatorChar + revisionNumber + "_deps.rsf";
-			String[] builderArgs = { fullClassesDir, depsRsfFilename };
 			File depsRsfFile = new File(depsRsfFilename);
 			if (!depsRsfFile.getParentFile().exists())
 				depsRsfFile.getParentFile().mkdirs();
@@ -92,7 +78,7 @@ public class BatchClusteringEngine {
 				}
 			}
 			
-			builder.build(builderArgs);
+			builder.build(fullClassesDir, depsRsfFilename);
 			if (builder.getEdges().size() == 0) {
 				return;
 			}
@@ -131,7 +117,7 @@ public class BatchClusteringEngine {
 					+ revisionNumber + "_" + numTopics + "_topics_"
 					+ runner.getFastClusters().size() + "_arc_clusters.rsf";
 			// need to build the map before writing the file
-			HashMap<String, Integer> clusterNameToNodeNumberMap = ClusterUtil
+			Map<String, Integer> clusterNameToNodeNumberMap = ClusterUtil
 					.createFastClusterNameToNodeNumberMap(runner
 							.getFastClusters());
 			ClusterUtil.writeFastClustersRsfFile(
@@ -142,8 +128,6 @@ public class BatchClusteringEngine {
 			Config.setDepsRsfFilename(depsRsfFile.getAbsolutePath());
 			String detectedSmellsFilename = outputDirName + File.separatorChar
 					+ revisionNumber + "_arc_smells.ser";
-			String[] smellArgs = { depsRsfFile.getAbsolutePath(),
-					arcClustersFilename, };
 
 			// Need to provide docTopics first
 			ArchSmellDetector.docTopics = TopicUtil.docTopics;
@@ -153,6 +137,4 @@ public class BatchClusteringEngine {
 			ArchSmellDetector.runAllDetectionAlgs(detectedSmellsFilename);
 		}
 	}
-
 }
-

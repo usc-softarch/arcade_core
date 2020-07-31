@@ -16,10 +16,6 @@ import edu.usc.softarch.arcade.util.FileUtil;
 public class BatchSmellDetectionRunner {
 
 	public static void main(String[] args) {
-		
-		
-		
-		String smellClassesFilename = args[0];
 		String gtRsfsDir = args[1];
 		String docTopicsFile = args[2];
 		String selectedLang = args[3];
@@ -68,12 +64,9 @@ public class BatchSmellDetectionRunner {
 			writer.close();
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
 }

@@ -12,16 +12,18 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -36,28 +38,19 @@ import soot.SootClass;
 
 /**
  * @author joshua
- *
  */
 public class ClassGraph implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -4718039019698373111L;
-	private HashSet<SootClassEdge> edges = new HashSet<SootClassEdge>();
+	private Set<SootClassEdge> edges = new HashSet<>();
 	
-	public ClassGraph() {
-		
-	}
+	public ClassGraph() { super(); }
 	
 	public void generateRsf() {
-		try {
-			Writer out = new BufferedWriter(new FileWriter(Config.getClassGraphRsfFilename()));
-		
+		try (Writer out = new BufferedWriter(new FileWriter(Config.getClassGraphRsfFilename()))) {
 			for (SootClassEdge edge : edges) {
 				out.write(edge.toRsf() + "\n");
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -75,8 +68,8 @@ public class ClassGraph implements Serializable {
 		obj_out.writeObject ( this );
 	}
 	
-	public ArrayList<SootClass> getNodes() {
-		ArrayList<SootClass> cgNodes = new ArrayList<SootClass>();
+	public List<SootClass> getNodes() {
+		List<SootClass> cgNodes = new ArrayList<>();
 		for (SootClassEdge e : edges) {
 			if (!cgNodes.contains(e.getTgt())) {
 				cgNodes.add(e.getTgt());
@@ -89,7 +82,7 @@ public class ClassGraph implements Serializable {
 		
 	}
 	
-	protected boolean hasClass(ArrayList<SootClass> cgNodes, SootClass inClass) {
+	protected boolean hasClass(List<SootClass> cgNodes, SootClass inClass) {
 		boolean hasClass = false;
 		for (SootClass c : cgNodes) {
 			if (inClass.toString().equals(c.toString())) {
@@ -99,8 +92,8 @@ public class ClassGraph implements Serializable {
 		return hasClass;
 	}
 	
-	public ArrayList<SootClass> getCallerClasses(SootClass c) {
-		ArrayList<SootClass> callerClasses = new ArrayList<SootClass>();
+	public List<SootClass> getCallerClasses(SootClass c) {
+		List<SootClass> callerClasses = new ArrayList<>();
 		for (SootClassEdge e : edges) {
 			if (e.getTgt().toString().equals(c.toString())) {
 				callerClasses.add(e.getSrc());
@@ -110,8 +103,8 @@ public class ClassGraph implements Serializable {
 		return callerClasses;
 	}
 	
-	public ArrayList<SootClass> getCalleeClasses(SootClass c) {
-		ArrayList<SootClass> calleeClasses = new ArrayList<SootClass>();
+	public List<SootClass> getCalleeClasses(SootClass c) {
+		List<SootClass> calleeClasses = new ArrayList<>();
 		for (SootClassEdge e : edges) {
 			if (e.getSrc().toString().equals(c.toString())) {
 				calleeClasses.add(e.getTgt());
@@ -138,14 +131,6 @@ public class ClassGraph implements Serializable {
 	}
 	
 	public boolean containsEdge(SootClass src, SootClass tgt, String type) {
-		/*Iterator<ClassEdge> iter = edges.iterator();
-		while(iter.hasNext()) {
-			ClassEdge e = (ClassEdge)iter.next();
-			if (e.equals(new ClassEdge(src,tgt))) {
-				return true;
-			}
-		}
-		return false;*/
 		return edges.contains(new SootClassEdge(src,tgt,type));
 	}
 	
@@ -158,7 +143,7 @@ public class ClassGraph implements Serializable {
 		String str = "";
 		
 		while(iter.hasNext()) {
-			SootClassEdge e = (SootClassEdge) iter.next();
+			SootClassEdge e = iter.next();
 			str += e.toString();
 			if(iter.hasNext()) {
 				str+=",";
@@ -173,7 +158,7 @@ public class ClassGraph implements Serializable {
 		String str = "";
 		
 		while(iter.hasNext()) {
-			SootClassEdge e = (SootClassEdge) iter.next();
+			SootClassEdge e = iter.next();
 			str += e.toStringWithArchElemType();
 			if(iter.hasNext()) {
 				str+=",";
@@ -187,7 +172,7 @@ public class ClassGraph implements Serializable {
 		return edges.size();
 	}
 	
-	public void writeDotFile(String filename) throws FileNotFoundException, UnsupportedEncodingException {
+	public void writeDotFile(String filename) throws FileNotFoundException {
 		File f = new File(filename);
 		if (f.getParentFile() != null) {
 			if (!f.getParentFile().exists()) {
@@ -195,16 +180,15 @@ public class ClassGraph implements Serializable {
 			}
 		}
 		FileOutputStream fos = new FileOutputStream(f);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8"); 
+		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8); 
 		PrintWriter out = new PrintWriter(osw);
 		
 		Iterator<SootClassEdge> iter = edges.iterator();
-		String str = "";
 		
 		out.println("digraph G {");
 		
 		while(iter.hasNext()) {
-			SootClassEdge e = (SootClassEdge) iter.next();
+			SootClassEdge e = iter.next();
 			out.println(e.toDotString());
 		}
 		
@@ -219,16 +203,15 @@ public class ClassGraph implements Serializable {
 			f.getParentFile().mkdirs();
 		}
 		FileOutputStream fos = new FileOutputStream(f);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8"); 
+		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8); 
 		PrintWriter out = new PrintWriter(osw);
 		
 		Iterator<SootClassEdge> iter = edges.iterator();
-		String str = "";
 		
 		out.println("digraph G {");
 		
 		while(iter.hasNext()) {
-			SootClassEdge e = (SootClassEdge) iter.next();
+			SootClassEdge e = iter.next();
 			out.println(e.toDotStringWithArchElemType());
 		}
 		
@@ -237,14 +220,14 @@ public class ClassGraph implements Serializable {
 		out.close();
 	}
 	
-	public void addElementTypes(HashMap<String,String> map) {
+	public void addElementTypes(Map<String,String> map) {
 		Iterator<SootClassEdge> iter = edges.iterator();
 		
 		System.out.println("Current Map: " + map);
 		System.out.println("Printing class edges with arch element type...");
 		while(iter.hasNext()) {
 			
-			SootClassEdge e = (SootClassEdge) iter.next();
+			SootClassEdge e = iter.next();
 			
 			String srcStr = e.getSrc().getName();
 			String tgtStr = e.getTgt().getName();
@@ -308,11 +291,9 @@ public class ClassGraph implements Serializable {
 		  System.out.println("In " + Thread.currentThread().getStackTrace()[1].getClassName() 
 				  + ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
 				  + ", Wrote " + Config.getXMLClassGraphFilename());
-		
 	}
 
-	public HashSet<SootClassEdge> getEdges() {
+	public Set<SootClassEdge> getEdges() {
 		return edges;
 	}
-	
 }

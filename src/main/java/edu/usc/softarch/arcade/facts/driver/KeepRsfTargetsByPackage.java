@@ -4,16 +4,13 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import edu.usc.softarch.arcade.config.Config;
 
@@ -32,18 +29,16 @@ public class KeepRsfTargetsByPackage {
 		logger.debug("Input facts:");
 		logger.debug(Joiner.on("\n").join(inputFacts));
 		
-		List<List<String>> filteredFacts = new ArrayList<List<String>>();
+		List<List<String>> filteredFacts = new ArrayList<>();
 		
 		for (List<String> fact : inputFacts) { 
 			String target = fact.get(2);
 			if (target.startsWith(packageToKeep)) { 
 				filteredFacts.add(fact); 
 			}
-			
 		}
 		
-		try {
-			FileWriter fw = new FileWriter(outputRsfFilename);
+		try (FileWriter fw = new FileWriter(outputRsfFilename)) {
 			BufferedWriter out = new BufferedWriter(fw);
 			System.out.println("Writing to file " + outputRsfFilename + "...");
 			for (List<String> fact : filteredFacts) {
@@ -54,7 +49,5 @@ public class KeepRsfTargetsByPackage {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
-
 }

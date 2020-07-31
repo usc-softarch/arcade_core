@@ -1,43 +1,33 @@
 package edu.usc.softarch.arcade.functiongraph;
 
 import java.io.Serializable;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
+import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
 
-
-
+//TODO Replace all occurrences of this with the superclass
 public class StringTypedEdge extends StringEdge implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 2367755143057728102L;
-	static Logger logger = Logger.getLogger(StringTypedEdge.class);
+	private static Logger logger = Logger.getLogger(StringTypedEdge.class);
 
 	public String arcTypeStr = "";
-	public String srcStr = "";
-	public String tgtStr = "";
 	
-	public StringTypedEdge() {
-		super();
-	}
+	public StringTypedEdge() { super(); }
 
 	public StringTypedEdge(String arcTypeStr, String srcStr, String tgtStr) {
-		super(srcStr,tgtStr);
+		super (srcStr, tgtStr);
 		this.arcTypeStr = arcTypeStr;
-		this.srcStr = srcStr;
-		this.tgtStr = tgtStr;
 	}
 	
 	public boolean equals(Object o) {
-		boolean localDebug = false;
+		if(!(o instanceof StringTypedEdge))
+			return false;
 		
 		StringTypedEdge e = (StringTypedEdge) o;
 		
-		if (localDebug) {
+		if (Constants._DEBUG) {
 			logger.debug("e.arcTypeStr: " + e.arcTypeStr);
 			logger.debug("this.arcTypeStr: " + this.arcTypeStr);
 			
@@ -47,16 +37,10 @@ public class StringTypedEdge extends StringEdge implements Serializable {
 			logger.debug("e.tgtStr: " + e.tgtStr);
 			logger.debug("this.tgtStr: " + this.tgtStr);
 		}
-		if (
-			e.srcStr.equals(this.srcStr) &&
+
+		return (e.srcStr.equals(this.srcStr) &&
 			e.tgtStr.equals(this.tgtStr) &&
-			e.arcTypeStr.equals(this.arcTypeStr)
-		   ) {
-			return true;
-		}
-		else {
-			return false;
-		}
+			e.arcTypeStr.equals(this.arcTypeStr));
 	}
 	
 	/**
@@ -69,22 +53,17 @@ public class StringTypedEdge extends StringEdge implements Serializable {
 		int result = srcStr.hashCode();
 		result = 37 * result + tgtStr.hashCode();
 		result = 37 * result + arcTypeStr.hashCode();
-		// etc for all fields in the object
-		// This will only work for 5 fields before you overflow and lose input
-		// from the first field.
-		// The optimal prime multiplier is near Math.exp( Math.log(
-		// Integer.MAX_VALUE ) / numberOfFields) )
-		// This technique samples output from all the component Objects but
-		// mushes it together with information form the other fields.
 		return result;
 	}
 	
+	@Override
 	public String toString() {
 		return "(" + arcTypeStr + "," + srcStr + "," + tgtStr + ")";
 	}
 	
+	@Override
 	public String toDotString() {
-		return "\t\"" + srcStr + "\" -> \"" + tgtStr + "\"[ label=\"" + arcTypeStr + "\" ];;";
+		return "\t\"" + srcStr + "\" -> \"" + tgtStr + "\"[ label=\""
+			+ arcTypeStr + "\" ];;";
 	}
-
 }

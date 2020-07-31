@@ -3,25 +3,19 @@ package edu.usc.softarch.arcade.clustering;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.util.ExtractionContext;
-
 
 /**
  * @author joshua
- *
  */
 class UnbiasedEllenbergComparator extends SimMeasureComparator implements
 		Comparator<Cluster>, Serializable {
 
-	boolean DEBUG = false;
-
-	/**
-* 
-*/
 	private static final long serialVersionUID = -5406183535441641044L;
 	
 	public int compare(Cluster c1, Cluster c2) {
-		if (DEBUG) {
+		if (Constants._DEBUG) {
 			System.out.println("\tIn "
 					+ ExtractionContext.getCurrentClassAndMethodName());
 			System.out.println("\tc1: " + c1);
@@ -40,12 +34,12 @@ class UnbiasedEllenbergComparator extends SimMeasureComparator implements
 			return 0;
 		}
 
-		Double unbiasedEllenbergC2 = new Double(SimCalcUtil.getUnbiasedEllenbergMeasure(c2,
+		Double unbiasedEllenbergC2 = Double.valueOf(SimCalcUtil.getUnbiasedEllenbergMeasure(c2,
 				refCluster));
 
 		int returnValue = unbiasedEllenbergC2.compareTo(SimCalcUtil.getUnbiasedEllenbergMeasure(c1,
 				refCluster));
-		if (DEBUG)
+		if (Constants._DEBUG)
 			System.out.println("\tUnbiasedEllenbergComparator's return value: " + returnValue);
 
 		return returnValue;

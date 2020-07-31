@@ -16,7 +16,6 @@ public class BunchClusterToRsfClusterConverter {
 		String inBunchClusterFilename = args[0];
 		String outClusterRsfFilename = args[1];
 		
-		
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(new File(outClusterRsfFilename)));
 			Scanner scanner = new Scanner(new File(inBunchClusterFilename));
@@ -38,13 +37,9 @@ public class BunchClusterToRsfClusterConverter {
 			
 			out.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
-
 }

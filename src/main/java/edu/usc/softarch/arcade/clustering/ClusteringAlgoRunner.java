@@ -1,12 +1,10 @@
 package edu.usc.softarch.arcade.clustering;
 
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -20,8 +18,8 @@ import edu.usc.softarch.arcade.util.FileListing;
 public class ClusteringAlgoRunner {
 
 	private static Logger logger = Logger.getLogger(ClusteringAlgoRunner.class);
-	protected static ArrayList<FastCluster> fastClusters;
-	public static ArrayList<FastCluster> getFastClusters() {
+	protected static List<FastCluster> fastClusters;
+	public static List<FastCluster> getFastClusters() {
 		return fastClusters;
 	}
 
@@ -32,10 +30,10 @@ public class ClusteringAlgoRunner {
 	protected static int numberOfEntitiesToBeClustered = 0;
 	
 	protected static void initializeClusters(String srcDir) {
-		fastClusters = new ArrayList<FastCluster>();
+		fastClusters = new ArrayList<>();
 
 		for (String name : fastFeatureVectors.getFeatureVectorNames()) {
-			BitSet featureSet = (BitSet) fastFeatureVectors
+			BitSet featureSet = fastFeatureVectors
 					.getNameToFeatureSetMap().get(name);
 			FastCluster fastCluster = new FastCluster(name, featureSet,
 					fastFeatureVectors.getNamesInFeatureSet());
@@ -43,20 +41,17 @@ public class ClusteringAlgoRunner {
 			addClusterConditionally(fastCluster);
 		}
 		
-		
-		
 		try {
 			if (fastClusters.isEmpty()) {
 				List<File> javaFiles = FileListing.getFileListing(new File(srcDir),
 						".java");
 				
 				for (File javaFile : javaFiles) {
-					FastCluster cluster = new FastCluster(javaFile.getPath().toString());
+					FastCluster cluster = new FastCluster(javaFile.getPath());
 					fastClusters.add(cluster);
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -67,7 +62,7 @@ public class ClusteringAlgoRunner {
 
 		logger.debug("Listing initial cluster names using indexed loop...");
 		for (int i = 0; i < fastClusters.size(); i++) {
-			FastCluster cluster = (FastCluster) fastClusters.get(i);
+			FastCluster cluster = fastClusters.get(i);
 			logger.debug(cluster.getName());
 		}
 
@@ -106,10 +101,9 @@ public class ClusteringAlgoRunner {
 			}
 			fastClusters.add(fastCluster);
 		}
-		if (Config.getSelectedLanguage().equals(Language.java)) {
-			if (Config.isClassInSelectedPackages(fastCluster.getName())) {
-					fastClusters.add(fastCluster);
-			}
+		if (Config.getSelectedLanguage().equals(Language.java) && 
+			Config.isClassInSelectedPackages(fastCluster.getName())) {
+				fastClusters.add(fastCluster);
 		}
 	}
 

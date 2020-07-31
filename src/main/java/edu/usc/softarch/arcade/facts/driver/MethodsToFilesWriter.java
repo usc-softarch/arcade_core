@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -49,22 +48,17 @@ public class MethodsToFilesWriter {
 		Map<String,String> methodToContentMap = new HashMap<String,String>();
 		
 		Set<String> langKeywords = new HashSet<String>();
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(langKeywordsFilename));
+		try (BufferedReader in = new BufferedReader(new FileReader(langKeywordsFilename))) {
 			String word = null;
 			while ((word = in.readLine()) != null) {
 				word = word.trim();
 				langKeywords.add(word);
 			}
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 		
 		extractMethodInfo(fileName, methodToContentMap);
 
@@ -130,20 +124,14 @@ public class MethodsToFilesWriter {
 
 			}
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
 	}
 
 	private static void extractMethodInfo(String fileName,
@@ -171,16 +159,11 @@ public class MethodsToFilesWriter {
 
 					Element classElement = (Element) nNode;
 
-					// logger.debug(temp + " - " + eElement.getTextContent());
-
 					if (getTagValue("name", classElement) == null) {
 						continue;
 					}
 
 					String containerName = getContainerNameOfClassElement(classElement);
-
-					// String containerName =
-					// getPackageNameOfClassElement(classElement);
 
 					String className = getTagValue("name", classElement);
 
@@ -192,7 +175,7 @@ public class MethodsToFilesWriter {
 							.getElementsByTagName("constructor");
 
 					for (int fIndex = 0; fIndex < constructorList.getLength(); fIndex++) {
-						Node constructorNode = (Node) constructorList
+						Node constructorNode = constructorList
 								.item(fIndex);
 						if (constructorNode.getNodeType() == Node.ELEMENT_NODE) {
 							Element constructorElement = (Element) constructorNode;
@@ -218,7 +201,7 @@ public class MethodsToFilesWriter {
 							.getElementsByTagName("function");
 
 					for (int fIndex = 0; fIndex < functionList.getLength(); fIndex++) {
-						Node functionNode = (Node) functionList.item(fIndex);
+						Node functionNode = functionList.item(fIndex);
 						if (functionNode.getNodeType() == Node.ELEMENT_NODE) {
 							Element functionElement = (Element) functionNode;
 							Element nameElement = getChildElementByTagName(
@@ -239,13 +222,6 @@ public class MethodsToFilesWriter {
 					}
 
 					classCounter++;
-
-					/*
-					 * if (getTagValue("name", eElement) == null) {
-					 * logger.debug(temp + "block: " + getTagValue("block",
-					 * eElement)); }
-					 */
-
 				}
 			}
 		} catch (Exception e) {
@@ -318,49 +294,7 @@ public class MethodsToFilesWriter {
 		return null;
 	}
 	
-	private static String getPackageNameOfClassElement(Element classElement) {
-		Node currNode = classElement.getPreviousSibling();
-		if (currNode == null) {
-			currNode = classElement.getParentNode();
-		}
-		
-		Element currElement = null;
-		
-	    while (currNode.getNodeType() != Node.ELEMENT_NODE) {
-			currNode = currNode.getPreviousSibling();
-			if (currNode == null) {
-				currNode = classElement.getParentNode();
-			}
-			if (currNode.getNodeType() == Node.ELEMENT_NODE) {
-				currElement = (Element)currNode;
-			}
-	    }
-	    
-	    while (!currElement.getNodeName().equals("package")) {
-			Node prevNode = currNode;
-			currNode = currNode.getPreviousSibling();
-			if (currNode == null) {
-				currNode = prevNode.getParentNode();
-				if (currNode.getNodeType() == Node.ELEMENT_NODE) {
-					currElement = (Element) currNode;
-				}
-			}
-			else {
-				if (currNode.getNodeType() == Node.ELEMENT_NODE) {
-					currElement = (Element) currNode;
-				}
-			}
-		}
-	    
-	    Element packageElement = currElement;
-		String packageName = getPackageNameFromPackageElement(packageElement);
-		
-		return packageName;
-		
-	}
-	
 	private static String getContainerNameOfClassElement(Element classElement) {
-		
 		String containerName = "";
 		
 		Element currElement = null;
@@ -373,7 +307,6 @@ public class MethodsToFilesWriter {
 						currElement);
 			}
 		}
-		
 		
 		while (currNode.getNodeType() != Node.ELEMENT_NODE) {
 			Node prevNode = currNode;
@@ -388,7 +321,6 @@ public class MethodsToFilesWriter {
 			}
 		}
 		currElement = (Element)currNode;
-		
 		
 		while (!currElement.getNodeName().equals("package")) {
 			Node prevNode = currNode;
@@ -415,10 +347,8 @@ public class MethodsToFilesWriter {
 			containerName = packageName + "." + containerName;
 		else
 			containerName = packageName;
-		
-		
+	
 		return containerName;
-		
 	}
 
 	private static String updateContainerName(String containerName,
@@ -431,23 +361,4 @@ public class MethodsToFilesWriter {
 		}
 		return containerName;
 	}
-	
-	private static Element getPreviousSiblingNonNullElement(Node currNode) {
-		Element currElement = null;
-		
-		while (currNode != null || currElement == null) {
-			currNode = currNode.getPreviousSibling();
-			
-			if (currNode==null) {
-				continue;
-			}
-			
-			if (currNode.getNodeType() == Node.ELEMENT_NODE) {
-				currElement = (Element)currNode;
-			}
-		}
-		
-		return null;
-	}
-
 }

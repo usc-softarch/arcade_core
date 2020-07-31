@@ -5,11 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -51,17 +51,15 @@ import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.topics.WordTopicCounts;
 import edu.usc.softarch.arcade.topics.WordTopicItem;
 
-
 /**
  * @author joshua
- *
  */
 
 public class ADADetector {
 	
 	public static void runSmellDetectionAlgorithms(
-			ArrayList<Cluster> splitClusters) throws IOException,
-			ClassNotFoundException, FileNotFoundException,
+			List<Cluster> splitClusters) throws IOException,
+			ClassNotFoundException,
 			ParserConfigurationException, SAXException, TransformerException {
 		System.out.println("In "
 				+ Thread.currentThread().getStackTrace()[1].getClassName()
@@ -69,14 +67,13 @@ public class ADADetector {
 				+ Thread.currentThread().getStackTrace()[1].getMethodName()
 				+ ",");
 		ClusterUtil.generateLeafClusters(splitClusters);
-		// ClusterUtil.printItemsInClusters(splitClusters);
 
 		generateTopicsForSplitClusters(splitClusters);
 		printTopicsForSplitClusters(splitClusters);
 
-		HashMap<String, MyClass> classesWithUsedMethods = (HashMap<String, MyClass>) deserializeHashMap(Config
+		Map<String, MyClass> classesWithUsedMethods = (Map<String, MyClass>) deserializeHashMap(Config
 				.getClassesWithUsedMethodsFilename());
-		HashMap<String, MyMethod> unusedMethods = (HashMap<String, MyMethod>) deserializeHashMap(Config
+		Map<String, MyMethod> unusedMethods = (Map<String, MyMethod>) deserializeHashMap(Config
 				.getUnusedMethodsFilename());
 
 		System.out.println("Printing classes with used methods...");
@@ -101,7 +98,7 @@ public class ADADetector {
 		writeOutGraphsAndSmellArchToFiles(splitClusters, clusterGraph,
 				smellArchGraph);
 		
-		HashSet<TopicKey> topicKeys = TopicUtil.getTopicKeyListForCurrProj().set;
+		Set<TopicKey> topicKeys = TopicUtil.getTopicKeyListForCurrProj().set;
 		ClusterUtil.readInSmellArchFromXML(
 				Config.getSpecifiedSmallArchFromXML(), splitClusters, topicKeys);
 		
@@ -129,7 +126,6 @@ public class ADADetector {
 		TopicKeySet topicKeySet = TopicUtil.getTopicKeyListForCurrProj();
 		WordTopicCounts wordTopicCounts = TopicUtil
 				.getWordTopicCountsForCurrProj();
-		HashSet<String> stopWordsSet = TopicUtil.getStopWordSet();
 
 		System.out
 				.println("Computing word-topic probabilities for all words and topics...");
@@ -151,7 +147,7 @@ public class ADADetector {
 		
 		int scatteredParasiticFunctionalityCount = 0;
 		System.out.println("Finding instances of scattered parasitic functionality...");
-		scatteredParasiticFunctionalityCount = findScatteredParasiticFunctionalitySmells(splitClusters,scatteredParasiticFunctionalityCount);
+		scatteredParasiticFunctionalityCount = findScatteredParasiticFunctionalitySmells(splitClusters);
 		
 		int procCallBasedExtraneousConnectorCount = 0;
 		System.out.println("Finding procedure call-based extraneous connector smells...");
@@ -167,9 +163,9 @@ public class ADADetector {
 		
 		int unstableBrickDependencyCount = 0;
 		System.out.println("Finding Unstable Brick Dependencies smells...");
-		HashMap<String,Double> brickStabilityMap = new HashMap<String,Double>();
-		HashMap<String,Integer> brickFanInMap = new HashMap<String,Integer>();
-		HashMap<String,Integer> brickFanOutMap = new HashMap<String,Integer>();
+		Map<String,Double> brickStabilityMap = new HashMap<>();
+		Map<String,Integer> brickFanInMap = new HashMap<>();
+		Map<String,Integer> brickFanOutMap = new HashMap<>();
 		for (Cluster firstCluster : splitClusters) {
 			System.out.println("Current cluster: " + firstCluster);
 			int fanOut = 0;
@@ -188,7 +184,7 @@ public class ADADetector {
 					System.out.println("\tIncoming edge" + stringEdge);
 				}
 			}
-			double stability = (double)((double)fanOut/(double)(fanOut + fanIn));
+			double stability = ((double)fanOut/(double)(fanOut + fanIn));
 			System.out.println("\tstability: " + stability);
 			brickStabilityMap.put(firstCluster.name, stability);
 		}
@@ -202,24 +198,7 @@ public class ADADetector {
 			}
 		}
 		
-		SimpleDirectedGraph<String, DefaultEdge>  directedGraph = new SimpleDirectedGraph<String,DefaultEdge>(DefaultEdge.class);
-		
-		/*String v1 = "v1";
-        String v2 = "v2";
-        String v3 = "v3";
-        String v4 = "v4";
-
-        // add the vertices
-        directedGraph.addVertex(v1);
-        directedGraph.addVertex(v2);
-        directedGraph.addVertex(v3);
-        directedGraph.addVertex(v4);
-
-        // add edges to create a circuit
-        directedGraph.addEdge(v1, v2);
-        directedGraph.addEdge(v2, v3);
-        directedGraph.addEdge(v3, v4);
-        directedGraph.addEdge(v4, v1);*/
+		SimpleDirectedGraph<String, DefaultEdge>  directedGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
         
         for (Cluster splitCluster : splitClusters) {
         	directedGraph.addVertex(splitCluster.name);
@@ -230,22 +209,11 @@ public class ADADetector {
         		directedGraph.addEdge(stringEdge.srcStr, stringEdge.tgtStr);
         }
         
-        /*System.out.println("Printing out directed graph...");
-        System.out.println(directedGraph);*/
-        
         System.out.println("Finding cycles...");	
         CycleDetector cycleDetector = new CycleDetector(directedGraph);
         Set<String> cycleSet =  cycleDetector.findCycles();
         System.out.println("Printing the cycle set...");
         System.out.println(cycleSet);
-        
-       /* System.out.println();
-        System.out.println("Printing the cycles of each vertex in the cycle set....");
-        HashSet<Set<>>
-        for (String clusterName : cycleSet) {
-        	System.out.println(cycleDetector.findCyclesContainingVertex(clusterName));
-        	System.out.println();
-        }*/
         
         System.out.println("Printing the strongly connected sets of the graph....");
         StrongConnectivityInspector inspector = new StrongConnectivityInspector(directedGraph);
@@ -271,7 +239,7 @@ public class ADADetector {
         	int totalEdges = currFanIn + currFanOut;
         	sumEdges += totalEdges;
         }
-        double meanEdges = (double)((double)sumEdges/(double)splitClusters.size());
+        double meanEdges = ((double)sumEdges/(double)splitClusters.size());
         System.out.println("mean edges: " + meanEdges);
 		
         int sumForVar = 0;
@@ -281,7 +249,7 @@ public class ADADetector {
         	int totalEdges = currFanIn + currFanOut;
         	sumForVar += Math.pow(totalEdges-meanEdges,2);
         }
-        double variance = (double)((double)sumForVar/(double)splitClusters.size());
+        double variance = ((double)sumForVar/(double)splitClusters.size());
         
         double stdDev = Math.sqrt(variance);
         
@@ -320,7 +288,7 @@ public class ADADetector {
 		System.out.println("Brick Use Overload count: " + brickUseOverloadCount);
 	}
 
-	private static boolean haveMatchingTopicItem(ArrayList<TopicItem> topics,
+	private static boolean haveMatchingTopicItem(List<TopicItem> topics,
 			TopicItem inTopicItem) {
 		for (TopicItem currTopicItem : topics) {
 			if (currTopicItem.topicNum == inTopicItem.topicNum) {
@@ -352,7 +320,7 @@ public class ADADetector {
 	}
 	
 	private static void writeMethodInfoToXML(
-			ArrayList<Cluster> splitClusters, MyCallGraph myCallGraph) throws ParserConfigurationException, TransformerException {
+			List<Cluster> splitClusters, MyCallGraph myCallGraph) throws ParserConfigurationException, TransformerException {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory
 				.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -408,7 +376,7 @@ public class ADADetector {
 	}
 
 	private static int determineAmbiguousInterface(
-			ArrayList<Cluster> splitClusters, MyCallGraph myCallGraph,
+			List<Cluster> splitClusters, MyCallGraph myCallGraph,
 			int ambiguousInterfaceCount) {
 		for (Cluster splitCluster : splitClusters) {
 			System.out.println("Current cluster: " + splitCluster);
@@ -419,7 +387,7 @@ public class ADADetector {
 					if (myMethod.getParams().size() == 1 && myMethod.isPublic) {
 						System.out
 								.println("\t\t\tCandidate Ambiguous Interface");
-						HashSet<MyMethod> targetEdges = myCallGraph
+						Set<MyMethod> targetEdges = myCallGraph
 								.getTargetEdges(myMethod);
 						System.out.println("\t\t\ttarget edges size: "
 								+ targetEdges.size());
@@ -446,7 +414,7 @@ public class ADADetector {
 	}
 
 	private static void computeWordTopicProbabilitiesAndSpecifityTypesForMethods(
-			ArrayList<Cluster> splitClusters, TopicKeySet topicKeySet,
+			List<Cluster> splitClusters, TopicKeySet topicKeySet,
 			WordTopicCounts wordTopicCounts) throws IOException,
 			ParserConfigurationException, SAXException {
 		for (Cluster splitCluster : splitClusters) {
@@ -477,8 +445,8 @@ public class ADADetector {
 					System.out.println("\t\tProcssed method name: "
 							+ processedMethodName);
 
-					HashMap<Integer, String> positionWordMap = new HashMap<Integer, String>();
-					HashMap<Integer, Double> queryGivenTopicProbabilitiesMap = new HashMap<Integer, Double>();
+					Map<Integer, String> positionWordMap = new HashMap<>();
+					Map<Integer, Double> queryGivenTopicProbabilitiesMap = new HashMap<>();
 
 					computeQueryGivenTopicProbabilitiesMap(topicKeySet,
 							wordTopicCounts, processedMethodName,
@@ -486,7 +454,7 @@ public class ADADetector {
 
 					System.out.println();
 					determineTopicForMethod(topicKeySet, myMethod,
-							positionWordMap, queryGivenTopicProbabilitiesMap);
+							queryGivenTopicProbabilitiesMap);
 
 				}
 			}
@@ -494,14 +462,11 @@ public class ADADetector {
 	}
 
 	private static void determineTopicForMethod(TopicKeySet topicKeySet,
-			MyMethod myMethod, HashMap<Integer, String> positionWordMap,
-			HashMap<Integer, Double> queryGivenTopicProbabilitiesMap)
+			MyMethod myMethod, Map<Integer, Double> queryGivenTopicProbabilitiesMap)
 			throws IOException, ParserConfigurationException, SAXException {
 		int mostProbableTopic = -1;
 		double highestProbSoFar = 0;
 		for (TopicKey topicKey : topicKeySet.set) {
-			String wordName = positionWordMap
-					.get(topicKey.topicNum);
 			Double currProb = queryGivenTopicProbabilitiesMap
 					.get(topicKey.topicNum);
 			System.out.println("\t\t\ttopic: " + topicKey.topicNum);
@@ -537,12 +502,11 @@ public class ADADetector {
 	private static void computeQueryGivenTopicProbabilitiesMap(
 			TopicKeySet topicKeySet, WordTopicCounts wordTopicCounts,
 			String processedMethodName,
-			HashMap<Integer, String> positionWordMap,
-			HashMap<Integer, Double> queryGivenTopicProbabilitiesMap) {
+			Map<Integer, String> positionWordMap,
+			Map<Integer, Double> queryGivenTopicProbabilitiesMap) {
 		for (TopicKey topicKey : topicKeySet.set) {
 			String[] wordsInMethodName = processedMethodName
 					.split(" ");
-			int topicCount = 0;
 
 			double probabilitySum = 0;
 			for (String word : wordsInMethodName) {
@@ -554,10 +518,6 @@ public class ADADetector {
 						.getWordTopicItems().get(word);
 
 				positionWordMap.put(topicKey.topicNum, wtItem.name);
-				/*
-				 * if (stopWordsSet.contains(wtItem.name.trim())) {
-				 * continue; }
-				 */
 
 				double probWordGivenTopic = wtItem
 						.probabilityWordGivenTopic(topicKey.topicNum);
@@ -573,26 +533,26 @@ public class ADADetector {
 
 			System.out.println("\t\t\tProbability sum for topic "
 					+ topicKey.topicNum + ": " + probabilitySum);
-			double probabilityAverage = (double) ((double) probabilitySum / (double) wordsInMethodName.length);
+			double probabilityAverage = (probabilitySum / (double) wordsInMethodName.length);
 
 			System.out
 					.println("\t\t\tProbability avg for topic "
 							+ topicKey.topicNum + ": "
 							+ probabilityAverage);
 			queryGivenTopicProbabilitiesMap.put(topicKey.topicNum,
-					new Double(probabilityAverage));
+					Double.valueOf(probabilityAverage));
 		}
 	}
 
 	private static void printUnusedMethods(
-			HashMap<String, MyMethod> unusedMethods) {
+			Map<String, MyMethod> unusedMethods) {
 		for (MyMethod m : unusedMethods.values()) {
 			System.out.println("\t" + m.toString());
 		}
 
 	}
 
-	private static void printInterfacesOfClusters(ArrayList<Cluster> splitClusters) {
+	private static void printInterfacesOfClusters(List<Cluster> splitClusters) {
 		for (Cluster cluster : splitClusters) {
 			System.out.println("Printing interfaces of cluster " + cluster);
 			for (MyClass myClass : cluster.getClasses()) {
@@ -604,7 +564,7 @@ public class ADADetector {
 	}
 
 	private static void determineInterfacesForClusters(
-			ArrayList<Cluster> splitClusters, HashMap<String, MyClass> classes) {
+			List<Cluster> splitClusters, Map<String, MyClass> classes) {
 		for (Cluster cluster : splitClusters) {
 			System.out.println("Determining interfaces for cluster " + cluster);
 			cluster.instantiateClasses();
@@ -613,8 +573,7 @@ public class ADADetector {
 						leaf.toString().length() - 1);
 				System.out.println("\t" + strippedLeafClusterName);
 				if (classes.containsKey(strippedLeafClusterName)) {
-					MyClass myClass = (MyClass) classes
-							.get(strippedLeafClusterName);
+					MyClass myClass = classes.get(strippedLeafClusterName);
 					cluster.add(myClass);
 				}
 
@@ -626,7 +585,7 @@ public class ADADetector {
 
 
 	private static void printClassesWithUsedMethods(
-			HashMap<String, MyClass> classesWithMethodsInMyCallGraph) {
+			Map<String, MyClass> classesWithMethodsInMyCallGraph) {
 		for (MyClass c : classesWithMethodsInMyCallGraph.values()) {
 			System.out.println("Showing linked methods in " + c + "...");
 			System.out.println(c.methodsToString(1));
@@ -635,7 +594,7 @@ public class ADADetector {
 
 	
 	private static void printTopicsForSplitClusters(
-			ArrayList<Cluster> splitClusters) {
+			List<Cluster> splitClusters) {
 		System.out
 				.println("Printing document-topic distribution for each split cluster...");
 		for (Cluster splitCluster : splitClusters) {
@@ -646,13 +605,13 @@ public class ADADetector {
 	}
 	
 	private static void generateTopicsForSplitClusters(
-			ArrayList<Cluster> splitClusters) {
+			List<Cluster> splitClusters) {
 		DocTopics docTopics = null;
 		docTopics = TopicUtil.getDocTopicsFromFile();
 
 		for (Cluster splitCluster : splitClusters) {
 			System.out.println("Current split cluster: " + splitCluster);
-			ArrayList<Cluster> currLeafClusters = splitCluster.leafClusters;
+			List<Cluster> currLeafClusters = splitCluster.leafClusters;
 			int leafCounter = 0;
 
 			String strippedLeafSplitClusterName = ConfigUtil
@@ -674,18 +633,16 @@ public class ADADetector {
 
 			Cluster refLeaf = getClusterForReferenceOfTopics(currLeafClusters);
 
-			// verifyDocTopicOrder(splitCluster, currLeafClusters);
+			List<TopicItem> topics = createZeroProportionTopicsFromReference(refLeaf);
 
-			ArrayList<TopicItem> topics = createZeroProportionTopicsFromReference(refLeaf);
-
-			int nonAnonInnerClassLeafCounter = calculateNewTopicProportionsForSplitClusters(
+			calculateNewTopicProportionsForSplitClusters(
 					splitCluster, currLeafClusters, topics);
 
 		}
 	}
 	
 	private static void setDocTopicForEachLeafCluster(DocTopics docTopics,
-			ArrayList<Cluster> currLeafClusters, int leafCounter) {
+			List<Cluster> currLeafClusters, int leafCounter) {
 		for (Cluster leaf : currLeafClusters) {
 			System.out.println("\t" + leafCounter + ": " + leaf);
 			TopicUtil.setDocTopicForCluster(docTopics, leaf);
@@ -693,7 +650,7 @@ public class ADADetector {
 	}
 	
 	private static int findUnusedInterfaceSmells(
-			HashMap<String, MyMethod> unusedMethods, int unusedInterfaceCount) {
+			Map<String, MyMethod> unusedMethods, int unusedInterfaceCount) {
 		System.out.println("Number of unused methods: "
 				+ unusedMethods.values().size());
 		for (MyMethod myMethod : unusedMethods.values()) {
@@ -706,7 +663,7 @@ public class ADADetector {
 	}
 
 	private static int findBrickConcernOverloadSmells(
-			ArrayList<Cluster> splitClusters, int brickConcernOverloadCount) {
+			List<Cluster> splitClusters, int brickConcernOverloadCount) {
 		for (Cluster firstCluster : splitClusters) {
 			System.out.println("Current cluster: " + firstCluster);
 
@@ -720,7 +677,7 @@ public class ADADetector {
 			double proportionThreshold = 0.20;
 			int concernNumberThreshold = 1;
 
-			ArrayList<TopicItem> relevantTopics = new ArrayList<TopicItem>();
+			List<TopicItem> relevantTopics = new ArrayList<>();
 			for (TopicItem currTopicItem : firstCluster.docTopicItem.topics) {
 				if (currTopicItem.proportion >= proportionThreshold) {
 					relevantTopics.add(currTopicItem);
@@ -749,7 +706,7 @@ public class ADADetector {
 	}
 
 	private static int findProcCalBasedExtraneousConnectors(
-			ArrayList<Cluster> splitClusters, StringGraph clusterGraph,
+			List<Cluster> splitClusters, StringGraph clusterGraph,
 			int procCallBasedExtraneousConnectorCount) {
 		for (Cluster firstCluster : splitClusters) {
 			System.out.println("Current cluster: " + firstCluster);
@@ -856,7 +813,7 @@ public class ADADetector {
 	}
 
 	private static Cluster findDifferentClusterThatDependsOnConnector(
-			Cluster compCluster, Cluster connCluster, ArrayList<Cluster> splitClusters, StringGraph clusterGraph) {
+			Cluster compCluster, Cluster connCluster, List<Cluster> splitClusters, StringGraph clusterGraph) {
 		for (Cluster cluster : splitClusters) {
 			if (!cluster.name.equals(compCluster.name)) {
 				for (StringEdge stringEdge : clusterGraph.edges ) {
@@ -891,7 +848,7 @@ public class ADADetector {
 	}
 
 	private static Cluster getClusterByName(String tgtStr,
-			ArrayList<Cluster> splitClusters) {
+			List<Cluster> splitClusters) {
 		for (Cluster cluster : splitClusters) {
 			if (cluster.name.equals(tgtStr))
 				return cluster;
@@ -901,12 +858,11 @@ public class ADADetector {
 	}
 
 	private static int findScatteredParasiticFunctionalitySmells(
-			ArrayList<Cluster> splitClusters,
-			int scatteredParasiticFunctionalityCount) {
+			List<Cluster> splitClusters) {
 		double threshold1 = 0.30;
 		double threshold2 = 0.30;
 		
-		HashSet<TopicItem> scatteredTopics = new HashSet<TopicItem>();
+		Set<TopicItem> scatteredTopics = new HashSet<>();
 		
 		for (Cluster firstCluster : splitClusters) {
 			System.out.println("Current cluster: " + firstCluster);
@@ -963,7 +919,7 @@ public class ADADetector {
 	}
 	
 	private static void writeOutGraphsAndSmellArchToFiles(
-			ArrayList<Cluster> splitClusters, StringGraph clusterGraph,
+			List<Cluster> splitClusters, StringGraph clusterGraph,
 			SmellArchGraph smellArchGraph) {
 		try {
 			clusterGraph.writeDotFile(Config.getClusterGraphDotFilename());
@@ -974,16 +930,10 @@ public class ADADetector {
 			
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -1001,7 +951,7 @@ public class ADADetector {
 	}
 
 	private static int findUnacceptablyHighConnectorConcernSmells(
-			ArrayList<Cluster> splitClusters,
+			List<Cluster> splitClusters,
 			int unacceptablyHighConnectorConcernCount) {
 		for (Cluster splitCluster : splitClusters) {
 			System.out.println("Current cluster: " + splitCluster);
@@ -1040,7 +990,7 @@ public class ADADetector {
 	}
 
 	private static int findConnectorInterfaceImplementationSmells(
-			ArrayList<Cluster> splitClusters, int connectorInterfaceImplCount) {
+			List<Cluster> splitClusters, int connectorInterfaceImplCount) {
 		for (Cluster splitCluster : splitClusters) {
 			System.out.println("Current cluster: " + splitCluster);
 
@@ -1101,8 +1051,8 @@ public class ADADetector {
 	
 
 	private static int calculateNewTopicProportionsForSplitClusters(
-			Cluster splitCluster, ArrayList<Cluster> currLeafClusters,
-			ArrayList<TopicItem> topics) {
+			Cluster splitCluster, List<Cluster> currLeafClusters,
+			List<TopicItem> topics) {
 		int leafCounter;
 		leafCounter = 0;
 		System.out.println("Creating new topic items for split cluster: "
@@ -1161,10 +1111,10 @@ public class ADADetector {
 		return nonAnonInnerClassLeafCounter;
 	}
 
-	private static ArrayList<TopicItem> createZeroProportionTopicsFromReference(
+	private static List<TopicItem> createZeroProportionTopicsFromReference(
 			Cluster refLeaf) {
 		System.out.println("Copying first leafs topics to new topics...");
-		ArrayList<TopicItem> topics = new ArrayList<TopicItem>();
+		List<TopicItem> topics = new ArrayList<>();
 		for (TopicItem topicItem : refLeaf.docTopicItem.topics) {
 			topics.add(new TopicItem(topicItem));
 		}
@@ -1184,7 +1134,7 @@ public class ADADetector {
 	}
 
 	private static Cluster getClusterForReferenceOfTopics(
-			ArrayList<Cluster> currLeafClusters) {
+			List<Cluster> currLeafClusters) {
 		Cluster refLeaf = null;
 		for (Cluster leaf : currLeafClusters) {
 			if (leaf.docTopicItem != null) {

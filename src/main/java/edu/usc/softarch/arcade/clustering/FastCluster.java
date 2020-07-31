@@ -1,17 +1,17 @@
 package edu.usc.softarch.arcade.clustering;
 
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 
 public class FastCluster {
-	
 	private String name;
 	private int numEntities;
-	private HashMap<Integer,Double> nonZeroFeatureMap = new HashMap<Integer,Double>();
+	private Map<Integer,Double> nonZeroFeatureMap = new HashMap<>();
 	private int featuresLength = 0;
 	public DocTopicItem docTopicItem;
 	
@@ -23,11 +23,11 @@ public class FastCluster {
 		this.featuresLength = featuresLength;
 	}
 
-	public HashMap<Integer, Double> getNonZeroFeatureMap() {
+	public Map<Integer, Double> getNonZeroFeatureMap() {
 		return nonZeroFeatureMap;
 	}
 
-	public void setNonZeroFeatureMap(HashMap<Integer, Double> nonZeroFeatureMap) {
+	public void setNonZeroFeatureMap(Map<Integer, Double> nonZeroFeatureMap) {
 		this.nonZeroFeatureMap = nonZeroFeatureMap;
 	}
 
@@ -39,28 +39,18 @@ public class FastCluster {
 		this.name = name;
 	}
 	
-	public FastCluster(String name, BitSet featureSet, ArrayList<String> namesInFeatureSet) {
+	public FastCluster(String name, BitSet featureSet, List<String> namesInFeatureSet) {
 		this.name = name;
 		featuresLength = namesInFeatureSet.size();
-		/*features = new double[featureLength];
-		for (int i=0;i<featureLength;i++) {
-			if (featureSet.get(i)) {
-				features[i] = 1;
-			}
-			else {
-				features[i] = 0;
-			}
-		}*/
 		
-		nonZeroFeatureMap = new HashMap<Integer,Double>();
+		nonZeroFeatureMap = new HashMap<>();
 		for (int i=0;i<featuresLength;i++) {
 			if (featureSet.get(i)) {
 				double one = 1;
 				nonZeroFeatureMap.put(i,one);
 			}
 			else {
-				/*Don't put anythigng*/
-				
+				/*Don't put anything*/
 			}
 		}
 		this.numEntities = 1;
@@ -71,21 +61,9 @@ public class FastCluster {
 		this.numEntities = 1;
 	}
 
-	public FastCluster() {
-		// TODO Auto-generated constructor stub
-	}
+	public FastCluster() { super(); }
 
 	public FastCluster(FastCluster c1, FastCluster c2) {
-		/*double[] features1 = c1.getFeatures();
-		double[] features2 = c2.getFeatures();
-		double[] newFeatures = new double[features1.length];
-		
-		for (int i=0;i<features1.length;i++) {
-			double featureSum = features1[i] + features2[i];
-			double newFeatureVal = featureSum/(c1.getNumEntities()+c2.getNumEntities());
-			newFeatures[i] = newFeatureVal;
-		}*/
-		
 		Set<Integer> c1Indices = c1.getNonZeroFeatureMap().keySet();
 		setNonZeroFeatureMapForWcaUsingIndices(c1, c2, c1Indices);
 		
@@ -93,9 +71,6 @@ public class FastCluster {
 		setNonZeroFeatureMapForWcaUsingIndices(c1, c2, c2Indices);
 		
 		this.name = c1.getName() + ',' + c2.getName();
-		
-		/*this.features = new double[features1.length];
-		System.arraycopy(newFeatures, 0, this.features, 0, this.features.length);*/
 
 		this.numEntities = c1.getNumEntities() + c2.getNumEntities();
 		this.featuresLength = c1.getFeaturesLength();
@@ -127,14 +102,14 @@ public class FastCluster {
 			
 			Double newFeatureValue = null;
 			if (c1Value == null && c2Value != null) {
-				newFeatureValue = new Double( (c2Value*c2.getNumEntities()) /(c1.getNumEntities()+c2.getNumEntities()));
+				newFeatureValue = Double.valueOf( (c2Value*c2.getNumEntities()) /(c1.getNumEntities()+c2.getNumEntities()));
 				
 			}
 			else if (c2Value == null && c1Value != null) {
-				newFeatureValue = new Double((c1Value*c1.getNumEntities())/(c1.getNumEntities()+c2.getNumEntities()));
+				newFeatureValue = Double.valueOf((c1Value*c1.getNumEntities())/(c1.getNumEntities()+c2.getNumEntities()));
 			}
 			else if (c1Value != null && c2Value != null) {
-				newFeatureValue = new Double((c1Value*c1.getNumEntities()+ c2Value*c2.getNumEntities())/(c1.getNumEntities()+c2.getNumEntities()));
+				newFeatureValue = Double.valueOf((c1Value*c1.getNumEntities()+ c2Value*c2.getNumEntities())/(c1.getNumEntities()+c2.getNumEntities()));
 			}
 			
 			if (newFeatureValue != null)
@@ -151,14 +126,14 @@ public class FastCluster {
 			
 			Double newFeatureValue = null;
 			if (c1Value == null && c2Value != null) {
-				newFeatureValue = new Double(c2Value/(c1.getNumEntities()+c2.getNumEntities()));
+				newFeatureValue = Double.valueOf(c2Value/(c1.getNumEntities()+c2.getNumEntities()));
 				
 			}
 			else if (c2Value == null && c1Value != null) {
-				newFeatureValue = new Double(c1Value/(c1.getNumEntities()+c2.getNumEntities()));
+				newFeatureValue = Double.valueOf(c1Value/(c1.getNumEntities()+c2.getNumEntities()));
 			}
 			else if (c1Value != null && c2Value != null) {
-				newFeatureValue = new Double((c1Value + c2Value)/(c1.getNumEntities()+c2.getNumEntities()));
+				newFeatureValue = Double.valueOf((c1Value + c2Value)/(c1.getNumEntities()+c2.getNumEntities()));
 			}
 			
 			if (newFeatureValue != null)

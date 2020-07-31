@@ -1,20 +1,16 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -26,29 +22,17 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import com.google.common.base.Joiner;
 
 import cc.mallet.util.Maths;
 import edu.usc.softarch.arcade.MetricsDriver;
-import edu.usc.softarch.arcade.clustering.ConcernClusteringRunner;
-import edu.usc.softarch.arcade.clustering.FastCluster;
-import edu.usc.softarch.arcade.clustering.Feature;
-import edu.usc.softarch.arcade.clustering.FeatureVector;
 import edu.usc.softarch.arcade.clustering.SimCalcUtil;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
-import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.config.ConfigUtil;
-import edu.usc.softarch.arcade.topics.DocTopicItem;
-import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.clustering.Entity;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 
 public class ReverseAnalysis 
 {	
-	static Map<String,Integer> featureNameToBitsetIndex = new HashMap<String,Integer>();
+	static Map<String,Integer> featureNameToBitsetIndex = new HashMap<>();
 	static int bitSetSize = 0;
 	BufferedWriter out;
 	enum SimilarityMeasure {UELLENBERG, JS, LIMBO, BUNCH, UNM, PKG};
@@ -62,17 +46,17 @@ public class ReverseAnalysis
 			Map<String, Map<String, Entity>> clusterNameToEntities,
 			Map<String, Set<MutablePair<String, String>>> internalEdgeMap,
 			Map<String, Set<MutablePair<String, String>>> externalEdgeMap,
-			HashMap<String,Integer> pkgSizeMap)
+			Map<String,Integer> pkgSizeMap)
 			throws IOException
 	{
-		Map<String,Set<String>> clusterNameToEntitiesNames = new HashMap<String,Set<String>>();
+		Map<String,Set<String>> clusterNameToEntitiesNames = new HashMap<>();
 		for (String clusterName : clusterNameToEntities.keySet()) {
 
 			Map<String, Entity> nameToEntity = clusterNameToEntities
 					.get(clusterName);
 			Object[] entities = nameToEntity.values().toArray();
 
-			Set<String> entityNames = new HashSet<String>();
+			Set<String> entityNames = new HashSet<>();
 			for (Object obj : entities) {
 				Entity entity = (Entity) obj;
 				entityNames.add(entity.name);
@@ -86,7 +70,6 @@ public class ReverseAnalysis
 		for(String clusterName: clusterNameToEntities.keySet())
 		{
 			out.write(clusterName + ",");
-			Map<String, Entity> nameToEntity = clusterNameToEntities.get(clusterName);
 			
 			System.out.println("CLUSTER NAME: " + clusterName);
 			
@@ -123,11 +106,8 @@ public class ReverseAnalysis
 		out.close();
 	}
 	
-	private static HashMap<String, Integer> computePkgSizes(List<List<String>> pkgFacts) {
-		HashMap<String,Integer> pkgSizeMap = new HashMap<String,Integer>();
-		
-		
-		
+	private static Map<String, Integer> computePkgSizes(List<List<String>> pkgFacts) {
+		Map<String,Integer> pkgSizeMap = new HashMap<>();
 		for (List<String> fact : pkgFacts) {
 			String pkgName = fact.get(1);
 
@@ -136,14 +116,12 @@ public class ReverseAnalysis
 			} else {
 				pkgSizeMap.put(pkgName, 1);
 			}
-			
 		}
-		
 		
 		return pkgSizeMap;
 	}
 
-	private double computePkgClusterSim(String clusterName,Map<String,Map<String,Entity>> clusterNameToEntities,HashMap<String,Integer> pkgSizeMap) {
+	private double computePkgClusterSim(String clusterName,Map<String,Map<String,Entity>> clusterNameToEntities,Map<String,Integer> pkgSizeMap) {
 		Map<String, Entity> nameToEntity = clusterNameToEntities
 				.get(clusterName);
 		Object[] entities = nameToEntity.values().toArray();
@@ -153,7 +131,7 @@ public class ReverseAnalysis
 			return 0;
 		}
 
-		List<String> entityNames = new ArrayList<String>();
+		List<String> entityNames = new ArrayList<>();
 		for (Object obj : entities) {
 			Entity entity = (Entity) obj;
 			entityNames.add(entity.name);
@@ -173,13 +151,13 @@ public class ReverseAnalysis
 			throw new RuntimeException("Invalid language selected");
 		}
 
-		Map<String, Integer> pkgCountMap = new HashMap<String, Integer>();
+		Map<String, Integer> pkgCountMap = new HashMap<>();
 		for (Object obj : entities) {
 			Entity entity = (Entity) obj;
 			
 				String[] tokens = entity.name.split(regexDelimiter);
 				String directoryName = "";
-				List<String> directoryNameParts = new ArrayList<String>();
+				List<String> directoryNameParts = new ArrayList<>();
 				for (int i=0;i<tokens.length-1;i++) {
 					directoryNameParts.add(tokens[i]);
 				}
@@ -193,7 +171,6 @@ public class ReverseAnalysis
 				}
 		}
 
-		Collection<Integer> pkgCounts = pkgCountMap.values();
 		int maxCount = 0;
 		String maxPkgName = "";
 		boolean maxUpdated = false;
@@ -220,14 +197,8 @@ public class ReverseAnalysis
 		}
 		assert pkgSize != 0;
 
-		double samePkgToClusterSizeRatio = (double) maxCount
-				/ (double) entities.length;
-		double samePkgToPkgSizeRatio = (double)maxCount/(double)pkgSize;
-		double simValWithSize = (samePkgToClusterSizeRatio+samePkgToPkgSizeRatio)/2;
-		double simValNoSize = samePkgToClusterSizeRatio;
-
-		return simValNoSize;
-
+		//samePkgToClusterSizeRatio
+		return(double) maxCount	/ (double) entities.length;
 	}
 	
 	/**method calculates the average sim measure for a cluster 
@@ -236,20 +207,11 @@ public class ReverseAnalysis
 	{
 		if(sm == SimilarityMeasure.BUNCH)
 		{
-			double countInternalEdges = 0.0;
-			double countExternalEdges = 0.0;
 			Set<MutablePair<String,String>> intEdges = internalEdgeMap.get(clusterName);
 			Set<MutablePair<String,String>> extEdges = externalEdgeMap.get(clusterName);
-			for (MutablePair<String,String> edge : intEdges) 
-			{ 
-					countInternalEdges++;
-			}
-			for (MutablePair<String,String> edge : extEdges) 
-			{ 
-					countExternalEdges++;
-			}
-			double cf = (2*countInternalEdges)/((2*countInternalEdges) + countExternalEdges);
-			return cf;
+			double countInternalEdges = intEdges.size();
+			double countExternalEdges = extEdges.size();
+			return (2*countInternalEdges)/((2*countInternalEdges) + countExternalEdges);
 		} 
 		else {
 			Map<String, Entity> nameToEntity = clusterNameToEntities
@@ -270,8 +232,8 @@ public class ReverseAnalysis
 				}
 			}
 			System.out.println("Sum and n are " + sum + " " + n);
-			double average = (sum / n);
-			return average;
+			//return average
+			return (sum / n);
 		}
 	}
 	/**method to compute similarity between a pair of entities */
@@ -320,7 +282,7 @@ public class ReverseAnalysis
 			if (denom == 0) {
 				return denom;
 				}
-			return (double)0.5*sum11 / (denom);
+			return 0.5*sum11 / (denom);
 		}
 		else if(sm == SimilarityMeasure.JS)
 		{
@@ -332,19 +294,18 @@ public class ReverseAnalysis
 		}
 		else if(sm == SimilarityMeasure.UNM)
 		{
-			double result = 0.5*sum11/(0.5*sum11+2*((double)count10+(double)count01) + (double)count00 + (double)count11);
-			return result;
+			return 0.5*sum11/(0.5*sum11+2*((double)count10+(double)count01) + (double)count00 + (double)count11);
 		}
 		return 0;
 	}
 	
 	/** method that produces a feature vector bitset for each entity in each cluster **/
 	public Map<String,Map<String,Entity>> buildFeatureSetPerClusterEntity(Map<String,Set<String>> clusterMap, List<List<String>> depFacts) {
-		Map<String,Map<String,Entity>> map = new HashMap<String, Map<String,Entity>>();
+		Map<String,Map<String,Entity>> map = new HashMap<>();
 			
 		for (String clusterName : clusterMap.keySet()) 
 		{ // for each cluster name
-			Map<String,Entity> entityToFeatures = new HashMap<String,Entity>(); //using a map<String,Entity> instead of a list of entities so that getting the feature
+			Map<String,Entity> entityToFeatures = new HashMap<>(); //using a map<String,Entity> instead of a list of entities so that getting the feature
 			//vector for an Entity name will be faster. Mapping name of entity to Entity object.
 			for (List<String> depFact : depFacts) 
 			{
@@ -368,13 +329,13 @@ public class ReverseAnalysis
 						else //otherwise create new ones
 						{
 							entity = new Entity(source);
-							featureSet = new HashSet<String>();
+							featureSet = new HashSet<>();
 						}
 						featureSet.add(target); //adding target to set of features for that entity
 						entity.featureSet = featureSet;
 						if(featureNameToBitsetIndex.get(target) == null) //if this target has never been encountered yet
 						{
-							featureNameToBitsetIndex.put(target, new Integer(bitSetSize));
+							featureNameToBitsetIndex.put(target, Integer.valueOf(bitSetSize));
 							entity.featureVector.set(bitSetSize); //setting the spot for this feature as 1 in the entitie's feature vector
 							bitSetSize++;
 						}
@@ -386,13 +347,10 @@ public class ReverseAnalysis
 						entityToFeatures.put(source,entity);
 				}
 			}
-			
-				map.put(clusterName, entityToFeatures);
+			map.put(clusterName, entityToFeatures);
 		}
-
 		return map;
 	}
-	
 	
 	/*-----------------------------LIMBO STUFF--------------------------------------------*/
 	/**copied pasted*/
@@ -437,33 +395,11 @@ public class ReverseAnalysis
 	
 	
 	//----------------------DOCTOPICITEM STUFF----------------------------------------------------//
-	/** method to load doc-topic-item for each entity - reference ConcernClusteringRunner.initializeDocTopicsForEachFastCluster(), pretty much the same
-		/thing except instead of using FastClusters, this uses Entity data structure*/
-	/*private void initializeDocTopicsForEachEntity(Map<String,Map<String,Entity>> clusterNameToEntities) 
-	{
-		for(String clusterName: clusterNameToEntities.keySet())
-		{
-			Map<String, Entity> nameToEntity = clusterNameToEntities.get(clusterName);
-			Object[] entities = nameToEntity.values().toArray();
-			System.out.println("INCLUSTER NAME: " + clusterName);
-			for(String entityName: nameToEntity.keySet())
-			{
-				Entity entity = nameToEntity.get(entityName);
-				if (TopicUtil.docTopics == null)
-					TopicUtil.docTopics = TopicUtil.getDocTopicsFromVariableMalletDocTopicsFile();
-				if (entity.docTopicItem == null)
-					 TopicUtil.setDocTopicForEntity(TopicUtil.docTopics, entity);
-			}
-		}
-	
-	}*/
-	
 	private void initDocTopics(Map<String,Map<String,Entity>> clusterNameToEntities, String docTopicsFilename, String type) 
 	{
 		for(String clusterName: clusterNameToEntities.keySet())
 		{
 			Map<String, Entity> nameToEntity = clusterNameToEntities.get(clusterName);
-			Object[] entities = nameToEntity.values().toArray();
 			System.out.println("INCLUSTER NAME: " + clusterName);
 			for(String entityName: nameToEntity.keySet())
 			{
@@ -474,7 +410,6 @@ public class ReverseAnalysis
 					 TopicUtil.setDocTopicForEntity(TopicUtil.docTopics, entity, type);
 			}
 		}
-	
 	}
 	
 	/**
@@ -605,22 +540,10 @@ public class ReverseAnalysis
 	        System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
 	    }
 		
-		//RsfReader.loadRsfDataFromFile("archstudio4_deps (1).rsf");
-		//RsfReader.loadRsfDataFromFile("hadoop-0.19-odem-facts.rsf");
-		//RsfReader.loadRsfDataFromFile("bash_make_dep_facts.rsf");
-		//RsfReader.loadRsfDataFromFile("oodt_0.2_full_clean_odem_facts.rsf");
 		RsfReader.loadRsfDataFromFile(depsFilename);
-		//RsfReader.loadRsfDataFromFile("mozilla.flat.compact.Author#88AD5.clean.rsf");
-		//RsfReader.loadRsfDataFromFile("mozilla.static.flat.compact.rsf");
-		//RsfReader.loadRsfDataFromFile("mozilla.static.rel.rsf");
 		List<List<String>> depFacts = RsfReader.unfilteredFacts;	
 		
-		//RsfReader.loadRsfDataFromFile("archstudio4_clean_ground_truth_recovery.rsf");
-		//RsfReader.loadRsfDataFromFile("hadoop-0.19_ground_truth.rsf");
-		//RsfReader.loadRsfDataFromFile("bash_1.14_ground_truth_recovery.rsf");
-		//RsfReader.loadRsfDataFromFile("oodt_0.2_full_ground_truth_recovery.rsf");
 		RsfReader.loadRsfDataFromFile(authFilename);
-		//RsfReader.loadRsfDataFromFile("mozilla.static.flat.compact.rsf");
 		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
 		
 		RsfReader.loadRsfDataFromFile(pkgFilename);
@@ -638,7 +561,7 @@ public class ReverseAnalysis
 		Map<String, Set<MutablePair<String, String>>> externalEdgeMap = ClusterUtil
 				.buildExternalEdgesPerCluster(clusterMap, depFacts);
 		
-		HashMap<String,Integer> pkgSizeMap = computePkgSizes(pkgFacts);
+		Map<String,Integer> pkgSizeMap = computePkgSizes(pkgFacts);
 
 		Map<String,Map<String,Entity>> clusterNameToEntities = ra.buildFeatureSetPerClusterEntity(clusterMap,depFacts);
 		ra.initDocTopics(clusterNameToEntities, topicsFilename, langType); // -UNCOMMENT OUT FOR JSDIVERGENCE 
@@ -646,7 +569,6 @@ public class ReverseAnalysis
 		try {
 			ra.calculateResults(clusterNameToEntities, internalEdgeMap, externalEdgeMap, pkgSizeMap);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}     
 	}
@@ -665,7 +587,6 @@ public class ReverseAnalysis
 			out.write("PKG" + ",");
 			out.newLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 	}
@@ -691,21 +612,7 @@ public class ReverseAnalysis
 			for(String entityName: nameToEntity.keySet())
 			{
 				System.out.println("---Entity name--- : " + entityName);
-				Entity entity = nameToEntity.get(entityName);
-				//System.out.println("Entity's featureSet: ");
-			    //	Set<String> featureSet = entity.featureSet;
-				/*for(String featureName: featureSet)
-				{
-					System.out.println(featureName);
-				}*/
-				/*System.out.print("Feature vector bitset: ");
-				for(int i = 0; i < this.bitSetSize; i++)
-				{
-					System.out.print(entity.featureVector.get(i));
-				}*/
 			}
 		}
 	}
-	
-	
 }

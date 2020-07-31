@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -26,48 +25,11 @@ import edu.usc.softarch.arcade.util.FileUtil;
 public class SmellAnylazer {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-//		String inputDirectory = "E:\\ser_1";
-		
-		
-//		String inputDirectory = "F:\\cxf_data\\arc\\ser";
-//		String outputDirectory = "F:\\cxf_data\\excel\\arc_class";
-		
 		String inputDirectory = "E:\\android\\ser";
 		String outputDirectory = "E:\\android\\excel\\acdc_comp";
 		
-//		String inputDirectory = "F:\\ivy_data\\ivy_acdc\\ser";
-//		String outputDirectory = "F:\\ivy_data\\excel\\acdc_class";
-	
-//		String inputDirectory = "E:\\openjpa_data\\acdc\\ser";
-//		String outputDirectory = "E:\\openjpa_data\\excel\\pkg_class";		
-		
-//		String inputDirectory = "E:\\nutch_data\\pkg\\ser";
-//		String outputDirectory = "E:\\nutch_data\\excel\\pkg_class";
-		
-//		String inputDirectory = "E:\\lucene_data\\acdc\\ser";
-//		String outputDirectory = "E:\\lucene_data\\excel\\acdc_class";
-		
-		//		String inputDirectory = "F:\\continuum_data\\pkg\\ser";
-//		String outputDirectory = "F:\\continuum_data\\excel\\pkg_class";
-		// wicket
-//		String inputDirectory = "F:\\wicket_data\\arc\\ser";
-//		String outputDirectory = "F:\\wicket_data\\excel\\arc_class";
-//		
-//		String outputFileName = null;
-//		Scanner in = new Scanner(System.in);
-//		System.out.println("input directory:");
-//		inputDirectory = in.next();
-//		System.out.println("output directory:");
-//		outputDirectory = in.next();
-//		System.out.println("output file name:");
-//		outputFileName = in.next();
-		
 		Set<File> orderedSerFiles = getOrderedFiles(inputDirectory+"/");
-//		analyzeClassSmellnum(orderedSerFiles, outputDirectory);// "/Users/felicitia/Desktop/"+outputFileName);
-//		analyzeVersionSmellnum(orderedSerFiles, "E:\\output\\all.csv");
-		analyzeCompSmellnum(orderedSerFiles, outputDirectory); //"/Users/felicitia/Documents/Research/Arch_Decay/result/comp_smell/"+outputFileName);
+		analyzeCompSmellnum(orderedSerFiles, outputDirectory);
 	}
 
 	/**
@@ -82,7 +44,6 @@ public class SmellAnylazer {
 		try {
 			writer = new PrintWriter(outputPath);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		writer.println("version, bdc, buo, bco, spf, all");
@@ -123,10 +84,8 @@ public class SmellAnylazer {
 		try {
 			fileList = FileListing.getFileListing(new File(inputDirectory));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		fileList = FileUtil.sortFileListByVersion(fileList);
 
 		for (File file : fileList) {
 			if (file.getName().endsWith(".ser")) {
@@ -136,9 +95,7 @@ public class SmellAnylazer {
 		return orderedSerFiles;
 	}
 	
-	
 	/**
-	 * 
 	 * @param inputFiles
 	 * @param outputPath: full path without .xls
 	 */
@@ -199,7 +156,6 @@ public class SmellAnylazer {
 						entityMap.get(entity).all++;
 					}
 				}
-
 			}
 			
 			Iterator it = entityMap.entrySet().iterator();
@@ -229,13 +185,10 @@ public class SmellAnylazer {
 			workbook.write(os);  
 		    os.close(); 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}  
-		     
+		}    
 	}
 	/**
-	 * 
 	 * @param inputFiles
 	 * @param outputPath: full path WITHOUT .xls
 	 */
@@ -263,7 +216,7 @@ public class SmellAnylazer {
 			cell = row.createCell(5);
 			cell.setCellValue("all");
 			
-			Map<String, SmellCount> clusterMap = new HashMap<String, SmellCount>();
+			Map<String, SmellCount> clusterMap = new HashMap<>();
 
 			for (Smell smell : smells) {
 				Set<ConcernCluster> clusters = SmellUtil.getSmellClusters(smell);
@@ -322,9 +275,7 @@ public class SmellAnylazer {
 			workbook.write(os);  
 		    os.close(); 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}  
-		     
+		}    
 	}
 }

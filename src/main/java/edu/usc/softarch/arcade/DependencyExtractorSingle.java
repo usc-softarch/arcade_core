@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder;
 import edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder;
@@ -53,7 +52,6 @@ public class DependencyExtractorSingle {
 		
 		// depsRsfFilename is the file name of the dependencies rsf file (one is created per subdirectory of dir)
 		String depsRsfFilename = outputDir.getAbsolutePath() + File.separatorChar + versionFolderName + "_deps.rsf"; 
-		String[] builderArgs = {absoluteClassesDir,depsRsfFilename};
 		File depsRsfFile = new File(depsRsfFilename);
 		if (!depsRsfFile.getParentFile().exists())
 			depsRsfFile.getParentFile().mkdirs();
@@ -67,10 +65,9 @@ public class DependencyExtractorSingle {
 			}
 		}
 		
-		builder.build(builderArgs);
+		builder.build(absoluteClassesDir,depsRsfFilename);
 		if (builder.getEdges().size() == 0) {
 			return;
 		}
-		
 	}
 }

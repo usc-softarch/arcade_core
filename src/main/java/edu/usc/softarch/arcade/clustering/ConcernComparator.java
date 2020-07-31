@@ -3,8 +3,7 @@ package edu.usc.softarch.arcade.clustering;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import edu.usc.softarch.arcade.topics.DocTopics;
-import edu.usc.softarch.arcade.topics.TopicUtil;
+import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.util.ExtractionContext;
 
 
@@ -14,21 +13,16 @@ import edu.usc.softarch.arcade.util.ExtractionContext;
  */
 public class ConcernComparator extends SimMeasureComparator implements
 Comparator<Cluster>, Serializable {
-	boolean DEBUG = false;
-
-	/**
-* 
-*/
 	private static final long serialVersionUID = -5406183535441641044L;
 	
 	public int compare(Cluster c1, Cluster c2) {
 		if (refCluster == null) {
-			if (DEBUG)
+			if (Constants._DEBUG)
 					System.out.println("In ConcernComparator, refCluster is null");
 			return Integer.MAX_VALUE;
 		}
 		
-		if (DEBUG) {
+		if (Constants._DEBUG) {
 			System.out.println("\tIn "
 					+ ExtractionContext.getCurrentClassAndMethodName());
 			System.out.println("\tc1: " + c1);
@@ -49,12 +43,12 @@ Comparator<Cluster>, Serializable {
 			return Integer.MAX_VALUE;
 		}
 
-		Double concernMeasureC2 = new Double(SimCalcUtil.getJSDivergence(c1,
+		Double concernMeasureC2 = Double.valueOf(SimCalcUtil.getJSDivergence(c1,
 				refCluster));
 
 		int returnValue = concernMeasureC2.compareTo(SimCalcUtil.getJSDivergence(c2,
 				refCluster));
-		if (DEBUG)
+		if (Constants._DEBUG)
 			System.out.println("\tConcernComparator's return value: " + returnValue);
 
 		return returnValue;

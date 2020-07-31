@@ -1,7 +1,5 @@
 package edu.usc.softarch.arcade.util.graph;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,7 +37,5 @@ public class ClusterGraphDensityCalculator {
 		System.out.println("no. of edges: " + numEdges);
 		System.out.println("no. of vertices: " + numVertices);
 		System.out.println("graph density: " + graphDensity);
-
 	}
-
 }

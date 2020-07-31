@@ -104,8 +104,8 @@ public class MWBMatchingAlgorithm {
 
 	double[] pi;
 
-	List<Integer> eligibleS = new ArrayList<Integer>();
-	List<Integer> eligibleT = new ArrayList<Integer>();
+	List<Integer> eligibleS = new ArrayList<>();
+	List<Integer> eligibleT = new ArrayList<>();
 
 	public MWBMatchingAlgorithm() {
 		n = -1;
@@ -242,7 +242,7 @@ public class MWBMatchingAlgorithm {
 				for (int i = 0; i < n; i++) {
 					if (sMatches[i] == -1) {
 						sLabels[i] = EMPTY_LABEL;
-						eligibleS.add(new Integer(i));
+						eligibleS.add(Integer.valueOf(i));
 					}
 				}
 
@@ -309,7 +309,7 @@ public class MWBMatchingAlgorithm {
 							tLabels[j] = i;
 							pi[j] = diff;
 							if (pi[j] < TOL) {
-								eligibleT.add(new Integer(j));
+								eligibleT.add(Integer.valueOf(j));
 							}
 						}
 					}
@@ -324,7 +324,7 @@ public class MWBMatchingAlgorithm {
 
 				int i = tMatches[j];
 				sLabels[i] = j;
-				eligibleS.add(new Integer(i)); // ok to add twice
+				eligibleS.add(Integer.valueOf(i)); // ok to add twice
 			}
 		}
 
@@ -368,7 +368,7 @@ public class MWBMatchingAlgorithm {
 			} else if (tLabels[j] != NO_LABEL) {
 				pi[j] -= delta;
 				if (pi[j] < TOL) {
-					eligibleT.add(new Integer(j));
+					eligibleT.add(Integer.valueOf(j));
 				}
 			}
 		}
@@ -415,8 +415,6 @@ public class MWBMatchingAlgorithm {
 		int[] match = ma.getMatching();
 		for (int i = 0; i < match.length; i++) {
 			System.out.println(i + " : " + match[i]);
-
 		}
-
 	}
 }

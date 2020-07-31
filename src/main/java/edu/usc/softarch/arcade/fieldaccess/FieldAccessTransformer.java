@@ -5,18 +5,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import edu.usc.softarch.arcade.classgraphs.ClassGraph;
+import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.classgraphs.ClassGraphTransformer;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.datatypes.Proj;
-import edu.usc.softarch.arcade.topics.DocTopicItem;
-import edu.usc.softarch.arcade.topics.DocTopics;
-import edu.usc.softarch.arcade.topics.TopicKeySet;
 import edu.usc.softarch.arcade.weka.AddTargetClassToArff;
 
 import soot.Body;
@@ -27,7 +23,6 @@ import soot.SceneTransformer;
 import soot.SootClass;
 import soot.SootField;
 import soot.SootMethod;
-import soot.SootMethodRef;
 import soot.Unit;
 import soot.Value;
 import soot.ValueBox;
@@ -36,12 +31,8 @@ import soot.jimple.AssignStmt;
 import soot.jimple.Constant;
 import soot.jimple.DefinitionStmt;
 import soot.jimple.FieldRef;
-import soot.jimple.IfStmt;
 import soot.jimple.InstanceInvokeExpr;
-import soot.jimple.InvokeExpr;
-import soot.jimple.InvokeStmt;
 import soot.jimple.Stmt;
-import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.graph.UnitGraph;
 import soot.toolkits.scalar.SimpleLocalDefs;
@@ -53,23 +44,19 @@ import weka.core.converters.ArffSaver;
 
 /**
  * @author joshua
- *
  */
 public class FieldAccessTransformer extends SceneTransformer {
 
 	protected static int classFieldReadCount;
 	protected static int classFieldWriteCount;
 	protected static int classFieldInstanceInvokeCount;
-	protected static boolean DEBUG=false;
 	protected static boolean DEBUG_FIELDREADINVOKE=true;
 	protected static Instances data;
-	private static ClassGraph clg = new ClassGraph();
 	private static int classMethodSizeAggregator;
 
 	@Override
 	protected void internalTransform(String phaseName, Map options) {
 		String datasetsDir = "/Users/joshuaga/Documents/workspace/MyExtractors/datasets";
-		FileReader fr;
 		
 		String arffFilePrefix = prepareWekaInstances(datasetsDir);
 		
@@ -82,14 +69,13 @@ public class FieldAccessTransformer extends SceneTransformer {
 		System.out.println("Number of application classes: " + appClasses.size());
 		
 		ClassGraphTransformer.constructClassGraph();
-		ArrayList<SootClass> cgNodes = ClassGraphTransformer.clg.getNodes();
+		List<SootClass> cgNodes = ClassGraphTransformer.clg.getNodes();
 		
 		for (SootClass c : cgNodes) {
 			if (c.isConcrete())
 				try {
 					extractFromClass(c);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -100,12 +86,10 @@ public class FieldAccessTransformer extends SceneTransformer {
 				try {
 					extractFromClass(c);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		}
-		
 		
 		System.out.println("The dataset (changed?): ");
 		System.out.println("=======================================");
@@ -128,7 +112,6 @@ public class FieldAccessTransformer extends SceneTransformer {
 			saver.writeBatch();
 			System.out.println("Wrote file: " + fullDirAndArffFilename);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -155,14 +138,10 @@ public class FieldAccessTransformer extends SceneTransformer {
 			fr = new FileReader(datasetsDir + "/" + arffFilePrefix + "/" + arffFilePrefix  + ".arff");
 			data = new Instances(fr);
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 		
 		System.out.println("The dataset: ");
 		System.out.println("=======================================");
@@ -220,14 +199,11 @@ public class FieldAccessTransformer extends SceneTransformer {
 				MethodSource ms = m.getSource();
 				ms.getBody(m, "cg");
 			}
-				
 			
 			if (b == null) {
 				System.out.println("Got null active body for.");
 				continue;
 			}
-			
-			
 			
 			UnitGraph graph = new ExceptionalUnitGraph(b);
 			SimpleLocalDefs localDefs = new SimpleLocalDefs(graph);
@@ -243,7 +219,6 @@ public class FieldAccessTransformer extends SceneTransformer {
 				methodFieldReadCount += fs.fieldReadCount;
 				methodFieldWriteCount += countFieldWrites(sClassFields,localDefs,u);
 				methodInstanceInvokeExprCount += fs.fieldInstanceInvokeCount;
-				
 			}
 			System.out.println("Method's field read count: " + methodFieldReadCount);
 			System.out.println("Method's field write count: " + methodFieldWriteCount);
@@ -276,24 +251,22 @@ public class FieldAccessTransformer extends SceneTransformer {
 		instance.setValue(data.attribute("maxMethodSize"), maxMethodSize);
 	}
 	
-	
-
 	protected static int countFieldWrites(Chain<SootField> sClassFields,
 			SimpleLocalDefs localDefs, Unit u) {
 		int methodFieldWriteCount = 0;
 		if (u instanceof DefinitionStmt) { // if the next unit is an if statement
-			if ( DEBUG )
+			if (Constants._DEBUG)
 				System.out.println("\tAbove line is a definition statement");
 			Iterator dIt = u.getDefBoxes().iterator();
 			while (dIt.hasNext()) { // loop through all of the defs in the unit
 				ValueBox defBox = (ValueBox)dIt.next(); // grab a def box from the unit
-				if (DEBUG)
+				if (Constants._DEBUG)
 					System.out.println("\t\tdefBox's value and type: " + defBox.getValue() + "," + defBox.getValue().getType() );
 					for (SootField f : sClassFields) {
-						if (DEBUG)
+						if (Constants._DEBUG)
 							System.out.println( "\t\t\t\tChecking against " + f );
 						if (f.toString().equals(defBox.getValue().toString())) {
-							if (DEBUG)
+							if (Constants._DEBUG)
 								System.out.println( "\t\t\t\tDetected definition to the following field: " + defBox.getValue() );
 								methodFieldWriteCount++;
 						}
@@ -322,86 +295,25 @@ public class FieldAccessTransformer extends SceneTransformer {
 					System.out.println(tabs(1+1*depth) + "ArrayRef: " + ar + " at " + u);
 			}
 		}
-		if ( DEBUG )
+		if (Constants._DEBUG)
 			System.out.println(tabs(1+1*depth) + "Above line is an if statement");
 		methodFieldReadCount = countFieldReadsInUnit(depth, sClassFields,
 				localDefs, u, methodFieldReadCount);
 		
 		List<ValueBox> useBoxes = u.getUseBoxes();
 		for (ValueBox vb : useBoxes) {
-			/*if (checkFieldReadOnInvokeExpr(depth, sClassFields, localDefs, u, vb)) {
-				methodFieldReadCount++;
-			}*/
 			if ( vb.getValue() instanceof InstanceInvokeExpr ) {
 				InstanceInvokeExpr expr = (InstanceInvokeExpr)vb.getValue(); // if so then typecast the value to an InstanceInvokeExpr
 				if (isRecursiveFieldRead(depth, sClassFields, localDefs, u, expr.getBase()) ) {
 					instanceInvokeFieldCount++;
 				}
 			}
-		
 		}
 		
 		fs.fieldReadCount = methodFieldReadCount;
 		fs.fieldInstanceInvokeCount = instanceInvokeFieldCount;
 		
 		return fs;
-	}
-
-	private static boolean checkFieldReadOnInvokeExpr(int depth, Chain<SootField> sClassFields, SimpleLocalDefs localDefs, Unit u, ValueBox vb) {
-		if ( vb.getValue() instanceof InstanceInvokeExpr ) { // check if the valuebox is an InstanceInvokeExpr
-			if (DEBUG_FIELDREADINVOKE) 
-				System.out.println(tabs(1+1*depth) + "Found InvokeExpr");
-			InstanceInvokeExpr expr = (InstanceInvokeExpr)vb.getValue(); // if so then typecast the value to an InstanceInvokeExpr
-			if (DEBUG_FIELDREADINVOKE) {
-				System.out.println(tabs(1+1*depth) + "InstanceInvokeExpr: " + expr);
-				System.out.println(tabs(2+1*depth) + "Base:" + expr.getBase());
-			}
-			if (isRecursiveFieldRead(depth, sClassFields, localDefs, u, expr.getBase()) ) { // check if the expr is an invocation of a field or takes a field as an argument
-				SootMethod m = expr.getMethod();
-				Chain<SootField> sClassFields2 = m.getDeclaringClass().getFields();
-				
-				Iterator fIt = m.getDeclaringClass().getFields().iterator();
-				if (DEBUG_FIELDREADINVOKE) {
-					System.out.println(tabs(3+1*depth) + "\n");
-					System.out.println(tabs(3+1*depth) + "Fields of " + m.getDeclaringClass());
-					System.out.println(tabs(3+1*depth) + "=======================================");
-				}
-				while (fIt.hasNext()) {
-					SootField f = (SootField)fIt.next();
-					System.out.println(tabs(3+1*depth) + f);
-				}
-				
-				if (m.isConcrete()) {
-					if (DEBUG_FIELDREADINVOKE) {
-						System.out.println(tabs(3 + 1 * depth)
-								+ "=======================================");
-						System.out.println(tabs(3 + 1 * depth) + "method: "
-								+ m.toString());
-					}
-					Body b = m.retrieveActiveBody();
-					UnitGraph graph = new ExceptionalUnitGraph(b);
-					SimpleLocalDefs localDefs2 = new SimpleLocalDefs(graph);
-					Iterator graphIt = graph.iterator();
-					int methodFieldReadCount = 0;
-					while (graphIt.hasNext()) { // loop through all units of method's graph
-						Unit u2 = (Unit)graphIt.next(); // grab the next unit from the graph
-						if (DEBUG_FIELDREADINVOKE) {
-							System.out.println(tabs(3+1*depth) + u2);
-						}
-						
-						methodFieldReadCount += (countFieldReads(depth+1, sClassFields2, localDefs2, u2)).fieldReadCount;
-						
-					}
-					System.out.println(tabs(3+1*depth) + methodFieldReadCount);
-				}
-				return true;
-			}				
-			else 
-				return false;
-		}
-		else
-			return false;
-		
 	}
 	
 	private static boolean isRecursiveFieldRead(int depth, Chain<SootField> sClassFields, SimpleLocalDefs localDefs, Unit u, Value base) {
@@ -458,18 +370,12 @@ public class FieldAccessTransformer extends SceneTransformer {
 											}
 										}
 									}
-									/*else if (ubVal instanceof InstanceInvokeExpr) {
-										InstanceInvokeExpr expr = (InstanceInvokeExpr)ubVal;
-										isField(sClassFields,localDefs,d,expr.getBase());
-									}*/
 								}
 							}
 						}
 					}
 				}
 			}
-			/*if ( f.toString().equals(base.toString()) )
-				foundSomeMatchingField = true;*/
 		
 		return foundSomeMatchingField;
 		
@@ -494,42 +400,37 @@ public class FieldAccessTransformer extends SceneTransformer {
 		Iterator uIt = u.getUseBoxes().iterator();
 		while (uIt.hasNext()) { // loop through all of the uses in the unit
 			ValueBox useBox = (ValueBox)uIt.next(); // grab a use box from the unit
-			if (DEBUG)
+			if (Constants._DEBUG)
 				System.out.println(tabs(2*depth) + "useBox's value and type: " + useBox.getValue() + "," + useBox.getValue().getType() );
 			if (useBox.getValue() instanceof Local) { // if the usebox is a local variable
 				Iterator ldIt = localDefs.getDefsOfAt((Local)useBox.getValue(), u).iterator();
 				while (ldIt.hasNext()) { // loop through all the definitions for that use box
 					Unit d = (Unit)ldIt.next();
 					 
-						
-					ArrayList<FieldDefPair> fdPairs = findFieldOriginalDefinitionSitePairs(
+					List<FieldDefPair> fdPairs = findFieldOriginalDefinitionSitePairs(
 							depth, sClassFields, localDefs,
 							d, methodFieldReadCount);
 				
 					methodFieldReadCount = fdPairs.size();
-
-//								}
 				}
-				
-				
 			}
 		}
 		return methodFieldReadCount;
 	}
 
-	protected static ArrayList<FieldDefPair> findFieldOriginalDefinitionSitePairs(int depth, Chain<SootField> sClassFields,
+	protected static List<FieldDefPair> findFieldOriginalDefinitionSitePairs(int depth, Chain<SootField> sClassFields,
 			SimpleLocalDefs localDefs, Unit d, int methodFieldReadCount) {
-		ArrayList<FieldDefPair> origFieldDefPairs = new ArrayList<FieldDefPair>();
+		List<FieldDefPair> origFieldDefPairs = new ArrayList<>();
 		if (d instanceof AssignStmt) { // if the definition site of the usebox is an assignment statement
 			AssignStmt stmt = (AssignStmt)d; // grab the assignment statement
-			if (DEBUG) 
+			if (Constants._DEBUG) 
 				System.out.println(tabs(4+1*depth) + "stmt.getRightOp() " + stmt.getRightOp() + " has useBoxes of size " + stmt.getRightOp().getUseBoxes().size());
 			if (stmt.getRightOp().getUseBoxes().size() <= 1) {
 				for (SootField f : sClassFields) {
-					if (DEBUG)
+					if (Constants._DEBUG)
 						System.out.println(tabs(4+1*depth) + "Checking against " + f );
 					if (f.toString().equals(stmt.getRightOp().toString())) {
-						if (DEBUG)
+						if (Constants._DEBUG)
 							System.out.println(tabs(4+1*depth) + "Detected Assignment using the following field as the right op: " + stmt.getRightOp() );
 						methodFieldReadCount++;
 						origFieldDefPairs.add(new FieldDefPair(f,d));
@@ -537,14 +438,14 @@ public class FieldAccessTransformer extends SceneTransformer {
 				}
 			}
 			else {
-				if (DEBUG) {
+				if (Constants._DEBUG) {
 					System.out.println(tabs(4+1*depth) + "right op for " + stmt + ": " + stmt.getRightOp());
 					System.out.println(tabs(4+1*depth) + "Values used by " + stmt.getRightOp());
 				}
 				Iterator ubIt = stmt.getRightOp().getUseBoxes().iterator(); // grab all the use boxes from the right side of the assignment
 				while (ubIt.hasNext()) { // loop through all the use boxes from the right side of the assignment
 					ValueBox box = (ValueBox)ubIt.next(); // grab a use box from the right side of the assignment
-					if (DEBUG)
+					if (Constants._DEBUG)
 						System.out.println(tabs(4+1*depth) + box.getValue());
 					if (box.getValue() instanceof Constant) {
 						continue;
@@ -553,19 +454,15 @@ public class FieldAccessTransformer extends SceneTransformer {
 					while (ld2It.hasNext()) {
 						Unit d2 = (Unit)ld2It.next(); 
 						 
-							
-						ArrayList<FieldDefPair> fdPairs = findFieldOriginalDefinitionSitePairs(
+						List<FieldDefPair> fdPairs = findFieldOriginalDefinitionSitePairs(
 								depth, sClassFields, localDefs,
 								d2, methodFieldReadCount);
 							
 						methodFieldReadCount = fdPairs.size();
 					}
-					
-					
 				}
 			}
 		}
 		return origFieldDefPairs;
 	}
-
 }

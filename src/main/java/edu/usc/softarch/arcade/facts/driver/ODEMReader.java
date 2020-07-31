@@ -1,7 +1,6 @@
 package edu.usc.softarch.arcade.facts.driver;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +26,9 @@ import edu.usc.softarch.extractors.cda.odem.ODEM;
 import edu.usc.softarch.extractors.cda.odem.Type;
 
 public class ODEMReader {
-	private static List<Type> allTypes = new ArrayList<Type>();
+	private static List<Type> allTypes = new ArrayList<>();
 	
-	static Logger logger = Logger.getLogger(ODEMReader.class);
+	private static Logger logger = Logger.getLogger(ODEMReader.class);
 	
 	public static void main(String[] args) {
 		Options options = new Options();
@@ -63,7 +62,6 @@ public class ODEMReader {
 			System.err.println("Parsing failed.  Reason: " + exp.getMessage());
 		}
 		
-		
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 		
 		Config.initConfigFromFile(Config.getProjConfigFilename());
@@ -71,11 +69,6 @@ public class ODEMReader {
 		System.out.println("Reading in odem file " + Config.getOdemFile()  + "...");
 		
 		setTypesFromODEMFile(Config.getOdemFile());
-		
-		
-		
-		
-		//parseXmlFile(Config.getOdemFile());
 	}
 	
 	public static void setTypesFromODEMFile(String odemFile) {
@@ -96,11 +89,9 @@ public class ODEMReader {
 				typeCount++;
 			}
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
 
 	public static List<Type> getAllTypes() {
 		return allTypes;

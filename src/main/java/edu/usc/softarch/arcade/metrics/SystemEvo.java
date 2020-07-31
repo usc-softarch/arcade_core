@@ -1,20 +1,9 @@
 package edu.usc.softarch.arcade.metrics;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -28,7 +17,7 @@ import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 
 public class SystemEvo {
-	static Logger logger = Logger.getLogger(SystemEvo.class);
+	private static Logger logger = Logger.getLogger(SystemEvo.class);
 	
 	public static double sysEvo = 0;
 	
@@ -89,8 +78,8 @@ public class SystemEvo {
 		
 		int ns = sourceClusters.size();
 		int nt = targetClusters.size();
-		Map<Integer,ConcernCluster> sourceNumToCluster = new HashMap<Integer,ConcernCluster>(); // Pooyan! It maps every source_cluster to a number from 0 to ns-1
-		Map<ConcernCluster,Integer> sourceClusterToNum = new HashMap<ConcernCluster,Integer>(); // Pooyan! It maps every target_cluster to a number from 0 to nm-1
+		Map<Integer,ConcernCluster> sourceNumToCluster = new HashMap<>(); // Pooyan! It maps every source_cluster to a number from 0 to ns-1
+		Map<ConcernCluster,Integer> sourceClusterToNum = new HashMap<>(); // Pooyan! It maps every target_cluster to a number from 0 to nm-1
 		int counter = 0 ;
 		for (ConcernCluster source:sourceClusters){
 			sourceNumToCluster.put(counter, source);
@@ -98,8 +87,8 @@ public class SystemEvo {
 			counter++;
 		}
 
-		Map<Integer,ConcernCluster> targetNumToCluster = new HashMap<Integer,ConcernCluster>();
-		Map<ConcernCluster,Integer> targetClusterToNum = new HashMap<ConcernCluster,Integer>();
+		Map<Integer,ConcernCluster> targetNumToCluster = new HashMap<>();
+		Map<ConcernCluster,Integer> targetClusterToNum = new HashMap<>();
 		counter = 0;
 		for (ConcernCluster target:targetClusters){
 			targetNumToCluster.put(counter,  target);
@@ -114,17 +103,17 @@ public class SystemEvo {
 		
 		for (ConcernCluster sourceCluster : sourceClusters) {
 			for (ConcernCluster targetCluster : targetClusters) {
-				Set<String> entitiesIntersection = new HashSet<String>(sourceCluster.getEntities());
+				Set<String> entitiesIntersection = new HashSet<>(sourceCluster.getEntities());
 				entitiesIntersection.retainAll(targetCluster.getEntities());
 				ma.setWeight(sourceClusterToNum.get(sourceCluster), targetClusterToNum.get(targetCluster), entitiesIntersection.size()); // Pooyan the weight of (source,target) as the interesection between them
 			}	
 		}
 		
-		Map<ConcernCluster,Set<String>> sourceClusterMatchEntities = new HashMap<ConcernCluster,Set<String>>(); //Pooyan! It keeps the source Cluster Match Entities, not necessarily the max match 
-		Map<ConcernCluster,ConcernCluster> matchOfSourceInTarget = new HashMap<ConcernCluster,ConcernCluster>();//Pooyan! It keeps the matched cluster in target for every source
-		Map<ConcernCluster,ConcernCluster> matchOfTargetInSource = new HashMap<ConcernCluster,ConcernCluster>();//Pooyan! It keeps the matched cluster in source for every target
+		Map<ConcernCluster,Set<String>> sourceClusterMatchEntities = new HashMap<>(); //Pooyan! It keeps the source Cluster Match Entities, not necessarily the max match 
+		Map<ConcernCluster,ConcernCluster> matchOfSourceInTarget = new HashMap<>();//Pooyan! It keeps the matched cluster in target for every source
+		Map<ConcernCluster,ConcernCluster> matchOfTargetInSource = new HashMap<>();//Pooyan! It keeps the matched cluster in source for every target
 		
-		int[] match = ma.getMatching(); // Pooyan! calculates the max weighted match;
+		int[] match = ma.getMatching(); // Pooyan! calculates the max weighted match
 		
 		for (int i=0;i<match.length;i++){
 
@@ -135,7 +124,7 @@ public class SystemEvo {
 				target=targetNumToCluster.get(match[i]) ;					
 			matchOfSourceInTarget.put(source, target); // Pooyan! set the match of source
 			matchOfTargetInSource.put(target, source); // Pooyan! set the match of target
-			Set<String> entitiesIntersection = new HashSet<String>(source.getEntities());
+			Set<String> entitiesIntersection = new HashSet<>(source.getEntities());
 			entitiesIntersection.retainAll(target.getEntities());
 			sourceClusterMatchEntities.put(source, entitiesIntersection);	
 			logger.debug("Pooyan -> "+source.getName() +" is matched to "+target.getName()+ " - the interesection size is " + entitiesIntersection.size() );
@@ -147,21 +136,19 @@ public class SystemEvo {
 		logger.debug("Pooyan -> cluster -> matched clusters in target cluster for every source cluster");
 		logger.debug(Joiner.on("\n").withKeyValueSeparator("->").useForNull("null").join(matchOfSourceInTarget));
 		
-		int sourceClusterRemovalCount=0 ;
-		Set<ConcernCluster> removedSourceClusters = new HashSet<ConcernCluster> () ;
+		Set<ConcernCluster> removedSourceClusters = new HashSet<> () ;
 		
 		//Pooyan! unmatched clusters must be removed
 		for (ConcernCluster source:sourceClusters){
 			ConcernCluster matched = matchOfSourceInTarget.get(source);
 			if (matched.getName().equals("-1")){
-				sourceClusterRemovalCount++;
 				removedSourceClusters.add(source);
 			}
 		}
 		logger.debug("Pooyan -> Removed source clusters:");
 		logger.debug(Joiner.on(",").join(removedSourceClusters));
 		
-		Set<String> entitiesToMoveInRemovedSourceClusters = new HashSet<String>(); // Pooyan! These are the entities in the removed source clusters which exists in the target clusters and have to be moved 
+		Set<String> entitiesToMoveInRemovedSourceClusters = new HashSet<>(); // Pooyan! These are the entities in the removed source clusters which exists in the target clusters and have to be moved 
 		logger.debug("Entities of removed clusters:");
 		for (ConcernCluster source : removedSourceClusters) {
 			Set<String> entities = source.getEntities();
@@ -171,23 +158,17 @@ public class SystemEvo {
 		}
 		
 		// The clusters that remain after removal of clusters 
-		Set<ConcernCluster> remainingSourceClusters = new HashSet<ConcernCluster>(sourceClusters);
+		Set<ConcernCluster> remainingSourceClusters = new HashSet<>(sourceClusters);
 		remainingSourceClusters.removeAll(removedSourceClusters);
 		
 		// for each cluster, the map gives the set of entities that may be moved (not including added or
 		// removed entities)
-		Map<ConcernCluster,Set<String>> entitiesToMoveInCluster = new HashMap<ConcernCluster,Set<String>>(); 
+		Map<ConcernCluster,Set<String>> entitiesToMoveInCluster = new HashMap<>(); 
 		for (ConcernCluster remainingCluster : remainingSourceClusters) {
 			Set<String> matchedIntersectionEntities = sourceClusterMatchEntities.get(remainingCluster);
-			Set<String> currEntitiesToMove = new HashSet<String>( remainingCluster.getEntities() );
+			Set<String> currEntitiesToMove = new HashSet<>( remainingCluster.getEntities() );
 			if (matchOfSourceInTarget.get(remainingCluster) != null && matchOfTargetInSource.get(matchOfSourceInTarget.get(remainingCluster)).equals(remainingCluster))// Pooyan! if the ramaining cluster is  the base cluster, it is entity should not be removed, otherwise they should be in the current entity to move
 				currEntitiesToMove.removeAll(matchedIntersectionEntities); // the problem is here!!! It should move the maxIntersecting Entities since the cluster in the other arc is assigned to another cluster
-			else{
-				//logger.debug("Pooyan -> /*");
-				//logger.debug("Pooyan -> remainingCluster: "+remainingCluster.getName());
-				//logger.debug("Pooyan -> clusterToMaxIntersectingCluster.get(remainingCluster): " +clusterToMaxIntersectingCluster.get(remainingCluster).getName());
-				//logger.debug("Pooyan -> targetClusterMatchInSource.get(clusterToMaxIntersectingCluster.get(remainingCluster)): "+targetClusterMatchInSource.get(clusterToMaxIntersectingCluster.get(remainingCluster)));
-			}
 			
 			currEntitiesToMove.removeAll(entitiesToAdd);
 			currEntitiesToMove.removeAll(entitiesToRemove);
@@ -196,7 +177,7 @@ public class SystemEvo {
 				logger.debug("Pooyan -> remaining cluster " + remainingCluster.getName() + ", adn current entity to move :" +e);
 		}
 		
-		Set<String> allEntitiesToMove = new HashSet<String>();
+		Set<String> allEntitiesToMove = new HashSet<>();
 		for (Set<String> currEntitiesToMove : entitiesToMoveInCluster.values()) {
 			allEntitiesToMove.addAll(currEntitiesToMove); // entities to move in clusters not removed
 		}
@@ -218,14 +199,14 @@ public class SystemEvo {
 		
 		
 		// Don't think I need this block for actual sysevo computation
-		Map<String,ConcernCluster> entityToTargetCluster = new HashMap<String,ConcernCluster>(); 		
+		Map<String,ConcernCluster> entityToTargetCluster = new HashMap<>(); 		
 		for (ConcernCluster sourceCluster : sourceClusters) {
-			Set<String> sourceEntitiesToMove = new HashSet<String>( sourceCluster.getEntities() ); // entities that exist already and might be moved
+			Set<String> sourceEntitiesToMove = new HashSet<>( sourceCluster.getEntities() ); // entities that exist already and might be moved
 			sourceEntitiesToMove.removeAll(entitiesToAdd); // so you need to ignore added entities
 			sourceEntitiesToMove.removeAll(entitiesToRemove); // and removed entities.
 			for (ConcernCluster targetCluster : targetClusters) {
 				Set<String> currTargetEntitites = targetCluster.getEntities();
-				Set<String> intersectingEntities = new HashSet<String>(sourceEntitiesToMove); // entities in both the current source and target cluster
+				Set<String> intersectingEntities = new HashSet<>(sourceEntitiesToMove); // entities in both the current source and target cluster
 				intersectingEntities.retainAll(currTargetEntitites);
 				logger.debug("intersecting entities: ");
 				logger.debug(intersectingEntities);
@@ -255,28 +236,6 @@ public class SystemEvo {
 		sysEvo = localSysEvo;
 			
 	}
-	
-	
-	private static Map<ConcernCluster,Set<String>> entriesSortedByEntitiesSize(Map<ConcernCluster,Set<String>> map) {
-		List<Entry<ConcernCluster,Set<String>>> list = new ArrayList<Entry<ConcernCluster,Set<String>>>(map.entrySet());
-		
-		// sort list based on comparator
-        Collections.sort(list, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                //return ((Comparable) ((Map.Entry) (o1)).getValue())
-                //                      .compareTo(((Map.Entry) (o2)).getValue());
-            	Entry<ConcernCluster,Set<String>> e1 = (Entry<ConcernCluster,Set<String>>)o1;
-            	Entry<ConcernCluster,Set<String>> e2 = (Entry<ConcernCluster,Set<String>>)o2;
-            	return e1.getValue().size() - e2.getValue().size(); // ascending order
-            }
-        });
-        
-        Map<ConcernCluster,Set<String>> sortedMap = new LinkedHashMap<ConcernCluster,Set<String>>();
-        for (Entry<ConcernCluster,Set<String>> entry : list) {
-            sortedMap.put(entry.getKey(), entry.getValue());
-        }
-        return sortedMap;
-	}
 
 	private static String clustersToString(Set<ConcernCluster> sourceClusters) {
 		String output = "";
@@ -292,11 +251,10 @@ public class SystemEvo {
 
 	private static Set<String> getAllEntitiesInClusters(
 			Set<ConcernCluster> clusters) {
-		Set<String> entities = new HashSet<String>();
+		Set<String> entities = new HashSet<>();
 		for (ConcernCluster cluster : clusters) {
 			entities.addAll( cluster.getEntities() );
 		}
 		return entities;
 	}
-
 }

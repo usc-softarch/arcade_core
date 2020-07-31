@@ -1,8 +1,6 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
@@ -23,7 +21,7 @@ import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
 public class GroundTruthRecoveryReader {
 
 	static Logger logger = Logger.getLogger(GroundTruthRecoveryReader.class);
-	private static Set<ConcernCluster> clusters = new HashSet<ConcernCluster>();
+	private static Set<ConcernCluster> clusters = new HashSet<>();
 
 	public static Set<ConcernCluster> getClusters() {
 		return clusters;
@@ -68,5 +66,4 @@ public class GroundTruthRecoveryReader {
 		GroundTruthFileParser.parseHadoopStyle(Config.getGroundTruthFile());
 		clusters = GroundTruthFileParser.getClusters();
 	}
-
 }

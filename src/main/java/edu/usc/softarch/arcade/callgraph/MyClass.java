@@ -3,22 +3,18 @@ package edu.usc.softarch.arcade.callgraph;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import soot.SootClass;
-import soot.SootMethod;
 
 /**
  * @author joshua
- *
  */
 public class MyClass implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5575671464833110817L;
 	public String packageName;
 	public String className;
-	HashSet<MyMethod> methods;
+	Set<MyMethod> methods;
 	
 	public void addMethod(MyMethod m) {
 		methods.add(m);
@@ -29,7 +25,7 @@ public class MyClass implements Serializable {
 		int methodCount = 0;
 		Iterator<MyMethod> iter = methods.iterator();
 		while (iter.hasNext()) {
-			MyMethod m = (MyMethod)iter.next();
+			MyMethod m = iter.next();
 			for (int i=0;i<tabCount;i++) {
 				methodsStr +='\t';
 			}
@@ -40,49 +36,41 @@ public class MyClass implements Serializable {
 	}
 	
 	public MyClass(MyClass declaringClass) {
-		this.className = new String(declaringClass.className);
-		this.packageName = new String(declaringClass.packageName);
-		this.methods = new HashSet<MyMethod>(declaringClass.methods);
+		this.className = declaringClass.className;
+		this.packageName = declaringClass.packageName;
+		this.methods = new HashSet<>(declaringClass.methods);
 	}
 	
 	public MyClass(SootClass declaringClass) {
-		this.className = new String(declaringClass.getShortName());
-		this.packageName = new String(declaringClass.getPackageName());
-		this.methods = new HashSet<MyMethod>();
-		/*for (SootMethod sm : declaringClass.getMethods()) {
-			methods.add(new MyMethod(sm));
-		}*/
+		this.className = declaringClass.getShortName();
+		this.packageName = declaringClass.getPackageName();
+		this.methods = new HashSet<>();
 	}
 
+	@Override
 	public boolean equals(Object o) {
-		MyClass c = (MyClass) o;
-		if (
-				this.className.equals(c.className) &&
-				this.packageName.equals(c.packageName)
-				//(this.methods == null ? true : this.methods.equals(c.methods) )
-			) {
-				return true;
-		}
-		else {
+		if (!(o instanceof MyClass))
 			return false;
-		}
+
+		MyClass c = (MyClass) o;
+		return (this.className.equals(c.className)
+			&& this.packageName.equals(c.packageName));
 	}
 	
+	@Override
 	public int hashCode() {
 		int hash = 7;
 		hash = 37 * hash + (this.className == null ? 0 : this.className.hashCode());
 		hash = 37 * hash + (this.packageName == null ? 0 : this.packageName.hashCode());
-		//hash = 37 * hash + (this.methods == null ? 0 : this.methods.hashCode());
 		return hash;
 	}
 	
+	@Override
 	public String toString() {
 		return this.packageName + "." + this.className;
 	}
 
-	public HashSet<MyMethod> getMethods() {
-		return new HashSet<MyMethod>(methods);
+	public Set<MyMethod> getMethods() {
+		return new HashSet<>(methods);
 	}
-	
-	
 }

@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -23,8 +21,6 @@ public class SmellSummary {
 	//static String inputDirectory = "F:\\Google Drive\\ARC_Results\\jackrabbit_ARC_java_2015-08-12_07_37_56_978\\ser";
 	static String inputDirectory = "E:\\cxf_data\\arc\\ser"; 
 	public static void main(String[] args) {
-
-		List<File> summaryFiles = getFiles(summaryDirectory);
 		List<File> inputFiles = getFiles(inputDirectory);
 		String csvSplit = ",";
 		String filenameSplit = "_";
@@ -44,7 +40,6 @@ public class SmellSummary {
 				excelInput = new FileInputStream(new File(summaryDirectory
 						+ system + "_Smell_Summary.xlsx"));
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			// convert it into a POI object
@@ -52,7 +47,6 @@ public class SmellSummary {
 			try {
 				workbook = new XSSFWorkbook(excelInput);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			// Read excel sheet that needs to be updated
@@ -111,7 +105,6 @@ public class SmellSummary {
 			try {
 				excelInput.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			// Open FileOutputStream to write updates
@@ -120,21 +113,18 @@ public class SmellSummary {
 				excelOutput = new FileOutputStream(new File(summaryDirectory
 						+ system + "_Smell_Summary.xlsx"));
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			// write changes
 			try {
 				workbook.write(excelOutput);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			// close the stream
 			try {
 				excelOutput.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -146,7 +136,6 @@ public class SmellSummary {
 		try {
 			fileList = FileListing.getFileListing(new File(inputDirectory));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return fileList;

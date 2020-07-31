@@ -1,7 +1,6 @@
 package edu.usc.softarch.arcade.util.convert;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -34,7 +33,7 @@ public class ExcelToRsfConverter {
 			InputStream inp = new FileInputStream(excelFilename);
 			Workbook wb = WorkbookFactory.create(inp);
 			Sheet sheet = wb.getSheetAt(0);
-			Set<List<String>> facts = new HashSet<List<String>>();
+			Set<List<String>> facts = new HashSet<>();
 			PrintStream origOut = System.out;
 			System.setOut(new PrintStream(new OutputStream(){
 				public void write(int b) {
@@ -44,7 +43,7 @@ public class ExcelToRsfConverter {
 				if (row.getRowNum() == 0) { // Skip header row and column
 					continue;
 				}
-				List<String> fact = new ArrayList<String>();
+				List<String> fact = new ArrayList<>();
 				fact.add("contain");
 				for (Cell cell : row) {
 					
@@ -64,13 +63,10 @@ public class ExcelToRsfConverter {
 			}
 			out.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

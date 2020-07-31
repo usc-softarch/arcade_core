@@ -3,8 +3,10 @@ package edu.usc.softarch.arcade.facts.driver;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -13,7 +15,6 @@ import java.util.Random;
 import java.util.Set;
 
 import mojo.MoJoCalculator;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -23,8 +24,8 @@ public class GroundTruthArchMutator {
 		String groundTruthFilename = args[0];
 		String outputDir = args[1];
 		Set<ConcernCluster> clusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(groundTruthFilename);
-		Set<String> allEntitiesSet = new LinkedHashSet<String>();
-		List<String> allEntitiesList = new ArrayList<String>();
+		Set<String> allEntitiesSet = new LinkedHashSet<>();
+		List<String> allEntitiesList = new ArrayList<>();
 		
 		
 		for (ConcernCluster cluster : clusters) {
@@ -41,7 +42,7 @@ public class GroundTruthArchMutator {
 			Random rand = new Random(seed);
 			int tenPercentOfEntities = (int) Math.ceil(0.10 * allEntitiesList
 					.size());
-			List<String> selectedEntities = new ArrayList<String>();
+			List<String> selectedEntities = new ArrayList<>();
 			System.out.println("Randomly selected entitites:");
 			for (int i = 0; i < tenPercentOfEntities; i++) {
 				String selectedEntity = allEntitiesList.get(rand
@@ -83,9 +84,8 @@ public class GroundTruthArchMutator {
 		});
 
 		String mojoFmMappingFilename = "mojofm_mapping.csv";
-		try {
-			PrintWriter writer = new PrintWriter(outputDir + File.separatorChar
-					+ mojoFmMappingFilename, "UTF-8");
+		try (PrintWriter writer = new PrintWriter(outputDir + File.separatorChar
+		+ mojoFmMappingFilename, StandardCharsets.UTF_8)) {
 			for (File newGtFile : newGtFiles) {
 				MoJoCalculator mojoCalc = new MoJoCalculator(
 						newGtFile.getAbsolutePath(), groundTruthFilename, null);
@@ -93,18 +93,14 @@ public class GroundTruthArchMutator {
 				System.out.println(mojoFmValue);
 
 				writer.println(newGtFile.getAbsolutePath() + "," + mojoFmValue);
-
 			}
-			writer.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-				
-		
 	}
 	
 	public static void writeMutatedClusterRsfFile(Set<ConcernCluster> clusters, long seed,
@@ -126,10 +122,8 @@ public class GroundTruthArchMutator {
 			}
 			writer.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -138,10 +132,10 @@ public class GroundTruthArchMutator {
 	private static ConcernCluster randomlySelectTargetCluster(
 			Set<ConcernCluster> clusters, ConcernCluster containingCluster, long seed) {
 		
-			Set<ConcernCluster> copiedClusters = new HashSet<ConcernCluster>(clusters);
+			Set<ConcernCluster> copiedClusters = new HashSet<>(clusters);
 			copiedClusters.remove(containingCluster);
 			
-			List<ConcernCluster> reducedClustersList = new ArrayList<ConcernCluster>(copiedClusters);
+			List<ConcernCluster> reducedClustersList = new ArrayList<>(copiedClusters);
 			Random rand = new Random(seed);
 			
 			ConcernCluster targetCluster = reducedClustersList.get( rand.nextInt(reducedClustersList.size()) );
@@ -160,5 +154,4 @@ public class GroundTruthArchMutator {
 		}
 		return null;
 	}
-
 }

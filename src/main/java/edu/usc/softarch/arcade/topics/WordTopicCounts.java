@@ -3,19 +3,18 @@ package edu.usc.softarch.arcade.topics;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
  * @author joshua
- *
  */
 public class WordTopicCounts {
-	public HashMap<String, WordTopicItem> getWordTopicItems() {
+	public Map<String, WordTopicItem> getWordTopicItems() {
 		return wordTopicItems;
 	}
 
-	HashMap<String, WordTopicItem> wordTopicItems = new HashMap<String,WordTopicItem>();
+	Map<String, WordTopicItem> wordTopicItems = new HashMap<>();
 	
 	public WordTopicCounts(String filename) throws FileNotFoundException {
 		loadFromFile(filename);
@@ -26,7 +25,7 @@ public class WordTopicCounts {
 
 		Scanner s = new Scanner(f);
 
-		wordTopicItems = new HashMap<String,WordTopicItem>();
+		wordTopicItems = new HashMap<>();
 		
 		while (s.hasNext()) {
 			String line = s.nextLine();
@@ -36,10 +35,10 @@ public class WordTopicCounts {
 			String[] items = line.split(" ");
 			
 			WordTopicItem wtItem = new WordTopicItem();
-			wtItem.id = (new Integer(items[0])).intValue();
+			wtItem.id = (Integer.valueOf(items[0])).intValue();
 			wtItem.name = items[1];
 
-			wtItem.topicIDWordCountMap = new HashMap<Integer,Integer>();
+			wtItem.topicIDWordCountMap = new HashMap<>();
 
 			for (int i = 2; i < items.length; i++) {
 				String topicWordCountStr = items[i];
@@ -49,17 +48,14 @@ public class WordTopicCounts {
 				Integer wordCount = Integer.parseInt(topicWordCount[1]);
 				
 				wtItem.topicIDWordCountMap.put(topicNum, wordCount);
-				
 			}
 			wordTopicItems.put(wtItem.name,wtItem);
 			System.out.println(line);
-
 		}
 		
 		System.out.println();
 		for (WordTopicItem wtItem : wordTopicItems.values()) {
 			System.out.println(wtItem);
 		}
-		
 	}
 }

@@ -2,11 +2,8 @@ package edu.usc.softarch.arcade.facts.driver;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -14,25 +11,15 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import com.google.common.base.Joiner;
-
-import classycle.Analyser;
-import classycle.ClassAttributes;
-import classycle.graph.AtomicVertex;
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
 import edu.usc.softarch.arcade.util.FileUtil;
 
-public class CSourceToDepsBuilder implements SourceToDepsBuilder {
-	
-	static Logger logger = Logger.getLogger(CSourceToDepsBuilder.class);
-
-	public Set<Pair<String,String>> edges;
+public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 	public static FastFeatureVectors ffVecs = null;
 	public static int numSourceEntities = 0;
 	
@@ -42,15 +29,15 @@ public class CSourceToDepsBuilder implements SourceToDepsBuilder {
 	}
 
 	public static void main(String[] args) throws IOException {
-		(new CSourceToDepsBuilder()).build(args);
+		(new CSourceToDepsBuilder()).build(args[0], args[1]);
 	}
 
-	public void build(String[] args) throws IOException,
-			FileNotFoundException {
+	@Override
+	public void build(String classesDirPath, String depsRsfFilename) throws IOException {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 		
-		String inputDir = FileUtil.tildeExpandPath(args[0]);
-		String depsRsfFilename = FileUtil.tildeExpandPath(args[1]);
+		String inputDir = FileUtil.tildeExpandPath(classesDirPath);
+		String depsRsfFilepath = FileUtil.tildeExpandPath(depsRsfFilename);
 		
 		String pwd = System.getProperty("user.dir");
 		String mkFilesCmd = "perl " + pwd + File.separator + "mkfiles.pl";
@@ -63,11 +50,11 @@ public class CSourceToDepsBuilder implements SourceToDepsBuilder {
 		}
 		
 		String makeDepFileLocation = inputDir + File.separator + "make.dep";
-		String[] makeDepReaderArgs = {makeDepFileLocation,depsRsfFilename};
+		String[] makeDepReaderArgs = {makeDepFileLocation,depsRsfFilepath};
 		
 		MakeDepReader.main(makeDepReaderArgs);
 		
-		RsfReader.loadRsfDataFromFile(depsRsfFilename);
+		RsfReader.loadRsfDataFromFile(depsRsfFilepath);
 				
 		numSourceEntities = RsfReader.unfilteredFacts.size();
 		
@@ -79,11 +66,11 @@ public class CSourceToDepsBuilder implements SourceToDepsBuilder {
 			
 			typedEdgeGraph.addEdge("depends",source,target);
 			
-			Pair<String,String> edge = new ImmutablePair<String,String>(source,target);
+			Pair<String,String> edge = new ImmutablePair<>(source,target);
 			edges.add(edge);
 		}
 		
-		Set<String> sources = new HashSet<String>();
+		Set<String> sources = new HashSet<>();
 		for (Pair<String,String> edge : edges) {
 			sources.add(edge.getLeft());
 		}

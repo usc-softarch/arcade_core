@@ -3,16 +3,12 @@ package edu.usc.softarch.arcade.antipattern.detection;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -22,7 +18,7 @@ import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.LogUtil;
 
 public class SmellEvolutionAnalyzer {
-	static Logger logger = Logger.getLogger(SmellEvolutionAnalyzer.class);
+	private static Logger logger = Logger.getLogger(SmellEvolutionAnalyzer.class);
 
 	public static void main(String[] args) throws FileNotFoundException {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
@@ -33,7 +29,7 @@ public class SmellEvolutionAnalyzer {
 		
 		List<File> fileList = FileListing.getFileListing(new File(FileUtil.tildeExpandPath(inputDirFilename)));
 		fileList = FileUtil.sortFileListByVersion(fileList);
-		List<File> orderedSerFiles = new ArrayList<File>();
+		List<File> orderedSerFiles = new ArrayList<>();
 		for (File file : fileList) {
 			if (file.getName().endsWith(".ser")) {
 				orderedSerFiles.add(file);
@@ -66,7 +62,5 @@ public class SmellEvolutionAnalyzer {
 		System.out.println();
 		System.out.println(stats);
 		logger.debug(stats);
-
 	}
-
 }

@@ -10,9 +10,9 @@ import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,14 +29,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -46,6 +44,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.callgraph.MyClass;
 import edu.usc.softarch.arcade.callgraph.MyMethod;
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
@@ -66,7 +65,6 @@ import edu.usc.softarch.arcade.smellarchgraph.SmellArchGraph;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.TopicItem;
 import edu.usc.softarch.arcade.topics.TopicKey;
-import edu.usc.softarch.arcade.topics.TopicKeySet;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.util.DebugUtil;
 import edu.usc.softarch.extractors.cda.odem.Dependencies;
@@ -75,17 +73,14 @@ import edu.usc.softarch.extractors.cda.odem.Type;
 
 /**
  * @author joshua
- * 
  */
 public class ClusterUtil {
-	private static int numClustersToSplit = 5;
-	private static boolean DEBUG = false;
 	private static Logger logger = Logger.getLogger(ClusterUtil.class);
 
-	public static void generateLeafClusters(ArrayList<Cluster> clusters) {
+	public static void generateLeafClusters(List<Cluster> clusters) {
 		for (Cluster c : clusters) {
-			ArrayList<Cluster> startClusters = new ArrayList<Cluster>();
-			ArrayList<Cluster> leafClusters = getLeafClusters(c, startClusters);
+			List<Cluster> startClusters = new ArrayList<>();
+			List<Cluster> leafClusters = getLeafClusters(c, startClusters);
 			logger.debug("Listing each leaf cluster of cluster " + c.name
 					+ "...");
 			int clusterCount = 0;
@@ -97,7 +92,7 @@ public class ClusterUtil {
 		}
 	}
 
-	public static void printItemsInClusters(ArrayList<Cluster> clusters) {
+	public static void printItemsInClusters(List<Cluster> clusters) {
 		logger.debug("Listing items in each cluster of the clusters...");
 		for (Cluster c : clusters) {
 			logger.debug("Cluster: " + c.name);
@@ -109,8 +104,8 @@ public class ClusterUtil {
 		}
 	}
 
-	private static ArrayList<Cluster> getLeafClusters(Cluster c,
-			ArrayList<Cluster> startClusters) {
+	private static List<Cluster> getLeafClusters(Cluster c,
+			List<Cluster> startClusters) {
 		if (c.left == null && c.right == null) {
 			startClusters.add(c);
 			return startClusters;
@@ -124,15 +119,15 @@ public class ClusterUtil {
 
 	}
 
-	public static ArrayList<Cluster> splitClusters(ArrayList<Cluster> clusters) {
+	public static List<Cluster> splitClusters(List<Cluster> clusters) {
 		Cluster root = clusters.get(0);
 
 		Cluster curr = root;
-		LinkedList<Cluster> queue = new LinkedList<Cluster>();
-		ArrayList<Cluster> splitClusters = new ArrayList<Cluster>();
+		LinkedList<Cluster> queue = new LinkedList<>();
+		List<Cluster> splitClusters = new ArrayList<>();
 		splitClusters.add(curr);
 
-		if (DEBUG) {
+		if (Constants._DEBUG) {
 			logger.debug("Initial split clusters size: " + splitClusters.size());
 			logger.debug("Initial split clusters: ");
 		}
@@ -142,7 +137,7 @@ public class ClusterUtil {
 		curr = queue.pop();
 		while (curr != null) {
 
-			if (DEBUG) {
+			if (Constants._DEBUG) {
 				logger.debug("--------------------");
 				logger.debug("curr: " + curr);
 				logger.debug("--------------------");
@@ -152,25 +147,24 @@ public class ClusterUtil {
 				logger.debug("--------------------");
 			}
 
-			if (DEBUG)
+			if (Constants._DEBUG)
 				logger.debug("Item size of current cluster: "
 						+ curr.items.size());
-			if (curr.items.size() >= 1) {
-				if (curr.left != null || curr.right != null) {
-					splitClusters.remove(curr);
-				}
+			if (curr.items.size() >= 1 
+					&& (curr.left != null || curr.right != null)) {
+				splitClusters.remove(curr);
 			}
 
 			if (curr.left != null) {
 				if (curr.right != null) {
-					if (DEBUG) {
+					if (Constants._DEBUG) {
 						System.out
 								.println("Testing similiarity of left and right cluster: ");
 						logger.debug("Left: " + curr.left.simLeftRight + ", : "
 								+ curr.right.simLeftRight);
 					}
 					if (curr.left.simLeftRight < curr.right.simLeftRight) {
-						if (DEBUG)
+						if (Constants._DEBUG)
 							logger.debug("Splitting left then right");
 						queue.offer(curr.left);
 						splitClusters.add(curr.left);
@@ -178,7 +172,7 @@ public class ClusterUtil {
 						queue.offer(curr.right);
 						splitClusters.add(curr.right);
 					} else {
-						if (DEBUG)
+						if (Constants._DEBUG)
 							logger.debug("Splitting right then left");
 						queue.offer(curr.right);
 						splitClusters.add(curr.right);
@@ -188,19 +182,19 @@ public class ClusterUtil {
 					}
 
 				} else {
-					if (DEBUG)
+					if (Constants._DEBUG)
 						logger.debug("Splitting only left");
 					queue.offer(curr.left);
 					splitClusters.add(curr.left);
 				}
 			} else if (curr.right != null) {
-				if (DEBUG)
+				if (Constants._DEBUG)
 					logger.debug("Splitting only right");
 				queue.offer(curr.right);
 				splitClusters.add(curr.right);
 			}
 
-			if (DEBUG) {
+			if (Constants._DEBUG) {
 				logger.debug("Current split clusters size: "
 						+ splitClusters.size());
 				logger.debug("Current split clusters: ");
@@ -221,33 +215,29 @@ public class ClusterUtil {
 		return splitClusters;
 	}
 
-	public static void prettyPrintSplitClusters(ArrayList<Cluster> splitClusters) {
+	public static void prettyPrintSplitClusters(List<Cluster> splitClusters) {
 
 		int count = 1;
 		for (Cluster c : splitClusters) {
 			logger.debug(count + ":" + c);
 			count++;
 		}
-
 	}
 
-	public static void printClustersByLine(ArrayList<Cluster> clusters) {
+	public static void printClustersByLine(List<Cluster> clusters) {
 		for (int i = 0; i < clusters.size(); i++) {
 			logger.debug(i + ": " + clusters.get(i));
 		}
-
 	}
 	
-	public static void printFastClustersByLine(ArrayList<FastCluster> clusters) {
+	public static void printFastClustersByLine(List<FastCluster> clusters) {
 		for (int i = 0; i < clusters.size(); i++) {
 			logger.debug(i + ": " + clusters.get(i).getName());
 		}
-
 	}
 
 	public static StringGraph generateClusterGraph(
 			Collection<Cluster> splitClusters) {
-		boolean debugMethod = false;
 		StringGraph clusterGraph = new StringGraph();
 		for (Cluster c1 : splitClusters) {
 			for (Cluster c2 : splitClusters) {
@@ -256,7 +246,7 @@ public class ClusterUtil {
 						String lc2NameClean = lc2.name.substring(1,
 								lc2.name.length() - 1).trim();
 						String featureEdgeClean = f.edge.tgtStr.trim();
-						if (debugMethod) {
+						if (Constants._DEBUG) {
 							logger.debug("featureEdgeClean: "
 									+ featureEdgeClean);
 							logger.debug("lc2NameClean: " + lc2NameClean);
@@ -276,12 +266,11 @@ public class ClusterUtil {
 
 	public static StringGraph generateFastClusterGraph(
 			Collection<FastCluster> splitClusters,
-			ArrayList<String> namesInFeatureSet) {
+			List<String> namesInFeatureSet) {
 		boolean debugMethod = false;
 		StringGraph clusterGraph = new StringGraph();
 		for (FastCluster c1 : splitClusters) {
 			for (FastCluster c2 : splitClusters) {
-				// double[] c1Features = c1.getFeatures();
 				Set<Integer> c1Keys = c1.getNonZeroFeatureMap().keySet();
 				for (Integer key : c1Keys) {
 					Double c1FeatureValue = c1.getNonZeroFeatureMap().get(key);
@@ -308,7 +297,7 @@ public class ClusterUtil {
 	}
 
 	public static SmellArchGraph generateSmellArchGraph(
-			ArrayList<Cluster> splitClusters) {
+			List<Cluster> splitClusters) {
 		boolean debugMethod = false;
 		SmellArchGraph smellArchGraph = new SmellArchGraph();
 		for (Cluster c1 : splitClusters) {
@@ -336,7 +325,7 @@ public class ClusterUtil {
 	}
 
 	public static void readInSmellArchFromXML(String filename,
-			ArrayList<Cluster> splitClusters, HashSet<TopicKey> topicKeys)
+			List<Cluster> splitClusters, Set<TopicKey> topicKeys)
 			throws ParserConfigurationException, SAXException, IOException {
 		File smellArchXMLFile = new File(filename);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -466,7 +455,7 @@ public class ClusterUtil {
 
 	}
 
-	public static void writeOutSmellArchToXML(ArrayList<Cluster> splitClusters)
+	public static void writeOutSmellArchToXML(List<Cluster> splitClusters)
 			throws ParserConfigurationException, TransformerException,
 			FileNotFoundException {
 
@@ -513,8 +502,6 @@ public class ClusterUtil {
 
 			Element nameElem = doc.createElement("name");
 			nameElem.appendChild(doc.createTextNode(cluster.name));
-			// Element tgt = doc.createElement("tgt");
-			// tgt.appendChild(doc.createTextNode(e.getTgt().toString()));
 			clusterElement.appendChild(nameElem);
 
 			Element classesElem = doc.createElement("classes");
@@ -533,7 +520,6 @@ public class ClusterUtil {
 							.toString()));
 					methodsElem.appendChild(methodElem);
 				}
-				// for (MyClass myclass : )
 			}
 
 			Element docTopicElem = doc.createElement("doc-topic");
@@ -548,8 +534,6 @@ public class ClusterUtil {
 						.toString(topicItem.proportion)));
 				docTopicElem.appendChild(topicElem);
 			}
-
-			// clusterElement.appendChild(tgt);
 		}
 
 		// write the content into xml file
@@ -573,7 +557,7 @@ public class ClusterUtil {
 	}
 
 	public static void classifyClustersBasedOnTopicTypes(
-			ArrayList<Cluster> splitClusters) {
+			List<Cluster> splitClusters) {
 
 		for (Cluster cluster : splitClusters) {
 			double specTypeWeight = 0;
@@ -613,7 +597,7 @@ public class ClusterUtil {
 	}
 
 	public static void writeOutSpecifiedSmellArchToXML(
-			ArrayList<Cluster> splitClusters, HashSet<TopicKey> topicKeys)
+			List<Cluster> splitClusters, Set<TopicKey> topicKeys)
 			throws ParserConfigurationException, TransformerException,
 			FileNotFoundException {
 
@@ -660,8 +644,6 @@ public class ClusterUtil {
 
 			Element nameElem = doc.createElement("name");
 			nameElem.appendChild(doc.createTextNode(cluster.name));
-			// Element tgt = doc.createElement("tgt");
-			// tgt.appendChild(doc.createTextNode(e.getTgt().toString()));
 			clusterElement.appendChild(nameElem);
 
 			Element classesElem = doc.createElement("classes");
@@ -680,7 +662,6 @@ public class ClusterUtil {
 							.toString()));
 					methodsElem.appendChild(methodElem);
 				}
-				// for (MyClass myclass : )
 			}
 
 			Element docTopicElem = doc.createElement("doc-topic");
@@ -695,8 +676,6 @@ public class ClusterUtil {
 						.toString(topicItem.proportion)));
 				docTopicElem.appendChild(topicElem);
 			}
-
-			// clusterElement.appendChild(tgt);
 		}
 
 		// write the content into xml file
@@ -722,14 +701,7 @@ public class ClusterUtil {
 	public static double computeCentroidUsingStructuralData(FastCluster cluster) {
 
 		double centroidSum = 0;
-
-		/* double[] features = cluster.getFeatures(); */
-
 		Set<Integer> clusterKeys = cluster.getNonZeroFeatureMap().keySet();
-
-		/*
-		 * for (int i=0; i<features.length; i++) { centroidSum += features[i]; }
-		 */
 
 		for (Integer key : clusterKeys) {
 			centroidSum += cluster.getNonZeroFeatureMap().get(key)
@@ -738,9 +710,8 @@ public class ClusterUtil {
 
 		double centroidAvg = centroidSum / cluster.getFeaturesLength();
 
-		double centroid = centroidAvg / cluster.getNumEntities();
-
-		return centroid;
+		// centroid
+		return centroidAvg / cluster.getNumEntities();
 	}
 
 	public static double computeCentroidUsingStructuralData(FeatureVector fv) {
@@ -757,7 +728,7 @@ public class ClusterUtil {
 	}
 
 	public static double computeGlobalCentroidForStructuralData(
-			ArrayList<Double> clusterCentroids) {
+			List<Double> clusterCentroids) {
 
 		double centroidSum = 0;
 
@@ -769,11 +740,11 @@ public class ClusterUtil {
 	}
 
 	public static double computeClusterGainUsingStructuralDataFromFeatureVectorMap(
-			ArrayList<Cluster> clusters) {
-		ArrayList<Double> clusterCentroids = new ArrayList<Double>();
+			List<Cluster> clusters) {
+		ArrayList<Double> clusterCentroids = new ArrayList<>();
 
 		for (Cluster c : clusters) {
-			clusterCentroids.add(new Double(
+			clusterCentroids.add(Double.valueOf(
 					computeCentroidUsingStructuralData(c)));
 		}
 
@@ -791,8 +762,8 @@ public class ClusterUtil {
 	}
 
 	public static double computeClusterGainUsingStructuralDataFromFastFeatureVectors(
-			ArrayList<FastCluster> fastClusters) {
-		ArrayList<Double> clusterCentroids = new ArrayList<Double>();
+			List<FastCluster> fastClusters) {
+		ArrayList<Double> clusterCentroids = new ArrayList<>();
 
 		for (FastCluster cluster : fastClusters) {
 			double centroid = computeCentroidUsingStructuralData(cluster);
@@ -813,7 +784,7 @@ public class ClusterUtil {
 	}
 
 	public static DocTopicItem computeGlobalCentroidUsingTopics(
-			ArrayList<DocTopicItem> docTopicItems) {
+			List<DocTopicItem> docTopicItems) {
 		int firstNonNullDocTopicItemIndex = 0;
 		for (; docTopicItems.get(firstNonNullDocTopicItemIndex) == null
 				&& firstNonNullDocTopicItemIndex < docTopicItems.size(); firstNonNullDocTopicItemIndex++) {
@@ -831,8 +802,8 @@ public class ClusterUtil {
 	}
 
 	public static double computeClusterGainUsingTopics(
-			ArrayList<FastCluster> clusters) {
-		ArrayList<DocTopicItem> docTopicItems = new ArrayList<DocTopicItem>();
+			List<FastCluster> clusters) {
+		ArrayList<DocTopicItem> docTopicItems = new ArrayList<>();
 		for (FastCluster c : clusters) {
 			docTopicItems.add(c.docTopicItem);
 		}
@@ -852,30 +823,30 @@ public class ClusterUtil {
 
 	}
 
-	public static HashMap<String, Integer> createClusterNameToNodeNumberMap(
-			ArrayList<Cluster> clusters) {
-		HashMap<String, Integer> clusterNameToNodeNumberMap = new HashMap<String, Integer>();
+	public static Map<String, Integer> createClusterNameToNodeNumberMap(
+			List<Cluster> clusters) {
+		HashMap<String, Integer> clusterNameToNodeNumberMap = new HashMap<>();
 		for (int i = 0; i < clusters.size(); i++) {
 			Cluster cluster = clusters.get(i);
-			clusterNameToNodeNumberMap.put(cluster.name, new Integer(i));
+			clusterNameToNodeNumberMap.put(cluster.name, Integer.valueOf(i));
 		}
 		return clusterNameToNodeNumberMap;
 	}
 
-	public static HashMap<String, Integer> createFastClusterNameToNodeNumberMap(
+	public static Map<String, Integer> createFastClusterNameToNodeNumberMap(
 			List<FastCluster> clusters) {
-		HashMap<String, Integer> clusterNameToNodeNumberMap = new HashMap<String, Integer>();
+		HashMap<String, Integer> clusterNameToNodeNumberMap = new HashMap<>();
 		for (int i = 0; i < clusters.size(); i++) {
 			FastCluster cluster = clusters.get(i);
-			clusterNameToNodeNumberMap.put(cluster.getName(), new Integer(i));
+			clusterNameToNodeNumberMap.put(cluster.getName(), Integer.valueOf(i));
 		}
 		return clusterNameToNodeNumberMap;
 	}
 
-	public static TreeMap<Integer, String> createNodeNumberToClusterNameMap(
-			ArrayList<Cluster> clusters,
-			HashMap<String, Integer> clusterNameToNodeNumberMap) {
-		TreeMap<Integer, String> nodeNumberToClusterNameMap = new TreeMap<Integer, String>();
+	public static Map<Integer, String> createNodeNumberToClusterNameMap(
+			List<Cluster> clusters,
+			Map<String, Integer> clusterNameToNodeNumberMap) {
+		Map<Integer, String> nodeNumberToClusterNameMap = new TreeMap<>();
 
 		for (Cluster cluster : clusters) {
 			nodeNumberToClusterNameMap.put(
@@ -885,10 +856,10 @@ public class ClusterUtil {
 		return nodeNumberToClusterNameMap;
 	}
 
-	public static TreeMap<Integer, String> createNodeNumberToFastClusterNameMap(
+	public static Map<Integer, String> createNodeNumberToFastClusterNameMap(
 			List<FastCluster> clusters,
-			HashMap<String, Integer> clusterNameToNodeNumberMap) {
-		TreeMap<Integer, String> nodeNumberToClusterNameMap = new TreeMap<Integer, String>();
+			Map<String, Integer> clusterNameToNodeNumberMap) {
+		Map<Integer, String> nodeNumberToClusterNameMap = new TreeMap<>();
 
 		for (FastCluster cluster : clusters) {
 			nodeNumberToClusterNameMap.put(
@@ -900,8 +871,8 @@ public class ClusterUtil {
 	}
 
 	public static ByteArrayOutputStream writeRSFToByteArrayOutputStream(
-			HashMap<String, Integer> clusterNameToNodeNumberMap,
-			ArrayList<Cluster> clusters) throws UnsupportedEncodingException {
+			Map<String, Integer> clusterNameToNodeNumberMap,
+			List<Cluster> clusters) {
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		OutputStreamWriter osw = new OutputStreamWriter(bos);
@@ -930,13 +901,12 @@ public class ClusterUtil {
 	}
 
 	public static void writeClusterRSFFile(
-			HashMap<String, Integer> clusterNameToNodeNumberMap,
-			ArrayList<Cluster> clusters) throws FileNotFoundException,
-			UnsupportedEncodingException {
+			Map<String, Integer> clusterNameToNodeNumberMap,
+			List<Cluster> clusters) throws FileNotFoundException {
 		File rsfFile = new File(Config.getClustersRSFFilename(clusters.size()));
 
 		FileOutputStream fos = new FileOutputStream(rsfFile);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
 		PrintWriter out = new PrintWriter(osw);
 
 		logger.debug("Printing each cluster and its leaves...");
@@ -956,7 +926,7 @@ public class ClusterUtil {
 	}
 
 	public static void writeFastClusterRSFFileUsingConfigName(
-			HashMap<String, Integer> clusterNameToNodeNumberMap,
+			Map<String, Integer> clusterNameToNodeNumberMap,
 			List<FastCluster> clusters) throws FileNotFoundException,
 			UnsupportedEncodingException {
 		String currentClustersDetailedRsfFilename = Config.getClustersRSFFilename(clusters.size());
@@ -965,14 +935,14 @@ public class ClusterUtil {
 	}
 
 	public static void writeFastClustersRsfFile(
-			HashMap<String, Integer> clusterNameToNodeNumberMap,
+			Map<String, Integer> clusterNameToNodeNumberMap,
 			List<FastCluster> clusters,
 			String currentClustersDetailedRsfFilename)
-			throws FileNotFoundException, UnsupportedEncodingException {
+			throws FileNotFoundException {
 		File rsfFile = new File(currentClustersDetailedRsfFilename);
 
 		FileOutputStream fos = new FileOutputStream(rsfFile);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
 		PrintWriter out = new PrintWriter(osw);
 
 		logger.trace("Printing each cluster and its leaves...");
@@ -985,8 +955,6 @@ public class ClusterUtil {
 			Set<String> entitiesSet = new HashSet<String>( Arrays.asList(entities) );
 			int entityCount = 0;
 			for (String entity : entitiesSet) {
-				/*String clusterLimitedName = DebugUtil.getLimitedString(
-						cluster.getName(), 1000);*/
 				logger.trace(entityCount + ":\t" + entity);
 				out.println("contain " + currentNodeNumber + " " + entity);
 				entityCount++;
@@ -998,7 +966,7 @@ public class ClusterUtil {
 
 	public static void printSimilarFeatures(FastCluster c1, FastCluster c2,
 			FastFeatureVectors fastFeatureVectors) {
-		ArrayList<String> names = fastFeatureVectors.getNamesInFeatureSet();
+		List<String> names = fastFeatureVectors.getNamesInFeatureSet();
 
 		int characterLimit = 1000;
 		String c1LimitedName = DebugUtil.getLimitedString(c1.getName(),
@@ -1008,11 +976,6 @@ public class ClusterUtil {
 
 		logger.debug("Features shared between " + c1LimitedName + " and "
 				+ c2LimitedName);
-
-		/*
-		 * for (int i=0;i<features1.length;i++) { if (features1[i] > 0 &&
-		 * features2[i] > 0) { logger.debug(names.get(i)); } }
-		 */
 
 		Set<Integer> c1Keys = c1.getNonZeroFeatureMap().keySet();
 
@@ -1042,13 +1005,8 @@ public class ClusterUtil {
 			logger.debug(fastFeatureVectors.getNamesInFeatureSet());
 
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		logger.debug("Read in serialized feature vectors...");
@@ -1057,7 +1015,7 @@ public class ClusterUtil {
 	}
 
 	public static Set<String> getNodesInClusterGraph(StringGraph cg) {
-		HashSet<String> nodes = new HashSet<String>();
+		Set<String> nodes = new HashSet<>();
 		for (StringEdge edge : cg.edges) {
 			nodes.add(edge.srcStr.trim());
 			nodes.add(edge.tgtStr.trim());
@@ -1067,7 +1025,7 @@ public class ClusterUtil {
 
 	public static Set<String> getClassesInClusters(
 			Set<ConcernCluster> clusters) {
-		Set<String> classes = new HashSet<String>();
+		Set<String> classes = new HashSet<>();
 		for (ConcernCluster cluster : clusters) {
 			for (String entity : cluster.getEntities()) {
 				classes.add(entity.trim());
@@ -1076,9 +1034,9 @@ public class ClusterUtil {
 		return classes;
 	}
 	
-	public static Set<StringGraph> buildInternalGraphs(HashMap<String, Type> typeMap,
+	public static Set<StringGraph> buildInternalGraphs(Map<String, Type> typeMap,
 			Set<ConcernCluster> clusters) {
-		Set<StringGraph> graphs = new HashSet<StringGraph>();
+		Set<StringGraph> graphs = new HashSet<>();
 		for (ConcernCluster cluster : clusters) {
 			StringGraph currGraph = new StringGraph(cluster.getName().trim());
 			for (String entity : cluster.getEntities()) {
@@ -1134,7 +1092,7 @@ public class ClusterUtil {
 		return cg;
 	}
 	
-	public static StringGraph buildClusterGraphUsingOdemClasses(HashMap<String, Type> typeMap,
+	public static StringGraph buildClusterGraphUsingOdemClasses(Map<String, Type> typeMap,
 			Set<ConcernCluster> clusters) {
 		StringGraph cg = new StringGraph();
 		for (ConcernCluster cluster : clusters) {
@@ -1166,7 +1124,7 @@ public class ClusterUtil {
 	public static Set<ConcernCluster> buildGroundTruthClustersFromPackages(
 			Set<String> topLevelPackagesOfUnclusteredClasses,
 			Set<String> unClusteredClasses) {
-		Set<ConcernCluster> clusters = new HashSet<ConcernCluster>();
+		Set<ConcernCluster> clusters = new HashSet<>();
 		for (String pkg : topLevelPackagesOfUnclusteredClasses) {
 			ConcernCluster cluster = new ConcernCluster();
 			cluster.setName(pkg.trim());
@@ -1215,13 +1173,13 @@ public class ClusterUtil {
 	 */
 	public static Map<String,Set<String>> buildClusterMap(List<List<String>> clusterFacts ) {
 		
-		Map<String,Set<String>> clusterMap = new HashMap<String,Set<String>>();
+		Map<String,Set<String>> clusterMap = new HashMap<>();
 		
 		for (List<String> fact : clusterFacts) {
 			String clusterName = fact.get(1);
 			String entity = fact.get(2);
 			if (clusterMap.get(clusterName) == null) {
-				Set<String> entities = new HashSet<String>();
+				Set<String> entities = new HashSet<>();
 				entities.add(entity);
 				clusterMap.put(clusterName,entities);
 			}
@@ -1245,16 +1203,16 @@ public class ClusterUtil {
 	}
 	
 	public static Map<String,Set<MutablePair<String,String>>> buildInternalEdgesPerCluster(Map<String,Set<String>> clusterMap, List<List<String>> depFacts) {
-		Map<String,Set<MutablePair<String,String>>> map = new HashMap<String,Set<MutablePair<String,String>>>();
+		Map<String,Set<MutablePair<String,String>>> map = new HashMap<>();
 
 		for (String clusterName : clusterMap.keySet()) { // for each cluster name
-			Set<MutablePair<String,String>> edges = new HashSet<MutablePair<String,String>>();
+			Set<MutablePair<String,String>> edges = new HashSet<>();
 			for (List<String> depFact : depFacts) {
 				String source = depFact.get(1);
 				String target = depFact.get(2);
 				if (clusterMap.get(clusterName).contains(source) && clusterMap.get(clusterName).contains(target)) { // check if the source and target is in the cluster
 					// Add internal edge 
-					MutablePair<String, String> edge = new MutablePair<String, String>();
+					MutablePair<String, String> edge = new MutablePair<>();
 					edge.setLeft(source);
 					edge.setRight(target);
 					edges.add(edge);
@@ -1268,23 +1226,23 @@ public class ClusterUtil {
 	}
 	
 	public static Map<String,Set<MutablePair<String,String>>> buildExternalEdgesPerCluster(Map<String,Set<String>> clusterMap, List<List<String>> depFacts) {
-		Map<String,Set<MutablePair<String,String>>> map = new HashMap<String,Set<MutablePair<String,String>>>();
+		Map<String,Set<MutablePair<String,String>>> map = new HashMap<>();
 
 		for (String clusterName : clusterMap.keySet()) { // for each cluster name
-			Set<MutablePair<String,String>> edges = new HashSet<MutablePair<String,String>>();
+			Set<MutablePair<String,String>> edges = new HashSet<>();
 			for (List<String> depFact : depFacts) {
 				String source = depFact.get(1);
 				String target = depFact.get(2);
 				if (clusterMap.get(clusterName).contains(source) && !(clusterMap.get(clusterName).contains(target)) ) { // source is in cluster, but target is not
 					// Add external edge 
-					MutablePair<String, String> edge = new MutablePair<String, String>();
+					MutablePair<String, String> edge = new MutablePair<>();
 					edge.setLeft(source);
 					edge.setRight(target);
 					edges.add(edge);
 				}
 				if (!(clusterMap.get(clusterName).contains(source)) && clusterMap.get(clusterName).contains(target)) { // target is in cluster, but source is not
 					// Add external edge 
-					MutablePair<String, String> edge = new MutablePair<String, String>();
+					MutablePair<String, String> edge = new MutablePair<>();
 					edge.setLeft(source);
 					edge.setRight(target);
 					edges.add(edge);
@@ -1298,16 +1256,16 @@ public class ClusterUtil {
 	}
 	
 	public static Map<String,Set<MutablePair<String,String>>> buildEdgesIntoEachCluster(Map<String,Set<String>> clusterMap, List<List<String>> depFacts) {
-		Map<String,Set<MutablePair<String,String>>> map = new HashMap<String,Set<MutablePair<String,String>>>();
+		Map<String,Set<MutablePair<String,String>>> map = new HashMap<>();
 
 		for (String clusterName : clusterMap.keySet()) { // for each cluster name
-			Set<MutablePair<String,String>> edges = new HashSet<MutablePair<String,String>>();
+			Set<MutablePair<String,String>> edges = new HashSet<>();
 			for (List<String> depFact : depFacts) {
 				String source = depFact.get(1);
 				String target = depFact.get(2);
 				if (!(clusterMap.get(clusterName).contains(source)) && clusterMap.get(clusterName).contains(target)) { // target is in cluster, but source is not
 					// Add edge that goes into cluster 
-					MutablePair<String, String> edge = new MutablePair<String, String>();
+					MutablePair<String, String> edge = new MutablePair<>();
 					edge.setLeft(source);
 					edge.setRight(target);
 					edges.add(edge);
@@ -1321,7 +1279,7 @@ public class ClusterUtil {
 	}
 	
 	public static Set<List<String>> buildClusterEdges(Map<String,Set<String>> clusterMap, List<List<String>> depFacts) {
-		Set<List<String>> edges = new HashSet<List<String>>();
+		Set<List<String>> edges = new HashSet<>();
 
 		for (List<String> depFact : depFacts) {
 			String source = depFact.get(1);
@@ -1356,9 +1314,9 @@ public class ClusterUtil {
 			logger.debug(clusterGraph);
 		}
 
-		HashMap<String, Integer> clusterNameToNodeNumberMap = ClusterUtil
+		Map<String, Integer> clusterNameToNodeNumberMap = ClusterUtil
 				.createFastClusterNameToNodeNumberMap(fastClusters);
-		TreeMap<Integer, String> nodeNumberToClusterNameMap = ClusterUtil
+		Map<Integer, String> nodeNumberToClusterNameMap = ClusterUtil
 				.createNodeNumberToFastClusterNameMap(fastClusters,
 						clusterNameToNodeNumberMap);
 
@@ -1370,16 +1328,12 @@ public class ClusterUtil {
 					fastClusters);
 			clusterGraph.writeXMLClusterGraph(Config.getClusterGraphXMLFilename());
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
@@ -1389,7 +1343,7 @@ public class ClusterUtil {
 		RsfReader.loadRsfDataFromFile(depsRsfFilename);
 		Iterable<List<String>> depFacts = RsfReader.filteredRoutineFacts;
 		
-		Map<String,Set<String>> depMap = new HashMap<String,Set<String>>();
+		Map<String,Set<String>> depMap = new HashMap<>();
 		
 		for (List<String> fact : depFacts) {
 			String source = fact.get(1).trim();
@@ -1409,7 +1363,7 @@ public class ClusterUtil {
 	
 	public static SimpleDirectedGraph<String, DefaultEdge> buildConcernClustersDiGraph(
 			Set<ConcernCluster> clusters, String depsRsfFilename) {
-		SimpleDirectedGraph<String, DefaultEdge>  directedGraph = new SimpleDirectedGraph<String,DefaultEdge>(DefaultEdge.class);
+		SimpleDirectedGraph<String, DefaultEdge>  directedGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
 		
 		for (ConcernCluster cluster : clusters) {
 			directedGraph.addVertex(cluster.getName());
@@ -1431,7 +1385,7 @@ public class ClusterUtil {
 	
 	public static SimpleDirectedGraph<String, DefaultEdge> buildConcernClustersDiGraph(
 			Set<ConcernCluster> clusters, StringGraph clusterGraph) {
-		SimpleDirectedGraph<String, DefaultEdge>  directedGraph = new SimpleDirectedGraph<String,DefaultEdge>(DefaultEdge.class);
+		SimpleDirectedGraph<String, DefaultEdge>  directedGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
 		
 		for (ConcernCluster cluster : clusters) {
 			directedGraph.addVertex(cluster.getName());
@@ -1457,9 +1411,6 @@ public class ClusterUtil {
 		
 		StringGraph clusterGraph = ClusterUtil.buildClusterGraphUsingDepMap(depMap,clusters);
 		
-		SimpleDirectedGraph<String, DefaultEdge> actualGraph = ClusterUtil.buildConcernClustersDiGraph(
-				clusters, clusterGraph);
-		return actualGraph;
+		return ClusterUtil.buildConcernClustersDiGraph(clusters, clusterGraph);
 	}
-
 }

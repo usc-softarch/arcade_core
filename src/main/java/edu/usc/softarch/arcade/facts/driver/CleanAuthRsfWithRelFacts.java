@@ -16,11 +16,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.facts.SymmetricRsfFactsTransformer;
 
 /**
  * @author joshua
- *
  */
 public class CleanAuthRsfWithRelFacts {
 	static Logger logger = Logger.getLogger(CleanAuthRsfWithRelFacts.class);
@@ -40,9 +38,9 @@ public class CleanAuthRsfWithRelFacts {
 		System.out.println("number of facts in flat authoritative recovery: " + authFacts.size());
 
 		RsfReader.loadRsfDataFromFile(depsRsfFilename);
-		Set<String> allRelFactNodesSet = new HashSet<String>(RsfReader.allNodesSet);
+		Set<String> allRelFactNodesSet = new HashSet<>(RsfReader.allNodesSet);
 		
-		List<List<String>> factsToRemove = new ArrayList<List<String>>();
+		List<List<String>> factsToRemove = new ArrayList<>();
 		
 		for (List<String> fact : authFacts) { // for each fact in the flat authoritative recovery
 			String target = fact.get(2);
@@ -61,13 +59,7 @@ public class CleanAuthRsfWithRelFacts {
 		}
 		System.out.println("number of facts in clean flat authoritative recovery: " + cleanAuthFacts.size());
 		
-		//String extension = authRsfFilename.substring(authRsfFilename.lastIndexOf("."),authRsfFilename.length());
-		//String prefix = authRsfFilename.substring(0,authRsfFilename.lastIndexOf("."));
-		
-		//String outputFilename = prefix + ".clean" + extension;
-		
-		try {
-			FileWriter fw = new FileWriter(outputFilename);
+		try (FileWriter fw = new FileWriter(outputFilename)) {
 			BufferedWriter out = new BufferedWriter(fw);
 			System.out.println("Writing to file " + outputFilename + "...");
 			for (List<String> fact : cleanAuthFacts) {

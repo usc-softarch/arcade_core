@@ -3,13 +3,11 @@ package edu.usc.softarch.arcade.facts;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -23,8 +21,8 @@ import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 
 public class ExpertDecompositionBuilder {
-	static Logger logger = Logger.getLogger(ExpertDecompositionBuilder.class);
-	public static ArrayList<ExpertDecomposition> expertDecompositions = null;
+	private static Logger logger = Logger.getLogger(ExpertDecompositionBuilder.class);
+	public static List<ExpertDecomposition> expertDecompositions = null;
 	
 	public static void testFactFiltering() {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
@@ -42,11 +40,8 @@ public class ExpertDecompositionBuilder {
 	}
 	
 	public static void readInExpertDecomposition(String filename) {
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(filename));
-
-			expertDecompositions = new ArrayList<ExpertDecomposition>();
+		try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+			expertDecompositions = new ArrayList<>();
 
 			ExpertDecomposition currDecomposition = null;
 			Group currGroup = null;
@@ -87,14 +82,13 @@ public class ExpertDecompositionBuilder {
 			logger.debug("Printing expert decompositions...");
 			prettyLogExpertDecompositions(expertDecompositions);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 	}
 
 	private static void prettyLogExpertDecompositions(
-			ArrayList<ExpertDecomposition> expertDecompositions) {
+			List<ExpertDecomposition> expertDecompositions) {
 		int decompositionCounter = 1;
 		for (ExpertDecomposition decomposition : expertDecompositions) {
 			logger.debug("*** Expert Decomposition " + decompositionCounter + " ***");
@@ -142,7 +136,7 @@ public class ExpertDecompositionBuilder {
 			for (Group group : expertDecomposition.groups) {
 				for (String element1 : group.elements) {
 					for (String element2 : group.elements) {
-						HashSet<String> intraPair = new HashSet<String>();
+						Set<String> intraPair = new HashSet<>();
 						intraPair.add(element1);
 						intraPair.add(element2);
 						group.intraPairs.add(intraPair);
@@ -158,7 +152,7 @@ public class ExpertDecompositionBuilder {
 			for (Group group : expertDecomposition.groups) {
 				logger.debug("\t" + group);
 				logger.debug("\t\t" + group.elements);
-				for (HashSet<String> intraPair : group.intraPairs) {
+				for (Set<String> intraPair : group.intraPairs) {
 					logger.debug("\t\t\t" + intraPair);
 				}
 			}
@@ -174,7 +168,7 @@ public class ExpertDecompositionBuilder {
 		
 		for (ExpertDecomposition expertDecomposition : expertDecompositions) {
 			logger.debug("Printing all intrapairs for expert decomposition " + decompositionCounter);
-			for (HashSet<String> intraPair : expertDecomposition.allIntraPairs) {
+			for (Set<String> intraPair : expertDecomposition.allIntraPairs) {
 				logger.debug("\t" + intraPair);
 			}
 		}
@@ -226,8 +220,7 @@ public class ExpertDecompositionBuilder {
 			int groupCount = 0;
 			String mojoTargeFilename = Config.DATADIR + File.separator + Config.getCurrProjStr() + "_"
 					+ "expert_decomposition_" + decompositionCounter + ".rsf";
-			try {
-				FileWriter fstream = new FileWriter(mojoTargeFilename);
+			try (FileWriter fstream = new FileWriter(mojoTargeFilename)) {
 				BufferedWriter out = new BufferedWriter(fstream);
 
 				for (Group group : expertDecomposition.groups) {
@@ -255,8 +248,7 @@ public class ExpertDecompositionBuilder {
 			int groupCount = 0;
 			String mojoTargeFilename = Config.DATADIR + File.separator + Config.getCurrProjStr() + "_"
 					+ "expert_decomposition_file_level_" + decompositionCounter + ".rsf";
-			try {
-				FileWriter fstream = new FileWriter(mojoTargeFilename);
+			try (FileWriter fstream = new FileWriter(mojoTargeFilename)) {
 				BufferedWriter out = new BufferedWriter(fstream);
 
 				for (Group group : expertDecomposition.groups) {
@@ -278,14 +270,13 @@ public class ExpertDecompositionBuilder {
 	}
 
 	public static void findMissingElementsInExpertDecomposition() {
-		List<HashSet<String>> listOfElementsOfDecomp = new ArrayList<HashSet<String>>();
+		List<Set<String>> listOfElementsOfDecomp = new ArrayList<>();
 		for (ExpertDecomposition expertDecomposition : expertDecompositions) {
-			HashSet<String> elementsOfDecomp = new HashSet<String>();
+			Set<String> elementsOfDecomp = new HashSet<>();
 			for (Group group : expertDecomposition.groups) {
 				for (String element : group.elements) {
 					elementsOfDecomp.add(element);
 				}
-				
 			}
 			listOfElementsOfDecomp.add(elementsOfDecomp);
 		}
@@ -295,7 +286,7 @@ public class ExpertDecompositionBuilder {
 			for (int j=0;j<listOfElementsOfDecomp.size();j++) {
 				if (i!=j) {
 					logger.debug("Different between expert decompositions " + i + "  and " + j);
-					Set<String> difference = new HashSet<String>(listOfElementsOfDecomp.get(i));
+					Set<String> difference = new HashSet<>(listOfElementsOfDecomp.get(i));
 					difference.removeAll(listOfElementsOfDecomp.get(j));
 					logger.debug(difference);					
 				}

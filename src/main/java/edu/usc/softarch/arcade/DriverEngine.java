@@ -35,13 +35,12 @@ import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 /**
  * @author joshua
- *
  */
 public class DriverEngine {
 
 	private static ArrayList<Cluster> clusters = null;
 	
-	static Logger logger = Logger.getLogger(DriverEngine.class);
+	private static Logger logger = Logger.getLogger(DriverEngine.class);
 
 	/**
 	 * @param args
@@ -89,7 +88,6 @@ public class DriverEngine {
 		} else {
 			logger.error("Cannot determine run type");
 		}
-
 	}
 
 	public static void run() throws Exception {
@@ -128,7 +126,7 @@ public class DriverEngine {
 				// end common setup for clustering
 
 				if (Config.isUsingPreselectedRange()) {
-					List<Integer> clustersToWriteList = new ArrayList<Integer>();
+					List<Integer> clustersToWriteList = new ArrayList<>();
 
 					for (int clustersToWrite = Config
 							.getStartNumClustersRange(); clustersToWrite <= Config
@@ -140,7 +138,7 @@ public class DriverEngine {
 					Config.setClustersToWriteList(clustersToWriteList);
 
 					if (Config.isUsingNumTopicsRange()) {
-						List<Integer> numTopicsList = new ArrayList<Integer>();
+						List<Integer> numTopicsList = new ArrayList<>();
 						for (int numTopics = Config.getStartNumTopicsRange(); numTopics <= Config
 								.getEndNumTopicsRange(); numTopics += Config
 								.getRangeNumTopicsStep()) {
@@ -148,8 +146,6 @@ public class DriverEngine {
 							System.out.println("Clustering using " + numTopics
 									+ " topics...");
 							numTopicsList.add(numTopics);
-							// TopicUtil.docTopics =
-							// TopicUtil.getDocTopicsFromVariableMalletDocTopicsFile();
 						}
 						Config.setNumTopicsList(numTopicsList);
 					}
@@ -183,21 +179,8 @@ public class DriverEngine {
 		logger.debug("Pretty printing deserialized clusters: ");
 		ClusterUtil.prettyPrintSplitClusters(clusters);
 
-		/*Iterator iter = clusters.iterator();
-		Cluster c = null;
-		int clusterCount = 0;
-		while (iter.hasNext()) {
-			c = (Cluster) iter.next();
-			clusterCount++;
-		}
-		
-		logger.debug("Cluster items size: " + c.items.size());
-		logger.debug("Cluster items: ");
-		logger.debug(c.itemsToStringOnLine());*/
-
 		if (enableSplitClusters) {
-
-			ArrayList<Cluster> splitClusters = ClusterUtil
+			List<Cluster> splitClusters = ClusterUtil
 					.splitClusters(clusters);
 
 			if (enablePrintSplitClusters) {
@@ -211,24 +194,21 @@ public class DriverEngine {
 				logger.debug("Pretty printing splitclusters: ");
 				ClusterUtil.prettyPrintSplitClusters(splitClusters);
 			}
-
 		}
 
 		if (enableSmellDetection)
 			ADADetector.runSmellDetectionAlgorithms(clusters);
 	}
 	private static void deserializeClusters() {
-		FileInputStream fis = null;
 		ObjectInputStream in = null;
 		String filename = Config.getSerializedClustersFilename();
 		logger.debug("Will try to deserialize from file " + filename);
-		try {
-			fis = new FileInputStream(filename);
+		try (FileInputStream fis = new FileInputStream(filename)) {
 			in = new ObjectInputStream(fis);
 			logger.debug("Reading in serialized clusters...");
 			int clustersSize = in.readInt();
 			Cluster c = null;
-			clusters = new ArrayList<Cluster>();
+			clusters = new ArrayList<>();
 			for (int i = 0; i < clustersSize; i++) {
 				c = (Cluster) in.readObject();
 				clusters.add(c);
@@ -251,19 +231,15 @@ public class DriverEngine {
 		try {
 			System.setErr(new PrintStream(new FileOutputStream(stdErrFilename)));
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
 	}
 
 	public static void redirectSystemOut(String stdOutFilename) {
 		try {
 			System.setOut(new PrintStream(new FileOutputStream(stdOutFilename)));
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
-
 }

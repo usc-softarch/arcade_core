@@ -2,13 +2,11 @@ package logical_coupling;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public class cleanUpCodeMaat {
-	
 	private static String[] PATTERNS = {
 			"src/org/apache/",
 			"java/org/apache/",
@@ -17,8 +15,7 @@ public class cleanUpCodeMaat {
 			"test/org/apache/"
 	};
 
-	public static void main(String[] args) throws FileNotFoundException {
-		// TODO Auto-generated method stub
+	public static void main(String[] args) {
 		String inputDirFilename = args[0];
 		File folder = new File(inputDirFilename);
 		File[] files = folder.listFiles();
@@ -29,8 +26,6 @@ public class cleanUpCodeMaat {
 			single(sourceFile, inputDirFilename);
 			}
 		}
-		
-	
 	}
 
 	private static void single(String sourceFile, String folder) {
@@ -75,5 +70,4 @@ public class cleanUpCodeMaat {
 		
 		return null;
 	}
-	
 }

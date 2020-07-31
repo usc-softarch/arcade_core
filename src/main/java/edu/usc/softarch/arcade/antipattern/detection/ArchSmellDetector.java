@@ -1,11 +1,10 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,13 +37,12 @@ import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
 import com.thoughtworks.xstream.XStream;
 
-import edu.usc.softarch.arcade.classgraphs.StringEdge;
+import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
-import edu.usc.softarch.arcade.facts.driver.RsfReader;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicItem;
@@ -52,24 +50,18 @@ import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 
 public class ArchSmellDetector {
-
-	static Logger logger = Logger.getLogger(ArchSmellDetector.class);
-	public static TopicModelExtractionMethod tmeMethod = TopicModelExtractionMethod.VAR_MALLET_FILE;
+	private static Logger logger = Logger.getLogger(ArchSmellDetector.class);
+	public static TopicModelExtractionMethod tmeMethod =
+		TopicModelExtractionMethod.VAR_MALLET_FILE;
+	public static DocTopics docTopics;
 	
-	
-	static final Comparator<TopicItem> TOPIC_PROPORTION_ORDER = new Comparator<TopicItem>() {
-		public int compare(TopicItem t1, TopicItem t2) {
+	static final Comparator<TopicItem> TOPIC_PROPORTION_ORDER 
+		= (TopicItem t1, TopicItem t2) -> {
 			Double prop1 = t1.proportion;
 			Double prop2 = t2.proportion;
 			return prop1.compareTo(prop2);
-		}
-	};
-
-	public static DocTopics docTopics;
+		};
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 		
@@ -133,8 +125,9 @@ public class ArchSmellDetector {
 	}
 
 	public static void runAllDetectionAlgs(String detectedSmellsFilename) {
-		Set<Smell> detectedSmells = new LinkedHashSet<Smell>();
-		System.out.println("Reading in clusters file: " + Config.getSmellClustersFile());
+		Set<Smell> detectedSmells = new LinkedHashSet<>();
+		System.out.println("Reading in clusters file: "
+			+ Config.getSmellClustersFile());
 		Set<ConcernCluster> clusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(Config.getSmellClustersFile());
 		
 		boolean showBuiltClusters = true;
@@ -158,12 +151,9 @@ public class ArchSmellDetector {
 			}
 		}
 		
-		Map<String,Set<String>> clusterSmellMap = new HashMap<String,Set<String>>();
+		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
 		
-		detectBco(detectedSmells, clusters,
-				clusterSmellMap);
-		
-		//detectSpfOld(clusters, clusterSmellMap);
+		detectBco(detectedSmells, clusters, clusterSmellMap);
 		detectSpfNew(clusters, clusterSmellMap, detectedSmells);
 		
 		Map<String, Set<String>> depMap = ClusterUtil.buildDependenciesMap(Config.getDepsRsfFilename());
@@ -188,8 +178,6 @@ public class ArchSmellDetector {
         for (Entry<String,Set<String>> entry : smellClustersMap.entrySet()) {
         	logger.debug(entry.getKey() + " : " + entry.getValue());
         }
-        
-        //buildSmellToClassesMap(clusters, smellClustersMap);
 		
 		for (Smell smell : detectedSmells) {
 			logger.debug(SmellUtil.getSmellAbbreviation(smell) + " " + smell);
@@ -199,7 +187,7 @@ public class ArchSmellDetector {
 	}
 	
 	private static void runStructuralDetectionAlgs(String detectedSmellsFilename) {
-		Set<Smell> detectedSmells = new LinkedHashSet<Smell>();
+		Set<Smell> detectedSmells = new LinkedHashSet<>();
 		System.out.println("Reading in clusters file: " + Config.getSmellClustersFile());
 		Set<ConcernCluster> clusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(Config.getSmellClustersFile());
 		
@@ -211,7 +199,7 @@ public class ArchSmellDetector {
 			}
 		}
 		
-		Map<String,Set<String>> clusterSmellMap = new HashMap<String,Set<String>>();
+		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
 		
 		Map<String, Set<String>> depMap = ClusterUtil.buildDependenciesMap(Config.getDepsRsfFilename());
 		
@@ -235,8 +223,6 @@ public class ArchSmellDetector {
         for (Entry<String,Set<String>> entry : smellClustersMap.entrySet()) {
         	logger.debug(entry.getKey() + " : " + entry.getValue());
         }
-        
-        //buildSmellToClassesMap(clusters, smellClustersMap);
 		
 		for (Smell smell : detectedSmells) {
 			logger.debug(SmellUtil.getSmellAbbreviation(smell) + " " + smell);
@@ -247,52 +233,23 @@ public class ArchSmellDetector {
 
 	private static void serializeDetectedSmells(String detectedSmellsFilename,
 			Set<Smell> detectedSmells) {
-		try {
-			PrintWriter writer;
-			writer = new PrintWriter(detectedSmellsFilename, "UTF-8");
-			
+		try (PrintWriter writer = new PrintWriter(detectedSmellsFilename, StandardCharsets.UTF_8)) {
 			XStream xstream = new XStream();
 			String xml = xstream.toXML(detectedSmells);
-			
-	        writer.println(xml);
-	        
-			writer.close();
+	    writer.println(xml);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private static void buildSmellToClassesMap(Set<ConcernCluster> clusters,
-			Map<String, Set<String>> smellClustersMap) {
-		// create smell to classes map
-        Map<String,Set<String>> smellClassesMap = new HashMap<String,Set<String>>();
-        for (Entry<String,Set<String>> entry : smellClustersMap.entrySet()) {
-        	String smell = entry.getKey();
-        	Set<String> mClusters = entry.getValue();
-        	for (String clusterName : mClusters) {
-        		ConcernCluster cluster = findCluster(clusters,clusterName);
-        		assert cluster != null : "Could not find cluster " + clusterName;
-        		if (smellClassesMap.containsKey(smell)) {
-        			Set<String> classes = smellClassesMap.get(smell);
-        			classes.addAll(cluster.getEntities());
-        		}
-        		else {
-        			Set<String> classes = new HashSet<String>();
-        			classes.addAll(cluster.getEntities());
-        			smellClassesMap.put(smell, classes);
-        		}
-        	}
-        }
 	}
 
 	private static Map<String, Set<String>> buildSmellToClustersMap(
 			Map<String, Set<String>> clusterSmellMap) {
 		// create smell to clusters map
-        Map<String,Set<String>> smellClustersMap = new HashMap<String,Set<String>>();
+        Map<String,Set<String>> smellClustersMap = new HashMap<>();
         for (String clusterName : clusterSmellMap.keySet()) {
         	Set<String> smellList = clusterSmellMap.get(clusterName);
         	for (String smell : smellList) {
@@ -301,7 +258,7 @@ public class ArchSmellDetector {
         			mClusters.add(clusterName);
         		}
         		else {
-        			Set<String> mClusters = new HashSet<String>();
+        			Set<String> mClusters = new HashSet<>();
         			mClusters.add(clusterName);
         			smellClustersMap.put(smell, mClusters);
         		}
@@ -317,8 +274,8 @@ public class ArchSmellDetector {
 		Set<String> vertices = directedGraph.vertexSet();
         
         logger.debug("Computing the in and out degress of each vertex");
-        List<Double> inDegrees = new ArrayList<Double>();
-        List<Double> outDegrees = new ArrayList<Double>();
+        List<Double> inDegrees = new ArrayList<>();
+        List<Double> outDegrees = new ArrayList<>();
         for (String vertex : vertices) {
         	boolean analyzeThisVertex = true;
         	if (Config.getClusterStartsWith() != null) {
@@ -414,44 +371,48 @@ public class ArchSmellDetector {
 		System.out.println("Finding cycles...");
 		CycleDetector cycleDetector = new CycleDetector(directedGraph);
 		Set<String> cycleSet = cycleDetector.findCycles();
-		//logger.debug("Printing the cycle set, i.e., the set of all vertices which participate in at least one cycle in this graph...");
-		//logger.debug(cycleSet);
+		if(Constants._DEBUG) {
+			logger.debug("Printing the cycle set, i.e., the set of all vertices" + 
+				"which participate in at least one cycle in this graph...");
+			logger.debug(cycleSet);
+		}
 		
+		StrongConnectivityInspector inspector = new StrongConnectivityInspector(directedGraph);
+		List<Set<String>> connectedSets = inspector.stronglyConnectedSets();
+		if(Constants._DEBUG) {
+			logger.debug("Printing the strongly connected sets of the graph....");
+			logger.debug(Joiner.on("\n").join(connectedSets));
+		}
 		
-        StrongConnectivityInspector inspector = new StrongConnectivityInspector(directedGraph);
-        List<Set<String>> connectedSets = inspector.stronglyConnectedSets();
-        //logger.debug("Printing the strongly connected sets of the graph....");
-        //logger.debug(Joiner.on("\n").join(connectedSets));
-        
-        int relevantConnectedSetCount = 0;
-        Set<Set<String>> bdcConnectedSets = new HashSet<Set<String>>();
-        for (Set<String> connectedSet : connectedSets) {
-        	if (connectedSet.size() > 2) {
-        		logger.debug("Counting this strongly connected component set as relevant");
-        		logger.debug(connectedSet);
-        		relevantConnectedSetCount++;
-        		for (String clusterName : connectedSet) {
-        			updateSmellMap(clusterSmellMap, clusterName, "bdc");
-        		}
-        		logger.debug("scc size: " + connectedSet.size());
-        		bdcConnectedSets.add(connectedSet);
-        	}
-        }
-        
-        for (Set<String> bdcConnectedSet : bdcConnectedSets) {
-        	Smell bdc = new BdcSmell();
-        	Set<ConcernCluster> bdcClusters = new HashSet<ConcernCluster>();
-        	for (String clusterName : bdcConnectedSet) {
-        		ConcernCluster cluster = getMatchingCluster(clusterName,clusters);
-        		assert cluster != null : "No matching cluster found for " + clusterName;
-        		bdcClusters.add(cluster);
-        		
-        	}
-        	bdc.clusters = new HashSet<ConcernCluster>(bdcClusters);
-        	detectedSmells.add(bdc);
-        }
-        
-        logger.debug("Number of strongly connected components: " + relevantConnectedSetCount);
+		int relevantConnectedSetCount = 0;
+		Set<Set<String>> bdcConnectedSets = new HashSet<>();
+		for (Set<String> connectedSet : connectedSets) {
+			if (connectedSet.size() > 2) {
+				logger.debug("Counting this strongly connected component set as relevant");
+				logger.debug(connectedSet);
+				relevantConnectedSetCount++;
+				for (String clusterName : connectedSet) {
+					updateSmellMap(clusterSmellMap, clusterName, "bdc");
+				}
+				logger.debug("scc size: " + connectedSet.size());
+				bdcConnectedSets.add(connectedSet);
+			}
+		}
+		
+		for (Set<String> bdcConnectedSet : bdcConnectedSets) {
+			Smell bdc = new BdcSmell();
+			Set<ConcernCluster> bdcClusters = new HashSet<>();
+			for (String clusterName : bdcConnectedSet) {
+				ConcernCluster cluster = getMatchingCluster(clusterName,clusters);
+				assert cluster != null : "No matching cluster found for " + clusterName;
+				bdcClusters.add(cluster);
+				
+			}
+			bdc.clusters = new HashSet<ConcernCluster>(bdcClusters);
+			detectedSmells.add(bdc);
+		}
+		
+		logger.debug("Number of strongly connected components: " + relevantConnectedSetCount);
 	}
 
 	private static StandardDeviation detectBco(Set<Smell> detectedSmells,
@@ -459,8 +420,7 @@ public class ArchSmellDetector {
 			Map<String, Set<String>> clusterSmellMap) {
 		System.out.println("Finding brick concern overload instances...");
 		double concernOverloadTopicThreshold = .10;
-		//double concernCountThreshold = 2;
-		Map<ConcernCluster,Integer> concernCountMap = new HashMap<ConcernCluster,Integer>(); 
+		Map<ConcernCluster,Integer> concernCountMap = new HashMap<>(); 
 		for (ConcernCluster cluster : clusters) {
 			if (cluster.getDocTopicItem() != null) {
 				logger.debug("Have doc-topics for " + cluster.getName());
@@ -479,7 +439,7 @@ public class ArchSmellDetector {
 		
 		StandardDeviation stdDev = new StandardDeviation();
 		
-		int[] intConcernCountValues = ArrayUtils.toPrimitive( (Integer[])concernCountMap.values().toArray(new Integer[0]) );
+		int[] intConcernCountValues = ArrayUtils.toPrimitive(concernCountMap.values().toArray(new Integer[0]) );
 		double[] doubleConcernCountValues = new double[intConcernCountValues.length];
 		for (int i=0;i<intConcernCountValues.length;i++) {
 			doubleConcernCountValues[i] = intConcernCountValues[i];
@@ -569,7 +529,6 @@ public class ArchSmellDetector {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -603,15 +562,6 @@ public class ArchSmellDetector {
 		newDocTopicItem = docTopics.getDocTopicItemForJava(entity);
 		return newDocTopicItem;
 	}
-	
-	private static ConcernCluster findCluster(
-			Set<ConcernCluster> clusters, String clusterName) {
-		for (ConcernCluster cluster : clusters) {
-			if (cluster.getName().equals(clusterName))
-				return cluster;
-		}
-		return null;
-	}
 
 	private static void detectSpfNew(
 			Set<ConcernCluster> clusters,
@@ -621,8 +571,8 @@ public class ArchSmellDetector {
 		double scatteredConcernThreshold = .20;
 		double parasiticConcernThreshold = scatteredConcernThreshold;
 		
-		Map<Integer,Integer> topicNumCountMap = new HashMap<Integer,Integer>();
-		Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap = new HashMap<Integer, Set<ConcernCluster>>();
+		Map<Integer,Integer> topicNumCountMap = new HashMap<>();
+		Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap = new HashMap<>();
 		
 		
 		for (ConcernCluster cluster : clusters) {
@@ -647,7 +597,7 @@ public class ArchSmellDetector {
 
 						}
 						else {
-							Set<ConcernCluster> clustersWithTopic = new HashSet<ConcernCluster>();
+							Set<ConcernCluster> clustersWithTopic = new HashSet<>();
 							clustersWithTopic.add(cluster);
 							scatteredTopicToClustersMap.put(ti.topicNum, clustersWithTopic);
 
@@ -688,7 +638,7 @@ public class ArchSmellDetector {
 			if (topicCount > topicCountMean + topicCountStdDev) {
 				Set<ConcernCluster> clustersWithScatteredTopics = scatteredTopicToClustersMap.get(topicNum);
 				
-				Set<ConcernCluster> affectedClusters = new HashSet<ConcernCluster>();
+				Set<ConcernCluster> affectedClusters = new HashSet<>();
 				for (ConcernCluster cluster : clustersWithScatteredTopics) {
 					if (cluster.getDocTopicItem() != null) {
 						DocTopicItem dti = cluster.getDocTopicItem();
@@ -703,7 +653,7 @@ public class ArchSmellDetector {
 										smells.add("spf");
 									}
 									else {
-										Set<String> smells = new HashSet<String>();
+										Set<String> smells = new HashSet<>();
 										smells.add("spf");
 										clusterSmellsMap.put(cluster.getName(), smells);
 									}
@@ -721,7 +671,6 @@ public class ArchSmellDetector {
 				
 			}
 		}
-		
 	}
 
 	private static void updateSmellMap(
@@ -731,14 +680,11 @@ public class ArchSmellDetector {
 		if (clusterSmellMap.containsKey(clusterName)) {
 			smellList = clusterSmellMap.get(clusterName);
 			smellList.add(smellAbrv); 	
-			//clusterSmellMap.put(clusterName, smellList);
 		}
 		else {
-			smellList = new HashSet<String>();
+			smellList = new HashSet<>();
 			smellList.add(smellAbrv);
 			clusterSmellMap.put(clusterName, smellList);
 		}
 	}
-
-
 }

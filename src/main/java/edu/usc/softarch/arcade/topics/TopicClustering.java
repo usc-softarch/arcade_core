@@ -3,7 +3,6 @@ package edu.usc.softarch.arcade.topics;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Enumeration;
 
 import edu.usc.softarch.arcade.classgraphs.TopicModelData;
@@ -15,7 +14,6 @@ import weka.core.Instances;
 
 /**
  * @author joshua
- *
  */
 public class TopicClustering {
 
@@ -65,7 +63,6 @@ public class TopicClustering {
 			System.exit(1);
 		}
 
-		
 		String datasetsDir = "/home/joshua/Documents/workspace/MyExtractors/datasets";
 		FileReader fr;
 		
@@ -89,25 +86,17 @@ public class TopicClustering {
 			fr = new FileReader(datasetsDir + "/" + arffFilePrefix + "/" + arffFilePrefix  + ".arff");
 			data = new Instances(fr);
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		
+	
 		System.out.println("The dataset: ");
 		System.out.println("=======================================");
 		System.out.println(data);
 		System.out.println();
-		
-		ArrayList<DocTopicItem> dtItemList = new ArrayList<DocTopicItem>();
 
 		System.out.println("Loading doc-topics file...");
-		DocTopics dts = new DocTopics(currDocTopicsFilename);
-		dtItemList = dts.getDocTopicItemList();
 
 		System.out.println("Loading topic-keys file...");
 		TopicKeySet tkList = new TopicKeySet(currTopicKeysFilename);
@@ -121,9 +110,6 @@ public class TopicClustering {
 			System.out.println(ins.stringValue(data.attribute("name")));
 			System.out.println("\tpctCallers: " + ins.value(data.attribute("pctCallers")));
 			System.out.println("\tpctCallees: " + ins.value(data.attribute("pctCallees")));
-			
 		}
-
 	}
-
 }

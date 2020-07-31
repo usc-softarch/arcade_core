@@ -2,11 +2,11 @@ package edu.usc.softarch.arcade.util.ldasupport;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import cc.mallet.pipe.CharSequence2TokenSequence;
@@ -25,11 +25,8 @@ import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class PipeExtractor {
-
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		// TODO Auto-generated method stub
-		ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
-//		numTopics =99;
+	public static void main(String[] args) throws IOException {
+		List<Pipe> pipeList = new ArrayList<>();
 		// Pipes: alphanumeric only, camel case separation, lowercase, tokenize,
 		// remove stopwords english, remove stopwords java, stem, map to
 		// features
@@ -56,7 +53,7 @@ public class PipeExtractor {
 
 		InstanceList instances = new InstanceList(new SerialPipes(pipeList));
 		
-		String testDir = args[0]; //srcDir;
+		String testDir = args[0];
 		testDir = testDir.replaceFirst("^~",System.getProperty("user.home"));
 		for (File file : FileListing.getFileListing(new File(testDir))) {
 			if (file.isFile() && file.getName().endsWith(".java")) {
@@ -93,5 +90,4 @@ public class PipeExtractor {
 		String outputDir = args[1].replaceFirst("^~",System.getProperty("user.home"));
 		instances.save(new File (outputDir, "output.pipe"));
 	}
-
 }

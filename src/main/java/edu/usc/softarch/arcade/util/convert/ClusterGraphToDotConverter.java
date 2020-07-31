@@ -37,8 +37,7 @@ public class ClusterGraphToDotConverter {
 		
 		Set<List<String>> edges = ClusterUtil.buildClusterEdges(clusterMap, depFacts);
 		
-		try {
-			FileWriter out = new FileWriter(dotFilename);
+		try (FileWriter out = new FileWriter(dotFilename)) {
 			out.write("digraph G {\n");
 			
 			for (String clusterName : clusterMap.keySet()) {
@@ -51,15 +50,9 @@ public class ClusterGraphToDotConverter {
 				out.write("\t\"" + source + "\" -> \"" + target + "\";\n"); 
 			}
 			
-			
 			out.write("}\n");
-			
-			out.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
-
 }

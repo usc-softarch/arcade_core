@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
 public class RsfSourceTargetCounter {
@@ -18,8 +17,8 @@ public class RsfSourceTargetCounter {
 		RsfReader.loadRsfDataFromFile(firstRsfFilename);
 		Set<List<String>> facts = Sets.newHashSet(RsfReader.filteredRoutineFacts);
 		
-		Set<String> sources = new HashSet<String>();
-		Set<String> targets = new HashSet<String>();
+		Set<String> sources = new HashSet<>();
+		Set<String> targets = new HashSet<>();
 		for (List<String> fact : facts) {
 			sources.add(fact.get(1));
 			targets.add(fact.get(2));
@@ -27,7 +26,5 @@ public class RsfSourceTargetCounter {
 		
 		System.out.println("sources count: " + sources.size());
 		System.out.println("targets count: " + targets.size());
-
 	}
-
 }

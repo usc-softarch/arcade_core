@@ -25,8 +25,7 @@ public class CountClassInterface {
 		//Get the list of refactoring types
 		try {
 			fileList = FileListing.getFileListing(new File(inputDirFileName));
-			int i = 0;
-			Set<File> orderedSerFiles = new TreeSet<File>();
+			Set<File> orderedSerFiles = new TreeSet<>();
 			
 			for (File file : fileList) {
 					orderedSerFiles.add(file);
@@ -34,22 +33,18 @@ public class CountClassInterface {
 			
 			for (File file : orderedSerFiles){
 				String fileName = file.getPath();
-			//	System.out.println(fileName);
 				BufferedReader br = null;			 
 				try {
-		 
 					String sCurrentLine;		 
-					br = new BufferedReader(new FileReader(fileName));	
+					br = new BufferedReader(new FileReader(fileName));
 					sCurrentLine = br.readLine(); // summary
 					sCurrentLine = br.readLine(); // column names
 					while (!(sCurrentLine = br.readLine()).equals("Sloppy Delegation:")) {
 						if (!sCurrentLine.endsWith("Sloppy Delegation:"))
 							continue;
 						sCurrentLine = br.readLine();
-						int totalClass = 0;
 						while (!(sCurrentLine = br.readLine()).equals("")) {
 					    String[] counter = sCurrentLine.split(",");
-					    //System.out.println(sCurrentLine);
 					    total += Integer.valueOf(counter[2]);
 						}
 						System.out.println(total);
@@ -65,11 +60,9 @@ public class CountClassInterface {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		//System.out.print("source,target");
 		System.out.print("source_major,source_minor,source_path,target_major,target_minor,target_path");
 		for (String type: types){
 			System.out.print(","+type);
@@ -79,8 +72,7 @@ public class CountClassInterface {
 		//print number of refactoring
 		try {
 			fileList = FileListing.getFileListing(new File(inputDirFileName));
-			int i = 0;
-			Set<File> orderedSerFiles = new TreeSet<File>();
+			Set<File> orderedSerFiles = new TreeSet<>();
 			
 			for (File file : fileList) {
 					orderedSerFiles.add(file);
@@ -88,9 +80,8 @@ public class CountClassInterface {
 			
 			for (File file : orderedSerFiles){
 				String fileName = file.getPath();
-			//	System.out.println(fileName);
 				BufferedReader br = null;		
-				Map<String, Integer> counter = new HashMap<String, Integer>();
+				Map<String, Integer> counter = new HashMap<>();
 				for (String type: types){
 					counter.put(type, 0);
 				}
@@ -106,7 +97,6 @@ public class CountClassInterface {
 					}
 				// print out the result
 					String[] temp = fileName.split("[\\\\|\\\\.j-]");
-				//  System.out.print(temp[3]+","+temp[4]);
 					System.out.print(temp[4]+","+temp[5]+","+temp[6]+","+temp[8]+","+temp[9]+","+temp[10]);
 					for (String type: types){
 						int tmpInt = counter.get(type);
@@ -124,9 +114,7 @@ public class CountClassInterface {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		}
+	}
 }

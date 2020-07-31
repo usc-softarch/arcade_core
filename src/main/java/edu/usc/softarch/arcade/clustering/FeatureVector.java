@@ -1,19 +1,13 @@
 package edu.usc.softarch.arcade.clustering;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 
-
 /**
  * @author joshua
- *
  */
 public class FeatureVector extends ArrayList<Feature> {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2684090300773683383L;
 	public String name = "";
 	public DocTopicItem docTopicItem;
@@ -37,8 +31,8 @@ public class FeatureVector extends ArrayList<Feature> {
 	public String toBinaryForm() {
 		String str = "";
 		for (int i=0;i<this.size(); i++) {
-			Feature f = (Feature)this.get(i);
-			str = (new Double(f.value)).toString();
+			Feature f = this.get(i);
+			str = (Double.valueOf(f.value)).toString();
 		}
 		return str;
 	}
@@ -52,16 +46,16 @@ public class FeatureVector extends ArrayList<Feature> {
 		}
 	}
 	
+	@Override
 	public boolean equals(Object o) {
-		FeatureVector fv = (FeatureVector)o;
-		if (this.name.equals(fv.name)) {
-			return true;
-		}
-		else {
+		if(!(o instanceof FeatureVector))
 			return false;
-		}
+
+		FeatureVector fv = (FeatureVector)o;
+		return this.name.equals(fv.name);
 	}
 	
+	@Override
 	public int hashCode() {
 		int hash = 7;
 		hash = 37 * hash + (this.name == null ? 0 : this.name.hashCode());

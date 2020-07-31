@@ -35,7 +35,7 @@ public final class FileListing {
   *
   * @param aStartingDir is a valid directory, which can be read.
   */
-  static public List<File> getFileListing(
+  public static List<File> getFileListing(
     File aStartingDir
   ) throws FileNotFoundException {
     validateDirectory(aStartingDir);
@@ -49,7 +49,7 @@ public final class FileListing {
    *
    * @param aStartingDir is a valid directory, which can be read.
    */
-   static public List<File> getFileListing(
+   public static List<File> getFileListing(
      File aStartingDir, String extension
    ) throws FileNotFoundException {
      validateDirectory(aStartingDir);
@@ -59,7 +59,7 @@ public final class FileListing {
    }
 
   // PRIVATE //
-  static private List<File> getFileListingNoSort(
+  private static List<File> getFileListingNoSort(
     File aStartingDir, String extension
   ) throws FileNotFoundException {
     List<File> result = new ArrayList<File>();
@@ -80,7 +80,6 @@ public final class FileListing {
 				result.add(file); //always add if not symbolic, even if directory
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	  
@@ -102,7 +101,7 @@ public final class FileListing {
   /**
   * Directory is valid if it exists, does not represent a file, and can be read.
   */
-  static private void validateDirectory (
+  private static void validateDirectory (
     File aDirectory
   ) throws FileNotFoundException {
     if (aDirectory == null) {
@@ -119,4 +118,3 @@ public final class FileListing {
     }
   }
 } 
-

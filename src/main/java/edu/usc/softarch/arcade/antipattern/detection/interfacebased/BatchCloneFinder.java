@@ -16,49 +16,10 @@ import com.google.common.base.Joiner;
 import edu.usc.softarch.arcade.util.RecoveryParams;
 
 public class BatchCloneFinder {
-	static Logger logger = org.apache.logging.log4j.LogManager.getLogger(BatchCloneFinder.class);
-	//static String DepExt = "F:\\DependencyFinder-1.2.1-beta4\\bin";
-//	static String DepExt  		= System.getProperty("user.dir") + File.separator+ "DependencyFinder" + File.separator + "bin";
-//	static String DepExt  		= "C:\\apache-ant-1.9.6\\bin";
+	private static Logger logger = org.apache.logging.log4j.LogManager.getLogger(BatchCloneFinder.class);
 	static String DepExt  		= System.getProperty("user.dir")+ File.separator +"ext-tools";
 	static String cpd_file_path  = "pmd-bin-5.3.2"+ File.separator +"cpd.xml";
 	static String ant_path       = "apache-ant-1.9.6"+ File.separator +"bin"+ File.separator +"ant";
-
-//	Nutch
-//	static String testInput 	= "O:\\Subject_systems\\ivy";
-//	static String testOutput 	= "O:\\extras\\clones";
-//	static String testClass		= "";
-
-//	static String testInput 	= "E:\\openjpa\\src";
-//	static String testOutput 	= "E:\\openjpa_data\\clones";
-//	static String testClass		= "";
-
-//	static String testInput 	= "E:\\android\\src";
-//	static String testOutput 	= "E:\\android\\clones";
-//	static String testClass		= "";
-
-
-//cxf
-//	static String testInput 	= "F:\\cxf_data\\cxf_src";
-//	static String testOutput 	= "F:\\cxf_data\\clone";
-//	static String testClass		= "";
-
-//	Tika
-//	static String testInput 	= "F:\\tika-data\\src";
-//	static String testOutput 	= "F:\\tika-data\\extra_info\\clones";
-//	static String testClass		= "";
-
-//	Camel
-//	static String testInput 	= "F:\\camel_data\\src_1";
-//	static String testOutput 	= "F:\\camel_data\\extra_info\\clones_1";
-//	static String testClass		= "";
-
-//	Wicket
-//	static String testInput 	= "F:\\wicket_data\\src";
-//	static String testOutput 	= "F:\\wicket_data\\extra_info\\clones";
-//	static String testClass		= "";
-
-//	static String[] args	= new String[]{testInput, testOutput, testClass};
 
 	public static void main(final String[] args1) throws IOException {
 		if (args1.length != 2) {
@@ -69,7 +30,7 @@ public class BatchCloneFinder {
 		logger.info(System.getProperty("user.dir"));
 		final RecoveryParams recParms = new RecoveryParams(args);
 		final File[] files = recParms.getInputDir().listFiles();
-		final Set<File> fileSet = new TreeSet<File>(Arrays.asList(files));
+		final Set<File> fileSet = new TreeSet<>(Arrays.asList(files));
 		logger.debug("All files in " + recParms.getInputDir() + ":");
 		logger.debug(Joiner.on("\n").join(fileSet));
 		boolean nothingtodo = true;
@@ -109,7 +70,7 @@ public class BatchCloneFinder {
 
 		logger.debug("Get deps for revision " + revisionNumber);
 
-//		// Run deps for a single folder
+		// Run deps for a single folder
 
 		String[] command = {};
 
@@ -122,8 +83,6 @@ public class BatchCloneFinder {
 		// Run for linux
 		else
 		{
-//			command = "apache-ant-1.9.6/bin/ant -f pmd-bin-5.3.2/cpd.xml cpd -Din="
-//					+ versionFolder + File.separator + classesDirName + " -Dout="+depsXMLFilename;
 			String[] linux_command   = {ant_path,"-f",cpd_file_path, "cpd","-Din=" + versionFolder + File.separator + classesDirName,"-Dout="+depsXMLFilename};
 			command = ArrayUtils.addAll(command, linux_command);
 		}
@@ -132,7 +91,6 @@ public class BatchCloneFinder {
 		pb.directory(new File(DepExt));
 		pb.inheritIO();
 		pb.redirectErrorStream(true);
-		Process p = pb.start();
-
+		pb.start();
 	}
 }

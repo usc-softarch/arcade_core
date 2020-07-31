@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,7 +14,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -27,8 +25,7 @@ import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchSmellEvaluatorRunner {
-	
-	static Logger logger = Logger.getLogger(BatchSmellEvaluatorRunner.class);
+	private static Logger logger = Logger.getLogger(BatchSmellEvaluatorRunner.class);
 	
 	public static void main(String[] args) {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
@@ -95,7 +92,7 @@ public class BatchSmellEvaluatorRunner {
 			
 			SmellDetectionEvaluator.configureLogging = false; // do not log at class level for SmellDetectionEvaluator
 			SmellDetectionEvaluator.main(tokensArr);
-			coverageMap.put(system,new HashMap<Pair<Class,String>,Double>(SmellDetectionEvaluator.smellTypeTechRatioMap));
+			coverageMap.put(system,new HashMap<>(SmellDetectionEvaluator.smellTypeTechRatioMap));
 			logger.debug("completed evaluator for system: " + system);
 			logger.debug("coverage map contents:");
 			String output = "";
@@ -128,7 +125,7 @@ public class BatchSmellEvaluatorRunner {
 		for (Class smellClass : SmellUtil.getSmellClasses()) {
 			tableOutput += smellClass.getSimpleName() + ",";
 			for (String technique : techniques) {
-				Pair<Class,String> pair = new ImmutablePair<Class,String>(smellClass,technique);
+				Pair<Class,String> pair = new ImmutablePair<>(smellClass,technique);
 				Double ratio = coverageAvgAcrossSystemsMap.get(pair);
 				if (ratio==null) {
 					tableOutput += 0 + ",";
@@ -149,10 +146,8 @@ public class BatchSmellEvaluatorRunner {
 			writer.println(tableOutput);
 			writer.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -160,7 +155,7 @@ public class BatchSmellEvaluatorRunner {
 
 	private static Map<Pair<Class,String>,Double> buildCoverMapAcrossSystems(String[] systems,
 			Map<String, Map<Pair<Class, String>, Double>> coverageMap, Set<String> techniquesSet) {
-		Map<Pair<Class,String>,Double> coverageAvgAcrossSystemsMap = new HashMap<Pair<Class,String>,Double>();
+		Map<Pair<Class,String>,Double> coverageAvgAcrossSystemsMap = new HashMap<>();
 		
 		for (String system : systems) {
 			Map<Pair<Class,String>,Double> smellTypeTechRatioMap = coverageMap.get(system);
@@ -193,7 +188,7 @@ public class BatchSmellEvaluatorRunner {
 					}
 				}
 				assert foundMatchingTechnique : "No matching technique for " + alteredPrefix;
-				Pair<Class,String> alteredPair = new ImmutablePair<Class,String>(smellType,alteredPrefix);
+				Pair<Class,String> alteredPair = new ImmutablePair<>(smellType,alteredPrefix);
 				Double existingRatio = smellTypeTechRatioMap.get(origPair);
 				if (coverageAvgAcrossSystemsMap.containsKey(alteredPair)) {
 					Double ratioToAccumulate = coverageAvgAcrossSystemsMap.get(alteredPair);
@@ -213,5 +208,4 @@ public class BatchSmellEvaluatorRunner {
 		}
 		return coverageAvgAcrossSystemsMap;
 	}
-
 }

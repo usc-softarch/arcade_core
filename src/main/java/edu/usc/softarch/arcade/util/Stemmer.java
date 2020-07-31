@@ -36,6 +36,7 @@ package edu.usc.softarch.arcade.util;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Stemmer, implementing the Porter Stemming Algorithm
@@ -562,15 +563,14 @@ public class Stemmer {
 		i = 0;
 	}
 	
-	public static ArrayList<File> listFilesInDirectory(File dir) {
-		ArrayList<File> filesList = new ArrayList<File>();
+	public static List<File> listFilesInDirectory(File dir) {
+		List<File> filesList = new ArrayList<File>();
 		File[] files = dir.listFiles();
 		if (files != null) {
 			for (File f : files) {
 				if (f.isDirectory()) {
 					filesList.addAll(listFilesInDirectory(f));
 				} else {
-					// System.out.println(f.getName());
 					filesList.add(f);
 				}
 			}
@@ -600,7 +600,7 @@ public class Stemmer {
 						
 				BufferedWriter out = null;
 				
-				ArrayList<File> filesList = listFilesInDirectory(inputDir);
+				List<File> filesList = listFilesInDirectory(inputDir);
 				
 				FileInputStream in = null;
 				for (File f : filesList) {
@@ -625,28 +625,15 @@ public class Stemmer {
 											j++;
 										ch = in.read();
 										if (!Character.isLetter((char) ch)) {
-											/* to test add(char ch) */
 											for (int c = 0; c < j; c++)
 												s.add(w[c]);
-
-											/* or, to test add(char[] w, int j) */
-											/* s.add(w, j); */
 
 											s.stem();
 											{
 												String u;
 
-												/* and now, to test toString() : */
 												u = s.toString();
 
-												/*
-												 * to test getResultBuffer(),
-												 * getResultLength() :
-												 */
-												/*
-												 * u = new String(s.getResultBuffer(),
-												 * 0, s.getResultLength());
-												 */
 												if (outputStemmedFileToScreen)
 													System.out.print(u);
 												out.write(u);
@@ -668,14 +655,12 @@ public class Stemmer {
 						out.close();
 					}
 				}
-
 				
 			} catch (FileNotFoundException e) {
 				System.out.println("file " + args[i] + " not found");
 				e.printStackTrace();
 				break;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	}

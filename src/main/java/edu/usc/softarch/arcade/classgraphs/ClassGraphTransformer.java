@@ -1,13 +1,10 @@
 package edu.usc.softarch.arcade.classgraphs;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,19 +12,19 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
+import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.callgraph.MethodEdge;
 import edu.usc.softarch.arcade.callgraph.MyCallGraph;
 import edu.usc.softarch.arcade.callgraph.MyClass;
 import edu.usc.softarch.arcade.callgraph.MyMethod;
 import edu.usc.softarch.arcade.classgraphs.exception.CannotGetCurrProjStrException;
-import edu.usc.softarch.arcade.clustering.FeatureVector;
 import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
@@ -39,11 +36,9 @@ import edu.usc.softarch.arcade.util.DebugUtil;
 
 import soot.ArrayType;
 import soot.Body;
-import soot.EntryPoints;
 import soot.MethodOrMethodContext;
 import soot.MethodSource;
 import soot.NullType;
-import soot.PrimType;
 import soot.RefLikeType;
 import soot.RefType;
 import soot.Scene;
@@ -52,12 +47,10 @@ import soot.SootClass;
 import soot.SootMethod;
 import soot.Type;
 import soot.Unit;
-import soot.Value;
 import soot.ValueBox;
 import soot.jimple.FieldRef;
 import soot.jimple.Stmt;
 import soot.jimple.ThrowStmt;
-import soot.jimple.toolkits.callgraph.CHATransformer;
 import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.jimple.toolkits.callgraph.Sources;
 import soot.jimple.toolkits.callgraph.Targets;
@@ -72,15 +65,13 @@ import weka.core.converters.ArffSaver;
 
 /**
  * @author joshua
- *
  */
 public class ClassGraphTransformer extends SceneTransformer  {
-	private static HashSet<String> traversedMethodSet = new HashSet<String>();
-	private static final boolean DEBUG = true;
+	private static Set<String> traversedMethodSet = new HashSet<>();
 	public static ClassGraph clg = new ClassGraph();
 	public static MyCallGraph mg = new MyCallGraph();
-	private static HashMap<String,MyClass> classesWithUsedMethods;
-	private static HashMap<String,MyClass> classesWithAllMethods;
+	private static Map<String,MyClass> classesWithUsedMethods;
+	private static Map<String,MyClass> classesWithAllMethods;
 	
 	public static TopicModelData freecsTMD = new TopicModelData();
 	public static TopicModelData LlamaChatTMD = new TopicModelData();
@@ -94,7 +85,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	
 	public boolean wekaDataSetProcessing = false;
 
-	private FeatureVectorMap fvMap = new FeatureVectorMap(new HashMap<SootClass, FeatureVector>());
+	private FeatureVectorMap fvMap = new FeatureVectorMap(new HashMap<>());
 	
 	static Logger logger = Logger.getLogger(ClassGraphTransformer.class);
 	
@@ -118,7 +109,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			logger.debug("Printing classes with all methods...");
 			printClassesFromHashMap(classesWithAllMethods);
 			
-			HashMap<String,MyMethod> unusedMethods = determineUnusedMethods(classesWithUsedMethods,classesWithAllMethods);
+			Map<String,MyMethod> unusedMethods = determineUnusedMethods(classesWithUsedMethods,classesWithAllMethods);
 			logger.debug("Printing unused methods...");
 			printUnusedMethods(unusedMethods);
 			
@@ -130,9 +121,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			fvMap.writeXMLFeatureVectorMapUsingSootClassEdges();
 			clg.generateRsf();
 
-			// logger.debug("Nodes in class graph: " + clg.getNodes());
-
-			ArrayList<SootClass> selectedClasses = new ArrayList<SootClass>();
+			List<SootClass> selectedClasses = new ArrayList<>();
 			determineSelectedClasses(clg.getNodes(), selectedClasses);
 
 			// Set up attributes for weka
@@ -144,22 +133,18 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		// printSourceMethods(cg);
-		// printPossibleCallees(src);
-
 	}
 
-	private void printUnusedMethods(HashMap<String, MyMethod> unusedMethods) {
+	private void printUnusedMethods(Map<String, MyMethod> unusedMethods) {
 		for (MyMethod m : unusedMethods.values()) {
 			logger.debug("\t" + m.toString());
 		}
 	}
 
-	private HashMap<String, MyMethod> determineUnusedMethods(
-			HashMap<String, MyClass> classesWithUsedMethods,
-			HashMap<String, MyClass> classesWithAllMethods) {
-		HashMap<String,MyMethod>unusedMethods = new HashMap<String,MyMethod>();
+	private Map<String, MyMethod> determineUnusedMethods(
+			Map<String, MyClass> classesWithUsedMethods,
+			Map<String, MyClass> classesWithAllMethods) {
+		Map<String,MyMethod>unusedMethods = new HashMap<>();
 		for (MyClass undeterminedClass : classesWithAllMethods.values()) {
 			for (MyMethod undeterminedMethod : undeterminedClass.getMethods()) {
 				if (classesWithUsedMethods.containsKey(undeterminedClass.toString())) { // undetermined class is part of the used classes
@@ -178,7 +163,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 
 	private void constructClassesWithAllMethods() {
 		Chain<SootClass> appClasses = Scene.v().getApplicationClasses();
-		classesWithAllMethods = new HashMap<String,MyClass>();
+		classesWithAllMethods = new HashMap<>();
 		for (SootClass sootClass : appClasses) {
 			MyClass myClass = new MyClass(sootClass);
 			for (SootMethod sootMethod : sootClass.getMethods()) {
@@ -190,7 +175,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		
 	}
 
-	private void processWekaDataSet(ArrayList<SootClass> selectedClasses) {
+	private void processWekaDataSet(List<SootClass> selectedClasses) {
 		
 		FastVector atts = new FastVector();
 		atts.addElement(new Attribute("name", (FastVector) null));
@@ -207,7 +192,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			prepareWekaDataSet(selectedClasses, atts, data);
 			writeWekaDataSet(data);
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -229,14 +213,13 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			saver.writeBatch();
 			logger.debug("Wrote file: " + fullDir);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	private void prepareWekaDataSet(ArrayList<SootClass> selectedClasses,
+	private void prepareWekaDataSet(List<SootClass> selectedClasses,
 			FastVector atts, Instances data) throws FileNotFoundException {
-		ArrayList<DocTopicItem> dtItemList = new ArrayList<DocTopicItem>();
+		List<DocTopicItem> dtItemList;
 
 		DocTopics dts = new DocTopics(currDocTopicsFilename);
 		dtItemList = dts.getDocTopicItemList();
@@ -248,8 +231,8 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		}
 
 		for (SootClass c : selectedClasses) {
-			ArrayList<SootClass> callerClasses = clg.getCallerClasses(c);
-			ArrayList<SootClass> calleeClasses = clg.getCalleeClasses(c);
+			List<SootClass> callerClasses = clg.getCallerClasses(c);
+			List<SootClass> calleeClasses = clg.getCalleeClasses(c);
 
 			double[] vals = new double[data.numAttributes()];
 
@@ -258,9 +241,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			if (dtItem == null) {
 				System.err.println("Got null dtItem for " + c);
 			}
-			// for (DocTopicItem dtItem : dtItemList) {
-			// dtItem.doc
-			// }
 			vals[0] = data.attribute(0).addStringValue(c.toString());
 			logger.debug("=======================================");
 			logger.debug("Field count: " + c.getFieldCount());
@@ -289,7 +269,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 
 			logger.debug("mallet");
 
-			int topicNumCount = 0;
 			for (TopicKey tk : tkList.set) { // iterator over all possible
 												// topics
 				boolean hasCurrTopicNum = false;
@@ -315,8 +294,8 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		}
 	}
 
-	private void determineSelectedClasses(ArrayList<SootClass> cgNodes,
-			ArrayList<SootClass> selectedClasses) {
+	private void determineSelectedClasses(List<SootClass> cgNodes,
+			List<SootClass> selectedClasses) {
 		selectedClasses.addAll(cgNodes);
 		
 		Chain<SootClass> classes = Scene.v().getClasses();
@@ -331,40 +310,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		}
 	}
 
-	private void setFullEntryPoints() {
-		boolean debugEntryPointSelection = true;
-		
-		ArrayList<SootMethod> entryPoints = new ArrayList<SootMethod>();
-		Iterator appClassesIter = Scene.v().getApplicationClasses().iterator();
-		while (appClassesIter.hasNext()) {
-			SootClass currClass = (SootClass) appClassesIter.next();
-			Iterator mIter = currClass.getMethods().iterator();
-			while (mIter.hasNext()) {
-				SootMethod currMethod = (SootMethod) mIter.next();
-				if (currMethod.isConcrete() && !currMethod.isPhantom())
-					entryPoints.add(currMethod);
-			}
-		}
-
-		if (debugEntryPointSelection) {
-			logger.debug("Selected entry points:");
-			logger.debug(entryPoints);
-		}
-
-		Scene.v().setEntryPoints(entryPoints);
-	}
-
-	private void setCustomEntryPoints() {
-		SootClass epClass = Scene.v().getSootClass("server.LlamaChatServer");
-		logger.debug("Attempting to get run method of server.LlamaChatServer...");
-		logger.debug(epClass.getMethodByName("run"));
-		ArrayList<SootMethod> entryPoints = new ArrayList<SootMethod>();
-		entryPoints.add(epClass.getMethodByName("run"));
-		entryPoints.add(epClass.getMethodByName("main"));
-		entryPoints.add(epClass.getMethodByName("main"));
-		Scene.v().setEntryPoints(entryPoints);
-	}
-
 	private void outputGraphsAndClassesToFiles() throws ParserConfigurationException,
 			TransformerException, IOException {
 		writeXMLClassGraph();
@@ -377,14 +322,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			TransformerException {
 		clg.writeXMLClassGraph();
 		logger.debug("ClassGraph's no. of edges: " + clg.size());
-		//logger.debug("Printing my call graph...");
-		//logger.debug(mg);
-	}
-
-
-	private void serializeClassGraph() throws IOException {
-		String filename = Config.getClassGraphFilename();
-		clg.serialize(filename);
 	}
 	
 	private void serializeMyCallGraph() throws IOException {
@@ -407,26 +344,13 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	}
 	
 
-	private void outputUnusedMethodsToFile(HashMap<String, MyMethod> unusedMethods) throws IOException {
+	private void outputUnusedMethodsToFile(Map<String, MyMethod> unusedMethods) throws IOException {
 		serialize(unusedMethods, Config.getUnusedMethodsFilename());
 		
 	}
-	
-	/*private void serialize(HashMap<String, MyMethod> methods, String filename) throws IOException {
-		// Write to disk with FileOutputStream
-		FileOutputStream f_out = new 
-			FileOutputStream(filename);
-
-		// Write object with ObjectOutputStream
-		ObjectOutputStream obj_out = new
-			ObjectOutputStream (f_out);
-
-		// Write object out to disk
-		obj_out.writeObject ( methods );
-	}*/
 
 	private void serialize(
-			HashMap<?, ?> hashMap,
+			Map<?, ?> hashMap,
 			String filename) throws IOException {
 			// Write to disk with FileOutputStream
 			FileOutputStream f_out = new 
@@ -441,45 +365,17 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		
 	}
 
-	private void deserializeClassGraph() throws IOException, ClassNotFoundException {
-		String filename = Config.getCurrProjStr() + ".data";
-		// Read from disk using FileInputStream
-		FileInputStream f_in = new 
-			FileInputStream(filename);
-
-		// Read object using ObjectInputStream
-		ObjectInputStream obj_in = 
-			new ObjectInputStream (f_in);
-
-		// Read an object
-		Object obj = obj_in.readObject();
-
-		if (obj instanceof ClassGraph)
-		{
-			// Cast object to a Vector
-			clg = (ClassGraph) obj;
-		}
-		
-	}
-
 	private void createClassGraphDotFile() throws CannotGetCurrProjStrException {
 		String dotFilename = "";
-		//String dotWithArchElemTypeFilename = "";
 		if (!(Config.getCurrProjStr().equals(""))) {
 			dotFilename = Config.getClassGraphDotFilename();
-			//dotWithArchElemTypeFilename = visualDir + "/" + CurrProj.getCurrProjStr() + "/" + CurrProj.getCurrProjStr() + "_withArchElemType.dot";
 		}
 		else {
 			throw new CannotGetCurrProjStrException("Cannot identify current project's str.");
 		}
 		try {
 			clg.writeDotFile(dotFilename);
-			//clg.writeDotFileWithArchElementType(dotWithArchElemTypeFilename);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -487,7 +383,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	
 
 	private DocTopicItem getMatchingDocTopicItem(
-			ArrayList<DocTopicItem> dtItemList, SootClass c) {
+			List<DocTopicItem> dtItemList, SootClass c) {
 		logger.debug(c);
 		logger.debug(c.getShortName());
 		String[] classNames = c.getShortName().split("\\$");
@@ -528,14 +424,14 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	}
 
 	private DocTopicItem returnMatchingDocTopicItem(
-			ArrayList<DocTopicItem> dtItemList, String className) {
+			List<DocTopicItem> dtItemList, String className) {
 		for (DocTopicItem dtItem : dtItemList) {
 			String[] sourceSplit = dtItem.source.split("/");
-			ArrayList<String> sourceSplitList = new ArrayList<String>(Arrays
+			List<String> sourceSplitList = new ArrayList<>(Arrays
 					.asList(sourceSplit));
 			System.err.println("sourceSplit: " + sourceSplitList);
 			String[] nameDotJava = sourceSplit[1].split("\\.");
-			ArrayList<String> nameDotJavaList = new ArrayList<String>(Arrays
+			List<String> nameDotJavaList = new ArrayList<>(Arrays
 					.asList(nameDotJava));
 			System.err.println("nameDotJava: " + nameDotJavaList);
 			System.err.println("");
@@ -551,16 +447,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		return null;
 	}
 
-	private static void printEntireCallGraph() {
-		CallGraph cg = Scene.v().getCallGraph();
-		logger.debug("Call Graph");
-		logger.debug("================================");
-		logger.debug(cg);
-		logger.debug("================================");
-		logger.debug("End Call Graph");
-		logger.debug("Number of edges in call graph: " + cg.size());
-	}
-
 	private double getPercentageOfCallees(int numCallees, int numCallers) {
 		return ((double) numCallees / (double) (numCallers + numCallees)) * 100d;
 	}
@@ -571,7 +457,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 
 	public static void printSourceClasses(CallGraph cg) {
 		Iterator<MethodOrMethodContext> sources = cg.sourceMethods();
-		HashSet<SootClass> sourceClasses = new HashSet<SootClass>();
+		Set<SootClass> sourceClasses = new HashSet<>();
 
 		logger.debug("List of source classes:");
 		while (sources.hasNext()) {
@@ -589,7 +475,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		while (iter.hasNext()) {
 			logger.debug("\t" + iter.next());
 		}
-
 	}
 
 	public static void printSourceMethods(CallGraph cg) {
@@ -611,7 +496,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 
 	public static void constructClassGraph() {
 		CallGraph cg = Scene.v().getCallGraph();
-		//printEntireCallGraph();
 		addCallGraphEdgesToClassGraph(cg);
 		addSuperClassEdgesToClassGraph();
 		addInterfacesToClassGraph();
@@ -747,7 +631,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 				}
 			}
 		}
-
 	}
 
 	private static boolean isEdgeValidForClassGraph(SootClass srcClass,
@@ -783,7 +666,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 				}
 			}
 		}
-		
 	}
 
 	private static boolean isClassValidForClassGraph(SootClass src) {
@@ -810,10 +692,9 @@ public class ClassGraphTransformer extends SceneTransformer  {
 				}
 			}
 		}
-		
 	}
 
-	private static void printClassesFromHashMap(HashMap<String,MyClass> classes) {
+	private static void printClassesFromHashMap(Map<String,MyClass> classes) {
 		for (MyClass c : classes.values()) {
 			logger.debug("Showing methods in " + c + "...");
 			logger.debug(c.methodsToString(1));
@@ -823,7 +704,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	private static void addUsedMethodsToClasses() {
 		Iterator iter = mg.getEdges().iterator();
 		logger.debug("Adding my methods to each myclass..");
-		classesWithUsedMethods = new HashMap<String,MyClass>();
+		classesWithUsedMethods = new HashMap<>();
 		while (iter.hasNext()) {
 			MethodEdge edge = (MethodEdge) iter.next();
 			
@@ -845,24 +726,11 @@ public class ClassGraphTransformer extends SceneTransformer  {
 				tgtClass = new MyClass(edge.tgt.declaringClass);
 				classesWithUsedMethods.put(edge.tgt.declaringClass.toString(),tgtClass);
 			}
-			/*edge.src.declaringClass.addMethod(edge.src);
-			edge.tgt.declaringClass.addMethod(edge.tgt);*/
 			if (!edge.src.declaringClass.equals(edge.tgt.declaringClass)) {
 				srcClass.addMethod(edge.src);
 				tgtClass.addMethod(edge.tgt);
 			}
-			
-			/*Iterator methIter = edge.src.declaringClass.getMethods().iterator();
-			logger.debug("Showing current methods in " + edge.src.declaringClass);
-			while (methIter.hasNext()) {
-				MyMethod m = (MyMethod)methIter.next();
-				logger.debug("\t" + m);
-			}*/
-
-			/*classesInMyCallGraph.add(edge.src.declaringClass);
-			classesInMyCallGraph.add(edge.tgt.declaringClass);*/
 		}
-
 	}
 
 	private static void addCallGraphEdgesToMyCallGraph(CallGraph cg) {
@@ -894,7 +762,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 				}
 			}
 		}
-		
 	}
 
 	private static void addFieldRefEdgesToClassGraph() {
@@ -931,7 +798,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 					Iterator graphIt = graph.iterator();
 					while (graphIt.hasNext()) { // loop through all units of method's graph
 						Unit u = (Unit)graphIt.next(); // grab the next unit from the graph
-						//logger.debug(u);
 						
 						if (u instanceof Stmt) {
 							Stmt stmt = (Stmt) u;
@@ -943,7 +809,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 								SootClass tgtClass = ref.getFieldRef().declaringClass();
 								logger.debug("\t\ttarget: " + tgtClass);
 								Type fieldType = ref.getField().getType();
-								//Scene.v().getSootClass(.toString());
 								logger.debug("\t\tfield's type: " + fieldType);
 								if (appClasses.contains(srcClass) && appClasses.contains(tgtClass)) {
 									if (isEdgeValidForClassGraph(srcClass, tgtClass)) {
@@ -962,22 +827,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 								}
 							}
 						}
-						
-						/*if (u instanceof DefinitionStmt) {
-							DefinitionStmt defStmt = (DefinitionStmt) u;
-							logger.debug("defStmt: " + defStmt);
-							logger.debug("leftOp: " + defStmt.getLeftOp());
-							if (defStmt.getLeftOp() instanceof FieldRef) {
-								FieldRef ref = (FieldRef) defStmt.getLeftOp();
-								logger.debug("\t" + ref);
-								SootClass srcClass = m.getDeclaringClass();
-								logger.debug("\t\tsource: " + srcClass);
-								SootClass tgtClass = ref.getFieldRef().declaringClass();
-								logger.debug("\t\ttarget: " + tgtClass);
-								
-							}
-							logger.debug("rightOp: " + defStmt.getRightOp());
-						}*/
 					}
 				}
 			}
@@ -1015,14 +864,14 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	public static void printPossibleCalledClasses_Recursive(SootMethod source,
 			int depth) throws IOException {
 		printTabByDepth(depth);
-		if (DEBUG) {
+		if (Constants._DEBUG) {
 			logger.debug("Analyzing " + source);
 		}
 		CallGraph cg = Scene.v().getCallGraph();
 		traversedMethodSet.add(source.toString());
 		Iterator<MethodOrMethodContext> targets = new Targets(cg
 				.edgesOutOf(source));
-		HashSet<SootClass> classes = new HashSet<SootClass>();
+		Set<SootClass> classes = new HashSet<>();
 
 		// iterate over all the targets of this source method
 		while (targets.hasNext()) {
@@ -1064,12 +913,10 @@ public class ClassGraphTransformer extends SceneTransformer  {
 
 			) {
 				printPossibleCalledClasses_Recursive(tgt, depth + 1);
-			} else if (traversedMethodSet.contains(tgt.toString())) {
-				if (DEBUG) {
+			} else if (traversedMethodSet.contains(tgt.toString()) && Constants._DEBUG) {
 					printTabByDepth(depth);
 					logger.debug("\tSkipping " + tgt
 							+ " because it is in the traversedMethodSet");
-				}
 			}
 		}
 	}
@@ -1084,7 +931,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		CallGraph cg = Scene.v().getCallGraph();
 		Iterator<MethodOrMethodContext> targets = new Targets(cg
 				.edgesOutOf(source));
-		HashSet<SootClass> classes = new HashSet<SootClass>();
+		Set<SootClass> classes = new HashSet<>();
 
 		while (targets.hasNext()) {
 			SootMethod tgt = (SootMethod) targets.next();
@@ -1125,5 +972,4 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			logger.debug(target + " might be called by " + src);
 		}
 	}
-
 }

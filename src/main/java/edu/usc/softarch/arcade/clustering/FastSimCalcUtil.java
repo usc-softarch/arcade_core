@@ -1,12 +1,9 @@
 package edu.usc.softarch.arcade.clustering;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 
 import cc.mallet.util.Maths;
 
-import edu.usc.softarch.arcade.topics.TopicUtil;
 
 public class FastSimCalcUtil {
 	 
@@ -32,26 +29,9 @@ public class FastSimCalcUtil {
 		return 0.5*sumOfFeaturesInBothEntities/(0.5*sumOfFeaturesInBothEntities+2*((double)num10Features+(double)num01Features) + (double)num00Features + (double)numSharedFeatures);
 	}
 
-	private int getNumSharedFeatures(FastCluster currCluster,
-			FastCluster otherCluster) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 	private static int getNumOf01Features(FastCluster currCluster,
 			FastCluster otherCluster) {
-		/*double[] currFeatures = currCluster.getFeatures();
-		double[] otherFeatures = otherCluster.getFeatures();
-		
-		int num01Features = 0;
-		for (int i=0;i<currCluster.getFeatures().length;i++) {
-			if (currFeatures[i] == 0) {
-				if (otherFeatures[i] > 0) {
-					num01Features++;
-				}
-			}
-		}*/
-		
+	
 		Set<Integer> otherIndices = otherCluster.getNonZeroFeatureMap().keySet();
 		
 		int num01Features = 0;
@@ -67,17 +47,6 @@ public class FastSimCalcUtil {
 	
 	private static int getNumOf00Features(FastCluster currCluster,
 			FastCluster otherCluster) {
-		/*double[] currFeatures = currCluster.getFeatures();
-		double[] otherFeatures = otherCluster.getFeatures();
-		
-		int num10Features = 0;
-		for (int i=0;i<currCluster.getFeatures().length;i++) {
-			if (otherFeatures[i] == 0) {
-				if (currFeatures[i] > 0) {
-					num10Features++;
-				}
-			}
-		}*/
 		
 		Set<Integer> currIndices = currCluster.getNonZeroFeatureMap().keySet();
 		
@@ -94,17 +63,6 @@ public class FastSimCalcUtil {
 
 	private static int getNumOf10Features(FastCluster currCluster,
 			FastCluster otherCluster) {
-		/*double[] currFeatures = currCluster.getFeatures();
-		double[] otherFeatures = otherCluster.getFeatures();
-		
-		int num10Features = 0;
-		for (int i=0;i<currCluster.getFeatures().length;i++) {
-			if (otherFeatures[i] == 0) {
-				if (currFeatures[i] > 0) {
-					num10Features++;
-				}
-			}
-		}*/
 		
 		Set<Integer> currIndices = currCluster.getNonZeroFeatureMap().keySet();
 		
@@ -122,16 +80,6 @@ public class FastSimCalcUtil {
 	private static int getNumOfFeaturesInBothEntities(
 			FastCluster currCluster, FastCluster otherCluster) {
 		
-		/*double[] currFeatures = currCluster.getFeatures();
-		double[] otherFeatures = otherCluster.getFeatures();
-		
-		double sumSharedFeatures = 0;
-		for (int i=0;i<currCluster.getFeatures().length;i++) {
-			if (currFeatures[i] > 0 && otherFeatures[i] > 0) {
-				sumSharedFeatures += currFeatures[i] +  otherFeatures[i];
-			}
-		}*/
-		
 		Set<Integer> currIndices = currCluster.getNonZeroFeatureMap().keySet();
 		
 		int numSharedFeatures = 0;
@@ -147,16 +95,6 @@ public class FastSimCalcUtil {
 	private static double getSumOfFeaturesInBothEntities(
 			FastCluster currCluster, FastCluster otherCluster) {
 		
-		/*double[] currFeatures = currCluster.getFeatures();
-		double[] otherFeatures = otherCluster.getFeatures();
-		
-		double sumSharedFeatures = 0;
-		for (int i=0;i<currCluster.getFeatures().length;i++) {
-			if (currFeatures[i] > 0 && otherFeatures[i] > 0) {
-				sumSharedFeatures += currFeatures[i] +  otherFeatures[i];
-			}
-		}*/
-		
 		Set<Integer> currIndices = currCluster.getNonZeroFeatureMap().keySet();
 		
 		double sumSharedFeatures = 0;
@@ -171,7 +109,7 @@ public class FastSimCalcUtil {
 		return sumSharedFeatures;
 	}
 
-	public static double getStructAndConcernMeasure(int numberOfEntitiesToBeClustered, FastCluster cluster,
+	public static double getStructAndConcernMeasure(FastCluster cluster,
 			FastCluster otherCluster) {
 		if (cluster.getFeaturesLength()!=otherCluster.getFeaturesLength()) {
 			throw new IllegalArgumentException("cluster.getFeaturesLength()!=otherCluster.getFeaturesLength()()");
@@ -236,14 +174,6 @@ public class FastSimCalcUtil {
 			else { // this feature is zero
 				firstDist[i] = 0;
 			}
-			
-			/*if (otherCluster.getNonZeroFeatureMap().get(i) != null) {
-				double featureValue = otherCluster.getNonZeroFeatureMap().get(i);
-				secondDist[i] = featureValue/otherCluster.getNonZeroFeatureMap().size();
-			}
-			else { // this feature is zero
-				secondDist[i] = 0;
-			}*/
 		}
 	}
 }

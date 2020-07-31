@@ -5,15 +5,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import edu.usc.softarch.arcade.facts.driver.RsfReader;
-
 /**
  * @author joshua
- *
  */
 public class DebugUtil {
 	static Logger logger = Logger.getLogger(DebugUtil.class);
@@ -48,13 +45,10 @@ public class DebugUtil {
 			    streamAsString+=line + '\n';
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         
-        return streamAsString;
-        
-		
+    return streamAsString;
 	}
 
 	public static String addTabs(int depth) {
@@ -70,7 +64,7 @@ public class DebugUtil {
 		System.exit(0);
 	}
 	
-	public static void checkIntraPairSize(HashSet<String> intraPair,
+	public static void checkIntraPairSize(Set<String> intraPair,
 			String element1, String element2) {
 		if (intraPair.size() != 2) {
 			logger.debug("Intrapair wrong size: " + intraPair);
@@ -79,7 +73,5 @@ public class DebugUtil {
 			System.err.println("Invalid intrapair size");
 			System.exit(1);
 		}
-		
 	}
-	
 }

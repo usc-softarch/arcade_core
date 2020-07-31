@@ -5,8 +5,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import mojo.MoJoCalculator;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
@@ -20,7 +18,7 @@ import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchSystemEvo {
-	static Logger logger = Logger.getLogger(BatchSystemEvo.class);
+	private static Logger logger = Logger.getLogger(BatchSystemEvo.class);
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
@@ -60,7 +58,6 @@ public class BatchSystemEvo {
 		else {
 			throw new RuntimeException("Unknown value for option distopt: " + options.distopt);
 		}
-
 	}
 	
 	private static void compareOverDistanceOfOne(
@@ -70,7 +67,6 @@ public class BatchSystemEvo {
 			int comparisonDistance = 1;
 			System.out.println("Comparison distance is: " + comparisonDistance);
 			for (int i = 0; i < clusterFiles.size(); i += comparisonDistance) {
-				// System.out.println("i: " + i);
 				File currFile = clusterFiles.get(i);
 				// exclude annoying .ds_store files from OSX
 				if (!currFile.getName().equals(".DS_Store")) {
@@ -86,37 +82,23 @@ public class BatchSystemEvo {
 			
 			DescriptiveStatistics stats = new DescriptiveStatistics(ArrayUtils.toPrimitive(sysEvoArr));
 
-			/*System.out.println("N: " + stats.getN());
-			System.out.println("max: " + stats.getMax());
-			System.out.println("min: " + stats.getMin());
-			System.out.println("mean: " + stats.getMean());*/
 			System.out.println(stats);
-			
-			
 			System.out.println();
 	}
 
 	private static void compareWithVdistGt1ForAll(
 			List<File> clusterFiles) {
-		//for (int comparisonDistance = 1; comparisonDistance < clusterFiles
-		//		.size(); comparisonDistance++) {
-			//File prevFile = null;
-			//System.out.println("Comparison distance is: " + comparisonDistance);
 			for (int i = 0; i < clusterFiles.size(); i++) {
-				List<Double> sysEvoValues = new ArrayList<Double>();
+				List<Double> sysEvoValues = new ArrayList<>();
 				System.out.println("start index is: " + i);
 				for (int j = i+1; j < clusterFiles.size(); j ++) {
-					// System.out.println("i: " + i);
 					File file1 = clusterFiles.get(i);
 					File file2 = clusterFiles.get(j);
 					// exclude annoying .ds_store files from OSX
 					if (!file1.getName().equals(".DS_Store")) {
-						//if (prevFile != null && file1 != null) {
 						double sysEvoValue = computeSysEvo(file1,
 								file2);
 						sysEvoValues.add(sysEvoValue);
-						//}
-						//prevFile = file1;
 					}
 				}
 				Double[] sysEvoArr = new Double[sysEvoValues.size()];
@@ -125,20 +107,9 @@ public class BatchSystemEvo {
 				DescriptiveStatistics stats = new DescriptiveStatistics(
 						ArrayUtils.toPrimitive(sysEvoArr));
 
-				/*
-				 * System.out.println("N: " + stats.getN());
-				 * System.out.println("max: " + stats.getMax());
-				 * System.out.println("min: " + stats.getMin());
-				 * System.out.println("mean: " + stats.getMean());
-				 */
 				System.out.println(stats);
-
 				System.out.println();
-				
-				//if (comparisonDistance == 1)
-				//	break;
 			}
-		//}
 	}
 	
 	private static void compareWithVdistGt1ForSubset(
@@ -146,10 +117,9 @@ public class BatchSystemEvo {
 		for (int comparisonDistance = 1; comparisonDistance < clusterFiles
 				.size(); comparisonDistance++) {
 			File prevFile = null;
-			List<Double> sysEvoValues = new ArrayList<Double>();
+			List<Double> sysEvoValues = new ArrayList<>();
 			System.out.println("Comparison distance is: " + comparisonDistance);
 			for (int i = 0; i < clusterFiles.size(); i += comparisonDistance) {
-				// System.out.println("i: " + i);
 				File currFile = clusterFiles.get(i);
 				// exclude annoying .ds_store files from OSX
 				if (!currFile.getName().equals(".DS_Store")) {
@@ -165,13 +135,7 @@ public class BatchSystemEvo {
 			
 			DescriptiveStatistics stats = new DescriptiveStatistics(ArrayUtils.toPrimitive(sysEvoArr));
 
-			/*System.out.println("N: " + stats.getN());
-			System.out.println("max: " + stats.getMax());
-			System.out.println("min: " + stats.getMin());
-			System.out.println("mean: " + stats.getMean());*/
 			System.out.println(stats);
-			
-			
 			System.out.println();
 		}
 	}
@@ -184,5 +148,4 @@ public class BatchSystemEvo {
 				+ " to " + currFile.getName() + ": " + sysEvoValue);
 		return sysEvoValue;
 	}
-
 }

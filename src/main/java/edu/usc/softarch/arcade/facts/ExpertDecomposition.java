@@ -3,14 +3,13 @@ package edu.usc.softarch.arcade.facts;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ExpertDecomposition {
-	public List<Group> groups = new ArrayList<Group>();
-	public HashSet<HashSet<String>> allIntraPairs = new HashSet<HashSet<String>> ();
-	//public HashSet<HashSet<String>> groupsOfStrings = new HashSet<HashSet<String>>();
+	public List<Group> groups = new ArrayList<>();
+	public Set<Set<String>> allIntraPairs = new HashSet<>();
 	
-	public void ExpertDecompsition() {
-	}
+	public void ExpertDecompsition() { }
 	
 	public String toString() {
 		

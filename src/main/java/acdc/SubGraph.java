@@ -1,10 +1,12 @@
 package acdc;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -60,12 +62,12 @@ public class SubGraph extends Pattern {
 					counter++;
 				}
 			}
-			ht.put(ncurr, new Integer(counter));
+			ht.put(ncurr, Integer.valueOf(counter));
 		}
 
 		//sort ht in increasing order
 
-		ArrayList my_array = new ArrayList();
+		List my_array = new ArrayList<>();
 		for (Enumeration e = ht.keys(); e.hasMoreElements();) {
 			Node curr_key = (Node) e.nextElement();
 			Integer curr_value = (Integer) ht.get(curr_key);

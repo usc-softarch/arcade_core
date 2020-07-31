@@ -1,11 +1,7 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Set;
 
 import com.thoughtworks.xstream.XStream;
@@ -48,7 +44,6 @@ public class SmellUtil {
 		try {
 			xml = FileUtil.readFile(detectedSmellsGtFilename,StandardCharsets.UTF_8);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		Set<Smell> detectedGtSmells = (Set<Smell>)xstream.fromXML(xml);

@@ -4,44 +4,40 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FastFeatureVectors implements Serializable{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -8870834810415855677L;
-	private ArrayList<String> featureVectorNames = new ArrayList<String>();
-	private ArrayList<String> namesInFeatureSet = new ArrayList<String>();
-	private HashMap<String, BitSet> nameToFeatureSetMap = new HashMap<String,BitSet>();
-	public HashMap<String, BitSet> getNameToFeatureSetMap() {
-		return nameToFeatureSetMap;
-	}
+	private List<String> featureVectorNames = new ArrayList<>();
+	private List<String> namesInFeatureSet = new ArrayList<>();
+	private Map<String, BitSet> nameToFeatureSetMap = new HashMap<>();
+	public Map<String, BitSet> getNameToFeatureSetMap() {
+		return nameToFeatureSetMap;	}
 
-	public void setNameToFeatureSetMap(HashMap<String, BitSet> nameToFeatureSetMap) {
-		this.nameToFeatureSetMap = nameToFeatureSetMap;
-	}
+	public void setNameToFeatureSetMap(Map<String, BitSet> nameToFeatureSetMap) {
+		this.nameToFeatureSetMap = nameToFeatureSetMap; }
 
-	public ArrayList<String> getNamesInFeatureSet() {
-		return namesInFeatureSet;
-	}
+	public List<String> getNamesInFeatureSet() {
+		return namesInFeatureSet;	}
 
-	public void setNamesInFeatureSet(ArrayList<String> namesInFeatureSet) {
+	public void setNamesInFeatureSet(List<String> namesInFeatureSet) {
 		this.namesInFeatureSet = namesInFeatureSet;
 	}
 
-	
-	
-	FastFeatureVectors(ArrayList<String> featureNames, HashMap<String, BitSet> nameToFeatureSetMap, ArrayList<String> namesInFeatureSet ) {
+	FastFeatureVectors(List<String> featureNames, 
+			Map<String, BitSet> nameToFeatureSetMap, 
+			List<String> namesInFeatureSet ) {
 		this.setFeatureVectorNames(featureNames);
 		this.nameToFeatureSetMap = nameToFeatureSetMap;
 		this.namesInFeatureSet = namesInFeatureSet;
 	}
 
-	public ArrayList<String> getFeatureVectorNames() {
+	public List<String> getFeatureVectorNames() {
 		return featureVectorNames;
 	}
 
-	public void setFeatureVectorNames(ArrayList<String> featureVectorNames) {
+	public void setFeatureVectorNames(List<String> featureVectorNames) {
 		this.featureVectorNames = featureVectorNames;
 	}
 }

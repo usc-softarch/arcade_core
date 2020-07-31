@@ -8,9 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
@@ -25,7 +22,7 @@ import edu.usc.softarch.arcade.util.LogUtil;
 import edu.usc.softarch.arcade.util.MapUtil;
 
 public class SmellDensityAnalyzer {
-	static Logger logger = Logger.getLogger(SmellDensityAnalyzer.class);
+	private static Logger logger = Logger.getLogger(SmellDensityAnalyzer.class);
 
 	public static void main(String[] args) throws FileNotFoundException {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
@@ -39,14 +36,14 @@ public class SmellDensityAnalyzer {
 		
 		List<File> fileList = FileListing.getFileListing(new File(inputDirFilename));
 		fileList = FileUtil.sortFileListByVersion(fileList);
-		Set<File> orderedSerFiles = new LinkedHashSet<File>();
+		Set<File> orderedSerFiles = new LinkedHashSet<>();
 		for (File file : fileList) {
 			if (file.getName().endsWith(".ser")) {
 				orderedSerFiles.add(file);
 			}
 		}
 		 	
-		Map<String,Set<Smell>> versionSmells = new LinkedHashMap<String,Set<Smell>>();
+		Map<String,Set<Smell>> versionSmells = new LinkedHashMap<>();
 		String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*";
 		
 		for (File file : orderedSerFiles) {
@@ -66,11 +63,9 @@ public class SmellDensityAnalyzer {
 			versionSmells.put(version, smells);
 		}
 		
-		Map<String,Set<ConcernCluster>> versionClusters = new LinkedHashMap<String,Set<ConcernCluster>>();
+		Map<String,Set<ConcernCluster>> versionClusters = new LinkedHashMap<>();
 		List<File> clustersFileList = FileListing.getFileListing(new File(clustersDirName));
 		for (File file : clustersFileList) {
-			Pattern p = Pattern.compile(versionSchemeExpr);
-			Matcher m  = p.matcher(file.getName());
 			Set<ConcernCluster> clusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(file.getAbsolutePath());
 			
 			String version = FileUtil.extractVersionFromFilename(versionSchemeExpr,file.getName());
@@ -87,7 +82,7 @@ public class SmellDensityAnalyzer {
 		for (String version : versionClusters.keySet()) {
 			Set<Smell> smells = versionSmells.get(version);
 			
-			Set<ConcernCluster> allSmellyClusters = new HashSet<ConcernCluster>();
+			Set<ConcernCluster> allSmellyClusters = new HashSet<>();
 			for (Smell smell : smells) {
 				allSmellyClusters.addAll(smell.clusters);
 			}
@@ -116,7 +111,5 @@ public class SmellDensityAnalyzer {
 		System.out.println("Clusters ratio stats:");
 		DescriptiveStatistics clustersRatioStats = new DescriptiveStatistics(clustersRatioArr);
 		System.out.println(clustersRatioStats);
-		
 	}
-
 }

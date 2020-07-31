@@ -1,38 +1,24 @@
 package edu.usc.softarch.arcade.clustering;
 
-import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
-
-import org.apache.log4j.Logger;
+import java.util.Set;
 
 import edu.usc.softarch.arcade.callgraph.MyClass;
 import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.util.ExtractionContext;
 
-import soot.JastAddJ.ThisAccess;
-
 /**
  * @author joshua
- *
  */
 public class Cluster extends FeatureVector {
-	
-	/**
-	 * 
-	 */
-	private static Logger logger = Logger.getLogger(Cluster.class);
 	private static final long serialVersionUID = -5521307722955232634L;
-	public HashSet<FeatureVector> items = new HashSet<FeatureVector>();
-	public ArrayList<Cluster> leafClusters = new ArrayList<Cluster>();
-	public HashSet<MyClass> classes = new HashSet<MyClass>();
+	public Set<FeatureVector> items = new HashSet<>();
+	public List<Cluster> leafClusters = new ArrayList<>();
+	public Set<MyClass> classes = new HashSet<>();
 	
 	private static UnbiasedEllenbergComparator DISTANCE_ORDER = null;
 	private static  ConcernComparator CONCERN_ORDER;
@@ -49,7 +35,7 @@ public class Cluster extends FeatureVector {
 	
 	
 	public void instantiateClasses() {
-		classes = new HashSet<MyClass>();
+		classes = new HashSet<>();
 	}
 	
 	public void add(MyClass c) {
@@ -171,11 +157,8 @@ public class Cluster extends FeatureVector {
 		
 		items.add(copyFV);
 		
-		//SimCalcUtil.verifySymmetricFeatureVectorOrdering(this, copyFV);
 		for (int i=0;i<this.size();i++) {
 			double featureSum = 0;
-/*			int thisFeatureValue = (this.elementAt(i).value)?1:0;
-			int inFeatureValue = (inFV.elementAt(i).value)?1:0;*/
 			featureSum = this.get(i).value + copyFV.get(i).value;
 			this.get(i).value = featureSum / items.size();
 		}
@@ -193,14 +176,12 @@ public class Cluster extends FeatureVector {
 					System.out.println("f2.value : " + f2.value);
 				}
 				if (f1.edge.tgtStr.equals(f2.edge.tgtStr) && (f1.value == 1 || f2.value == 1)) {
-					//f1.edge.srcStr = f1.edge.srcStr + ":" + f2.edge.srcStr;
 					if (f1.value == 1)
 						f1.edge.srcStr = f1.edge.srcStr;
 					else if (f2.value == 1)
 						f1.edge.srcStr = f2.edge.srcStr;
 					this.changeFeatureValue(f1.edge.tgtStr, 1);
 				} else if (f1.edge.tgtStr.equals(f2.edge.tgtStr) && !(f1.value == 1 || f2.value ==1)) {
-					//f1.edge.srcStr = f1.edge.srcStr + ":" + f2.edge.srcStr;
 					this.changeFeatureValue(f1.edge.tgtStr, 0);
 				}
 			}
@@ -225,15 +206,16 @@ public class Cluster extends FeatureVector {
 
 	}
 	
+	@Override
 	public boolean equals(Object o) {
-		Cluster c = (Cluster) o;
-		if (this.name.equals(c.name)) {
-			return true;
-		}
-		else 
+		if(!(o instanceof Cluster))
 			return false;
+
+		Cluster c = (Cluster) o;
+		return this.name.equals(c.name);
 	}
 	
+	@Override
 	public int hashCode() {
 		int hash = 7;
 		hash = 37 * hash + (this.name == null ? 0 : this.name.hashCode());
@@ -251,7 +233,7 @@ public class Cluster extends FeatureVector {
 		return true;
 	}
 	
-	public void addClustersToPriorityQueue(ArrayList<Cluster> clusters) {
+	public void addClustersToPriorityQueue(List<Cluster> clusters) {
 		
 		if (TopicUtil.docTopics == null && Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC))
 			TopicUtil.docTopics = TopicUtil.getDocTopicsFromFile();
@@ -273,16 +255,7 @@ public class Cluster extends FeatureVector {
 
 	}
 
-	public HashSet<MyClass> getClasses() {
-		return new HashSet<MyClass>(classes);
+	public Set<MyClass> getClasses() {
+		return new HashSet<>(classes);
 	}
-	
-/*	private void readObject(ObjectInputStream ois) throws Exception {
-		preparePriorityQueue();
-	    ois.defaultReadObject();
-	    System.out.println("Deserializing Cluster object");
-	  }*/
-	
-	
-
 }
