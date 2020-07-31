@@ -16,6 +16,10 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.apache.log4j.Logger;
 
+/**
+ * Tests for the FileUtil utilities. All failures are known issues with
+ * FileUtil and fixes are pending.
+ */
 public class FileUtilTest {
     // #region FIELDS ----------------------------------------------------------
     @Rule
@@ -26,7 +30,7 @@ public class FileUtilTest {
 
     // #region TESTS extractFilenamePrefix -------------------------------------
     @Test
-    public void testExtractFilenamePrefix1() { //TODO Pass
+    public void extractFilenamePrefixTest1() {
         // Simple filename test
         String test = "fileName.suffix";
         String result = FileUtil.extractFilenamePrefix(test);
@@ -34,7 +38,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testExtractFilenamePrefix2() { //TODO Fail
+    public void extractFilenamePrefixTest2() {
         // Filename without suffix
         String test = "fileName";
         String result = FileUtil.extractFilenamePrefix(test);
@@ -42,7 +46,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testExtractFilenamePrefix3() { //TODO Pass
+    public void extractFilenamePrefixTest3() {
         // Filename inside directory, relative path, Windows format
         char fs = File.separatorChar;
         String test = "directory" + fs + "fileName.suffix";
@@ -51,7 +55,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testExtractFilenamePrefix4() { //TODO Pass
+    public void extractFilenamePrefixTest4() {
         // Filename inside directory, absolute path, Unix format
         char fs = File.separatorChar;
         String test = fs + "dir1" + fs + "dir2" + fs + "dir3" 
@@ -61,7 +65,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testExtractFilenamePrefix5() { //TODO Pass
+    public void extractFilenamePrefixTest5() {
         // File has suffix
         char fs = File.separatorChar;
         String test = "." + fs + "src" + fs + "test" + fs + "resources"
@@ -72,7 +76,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testExtractFilenamePrefix6() { //TODO Pass
+    public void extractFilenamePrefixTest6() {
         // File does not have suffix
         char fs = File.separatorChar;
         String test = "." + fs + "src" + fs + "test" + fs + "resources"
@@ -85,7 +89,7 @@ public class FileUtilTest {
 
     // #region TESTS extractFilenameSuffix -------------------------------------
     @Test
-    public void testExtractFilenameSuffix1() { //TODO Pass
+    public void extractFilenameSuffixTest1() {
         // Simple filename test
         String test = "fileName.suffix";
         String result = FileUtil.extractFilenameSuffix(test);
@@ -93,7 +97,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testExtractFilenameSuffix2() { //TODO Fail
+    public void extractFilenameSuffixTest2() {
         // Filename without suffix
         String test = "fileName";
         String result = FileUtil.extractFilenameSuffix(test);
@@ -101,7 +105,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testExtractFilenameSuffix3() { //TODO Pass
+    public void extractFilenameSuffixTest3() {
         // Filename inside directory, relative path, Windows format
         char fs = File.separatorChar;
         String test = "directory" + fs + "fileName.suffix";
@@ -110,7 +114,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testExtractFilenameSuffix4() { //TODO Pass
+    public void extractFilenameSuffixTest4() {
         // Filename inside directory, absolute path, Unix format
         char fs = File.separatorChar;
         String test = fs + "dir1" + fs + "dir2" + fs + "dir3" 
@@ -120,7 +124,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testExtractFilenameSuffix5() { //TODO Fail
+    public void extractFilenameSuffixTest5() {
         // File has suffix
         char fs = File.separatorChar;
         String test = "." + fs + "src" + fs + "test" + fs + "resources"
@@ -131,7 +135,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testExtractFilenameSuffix6() { //TODO Pass
+    public void extractFilenameSuffixTest6() {
         // File does not have suffix
         char fs = File.separatorChar;
         String test = "." + fs + "src" + fs + "test" + fs + "resources"
@@ -144,7 +148,7 @@ public class FileUtilTest {
 
     // #region TESTS readFile --------------------------------------------------
     @Test
-    public void testReadFile1() { //TODO Pass
+    public void readFileTest1() {
         // File is empty
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -159,7 +163,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testReadFile2() { //TODO Pass
+    public void readFileTest2() {
         // File is a regular text, correct encoding
         char fs = File.separatorChar;
         String ls = System.lineSeparator();
@@ -177,7 +181,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testReadFile3() { //TODO Pass, but make it fail somehow?
+    public void readFileTest3() {
         // File is a regular text, incorrect encoding
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -192,7 +196,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testReadFile4() { //TODO Pass, but make it fail somehow?
+    public void readFileTest4() {
         // File is a binary
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -207,7 +211,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testReadFile5() { //TODO Pass, but make it fail somehow?
+    public void readFileTest5() {
         // File does not exist
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -223,7 +227,7 @@ public class FileUtilTest {
 
     // #region TESTS getPackageNameFromJavaFile --------------------------------
     @Test
-    public void testGetPackageNameFromJavaFile1() { //TODO Pass
+    public void getPackageNameFromJavaFileTest1() {
         // File does not contain any package names
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -238,7 +242,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetPackageNameFromJavaFile2() { //TODO Pass
+    public void getPackageNameFromJavaFileTest2() {
         // File contains a package name on line 1
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -253,7 +257,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetPackageNameFromJavaFile3() { //TODO Fail
+    public void getPackageNameFromJavaFileTest3() {
         // File contains a package name on line 4
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -268,7 +272,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetPackageNameFromJavaFile4() { //TODO Pass
+    public void getPackageNameFromJavaFileTest4() {
         // File contains multiple package names on different lines
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -283,7 +287,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetPackageNameFromJavaFile5() { //TODO Fail
+    public void getPackageNameFromJavaFileTest5() {
         // File contains multiple package names on the same line
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -298,7 +302,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetPackageNameFromJavaFile6() { //TODO Pass
+    public void getPackageNameFromJavaFileTest6() {
         // File is empty
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -313,7 +317,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetPackageNameFromJavaFile7() { //TODO Pass
+    public void getPackageNameFromJavaFileTest7() {
         // File is a binary
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -328,7 +332,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetPackageNameFromJavaFile8() { //TODO Pass
+    public void getPackageNameFromJavaFileTest8() {
         // File does not exist
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
@@ -344,7 +348,7 @@ public class FileUtilTest {
 
     // #region TESTS findPackageName -------------------------------------------
     @Test
-    public void testFindPackageName1() { //TODO Pass
+    public void findPackageNameTest1() {
         // Input String is well-formed
         String toTest = "package pkg.test.package;";
         String result = FileUtil.findPackageName(toTest);
@@ -352,7 +356,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testFindPackageName2() { //TODO Fail
+    public void findPackageNameTest2() {
         // Input String contains multiple packages
         String toTest = "package pkg.test.package; package more.packages;";
         String result = FileUtil.findPackageName(toTest);
@@ -360,7 +364,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testFindPackageName3() { //TODO Pass
+    public void findPackageNameTest3() {
         // Input String contains no packages
         String toTest = "no packages here";
         String result = FileUtil.findPackageName(toTest);
@@ -368,7 +372,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testFindPackageName4() { //TODO Pass
+    public void findPackageNameTest4() {
         // Input String is empty
         String toTest = "";
         String result = FileUtil.findPackageName(toTest);
@@ -376,7 +380,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testFindPackageName5() { //TODO Fail
+    public void findPackageNameTest5() {
         // Input String is null
         String toTest = null;
         String result = FileUtil.findPackageName(toTest);
@@ -384,7 +388,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testFindPackageName6() { //TODO Pass
+    public void findPackageNameTest6() {
         // Input String is malformed
         String toTest = "package";
         String result = FileUtil.findPackageName(toTest);
@@ -394,7 +398,7 @@ public class FileUtilTest {
 
     // #region TESTS tildeExpandPath -------------------------------------------
     @Test
-    public void testTildeExpandPath1() { //TODO Pass
+    public void tildeExpandPathTest1() {
         // Input String is well-formed
         String fs = File.separator;
         String pathAppend = "path" + fs + "is" + fs + "valid";
@@ -405,7 +409,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testTildeExpandPath2() { //TODO Pass
+    public void tildeExpandPathTest2() {
         // Input String is malformed
         String fs = File.separator;
         String pathAppend = "path" + fs + "is" + fs + "valid";
@@ -417,7 +421,7 @@ public class FileUtilTest {
 
     // #region TESTS sortFileListByVersion -------------------------------------
     @Test
-    public void testSortFileListByVersion1() { //TODO Fail
+    public void sortFileListByVersionTest1() {
         // Input is random files
         String fs = File.separator;
         String dirPath = "src" + fs + "test" + fs + "resources" + fs +
@@ -430,7 +434,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testSortFileListByVersion2() { //TODO Pass
+    public void sortFileListByVersionTest2() {
         // Input is files with same versioning scheme
         String fs = File.separator;
         String dirPath = "src" + fs + "test" + fs + "resources" + fs +
@@ -455,7 +459,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testSortFileListByVersion3() { //TODO Pass
+    public void sortFileListByVersionTest3() {
         // Input is files with different versioning scheme
         String fs = File.separator;
         String dirPath = "src" + fs + "test" + fs + "resources" + fs +
@@ -480,7 +484,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testSortFileListByVersion4() { //TODO Fail
+    public void sortFileListByVersionTest4() {
         // Input is files with one-item versioning scheme
         String fs = File.separator;
         String dirPath = "src" + fs + "test" + fs + "resources" + fs +
@@ -501,7 +505,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testSortFileListByVersion5() { //TODO Pass
+    public void sortFileListByVersionTest5() {
         // Input is files with two-item versioning scheme
         String fs = File.separator;
         String dirPath = "src" + fs + "test" + fs + "resources" + fs +
@@ -524,7 +528,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testSortFileListByVersion6() { //TODO Fail
+    public void sortFileListByVersionTest6() {
         // Input is files with letters in versioning scheme
         String fs = File.separator;
         String dirPath = "src" + fs + "test" + fs + "resources" + fs +
@@ -549,7 +553,7 @@ public class FileUtilTest {
 
     // #region TESTS extractVersion --------------------------------------------
     @Test
-    public void extractVersionTest1() { //TODO Pass
+    public void extractVersionTest1() {
         // Input is a three-point version
         String input = "2.3.10";
         String result = FileUtil.extractVersion(input);
@@ -557,7 +561,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionTest2() { //TODO Fail
+    public void extractVersionTest2() {
         // Input is a one-point version
         String input = "2";
         String result = FileUtil.extractVersion(input);
@@ -565,7 +569,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionTest3() { //TODO Fail
+    public void extractVersionTest3() {
         // Input is a lettered version
         String input = "2.3a";
         String result = FileUtil.extractVersion(input);
@@ -573,7 +577,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionTest4() { //TODO Pass
+    public void extractVersionTest4() {
         // Input is a filename without a version
         String input = "systemfile";
         String result = FileUtil.extractVersion(input);
@@ -581,7 +585,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionTest5() { //TODO Pass
+    public void extractVersionTest5() {
         // Input is a filename with a version
         String input = "systemfile-1.3";
         String result = FileUtil.extractVersion(input);
@@ -589,7 +593,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionTest6() { //TODO Pass
+    public void extractVersionTest6() {
         // Input is a filepath with a version
         String fs = File.separator;
         String dirPath = "src" + fs + "test" + fs + "resources" + fs +
@@ -602,7 +606,7 @@ public class FileUtilTest {
 
     // #region TESTS extractVersionFromFilename --------------------------------
     @Test
-    public void extractVersionFromFilenameTest1() { //TODO Pass
+    public void extractVersionFromFilenameTest1() {
         // Input is a three-point version
         String input = "2.3.10";
         String scheme = "[0-9]+\\.[0-9]+(\\.[0-9]+)*";
@@ -611,7 +615,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionFromFilenameTest2() { //TODO Pass
+    public void extractVersionFromFilenameTest2() {
         // Input is a one-point version
         String input = "2";
         String scheme = "[0-9]+(\\.[0-9]+)*";
@@ -620,7 +624,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionFromFilenameTest3() { //TODO Pass
+    public void extractVersionFromFilenameTest3() {
         // Input is a lettered version
         String input = "2.3a";
         String scheme = "[0-9]+[a-zA-Z]*(\\.[0-9]+[a-zA-Z]*)*";
@@ -629,7 +633,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionFromFilenameTest4() { //TODO Pass
+    public void extractVersionFromFilenameTest4() {
         // Input is a filename without a version
         String input = "systemfile";
         String scheme = "[0-9]+\\.[0-9]+(\\.[0-9]+)*";
@@ -638,7 +642,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionFromFilenameTest5() { //TODO Pass
+    public void extractVersionFromFilenameTest5() {
         // Input is a filename with a version
         String input = "systemfile-1.3";
         String scheme = "[0-9]+(\\.[0-9]+)*";
@@ -647,7 +651,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionFromFilenameTest6() { //TODO Pass
+    public void extractVersionFromFilenameTest6() {
         // Input is a filepath with a version
         String fs = File.separator;
         String dirPath = "src" + fs + "test" + fs + "resources" + fs +
@@ -661,7 +665,7 @@ public class FileUtilTest {
 
     // #region TESTS checkFile -------------------------------------------------
     @Test
-    public void checkFileTest1() { //TODO Pass
+    public void checkFileTest1() {
         // Input is an existing file, create = false, exitOnNoExist = false
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -671,7 +675,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkFileTest2() { //TODO Pass
+    public void checkFileTest2() {
         // Input is an existing file, create = true, exitOnNoExist = false
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -681,7 +685,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkFileTest3() { //TODO Pass
+    public void checkFileTest3() {
         // Input is an existing file, create = false, exitOnNoExist = true
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -691,7 +695,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkFileTest4() { //TODO Pass
+    public void checkFileTest4() {
         // Input is an existing file, create = true, exitOnNoExist = true
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -701,7 +705,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkFileTest5() { //TODO Pass
+    public void checkFileTest5() {
         // Input is not an existing file, create = false, exitOnNoExist = false
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -711,7 +715,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkFileTest6() { //TODO Pass
+    public void checkFileTest6() {
         // Input is not an existing file, create = true, exitOnNoExist = false
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -722,7 +726,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkFileTest7() { //TODO Pass
+    public void checkFileTest7() {
         // Input is not an existing file, create = false, exitOnNoExist = true
         exit.expectSystemExit();
         String fs = File.separator;
@@ -732,7 +736,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkFileTest8() { //TODO Pass
+    public void checkFileTest8() {
         // Input is not an existing file, create = true, exitOnNoExist = true
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -745,7 +749,7 @@ public class FileUtilTest {
 
     // #region TESTS checkDir --------------------------------------------------
     @Test
-    public void checkDirTest1() { //TODO Pass
+    public void checkDirTest1() {
         // Input is an existing directory, create = false, exitOnNoExist = false
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -755,7 +759,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkDirTest2() { //TODO Pass
+    public void checkDirTest2() {
         // Input is an existing directory, create = true, exitOnNoExist = false
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -765,7 +769,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkDirTest3() { //TODO Pass
+    public void checkDirTest3() {
         // Input is an existing directory, create = false, exitOnNoExist = true
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -775,7 +779,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkDirTest4() { //TODO Pass
+    public void checkDirTest4() {
         // Input is an existing directory, create = true, exitOnNoExist = true
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -785,7 +789,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkDirTest5() { //TODO Pass
+    public void checkDirTest5() {
         //Input not an existing directory, create = false, exitOnNoExist = false
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -795,7 +799,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkDirTest6() { //TODO Pass
+    public void checkDirTest6() {
         // Input not an existing directory, create = true, exitOnNoExist = false
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -806,7 +810,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkDirTest7() { //TODO Pass
+    public void checkDirTest7() {
         // Input not an existing directory, create = false, exitOnNoExist = true
         exit.expectSystemExit();
         String fs = File.separator;
@@ -816,7 +820,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void checkDirTest8() { //TODO Fail
+    public void checkDirTest8() {
         // Input not an existing directory, create = true, exitOnNoExist = true
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
@@ -829,7 +833,7 @@ public class FileUtilTest {
 
     // #region TESTS extractVersionPretty --------------------------------------
     @Test
-    public void extractVersionPrettyTest1() { //TODO Pass
+    public void extractVersionPrettyTest1() {
         // Input is a three-point version
         String input = "2.3.10";
         String result = FileUtil.extractVersionPretty(input);
@@ -837,7 +841,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionPrettyTest2() { //TODO Fail
+    public void extractVersionPrettyTest2() {
         // Input is a one-point version
         String input = "2";
         String result = FileUtil.extractVersionPretty(input);
@@ -845,7 +849,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionPrettyTest3() { //TODO Fail
+    public void extractVersionPrettyTest3() {
         // Input is a lettered version
         String input = "2.3a";
         String result = FileUtil.extractVersionPretty(input);
@@ -853,7 +857,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionPrettyTest4() { //TODO Pass
+    public void extractVersionPrettyTest4() {
         // Input is a filename without a version
         String input = "systemfile";
         String result = FileUtil.extractVersionPretty(input);
@@ -861,7 +865,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionPrettyTest5() { //TODO Pass
+    public void extractVersionPrettyTest5() {
         // Input is a filename with a version
         String input = "systemfile-1.3";
         String result = FileUtil.extractVersionPretty(input);
@@ -869,7 +873,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void extractVersionPrettyTest6() { //TODO Pass
+    public void extractVersionPrettyTest6() {
         // Input is a filepath with a version
         String fs = File.separator;
         String dirPath = "src" + fs + "test" + fs + "resources" + fs +

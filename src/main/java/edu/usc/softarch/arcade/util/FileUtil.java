@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.util;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -11,21 +10,18 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.usc.softarch.arcade.Constants;
 
 public class FileUtil {
-	static Logger logger = Logger.getLogger(FileUtil.class);
+	private static Logger logger = LogManager.getLogger(FileUtil.class);
 
 	/**
 	 * Extracts the name of a file without its extension.
@@ -39,6 +35,20 @@ public class FileUtil {
 	}
 
 	/**
+	 * Extracts the name of a file without its extension.
+	 * 
+	 * @param theFile Name or path to desired file's prefix.
+	 */
+	public static String extractFilenamePrefix(final File theFile) {
+		if(Constants._DEBUG)
+		{
+			logger.entry(theFile);
+			logger.traceExit();
+		}
+		return FilenameUtils.getBaseName(theFile.getName());
+	}
+
+	/**
 	 * Extracts the extension of a given file.
 	 * 
 	 * @param filename Relative or absolute path to file.
@@ -46,6 +56,20 @@ public class FileUtil {
 	 */
 	public static String extractFilenameSuffix(String filename) {
 		return filename.substring(filename.lastIndexOf("."),filename.length());
+	}
+
+	/**
+	 * Extracts the extension of a given file.
+	 * 
+	 * @param theFile Name or path to desired file's extension.
+	 */
+	public static String extractFilenameSuffix(final File theFile) {
+		if(Constants._DEBUG)
+		{
+			logger.entry(theFile);
+			logger.traceExit();
+		}
+		return FilenameUtils.getExtension(theFile.getName());
 	}
 
 	/**
@@ -57,7 +81,7 @@ public class FileUtil {
 	 * @throws IOException If file cannot be read.
 	 */
 	public static String readFile(String path, Charset encoding)
-			throws IOException {
+			throws IOException { //TODO If possible, fail on incorrect encoding
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
 		return encoding.decode(ByteBuffer.wrap(encoded)).toString();
 	}
@@ -71,30 +95,35 @@ public class FileUtil {
 	 */
 	public static String getPackageNameFromJavaFile(String filename)
 			throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(filename));
-		String line = null;
-		while ((line = reader.readLine()) != null) {
-			String packageName = findPackageName(line);
-			return packageName;
+		String packageName = null;
+		try (BufferedReader reader 
+				= new BufferedReader(new FileReader(filename))) {
+			String line = reader.readLine();
+			if(line != null)
+				packageName = findPackageName(line);
 		}
-		return null;
+		return packageName;
 	}
 
-	public static String findPackageName(String test1) {
-		//TODO Test this method and figure out what it does
+	/**
+	 * Extracts the name of a java code's package.
+	 * 
+	 * @param entry String from which to extract the package name.
+	 * @return Code's package name.
+	 */
+	public static String findPackageName(String entry) {
 		Pattern pattern = Pattern.compile("\\s*package\\s+(.+)\\s*;\\s*");
-		Matcher matcher = pattern.matcher(test1);
+		Matcher matcher = pattern.matcher(entry);
 		if (matcher.find()) return matcher.group(1).trim();
 		return null;
 	}
 
 	/**
-	 * Expands a path relative to Unix home to an absolute path.
+	 * Expands a path relative to home to an absolute path.
 	 *
 	 * @param path Path to expand.
 	 */
 	public static String tildeExpandPath(String path) {
-		//TODO Check operating system to avoid errors
 		if (path.startsWith("~" + File.separator)) {
 			path = System.getProperty("user.home") + path.substring(1);
 		}
@@ -113,19 +142,17 @@ public class FileUtil {
 
 		Collections.sort(
 			outList,
-			new Comparator<File>() {
-			@Override
-			public int compare(File o1, File o2) {
-				//TODO Create Unit test for this
-				//TODO Check if these version extractors still work.
+			(File o1, File o2) -> {
 				String version1 = extractVersion(o1.getName());
 				String[] parts1 = version1.split("\\.");
 				String version2 = extractVersion(o2.getName());
 				String[] parts2 = version2.split("\\.");
 
-				// Number of version "parts" (separated by ".") of the simpler version.
+				// Number of version "parts" (separated by ".") of the
+				// simpler version.
 				int minLength =
-					parts1.length > parts2.length ? parts2.length	: parts1.length;
+					parts1.length > parts2.length 
+					? parts2.length : parts1.length;
 
 				// For each version part shared by both compared versions
 				for (int i = 0; i < minLength; i++) {
@@ -134,8 +161,9 @@ public class FileUtil {
 						Integer part2 = Integer.parseInt(parts2[i]);
 						int compareToVal = part1.compareTo(part2);
 						if (compareToVal != 0) {
-							if(Constants._DEBUG) logger.debug("compareTo " + version1 + " to "
-										+ version2 + ": " + compareToVal);
+							if(Constants._DEBUG)
+								logger.debug("compareTo " + version1 + " to "
+									+ version2 + ": " + compareToVal);
 							return compareToVal;
 						}
 					} catch (NumberFormatException e) {
@@ -149,8 +177,7 @@ public class FileUtil {
 				}
 				//TODO Check if this can't replace the rest of this try/catch
 				return version1.compareTo(version2);
-			}
-		});
+			});
 
 		if(reverse) Collections.reverse(outList);
 		return outList;
@@ -316,29 +343,5 @@ public class FileUtil {
 
 		if(Constants._DEBUG) logger.traceExit();
 		return null;
-	}
-
-	/**
-	 * @param theFile Name or path to desired file's prefix.
-	 */
-	public static String extractFilenamePrefix(final File theFile) {
-		if(Constants._DEBUG)
-		{
-			logger.entry(theFile);
-			logger.traceExit();
-		}
-		return FilenameUtils.getBaseName(theFile.getName());
-	}
-
-	/**
-	 * @param theFile Name or path to desired file's extension.
-	 */
-	public static String extractFilenameSuffix(final File theFile) {
-		if(Constants._DEBUG)
-		{
-			logger.entry(theFile);
-			logger.traceExit();
-		}
-		return FilenameUtils.getExtension(theFile.getName());
 	}
 }
