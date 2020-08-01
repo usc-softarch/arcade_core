@@ -111,6 +111,9 @@ public class RsfReader {
 	public static List<List<String>> extractFactsFromRSF(String rsfFilename) {
 		// List of facts extracted from RSF File
 		List<List<String>> facts = Lists.newArrayList();
+
+		if(Constants._DEBUG)
+			logger.debug("Attempting to read " + rsfFilename);
 		
 		try (BufferedReader in = new BufferedReader(new FileReader(rsfFilename))) {
 			String line;
