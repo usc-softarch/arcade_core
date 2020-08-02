@@ -1,8 +1,10 @@
 package edu.usc.softarch.arcade.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,23 +13,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.apache.log4j.Logger;
+import com.ginsberg.junit.exit.ExpectSystemExit;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the FileUtil utilities. All failures are known issues with
  * FileUtil and fixes are pending.
  */
 public class FileUtilTest {
-    // #region FIELDS ----------------------------------------------------------
-    @Rule
-    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
-    
-    static Logger logger = Logger.getLogger(FileUtilTest.class);
-    // #endregion FIELDS -------------------------------------------------------
-
     // #region TESTS extractFilenamePrefix -------------------------------------
     @Test
     public void extractFilenamePrefixTest1() {
@@ -153,13 +147,9 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "empty.txt";
-        try {
-            String result = FileUtil.readFile(filePath, StandardCharsets.UTF_8);
-            assertEquals("", result);
-        } catch(IOException e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
+        String result = assertDoesNotThrow(() -> 
+            { return FileUtil.readFile(filePath, StandardCharsets.UTF_8); });
+        assertEquals("", result);
     }
 
     @Test
@@ -169,15 +159,11 @@ public class FileUtilTest {
         String ls = System.lineSeparator();
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "firstLinePackage.txt";
-        try {
-            String result = FileUtil.readFile(filePath, StandardCharsets.UTF_8);
-            String expectedResult = "package pkg.test.package;" + ls + 
-                "more text" + ls + "more text2" + ls + "more text3";
-            assertEquals(expectedResult, result);
-        } catch(IOException e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
+        String result = assertDoesNotThrow(() ->
+            { return FileUtil.readFile(filePath, StandardCharsets.UTF_8); });
+        String expectedResult = "package pkg.test.package;" + ls + 
+            "more text" + ls + "more text2" + ls + "more text3";
+        assertEquals(expectedResult, result);
     }
 
     @Test
@@ -186,13 +172,8 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "firstLinePackage.txt";
-        try {
-            FileUtil.readFile(filePath, StandardCharsets.UTF_16);
-            assertTrue(true);
-        } catch(IOException e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
+        assertDoesNotThrow(() -> 
+            FileUtil.readFile(filePath, StandardCharsets.UTF_16));
     }
 
     @Test
@@ -201,13 +182,8 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "ConvertRsfToGexf$1.class";
-        try {
-            FileUtil.readFile(filePath, StandardCharsets.UTF_16);
-            assertTrue(true);
-        } catch(IOException e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
+        assertDoesNotThrow(() -> 
+            FileUtil.readFile(filePath, StandardCharsets.UTF_16));
     }
 
     @Test
@@ -216,12 +192,8 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "nonExist.txt";
-        try {
-            FileUtil.readFile(filePath, StandardCharsets.UTF_16);
-            assertTrue(false);
-        } catch(IOException e) {
-            assertTrue(true);
-        }
+        assertThrows(IOException.class, () ->
+            FileUtil.readFile(filePath, StandardCharsets.UTF_16));
     }
     // #endregion TESTS readFile -----------------------------------------------
 
@@ -232,13 +204,9 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "textFile.txt";
-        try {
-            String result = FileUtil.getPackageNameFromJavaFile(filePath);
-            assertEquals(null, result);
-        } catch(IOException e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
+        String result = assertDoesNotThrow(() -> 
+            { return FileUtil.getPackageNameFromJavaFile(filePath); });
+        assertEquals(null, result);
     }
 
     @Test
@@ -247,13 +215,9 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "firstLinePackage.txt";
-        try {
-            String result = FileUtil.getPackageNameFromJavaFile(filePath);
-            assertEquals("pkg.test.package", result);
-        } catch(IOException e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
+        String result = assertDoesNotThrow(() -> 
+            { return FileUtil.getPackageNameFromJavaFile(filePath); });
+        assertEquals("pkg.test.package", result);
     }
 
     @Test
@@ -262,13 +226,9 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "fourthLinePackage.txt";
-        try {
-            String result = FileUtil.getPackageNameFromJavaFile(filePath);
-            assertEquals("pkg.test.package", result);
-        } catch(IOException e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
+        String result = assertDoesNotThrow(() ->
+            { return FileUtil.getPackageNameFromJavaFile(filePath); });
+        assertEquals("pkg.test.package", result);
     }
 
     @Test
@@ -277,13 +237,9 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "manyPackages.txt";
-        try {
-            String result = FileUtil.getPackageNameFromJavaFile(filePath);
-            assertEquals("pkg.test.package", result);
-        } catch(IOException e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
+        String result = assertDoesNotThrow(() ->
+            { return FileUtil.getPackageNameFromJavaFile(filePath); });
+        assertEquals("pkg.test.package", result);
     }
 
     @Test
@@ -292,13 +248,9 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "sameLinePackages.txt";
-        try {
-            String result = FileUtil.getPackageNameFromJavaFile(filePath);
-            assertEquals("package.number.one", result);
-        } catch(IOException e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
+        String result = assertDoesNotThrow(() ->
+            { return FileUtil.getPackageNameFromJavaFile(filePath); });
+        assertEquals("package.number.one", result);
     }
 
     @Test
@@ -307,13 +259,9 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "empty.txt";
-        try {
-            String result = FileUtil.getPackageNameFromJavaFile(filePath);
-            assertEquals(null, result);
-        } catch(IOException e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
+        String result = assertDoesNotThrow(() ->
+            { return FileUtil.getPackageNameFromJavaFile(filePath); });
+        assertEquals(null, result);
     }
 
     @Test
@@ -322,13 +270,9 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "ConvertRsfToGexf$1.class";
-        try {
-            String result = FileUtil.getPackageNameFromJavaFile(filePath);
-            assertEquals(null, result);
-        } catch(IOException e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
+        String result = assertDoesNotThrow(() ->
+            { return FileUtil.getPackageNameFromJavaFile(filePath); });
+        assertEquals(null, result);
     }
 
     @Test
@@ -337,12 +281,8 @@ public class FileUtilTest {
         char fs = File.separatorChar;
         String filePath = "." + fs + "src" + fs + "test" + fs + "resources" +
             fs + "FileUtilTest_resources" + fs + "nonExist.txt";
-        try {
-            FileUtil.getPackageNameFromJavaFile(filePath);
-            assertTrue(false);
-        } catch(IOException e) {
-            assertTrue(true);
-        }
+        assertThrows(IOException.class, () -> 
+            FileUtil.getPackageNameFromJavaFile(filePath));
     }
     // #endregion TESTS getPackageNameFromJavaFile -----------------------------
 
@@ -726,9 +666,9 @@ public class FileUtilTest {
     }
 
     @Test
+    @ExpectSystemExit
     public void checkFileTest7() {
         // Input is not an existing file, create = false, exitOnNoExist = true
-        exit.expectSystemExit();
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
             "FileUtilTest_resources" + fs + "nonExist.txt";
@@ -810,9 +750,9 @@ public class FileUtilTest {
     }
 
     @Test
+    @ExpectSystemExit
     public void checkDirTest7() {
         // Input not an existing directory, create = false, exitOnNoExist = true
-        exit.expectSystemExit();
         String fs = File.separator;
         String path = "src" + fs + "test" + fs + "resources" + fs +
             "FileUtilTest_resources" + fs + "nonExistDir";

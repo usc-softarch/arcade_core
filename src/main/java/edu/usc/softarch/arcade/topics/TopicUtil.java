@@ -30,6 +30,7 @@ import edu.usc.softarch.arcade.clustering.FastCluster;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.ConfigUtil;
 import edu.usc.softarch.arcade.config.Config.Language;
+import edu.usc.softarch.arcade.topics.DocTopicItem.Sort;
 import edu.usc.softarch.arcade.util.DebugUtil;
 
 /**
@@ -444,9 +445,9 @@ public class TopicUtil {
 			return new DocTopicItem(docTopicItem);
 		}
 		DocTopicItem mergedDocTopicItem = new DocTopicItem(docTopicItem);
-		Collections.sort(docTopicItem.topics,new TopicItemByTopicNumComparator());
-		Collections.sort(docTopicItem2.topics,new TopicItemByTopicNumComparator());
-		Collections.sort(mergedDocTopicItem.topics,new TopicItemByTopicNumComparator());
+		docTopicItem.sort(Sort.num);
+		docTopicItem2.sort(Sort.num);
+		mergedDocTopicItem.sort(Sort.num);
 		for (int i=0;i<docTopicItem.topics.size();i++) {
 			TopicItem ti1 = docTopicItem.topics.get(i);
 			TopicItem ti2 = docTopicItem2.topics.get(i);
@@ -480,8 +481,8 @@ public class TopicUtil {
 			return;
 		}
 		
-		Collections.sort(docTopicItem.topics,new TopicItemByTopicNumComparator());
-		Collections.sort(docTopicItem2.topics,new TopicItemByTopicNumComparator());
+		docTopicItem.sort(Sort.num);
+		docTopicItem2.sort(Sort.num);
 		
 		logger.debug(String.format("%5s%64s%64s\n", "", docTopicItem.source, docTopicItem2.source));
 		

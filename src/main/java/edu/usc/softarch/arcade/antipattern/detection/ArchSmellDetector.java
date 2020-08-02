@@ -567,16 +567,18 @@ public class ArchSmellDetector {
 			Set<ConcernCluster> clusters,
 			Map<String, Set<String>> clusterSmellsMap,
 			Set<Smell> detectedSmells) {
-		System.out.println("Finding scattered parasitic functionality instances...");
+		if(Constants._DEBUG)
+			logger.info("Finding scattered parasitic functionality instances...");
+
+		// Setting thresholds for detection algorithm
 		double scatteredConcernThreshold = .20;
 		double parasiticConcernThreshold = scatteredConcernThreshold;
 		
 		Map<Integer,Integer> topicNumCountMap = new HashMap<>();
 		Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap = new HashMap<>();
 		
-		
-		for (ConcernCluster cluster : clusters) {
-			if (cluster.getDocTopicItem() != null) {
+		for (ConcernCluster cluster : clusters) { // for each concern cluster
+			if (cluster.getDocTopicItem() != null) { //
 				DocTopicItem dti = cluster.getDocTopicItem();
 				for (TopicItem ti : dti.topics) {
 					if (ti.proportion >= scatteredConcernThreshold) {
@@ -668,23 +670,24 @@ public class ArchSmellDetector {
 				Smell spf = new SpfSmell(topicNum);
 				spf.clusters = new HashSet<ConcernCluster>(affectedClusters);
 				detectedSmells.add(spf);
-				
 			}
 		}
 	}
 
+	/**
+	 * Adds a smell to the given cluster.
+	 * 
+	 * @param clusterSmellMap Map of all clusters and their sets of smells.
+	 * @param clusterName Name of the cluster to add a smell to.
+	 * @param smellAbrv Abbreviation mell to add to the cluster.
+	 */
 	private static void updateSmellMap(
 			Map<String, Set<String>> clusterSmellMap,
 			String clusterName, String smellAbrv) {
-		Set<String> smellList = null;
-		if (clusterSmellMap.containsKey(clusterName)) {
-			smellList = clusterSmellMap.get(clusterName);
-			smellList.add(smellAbrv); 	
-		}
-		else {
+		Set<String> smellList = clusterSmellMap.get(clusterName);
+		if(smellList == null)
 			smellList = new HashSet<>();
-			smellList.add(smellAbrv);
-			clusterSmellMap.put(clusterName, smellList);
-		}
+		smellList.add(smellAbrv);
+		clusterSmellMap.putIfAbsent(clusterName, smellList);
 	}
 }

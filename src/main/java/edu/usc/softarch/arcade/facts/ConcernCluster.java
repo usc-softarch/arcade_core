@@ -7,32 +7,25 @@ import edu.usc.softarch.arcade.topics.DocTopicItem;
 
 /**
  * @author joshua
- * 
  */
 public class ConcernCluster {
+	// #region FIELDS ------------------------------------------------------------
 	private String name;
-	private Set<String> entities = new HashSet<String>();
+	private Set<String> entities = new HashSet<>();
 	private DocTopicItem docTopicItem = null;
+	// #endregion FIELDS ---------------------------------------------------------
 	
-	public String getName() {
-		return name;
-	}
+	// #region ACCESSORS ---------------------------------------------------------
+	public String getName() {	return name; }
+	public Set<String> getEntities() { return entities;	}
+	public DocTopicItem getDocTopicItem() { return docTopicItem; }
 
-	public Set<String> getEntities() {
-		return entities;
-	}
-
-	public void setEntities(Set<String> entities) {
-		this.entities = entities;
-	}
-	
-	public void addEntity(String entity) {
-		entities.add(entity);
-	}
-
-	public void setName(String trim) {
-		name = trim;
-	}
+	public void setEntities(Set<String> entities) { this.entities = entities; }
+	public void addEntity(String entity) { entities.add(entity); }
+	public void setName(String name) { this.name = name; }
+	public void setDocTopicItem(DocTopicItem docTopicItem) {
+		this.docTopicItem = docTopicItem; }
+	// #endregion ACCESSORS ------------------------------------------------------
 	
 	public boolean equals(Object obj) {
 		if (obj instanceof ConcernCluster) {
@@ -50,19 +43,6 @@ public class ConcernCluster {
 		return false;
 	}
 	
-	public int hashCode() {
-		return this.name.hashCode();
-	}
-
-	public DocTopicItem getDocTopicItem() {
-		return docTopicItem;
-	}
-
-	public void setDocTopicItem(DocTopicItem docTopicItem) {
-		this.docTopicItem = docTopicItem;
-	}
-	
-	public String toString() {
-		return this.name;
-	}
+	public int hashCode() { return this.name.hashCode(); }
+	public String toString() { return this.name; }
 }
