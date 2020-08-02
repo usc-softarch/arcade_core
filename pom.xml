@@ -9,8 +9,8 @@
   <url>https://github.com/usc-softarch/arcade_core</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
   </properties>
   <repositories>
     <repository>
@@ -31,11 +31,16 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.github.stefanbirkner/system-rules -->
     <dependency>
-      <groupId>com.github.stefanbirkner</groupId>
-      <artifactId>system-rules</artifactId>
-      <version>1.2.0</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.4.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ginsberg</groupId>
+      <artifactId>junit5-system-exit</artifactId>
+      <version>1.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
