@@ -54,6 +54,8 @@ public class ArchSmellDetector {
 	public static TopicModelExtractionMethod tmeMethod =
 		TopicModelExtractionMethod.VAR_MALLET_FILE;
 	public static DocTopics docTopics;
+	private static double scatteredConcernThreshold = .20;
+	private static double parasiticConcernThreshold = .20;
 	
 	static final Comparator<TopicItem> TOPIC_PROPORTION_ORDER 
 		= (TopicItem t1, TopicItem t2) -> {
@@ -563,6 +565,14 @@ public class ArchSmellDetector {
 		return newDocTopicItem;
 	}
 
+	// #region SCATTERED PARASITIC FUNCTIONALITY ---------------------------------
+	/**
+	 * Detects Scattered Parasitic Functionality smell instances.
+	 * 
+	 * @param clusters Input clusters to run detection algorithm on.
+	 * @param clusterSmellsMap Mapping of smells per cluster. Altered.
+	 * @param detectedSmells Set of detected smells. Altered.
+	 */
 	private static void detectSpfNew(
 			Set<ConcernCluster> clusters,
 			Map<String, Set<String>> clusterSmellsMap,
@@ -571,108 +581,138 @@ public class ArchSmellDetector {
 			logger.info("Finding scattered parasitic functionality instances...");
 
 		// Setting thresholds for detection algorithm
-		double scatteredConcernThreshold = .20;
-		double parasiticConcernThreshold = scatteredConcernThreshold;
+		Map<Integer, Integer> topicNumCountMap = new HashMap<>();
+		Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap 
+			= new HashMap<>();
 		
-		Map<Integer,Integer> topicNumCountMap = new HashMap<>();
-		Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap = new HashMap<>();
-		
-		for (ConcernCluster cluster : clusters) { // for each concern cluster
-			if (cluster.getDocTopicItem() != null) { //
+		mapTopicItemsToCluster(
+			clusters, topicNumCountMap, scatteredTopicToClustersMap);
+
+		final double significanceThreshold = computeSPFSignificanceThreshold(
+			new double[topicNumCountMap.keySet().size()], topicNumCountMap,
+			scatteredTopicToClustersMap);
+
+		// Select significant topic numbers
+		Set<Integer> significantTopicNums = 
+			new HashSet<>(topicNumCountMap.keySet());
+		significantTopicNums.removeIf((Integer topicNum) ->
+			topicNumCountMap.get(topicNum) <= significanceThreshold);
+
+		for (int topicNum : significantTopicNums) {
+			Set<ConcernCluster> clustersWithScatteredTopics = 
+				scatteredTopicToClustersMap.get(topicNum);
+			Set<ConcernCluster> affectedClusters = new HashSet<>();
+
+			// Filter out all clusters that don't have topics
+			Set<ConcernCluster> validScatteredClusters = 
+				new HashSet<>(clustersWithScatteredTopics);
+			validScatteredClusters.removeIf((ConcernCluster cluster) -> 
+				cluster.getDocTopicItem() == null);
+
+			for (ConcernCluster cluster : validScatteredClusters) {
+				// Filter out all topic items that aren't smelly
 				DocTopicItem dti = cluster.getDocTopicItem();
-				for (TopicItem ti : dti.topics) {
-					if (ti.proportion >= scatteredConcernThreshold) {
-						// count the number of times the topic appears
-						if (topicNumCountMap.containsKey(ti.topicNum)) {
-							int topicNumCount = topicNumCountMap
-									.get(ti.topicNum);
-							topicNumCount++;
-							topicNumCountMap.put(ti.topicNum, topicNumCount);
-						} else {
-							topicNumCountMap.put(ti.topicNum, 1);
-						}
-						
-						// determine which clusters have each topic
-						if (scatteredTopicToClustersMap.containsKey(ti.topicNum)) {
-							Set<ConcernCluster> clustersWithTopic = scatteredTopicToClustersMap.get(ti.topicNum);
-							clustersWithTopic.add(cluster);
+				List<TopicItem> significantTopicItems = new ArrayList<>(dti.topics);
+				significantTopicItems.removeIf((TopicItem ti) -> 
+					ti.topicNum == topicNum || ti.proportion < parasiticConcernThreshold);
 
-						}
-						else {
-							Set<ConcernCluster> clustersWithTopic = new HashSet<>();
-							clustersWithTopic.add(cluster);
-							scatteredTopicToClustersMap.put(ti.topicNum, clustersWithTopic);
+				for (int i = 0; i < significantTopicItems.size(); i++) {
+					if(Constants._DEBUG)
+						logger.debug(cluster.getName()
+							+ " has spf with scattered concern " + topicNum);
 
-						}
-					}
+					clusterSmellsMap.putIfAbsent(cluster.getName(), new HashSet<>());
+					clusterSmellsMap.get(cluster.getName()).add("spf");
+
+					affectedClusters.add(cluster);
 				}
 			}
+			
+			Smell spf = new SpfSmell(topicNum);
+			spf.clusters = new HashSet<ConcernCluster>(affectedClusters);
+			detectedSmells.add(spf);
 		}
+	}
+
+	/**
+	 * Maps topic items to clusters.
+	 * 
+	 * @param inputClusters Clusters on which to run the mapping.
+	 * @param topicNumCountMap Count of occurrences of each topic. Altered.
+	 * @param scatteredTopicToClustersMap Mapping of topics to clusters.
+	 */
+	private static void mapTopicItemsToCluster(
+			Set<ConcernCluster> inputClusters,
+			Map<Integer, Integer> topicNumCountMap,
+			Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap) {
+		// Filter out all clusters that don't have topics
+		Set<ConcernCluster> validClusters = new HashSet<>(inputClusters);
+		validClusters.removeIf((ConcernCluster cluster) -> 
+			cluster.getDocTopicItem() == null);
 		
-		double[] topicCounts = new double[topicNumCountMap.keySet().size()];
+		for (ConcernCluster cluster : validClusters) {
+			// Filter out all topic items that aren't smelly
+			DocTopicItem dti = cluster.getDocTopicItem();
+			List<TopicItem> smellyTopicItems = new ArrayList<>(dti.topics);
+			smellyTopicItems.removeIf((TopicItem ti) -> 
+				ti.proportion < scatteredConcernThreshold);
+
+			for (TopicItem ti : dti.topics) {
+				// count the number of times the topic appears
+				topicNumCountMap.compute(ti.topicNum, (k, v) ->	(v == null) ? 1 : v++);
+				
+				// map cluster to the related topicItem
+				scatteredTopicToClustersMap.putIfAbsent(ti.topicNum, new HashSet<>());
+				scatteredTopicToClustersMap.get(ti.topicNum).add(cluster);
+			}
+		}
+	}
+
+	/**
+	 * Computes the significance threshold for Scattered Parasitic Functionality
+	 * smells. This represents the number of clusters a topic item must appear in
+	 * to be considered an SPF.
+	 * 
+	 * @param topicCounts Number of appearances of each topic item number.
+	 * @param topicNumCountMap Map of topic item counts.
+	 * @param scatteredTopicToClustersMap Map of clusters per topic item.
+	 * @return
+	 */
+	private static double computeSPFSignificanceThreshold(
+			double[] topicCounts, Map<Integer, Integer> topicNumCountMap,
+			Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap){
 		double topicCountMean = 0;
 		double topicCountStdDev = 0;
 
 		int topicNumCounter = 0;
-		for (int topicNum : topicNumCountMap.values()) {
+
+		for (Integer topicNum : topicNumCountMap.values()) {
 			topicCounts[topicNumCounter] = (double)topicNum;
 			topicNumCounter++;
 		}
+
 		topicCountMean = StatUtils.mean(topicCounts);
 		StandardDeviation stdDev = new StandardDeviation();
 		topicCountStdDev = stdDev.evaluate(topicCounts);
 		
-		logger.debug("topic count mean: " + topicCountMean);
-		logger.debug("topic count standard deviation: " + topicCountStdDev);
+		if(Constants._DEBUG) {
+			logger.debug("topic count mean: " + topicCountMean);
+			logger.debug("topic count standard deviation: " + topicCountStdDev);
 
-		
-		logger.debug("topic num : count");
-		for (Map.Entry<Integer, Integer> entry : topicNumCountMap.entrySet()) {
-			logger.debug(entry.getKey() + " : " + entry.getValue() );
-		}
-		logger.debug("topic num : clusters with topic");
-		for (Map.Entry<Integer, Set<ConcernCluster>> entry : scatteredTopicToClustersMap.entrySet()) {
-			logger.debug(entry.getKey() + " : " + entry.getValue() );
-		}
-		
-		for (int topicNum : topicNumCountMap.keySet()) {
-			int topicCount = topicNumCountMap.get(topicNum);
-			if (topicCount > topicCountMean + topicCountStdDev) {
-				Set<ConcernCluster> clustersWithScatteredTopics = scatteredTopicToClustersMap.get(topicNum);
-				
-				Set<ConcernCluster> affectedClusters = new HashSet<>();
-				for (ConcernCluster cluster : clustersWithScatteredTopics) {
-					if (cluster.getDocTopicItem() != null) {
-						DocTopicItem dti = cluster.getDocTopicItem();
-						for (TopicItem ti : dti.topics) {
-							if (ti.topicNum != topicNum) {
-								if (ti.proportion >= parasiticConcernThreshold) {
-									logger.debug(cluster.getName() + " has spf with scattered concern " + topicNum);
-									
-									
-									if (clusterSmellsMap.containsKey(cluster.getName())) {
-										Set<String> smells = clusterSmellsMap.get(cluster.getName());
-										smells.add("spf");
-									}
-									else {
-										Set<String> smells = new HashSet<>();
-										smells.add("spf");
-										clusterSmellsMap.put(cluster.getName(), smells);
-									}
-									
-									affectedClusters.add(cluster);
-								}
-							}
-						}
-					}
-				}
-				
-				Smell spf = new SpfSmell(topicNum);
-				spf.clusters = new HashSet<ConcernCluster>(affectedClusters);
-				detectedSmells.add(spf);
+			logger.debug("topic num : count");
+			for (Map.Entry<Integer, Integer> entry : topicNumCountMap.entrySet()) {
+				logger.debug(entry.getKey() + " : " + entry.getValue() );
+			}
+			logger.debug("topic num : clusters with topic");
+			for (Map.Entry<Integer, Set<ConcernCluster>> entry 
+					: scatteredTopicToClustersMap.entrySet()) {
+				logger.debug(entry.getKey() + " : " + entry.getValue() );
 			}
 		}
+
+		return topicCountMean + topicCountStdDev;
 	}
+	// #endregion SCATTERED PARASITIC FUNCTIONALITY ------------------------------
 
 	/**
 	 * Adds a smell to the given cluster.
