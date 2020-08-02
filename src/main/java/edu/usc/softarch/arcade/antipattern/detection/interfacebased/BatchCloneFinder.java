@@ -62,18 +62,27 @@ public class BatchCloneFinder {
 		}
 
 		BatchCloneFinder batchCloneFinder = new BatchCloneFinder();
-		args = new String[] { args[0], args[1], "" };
+		String inputDir = args[0];
+		String outputDir = args[1];
+		String classesDir = "";
 		logger.info(System.getProperty("user.dir"));
-		
-		RecoveryParams recParms = new RecoveryParams(args);
-		File[] files = recParms.getInputDir().listFiles();
+
+		RecoveryParams recParams = null;
+		try {
+		 	recParams =	new RecoveryParams(inputDir, outputDir, classesDir);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+
+		File[] files = recParams.getInputDir().listFiles();
 		Set<File> fileSet = new TreeSet<>(Arrays.asList(files));
 
 		// Makes a list by calling "toString" on every File in fileSet
 		List<String> fileSetNames =
 			fileSet.stream().map(File::toString).collect(Collectors.toList());
 
-		logger.debug("All files in " + recParms.getInputDir() + ":");
+		logger.debug("All files in " + recParams.getInputDir() + ":");
 		logger.debug(String.join("\n", fileSetNames));
 
 
@@ -82,8 +91,8 @@ public class BatchCloneFinder {
 			if (versionFolder.isDirectory()) {
 				logger.debug("Identified directory: " + versionFolder.getName());
 				nothingtodo = false;
-				batchCloneFinder.single(versionFolder, recParms.getOutputDir(), 
-					recParms.getClassesDirName());
+				batchCloneFinder.single(versionFolder, recParams.getOutputDir(), 
+					recParams.getClassesDirName());
 			} else {
 				logger.debug("Not a directory: " + versionFolder.getName());
 			}
@@ -110,7 +119,8 @@ public class BatchCloneFinder {
 		
 		/* classesDir is the directory in each subdirectory of the dir directory
 		   that contains the compiled classes of the subdirectory */
-		String absoluteClassesDir = versionFolder.getAbsolutePath() + fs + classesDirName;
+		String absoluteClassesDir = versionFolder.getAbsolutePath()
+			+ fs + classesDirName;
 		File classesDirFile = new File(absoluteClassesDir);
 		if (!classesDirFile.exists())
 			return;
