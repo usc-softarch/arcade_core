@@ -413,6 +413,7 @@
           <include>cfg/*</include>
           <include>log4j2.xml</include>
 		  <include>stoplists/*</include>
+		  <include>res/*</include>
         </includes>
       </resource>
     </resources>
