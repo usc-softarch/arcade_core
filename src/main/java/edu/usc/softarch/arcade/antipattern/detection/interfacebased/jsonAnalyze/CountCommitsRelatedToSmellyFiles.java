@@ -15,8 +15,6 @@ public class CountCommitsRelatedToSmellyFiles {
 	/*
 	 * Detect if one file has smell, then keep track the number of its related commits
 	 */
-	
-	
 	public static void main(String[] args) throws IOException, ParseException{
 		String issue_json = "F:\\hadoop_data\\hadoop_pkg_full_shorted_removed_dc.json";
 		String commit_freq = "F:\\hadoop_data\\hadoop_commits.txt";
@@ -37,8 +35,7 @@ public class CountCommitsRelatedToSmellyFiles {
 			String fileName = sCurrentLine.split(" ")[1];
 			commitFreg.put(fileName, freg);
 		}
-		if (br != null)br.close();
-		
+		if (br != null) br.close();
 		
 		JSONParser parser = new JSONParser();
 		JSONArray issues = (JSONArray) parser.parse(new FileReader(issue_json));

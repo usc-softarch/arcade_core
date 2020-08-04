@@ -9,26 +9,15 @@ public class SpfSmell extends Smell {
 	
 	public boolean equals (Object obj) {
 		if (obj == null)
-            return false;
-        if (obj == this)
-            return true;
-        if (!(obj instanceof SpfSmell))
-            return false;
-        else {
-        	SpfSmell inSmell = (SpfSmell)obj;
-        	if (clusters.equals(inSmell.clusters)) {
-        		if (this.topicNum == inSmell.topicNum) {
-        			return true;
-        		}
-        		else {
-        			return false;
-        		}
-        	}
-        	else {
-        		return false;
-        	}
-        }
-        
+			return false;
+		if (obj == this)
+			return true;
+		if (!(obj instanceof SpfSmell))
+			return false;
+		else {
+			SpfSmell inSmell = (SpfSmell)obj;
+			return this.topicNum == inSmell.topicNum
+				&& clusters.equals(inSmell.clusters);
+		}  
 	}
-	
 }

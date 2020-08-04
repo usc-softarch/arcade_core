@@ -10,7 +10,6 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -57,12 +56,10 @@ public class ClassGraph implements Serializable {
 	
 	public void serialize(String filename) throws IOException {
 		// Write to disk with FileOutputStream
-		FileOutputStream f_out = new 
-			FileOutputStream(filename);
+		FileOutputStream f_out = new FileOutputStream(filename);
 
 		// Write object with ObjectOutputStream
-		ObjectOutputStream obj_out = new
-			ObjectOutputStream (f_out);
+		ObjectOutputStream obj_out = new ObjectOutputStream (f_out);
 
 		// Write object out to disk
 		obj_out.writeObject ( this );
@@ -174,10 +171,8 @@ public class ClassGraph implements Serializable {
 	
 	public void writeDotFile(String filename) throws FileNotFoundException {
 		File f = new File(filename);
-		if (f.getParentFile() != null) {
-			if (!f.getParentFile().exists()) {
-				f.getParentFile().mkdirs();
-			}
+		if (f.getParentFile() != null && !f.getParentFile().exists()) {
+			f.getParentFile().mkdirs();
 		}
 		FileOutputStream fos = new FileOutputStream(f);
 		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8); 
@@ -197,7 +192,7 @@ public class ClassGraph implements Serializable {
 		out.close();
 	}
 	
-	public void writeDotFileWithArchElementType(String filename) throws FileNotFoundException, UnsupportedEncodingException {
+	public void writeDotFileWithArchElementType(String filename) throws FileNotFoundException {
 		File f = new File(filename);
 		if (!f.getParentFile().exists()) {
 			f.getParentFile().mkdirs();
@@ -262,35 +257,35 @@ public class ClassGraph implements Serializable {
 
 	public void writeXMLClassGraph() throws ParserConfigurationException, TransformerException {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		  DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-	 
-		  //classgraph elements
-		  Document doc = docBuilder.newDocument();
-		  Element rootElement = doc.createElement("ClassGraph");
-		  doc.appendChild(rootElement);
-	 
-		  //classedge elements
-		  for (SootClassEdge e : edges) {
-			  Element ce = doc.createElement("ClassEdge");
-			  rootElement.appendChild(ce);
-			  Element src = doc.createElement("src");
-			  src.appendChild(doc.createTextNode(e.src.toString()));
-			  Element tgt = doc.createElement("tgt");
-			  tgt.appendChild(doc.createTextNode(e.tgt.toString()));
-			  ce.appendChild(src);
-			  ce.appendChild(tgt);
-		  }
-	 
-		  //write the content into xml file
-		  TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		  Transformer transformer = transformerFactory.newTransformer();
-		  DOMSource source = new DOMSource(doc);
-		  StreamResult result =  new StreamResult(new File(Config.getXMLClassGraphFilename()));
-		  transformer.transform(source, result);
-	 
-		  System.out.println("In " + Thread.currentThread().getStackTrace()[1].getClassName() 
-				  + ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
-				  + ", Wrote " + Config.getXMLClassGraphFilename());
+		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+	
+		//classgraph elements
+		Document doc = docBuilder.newDocument();
+		Element rootElement = doc.createElement("ClassGraph");
+		doc.appendChild(rootElement);
+	
+		//classedge elements
+		for (SootClassEdge e : edges) {
+			Element ce = doc.createElement("ClassEdge");
+			rootElement.appendChild(ce);
+			Element src = doc.createElement("src");
+			src.appendChild(doc.createTextNode(e.src.toString()));
+			Element tgt = doc.createElement("tgt");
+			tgt.appendChild(doc.createTextNode(e.tgt.toString()));
+			ce.appendChild(src);
+			ce.appendChild(tgt);
+		}
+	
+		//write the content into xml file
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer = transformerFactory.newTransformer();
+		DOMSource source = new DOMSource(doc);
+		StreamResult result =  new StreamResult(new File(Config.getXMLClassGraphFilename()));
+		transformer.transform(source, result);
+	
+		System.out.println("In " + Thread.currentThread().getStackTrace()[1].getClassName() 
+			+ ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
+			+ ", Wrote " + Config.getXMLClassGraphFilename());
 	}
 
 	public Set<SootClassEdge> getEdges() {

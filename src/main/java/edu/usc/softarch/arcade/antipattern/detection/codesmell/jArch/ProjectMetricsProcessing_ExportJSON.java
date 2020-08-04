@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,30 +23,32 @@ import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class ProjectMetricsProcessing_ExportJSON {
-	private static Logger logger = org.apache.logging.log4j.LogManager.getLogger(ProjectMetricsProcessing_ExportJSON.class);
-	// Define XML TAGs
-	public static String PKGNAME;
+	private static Logger logger =
+		LogManager.getLogger(ProjectMetricsProcessing_ExportJSON.class);
 	
-	public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
+	public static void main(String[] args)
+			throws ParserConfigurationException, IOException, SAXException {
 		String projectMetrics = "F:\\projects";
 
-		final File projectMetricsDir = FileUtil.checkDir(projectMetrics, false, false);
+		File projectMetricsDir = FileUtil.checkDir(projectMetrics, false, false);
 
 		List<File> fileList = FileListing.getFileListing(projectMetricsDir);
 		fileList = FileUtil.sortFileListByVersion(fileList);
-		final Set<File> cloneFiles = new LinkedHashSet<>();
-		for (final File file : fileList) {
+		Set<File> cloneFiles = new LinkedHashSet<>();
+		for (File file : fileList) {
 			if (file.getName().endsWith(".xml")) {
 				cloneFiles.add(file);
 			}
 		}
 		
-		final String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*+(-|\\.)*((RC|ALPHA|BETA|M|Rc|Alpha|Beta|rc|alpha|beta)[0-9])*";
+		String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*+(-|\\.)"
+			+ "*((RC|ALPHA|BETA|M|Rc|Alpha|Beta|rc|alpha|beta)[0-9])*";
 		
 		Map<String, String> versions = new LinkedHashMap<>();
-		for (final File file : cloneFiles) {
+		for (File file : cloneFiles) {
 			logger.debug(file.getName());
-			final String version = FileUtil.extractVersionFromFilename(versionSchemeExpr, file.getName());
+			final String version =
+				FileUtil.extractVersionFromFilename(versionSchemeExpr, file.getName());
 			assert !version.equals("") : "Could not extract version";
 			versions.put(version, file.getAbsolutePath());
 		}

@@ -52,7 +52,6 @@ import soot.jimple.FieldRef;
 import soot.jimple.Stmt;
 import soot.jimple.ThrowStmt;
 import soot.jimple.toolkits.callgraph.CallGraph;
-import soot.jimple.toolkits.callgraph.Sources;
 import soot.jimple.toolkits.callgraph.Targets;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.graph.UnitGraph;
@@ -75,8 +74,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	
 	public static TopicModelData freecsTMD = new TopicModelData();
 	public static TopicModelData LlamaChatTMD = new TopicModelData();
-	public static TopicModelData gujChatTMD = new TopicModelData();
-	
 
 	public String currDocTopicsFilename = "";
 	public String currTopicKeysFilename = "";
@@ -87,19 +84,16 @@ public class ClassGraphTransformer extends SceneTransformer  {
 
 	private FeatureVectorMap fvMap = new FeatureVectorMap(new HashMap<>());
 	
-	static Logger logger = Logger.getLogger(ClassGraphTransformer.class);
-	
+	private static Logger logger = Logger.getLogger(ClassGraphTransformer.class);
 
 	@Override
 	protected void internalTransform(String phaseName, Map options) {
 		try {
-			
 			CallGraph cg = Scene.v().getCallGraph();
 			addCallGraphEdgesToMyCallGraph(cg);
 			
 			constructClassGraph();
 			createClassGraphDotFile();
-			
 			
 			addUsedMethodsToClasses();
 			logger.debug("Printing classes with used methods...");
@@ -125,7 +119,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			determineSelectedClasses(clg.getNodes(), selectedClasses);
 
 			// Set up attributes for weka
-
 			if (wekaDataSetProcessing) {
 				processWekaDataSet(selectedClasses);
 			}
@@ -176,7 +169,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	}
 
 	private void processWekaDataSet(List<SootClass> selectedClasses) {
-		
 		FastVector atts = new FastVector();
 		atts.addElement(new Attribute("name", (FastVector) null));
 		atts.addElement(new Attribute("fieldCount"));
@@ -353,12 +345,10 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			Map<?, ?> hashMap,
 			String filename) throws IOException {
 			// Write to disk with FileOutputStream
-			FileOutputStream f_out = new 
-				FileOutputStream(filename);
+			FileOutputStream f_out = new FileOutputStream(filename);
 
 			// Write object with ObjectOutputStream
-			ObjectOutputStream obj_out = new
-				ObjectOutputStream (f_out);
+			ObjectOutputStream obj_out = new ObjectOutputStream (f_out);
 
 			// Write object out to disk
 			obj_out.writeObject ( hashMap );
@@ -379,8 +369,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			e.printStackTrace();
 		}
 	}
-
-	
 
 	private DocTopicItem getMatchingDocTopicItem(
 			List<DocTopicItem> dtItemList, SootClass c) {
@@ -413,14 +401,12 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	}
 
 	public boolean isIntNumber(String num) {
-
 		try {
 			Integer.parseInt(num);
 		} catch (NumberFormatException nfe) {
 			return false;
 		}
 		return true;
-
 	}
 
 	private DocTopicItem returnMatchingDocTopicItem(
@@ -441,7 +427,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			if (className.equals(name)) {
 				return dtItem;
 			}
-
 		}
 
 		return null;
@@ -455,45 +440,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		return ((double) numCallers / (double) (numCallers + numCallees)) * 100d;
 	}
 
-	public static void printSourceClasses(CallGraph cg) {
-		Iterator<MethodOrMethodContext> sources = cg.sourceMethods();
-		Set<SootClass> sourceClasses = new HashSet<>();
-
-		logger.debug("List of source classes:");
-		while (sources.hasNext()) {
-			SootMethod src = (SootMethod) sources.next();
-			if (!src.toString().startsWith("<java.")
-					&& !src.toString().startsWith("<javax.")
-					&& !src.toString().startsWith("<sun.")
-					&& !src.toString().startsWith("<com.")
-					&& !src.toString().startsWith("<org.")) {
-				sourceClasses.add(src.getDeclaringClass());
-			}
-		}
-
-		Iterator<SootClass> iter = sourceClasses.iterator();
-		while (iter.hasNext()) {
-			logger.debug("\t" + iter.next());
-		}
-	}
-
-	public static void printSourceMethods(CallGraph cg) {
-		Iterator<MethodOrMethodContext> sources = cg.sourceMethods();
-
-		logger.debug("List of source methods:");
-		while (sources.hasNext()) {
-			SootMethod src = (SootMethod) sources.next();
-			if (!src.toString().startsWith("<java.")
-					&& !src.toString().startsWith("<javax.")
-					&& !src.toString().startsWith("<sun.")
-					&& !src.toString().startsWith("<com.")
-					&& !src.toString().startsWith("<org.")) {
-				logger.debug("\t" + src);
-			}
-		}
-
-	}
-
 	public static void constructClassGraph() {
 		CallGraph cg = Scene.v().getCallGraph();
 		addCallGraphEdgesToClassGraph(cg);
@@ -503,7 +449,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		addThrowsEdgesToClassGraph();
 		addUseEdgesToCallGraph();
 	}
-
 
 	private static void addUseEdgesToCallGraph() {
 		Chain<SootClass> appClasses = Scene.v().getApplicationClasses();
@@ -541,7 +486,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 				}
 			}
 		}
-		
 	}
 	
 	private static void useEdgesHelper(List<ValueBox> useBoxes, int depth, SootClass srcClass) {
@@ -924,52 +868,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	private static void printTabByDepth(int depth) {
 		for (int i = 0; i < depth; i++) {
 			System.out.print("\t");
-		}
-	}
-
-	public static void printPossibleCalledClasses(SootMethod source) {
-		CallGraph cg = Scene.v().getCallGraph();
-		Iterator<MethodOrMethodContext> targets = new Targets(cg
-				.edgesOutOf(source));
-		Set<SootClass> classes = new HashSet<>();
-
-		while (targets.hasNext()) {
-			SootMethod tgt = (SootMethod) targets.next();
-			if (!tgt.toString().startsWith("<java.")) { // filter out the main
-				// java package
-				classes.add(tgt.getDeclaringClass());
-			}
-		}
-
-		logger.debug("List of classes that " + source.getDeclaringClass()
-				+ " might call(): ");
-		Iterator<SootClass> iter = classes.iterator();
-
-		while (iter.hasNext()) {
-			logger.debug("\t" + iter.next());
-		}
-	}
-
-	public static void printPossibleCallees(SootMethod source) {
-		CallGraph cg = Scene.v().getCallGraph();
-		Iterator<MethodOrMethodContext> targets = new Targets(cg
-				.edgesOutOf(source));
-
-		while (targets.hasNext()) {
-			SootMethod tgt = (SootMethod) targets.next();
-			if (!tgt.toString().startsWith("<java.")) { // filter out the main
-				// java package
-				logger.debug(source + " might call " + tgt);
-			}
-		}
-	}
-
-	public static void printPossibleCallers(SootMethod target) {
-		CallGraph cg = Scene.v().getCallGraph();
-		Iterator sources = new Sources(cg.edgesInto(target));
-		while (sources.hasNext()) {
-			SootMethod src = (SootMethod) sources.next();
-			logger.debug(target + " might be called by " + src);
 		}
 	}
 }

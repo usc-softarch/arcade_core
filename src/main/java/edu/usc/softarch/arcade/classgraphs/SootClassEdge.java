@@ -6,14 +6,8 @@ import soot.SootClass;
 
 /**
  * @author joshua
- *
  */
 public class SootClassEdge extends StringEdge implements Serializable {
-
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1783211540062135043L;
 	public SootClass src = null;
 	public SootClass tgt = null;
@@ -62,8 +56,6 @@ public class SootClassEdge extends StringEdge implements Serializable {
 	public boolean equals(Object o) {
 		SootClassEdge e = (SootClassEdge)o;
 		
-		
-		
 		if (e.src!=null && e.tgt!=null && this.src !=null && this.tgt != null ) {
 			if (e.src.getName().equals(this.src.getName()) &&
 				e.tgt.getName().equals(this.tgt.getName()) && 
@@ -85,13 +77,6 @@ public class SootClassEdge extends StringEdge implements Serializable {
 		int result = src.getName().hashCode();
 		result = 37 * result + tgt.getName().hashCode();
 		result = 37 * result + type.hashCode();
-		// etc for all fields in the object
-		// This will only work for 5 fields before you overflow and lose input
-		// from the first field.
-		// The optimal prime multiplier is near Math.exp( Math.log(
-		// Integer.MAX_VALUE ) / numberOfFields) )
-		// This technique samples output from all the component Objects but
-		// mushes it together with information form the other fields.
 		return result;
 	}
 	
@@ -123,5 +108,4 @@ public class SootClassEdge extends StringEdge implements Serializable {
 	public String toRsf() {
 		return type + " " + src + " " + " " + tgt;
 	}
-	
 }

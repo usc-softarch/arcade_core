@@ -1,11 +1,5 @@
 package edu.usc.softarch.arcade.antipattern.detection.interfacebased;
 
-/**
- * @author d.le
- * 
- * Find interface based architectural smell + co-change smell
- */
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,6 +24,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,8 +40,14 @@ import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
+/**
+ * @author d.le
+ * 
+ * Find interface based architectural smell + co-change smell
+ */
 public class DependencyFinderProcessing {
-	static Logger logger = org.apache.logging.log4j.LogManager.getLogger(DependencyFinderProcessing.class);
+	private static Logger logger =
+		LogManager.getLogger(DependencyFinderProcessing.class);
 	// Define XML TAGs
 	private String FEATURE = "feature";
 	private String NAME = "name";
@@ -153,7 +154,6 @@ public class DependencyFinderProcessing {
 
 	private static void single(String testDoc, String testRSF, String packageName, String testClone, String version)
 			throws IOException, ParserConfigurationException, SAXException {
-		
 		DependencyFinderProcessing dp = new DependencyFinderProcessing(testDoc, packageName);
 		dp.clusterList = dp.readClusterFile(testRSF);
 		dp.codeClone = dp.codeCloneUpdate(testClone);
@@ -222,7 +222,6 @@ public class DependencyFinderProcessing {
 	}
 	
 	public Map<String, List<String>> readLogicalDeps(String logicalDep){
-		
 		Map<String, List<String>> storage = new HashMap<>();
 		
 		String line = "";
@@ -804,8 +803,6 @@ public class DependencyFinderProcessing {
 		summary += total + ",";
 	}
 	
-	
-
 	private String getClassName(String featureName) {
 		String className ="";
 		if(featureName.contains("(")) {

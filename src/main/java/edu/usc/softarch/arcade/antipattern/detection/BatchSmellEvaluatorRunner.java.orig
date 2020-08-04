@@ -8,10 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-<<<<<<< HEAD
 import java.util.Set;
-=======
->>>>>>> d32d306e99b65f454169ffe364993106042d8923
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -106,12 +103,8 @@ public class BatchSmellEvaluatorRunner {
 					
 					String smellType = pair.getLeft().getSimpleName();
 					String filePrefix = FileUtil.extractFilenamePrefix(pair.getRight());
-<<<<<<< HEAD
 					filePrefixes.add(filePrefix);
 					output += "\t" + smellType + "," + filePrefix + "=" + ratioMap.get(pair) + "\n";
-=======
-					output += "\t" + smellType + "," + filePrefix + "=" + coverageRatio + "\n";
->>>>>>> d32d306e99b65f454169ffe364993106042d8923
 				}
 				output += "\n";
 			}

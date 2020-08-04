@@ -4,13 +4,8 @@ import java.io.Serializable;
 
 /**
  * @author joshua
- *
  */
 public class MethodEdge implements Serializable {
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5230066023797650367L;
 	public MyMethod src;
 	public MyMethod tgt;
@@ -21,14 +16,10 @@ public class MethodEdge implements Serializable {
 	}
 	
 	public boolean equals(Object o) {
-		MethodEdge e = (MethodEdge)o;
-		if (
-				this.src.equals(e.src) &&
-				this.tgt.equals(e.tgt)
-			) 
-			return true;
-		else 
-			return false;
+		if (o == null) return false;
+
+		MethodEdge e = (MethodEdge) o;
+		return this.src.equals(e.src) && this.tgt.equals(e.tgt);
 	}
 	
 	public int hashCode() {
@@ -45,8 +36,4 @@ public class MethodEdge implements Serializable {
 	public String toDotString() {
 		return "\t\"" + src.toString() + "\" -> \"" + tgt.toString() + "\";";
 	}
-
-
-	
-
 }

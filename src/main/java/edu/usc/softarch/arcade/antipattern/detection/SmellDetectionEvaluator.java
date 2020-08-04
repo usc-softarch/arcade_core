@@ -46,7 +46,9 @@ public class SmellDetectionEvaluator {
 	// the key is a pair consisting of a smell type and technique filename
 	// the value is the ratio of the matched smell count for that type over the number of ground truth smells for that type for the technique
 	// this is essentially the coverage ratio for the technique over a smell type
-	public static Map<Pair<Class,String>,Double> smellTypeTechRatioMap = new TreeMap<>(new ClassStringPairComparator());
+	public static Map<Pair<Class,String>,Double> smellTypeTechRatioMap =
+		new TreeMap<>((Pair<Class, String> o1, Pair<Class, String> o2) ->
+			o1.getLeft().getName().compareTo(o2.getLeft().getName()));
 	public static boolean configureLogging = true;
 	
 	public static void resetData() {

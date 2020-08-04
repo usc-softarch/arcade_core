@@ -54,9 +54,7 @@ import edu.usc.softarch.arcade.topics.WordTopicItem;
 /**
  * @author joshua
  */
-
 public class ADADetector {
-	
 	public static void runSmellDetectionAlgorithms(
 			List<Cluster> splitClusters) throws IOException,
 			ClassNotFoundException,
@@ -582,8 +580,6 @@ public class ADADetector {
 
 	}
 
-
-
 	private static void printClassesWithUsedMethods(
 			Map<String, MyClass> classesWithMethodsInMyCallGraph) {
 		for (MyClass c : classesWithMethodsInMyCallGraph.values()) {
@@ -591,7 +587,6 @@ public class ADADetector {
 			System.out.println(c.methodsToString(1));
 		}
 	}
-
 	
 	private static void printTopicsForSplitClusters(
 			List<Cluster> splitClusters) {
@@ -1025,8 +1020,6 @@ public class ADADetector {
 		return connectorInterfaceImplCount;
 	}
 	
-
-
 	private static HashMap<?, ?> deserializeHashMap(String filename)
 			throws IOException, ClassNotFoundException {
 
@@ -1047,8 +1040,6 @@ public class ADADetector {
 
 		return hashMap;
 	}
-
-	
 
 	private static int calculateNewTopicProportionsForSplitClusters(
 			Cluster splitCluster, List<Cluster> currLeafClusters,
@@ -1143,11 +1134,4 @@ public class ADADetector {
 		}
 		return refLeaf;
 	}
-
-
-	
-
-
-
-	
 }

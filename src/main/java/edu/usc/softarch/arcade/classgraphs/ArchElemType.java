@@ -1,11 +1,7 @@
-/**
- * 
- */
 package edu.usc.softarch.arcade.classgraphs;
 
 /**
  * @author joshua
- *
  */
 enum ArchElemType {
 	proc, data, conn;	

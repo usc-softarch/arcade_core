@@ -15,34 +15,22 @@ public class MyCallGraph implements Serializable {
 	private static final long serialVersionUID = 7989577593008055517L;
 	HashSet<MethodEdge> edges = new HashSet<>();
 	
-	public Set<MethodEdge> getEdges() {
-		HashSet<MethodEdge> copyEdges = new HashSet<>(edges);
-		return copyEdges;
-	}
+	public Set<MethodEdge> getEdges() { return new HashSet<>(edges); }
 	
 	public void addEdge(MyMethod src, MyMethod tgt) {
-		edges.add(new MethodEdge(src,tgt));
-	}
+		edges.add(new MethodEdge(src,tgt)); }
 	
-	public void addEdge(MethodEdge e) {
-		edges.add(e);
-	}
+	public void addEdge(MethodEdge e) { edges.add(e); }
 	
 	public boolean containsEdge(MyMethod src, MyMethod tgt) {
-		return edges.contains(new MethodEdge(src,tgt));
-	}
+		return edges.contains(new MethodEdge(src,tgt)); }
 	
-	public boolean containsEdge(MethodEdge e) {
-		return edges.contains(e);
-	}
+	public boolean containsEdge(MethodEdge e) { return edges.contains(e); }
 	
-	public void removeEdge(MethodEdge e) {
-		edges.remove(e);
-	}
+	public void removeEdge(MethodEdge e) { edges.remove(e); }
 	
 	public void removeEdge(MyMethod src, MyMethod tgt) {
-		edges.remove(new MethodEdge(src,tgt));
-	}
+		edges.remove(new MethodEdge(src,tgt)); }
 	
 	public String toString() {
 		Iterator<MethodEdge> iter = edges.iterator();
@@ -63,12 +51,10 @@ public class MyCallGraph implements Serializable {
 	
 	public void serialize(String filename) throws IOException {
 		// Write to disk with FileOutputStream
-		FileOutputStream f_out = new 
-			FileOutputStream(filename);
+		FileOutputStream f_out = new FileOutputStream(filename);
 
 		// Write object with ObjectOutputStream
-		ObjectOutputStream obj_out = new
-			ObjectOutputStream (f_out);
+		ObjectOutputStream obj_out = new ObjectOutputStream (f_out);
 
 		// Write object out to disk
 		obj_out.writeObject ( this );
@@ -82,6 +68,5 @@ public class MyCallGraph implements Serializable {
 			}
 		}
 		return targetMethods;
-	}
-	
+	}	
 }

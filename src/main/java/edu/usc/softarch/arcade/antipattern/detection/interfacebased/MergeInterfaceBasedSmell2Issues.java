@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.antipattern.detection.interfacebased;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,11 +13,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class MergeInterfaceBasedSmell2Issues {
-	public static void main(String[] args) throws FileNotFoundException, IOException, ParseException{
+	public static void main(String[] args) throws IOException, ParseException{
 		String issue_json = "F:\\hadoop_data\\hadoop_svn_acdc.json";
 		String smell_json = "F:\\hadoop_data\\hadoop_acdc_interface_smell.csv.json";
 		String merged_output_file = "F:\\hadoop_data\\hadoop_acdc_all.json";
-		
 		
 		JSONParser parser = new JSONParser();
 		JSONArray issues = (JSONArray) parser.parse(new FileReader(issue_json));
@@ -37,10 +35,8 @@ public class MergeInterfaceBasedSmell2Issues {
 					String filename = (String) file.get("filename");
 					if (filename.contains(".java") && filename.contains("org"))
 					{
-//						System.out.println(filename);
 						String orgFormat = StringUtil.dir2pkg(filename);
 						if (orgFormat != null) {
-							// System.out.println(orgFormat);
 							// try to map smell
 							JSONObject smell_of_a_version = (JSONObject) smell.get(afffect_version);
 							if (smell_of_a_version != null){
@@ -64,7 +60,6 @@ public class MergeInterfaceBasedSmell2Issues {
 			}
 		}
 		
-		
 		File json_file = new File(merged_output_file);
 		// if file doesnt exists, then create it
 		if (!json_file.exists()) {
@@ -76,6 +71,5 @@ public class MergeInterfaceBasedSmell2Issues {
 		bw.close();
 
 		System.out.println("Done");
-		
 	}
 }

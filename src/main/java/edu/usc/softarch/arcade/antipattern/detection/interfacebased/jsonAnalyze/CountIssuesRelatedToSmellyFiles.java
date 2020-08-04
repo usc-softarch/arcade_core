@@ -4,7 +4,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -12,17 +13,14 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class CountIssuesRelatedToSmellyFiles {
-	
 	/**
 	 * Detect if one file has smell, then keep track the number of its related issues
 	 */
-	
 	public static void main(String[] args) throws IOException, ParseException{
 		String issue_json = "F:\\hadoop_data\\hadoop_pkg_full_shorted_removed_dc.json";
 		
-		HashMap<String, Integer> countIssuesForSmelly = new HashMap<>();
-		HashMap<String, Integer> countIssuesForNonSmelly = new HashMap<>();
-		
+		Map<String, Integer> countIssuesForSmelly = new HashMap<>();
+		Map<String, Integer> countIssuesForNonSmelly = new HashMap<>();
 		
 		JSONParser parser = new JSONParser();
 		JSONArray issues = (JSONArray) parser.parse(new FileReader(issue_json));
@@ -85,11 +83,11 @@ public class CountIssuesRelatedToSmellyFiles {
 	
 	public static void Count_Critical(JSONArray issues){
 		Map<String, Integer> counter = new HashMap<>();
-		Vector<String> Blocker = new Vector<>();
-		Vector<String> Critical = new Vector<>();
-		Vector<String> Major = new Vector<>();
-		Vector<String> Minor = new Vector<>();
-		Vector<String> Trivial = new Vector<>();
+		List<String> Blocker = new ArrayList<>();
+		List<String> Critical = new ArrayList<>();
+		List<String> Major = new ArrayList<>();
+		List<String> Minor = new ArrayList<>();
+		List<String> Trivial = new ArrayList<>();
 		
 		for (int i = 0; i < issues.size(); i ++){
 			JSONObject issue = (JSONObject) issues.get(i);
@@ -144,7 +142,7 @@ public class CountIssuesRelatedToSmellyFiles {
 		countPercentage(Trivial, high_threshold, log_threshold);
 	}
 	
-	public static void countPercentage(Vector<String> values, long high_threshold, long low_threshold) {
+	public static void countPercentage(List<String> values, long high_threshold, long low_threshold) {
 		int counter = 0;
 		for (String s: values){
 			long time = Long.parseLong(s);
@@ -157,12 +155,12 @@ public class CountIssuesRelatedToSmellyFiles {
 
 	public static void Count_Issues_Type(JSONArray issues){
 		Map<String, Integer> counter = new HashMap<>();
-		Vector<String> All = new Vector<>();
-		Vector<String> Bug = new Vector<>();
-		Vector<String> Improvement = new Vector<>();
-		Vector<String> Task = new Vector<>();
-		Vector<String> SubTask = new Vector<>();
-		Vector<String> NewFeature = new Vector<>();
+		List<String> All = new ArrayList<>();
+		List<String> Bug = new ArrayList<>();
+		List<String> Improvement = new ArrayList<>();
+		List<String> Task = new ArrayList<>();
+		List<String> SubTask = new ArrayList<>();
+		List<String> NewFeature = new ArrayList<>();
 		
 		for (int i = 0; i < issues.size(); i ++){
 			JSONObject issue = (JSONObject) issues.get(i);

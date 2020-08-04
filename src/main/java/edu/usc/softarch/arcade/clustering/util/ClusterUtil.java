@@ -44,7 +44,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.callgraph.MyClass;
 import edu.usc.softarch.arcade.callgraph.MyMethod;
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
@@ -127,53 +126,41 @@ public class ClusterUtil {
 		List<Cluster> splitClusters = new ArrayList<>();
 		splitClusters.add(curr);
 
-		if (Constants._DEBUG) {
-			logger.debug("Initial split clusters size: " + splitClusters.size());
-			logger.debug("Initial split clusters: ");
-		}
+		logger.debug("Initial split clusters size: " + splitClusters.size());
+		logger.debug("Initial split clusters: ");
 		prettyPrintSplitClusters(splitClusters);
 
 		queue.offer(curr);
 		curr = queue.pop();
 		while (curr != null) {
 
-			if (Constants._DEBUG) {
-				logger.debug("--------------------");
-				logger.debug("curr: " + curr);
-				logger.debug("--------------------");
-				logger.debug("left: " + curr.left);
-				logger.debug("--------------------");
-				logger.debug("right: " + curr.right);
-				logger.debug("--------------------");
-			}
+			logger.debug("--------------------");
+			logger.debug("curr: " + curr);
+			logger.debug("--------------------");
+			logger.debug("left: " + curr.left);
+			logger.debug("--------------------");
+			logger.debug("right: " + curr.right);
+			logger.debug("--------------------");
 
-			if (Constants._DEBUG)
-				logger.debug("Item size of current cluster: "
-						+ curr.items.size());
-			if (curr.items.size() >= 1 
-					&& (curr.left != null || curr.right != null)) {
+			logger.debug("Item size of current cluster: " + curr.items.size());
+			if (curr.items.size() >= 1 && (curr.left != null || curr.right != null))
 				splitClusters.remove(curr);
-			}
 
 			if (curr.left != null) {
 				if (curr.right != null) {
-					if (Constants._DEBUG) {
-						System.out
-								.println("Testing similiarity of left and right cluster: ");
-						logger.debug("Left: " + curr.left.simLeftRight + ", : "
-								+ curr.right.simLeftRight);
-					}
+					System.out
+							.println("Testing similiarity of left and right cluster: ");
+					logger.debug("Left: " + curr.left.simLeftRight + ", : "
+							+ curr.right.simLeftRight);
 					if (curr.left.simLeftRight < curr.right.simLeftRight) {
-						if (Constants._DEBUG)
-							logger.debug("Splitting left then right");
+						logger.debug("Splitting left then right");
 						queue.offer(curr.left);
 						splitClusters.add(curr.left);
 
 						queue.offer(curr.right);
 						splitClusters.add(curr.right);
 					} else {
-						if (Constants._DEBUG)
-							logger.debug("Splitting right then left");
+						logger.debug("Splitting right then left");
 						queue.offer(curr.right);
 						splitClusters.add(curr.right);
 
@@ -182,29 +169,23 @@ public class ClusterUtil {
 					}
 
 				} else {
-					if (Constants._DEBUG)
-						logger.debug("Splitting only left");
+					logger.debug("Splitting only left");
 					queue.offer(curr.left);
 					splitClusters.add(curr.left);
 				}
 			} else if (curr.right != null) {
-				if (Constants._DEBUG)
-					logger.debug("Splitting only right");
+				logger.debug("Splitting only right");
 				queue.offer(curr.right);
 				splitClusters.add(curr.right);
 			}
 
-			if (Constants._DEBUG) {
-				logger.debug("Current split clusters size: "
-						+ splitClusters.size());
-				logger.debug("Current split clusters: ");
-				prettyPrintSplitClusters(splitClusters);
-				logger.debug("\n");
-			}
+			logger.debug("Current split clusters size: " + splitClusters.size());
+			logger.debug("Current split clusters: ");
+			prettyPrintSplitClusters(splitClusters);
+			logger.debug("\n");
 
-			if (splitClusters.size() == Config.getNumClusters()) {
+			if (splitClusters.size() == Config.getNumClusters())
 				break;
-			}
 
 			if (queue.isEmpty())
 				break;
@@ -221,12 +202,6 @@ public class ClusterUtil {
 		for (Cluster c : splitClusters) {
 			logger.debug(count + ":" + c);
 			count++;
-		}
-	}
-
-	public static void printClustersByLine(List<Cluster> clusters) {
-		for (int i = 0; i < clusters.size(); i++) {
-			logger.debug(i + ": " + clusters.get(i));
 		}
 	}
 	
@@ -246,11 +221,8 @@ public class ClusterUtil {
 						String lc2NameClean = lc2.name.substring(1,
 								lc2.name.length() - 1).trim();
 						String featureEdgeClean = f.edge.tgtStr.trim();
-						if (Constants._DEBUG) {
-							logger.debug("featureEdgeClean: "
-									+ featureEdgeClean);
-							logger.debug("lc2NameClean: " + lc2NameClean);
-						}
+						logger.debug("featureEdgeClean: " + featureEdgeClean);
+						logger.debug("lc2NameClean: " + lc2NameClean);
 
 						if (featureEdgeClean.equals(lc2NameClean)
 								&& f.value > 0) {

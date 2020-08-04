@@ -85,7 +85,6 @@ public class BatchCloneFinder {
 		logger.debug("All files in " + recParams.getInputDir() + ":");
 		logger.debug(String.join("\n", fileSetNames));
 
-
 		boolean nothingtodo = true;
 		for (File versionFolder : fileSet) {
 			if (versionFolder.isDirectory()) {

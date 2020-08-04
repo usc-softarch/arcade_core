@@ -1,11 +1,5 @@
 package edu.usc.softarch.arcade.antipattern.detection.interfacebased;
 
-/**
- * @author d.le
- * 
- * Find interface based architectural smell + co-change smell
- */
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,6 +24,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.w3c.dom.Document;
@@ -46,8 +41,14 @@ import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
+/**
+ * @author d.le
+ * 
+ * Find interface based architectural smell + co-change smell
+ */
 public class DependencyFinderProcessing_ExportJSON {
-	private static Logger logger = org.apache.logging.log4j.LogManager.getLogger(DependencyFinderProcessing_ExportJSON.class);
+	private static Logger logger =
+		LogManager.getLogger(DependencyFinderProcessing_ExportJSON.class);
 	// Define XML TAGs
 	private String FEATURE = "feature";
 	private String NAME = "name";
