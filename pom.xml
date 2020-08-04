@@ -234,6 +234,12 @@
       <artifactId>gexf4j</artifactId>
       <version>local</version>
     </dependency>
+	<!-- https://mvnrepository.com/artifact/oro/oro -->
+	<dependency>
+      <groupId>oro</groupId>
+      <artifactId>oro</artifactId>
+      <version>2.0.8</version>
+	</dependency>
   </dependencies>
   <build>
     <plugins>
@@ -394,6 +400,7 @@
           <include>log4j.properties</include>
           <include>cfg/*</include>
           <include>log4j2.xml</include>
+		  <include>stoplists/*</include>
         </includes>
       </resource>
     </resources>
