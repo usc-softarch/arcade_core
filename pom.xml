@@ -418,4 +418,11 @@
       </resource>
     </resources>
   </build>
+  <distributionManagement>
+	<repository>
+		<id>github</id>
+		<name>ARCADE Github Maven Package</name>
+		<url>https://maven.pkg.github.com/usc-softarch/arcade_core</url>
+	</repository>
+  </distributionManagement>
 </project>
