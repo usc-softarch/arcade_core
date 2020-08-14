@@ -26,7 +26,7 @@ public class Config {
 			System.out.println("sup?");
 		}
 	}
-	public  String getValue(String key){
+	public String getValue(String key){
 		return prop.getProperty(key);
 	}
 }

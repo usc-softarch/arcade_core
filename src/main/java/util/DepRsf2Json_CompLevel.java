@@ -165,7 +165,7 @@ public class DepRsf2Json_CompLevel {
 	private static String convertName(String inputComponent){
 		if (inputComponent.endsWith(".ss")) {
 			String tmp = inputComponent.replace(".ss", "");
-			String tmp_2 = tmp.replaceAll("\\.", "_");
+			String tmp_2 = tmp.replace("\\.", "_");
 			return tmp +"." +tmp_2;
 		}
 		return inputComponent;

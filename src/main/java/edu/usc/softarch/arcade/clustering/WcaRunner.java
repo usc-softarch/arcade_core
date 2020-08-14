@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.SimMeasure;
-import edu.usc.softarch.arcade.util.DebugUtil;
 import edu.usc.softarch.arcade.util.StopWatch;
 
 public class WcaRunner extends ClusteringAlgoRunner {
@@ -30,8 +29,6 @@ public class WcaRunner extends ClusteringAlgoRunner {
 		logger.debug("time to create similarity matrix: "
 				+ matrixCreateTimer.getElapsedTime());
 
-		int clusterStepCount = 0;
-		int stepCountToStop = 5;
 		while (stopCriterion.notReadyToStop()) {
 			if (Config.stoppingCriterion
 					.equals(Config.StoppingCriterionConfig.clustergain)) {

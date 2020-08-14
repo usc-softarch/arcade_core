@@ -1,12 +1,5 @@
 package edu.usc.softarch.arcade.util;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -31,26 +24,6 @@ public class DebugUtil {
 				+ ", " + s;
 	}
 
-	public static String convertByteArrayOutputStreamToString(
-			ByteArrayOutputStream sourceStream) {
-		//Construct the BufferedReader object
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(sourceStream.toByteArray())));
-        
-        String line = null;
-        String streamAsString = "";
-        
-        try {
-			while ((line = bufferedReader.readLine()) != null) {
-			    //Process the data, here we just print it out
-			    streamAsString+=line + '\n';
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-        
-    return streamAsString;
-	}
-
 	public static String addTabs(int depth) {
 		String tabs = "";
 		for (int i=0;i<depth;i++) {
@@ -62,16 +35,5 @@ public class DebugUtil {
 	public static void earlyExit()  {
 		System.out.println("Exiting early for debugging purposes...");
 		System.exit(0);
-	}
-	
-	public static void checkIntraPairSize(Set<String> intraPair,
-			String element1, String element2) {
-		if (intraPair.size() != 2) {
-			logger.debug("Intrapair wrong size: " + intraPair);
-			logger.debug("Expected element1: " + element1);
-			logger.debug("Expected element2: " + element2);
-			System.err.println("Invalid intrapair size");
-			System.exit(1);
-		}
 	}
 }

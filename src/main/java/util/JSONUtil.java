@@ -19,15 +19,14 @@ import org.json.simple.parser.JSONParser;
 public class JSONUtil {
 	final static String inputFile = "E:\\android\\excel\\acdc_comp.xls";
 	final static String outputFile = "E:\\android\\excel\\acdc_comp.json";
-	
+
 	public static void main(String[] args) {
 		writeJSONArray2File(xls2JSON(inputFile), outputFile);
 	}
 
 	public static JSONArray xls2JSON(String filename) {
 		JSONArray resultArray = new JSONArray();
-		try {
-			FileInputStream file = new FileInputStream(new File(filename));
+		try (FileInputStream file = new FileInputStream(new File(filename))) {
 			HSSFWorkbook workbook = new HSSFWorkbook(file);
 			String[] smellPerClassHeader = {"classname", "buo", "bdc", "spf", "bco", "all"};
 			// Iterate through each sheets
@@ -85,9 +84,7 @@ public class JSONUtil {
 	}
 	
 	/**
-	 * @param filename
-	 *            full file name
-	 * @return
+	 * @param filename full file name
 	 */
 	public static Object readJsonFromFile(String filename) {
 		Object obj = new JSONObject();
