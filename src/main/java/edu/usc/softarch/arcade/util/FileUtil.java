@@ -342,8 +342,8 @@ public class FileUtil {
 	public static <E extends Object> List<String>
 			collectionToString(Collection<E> collection) {
 		return collection.stream()
-			.map(E::toString)
 			.filter(Objects::nonNull)
+			.map(E::toString)
 			.collect(Collectors.toList());
 	}
 
