@@ -37,7 +37,6 @@ import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
 import com.thoughtworks.xstream.XStream;
 
-import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
@@ -373,18 +372,14 @@ public class ArchSmellDetector {
 		System.out.println("Finding cycles...");
 		CycleDetector cycleDetector = new CycleDetector(directedGraph);
 		Set<String> cycleSet = cycleDetector.findCycles();
-		if(Constants._DEBUG) {
-			logger.debug("Printing the cycle set, i.e., the set of all vertices" + 
-				"which participate in at least one cycle in this graph...");
-			logger.debug(cycleSet);
-		}
+		logger.debug("Printing the cycle set, i.e., the set of all vertices" + 
+			"which participate in at least one cycle in this graph...");
+		logger.debug(cycleSet);
 		
 		StrongConnectivityInspector inspector = new StrongConnectivityInspector(directedGraph);
 		List<Set<String>> connectedSets = inspector.stronglyConnectedSets();
-		if(Constants._DEBUG) {
-			logger.debug("Printing the strongly connected sets of the graph....");
-			logger.debug(Joiner.on("\n").join(connectedSets));
-		}
+		logger.debug("Printing the strongly connected sets of the graph....");
+		logger.debug(Joiner.on("\n").join(connectedSets));
 		
 		int relevantConnectedSetCount = 0;
 		Set<Set<String>> bdcConnectedSets = new HashSet<>();
@@ -577,8 +572,7 @@ public class ArchSmellDetector {
 			Set<ConcernCluster> clusters,
 			Map<String, Set<String>> clusterSmellsMap,
 			Set<Smell> detectedSmells) {
-		if(Constants._DEBUG)
-			logger.info("Finding scattered parasitic functionality instances...");
+		logger.info("Finding scattered parasitic functionality instances...");
 
 		// Setting thresholds for detection algorithm
 		Map<Integer, Integer> topicNumCountMap = new HashMap<>();
@@ -617,9 +611,8 @@ public class ArchSmellDetector {
 					ti.topicNum == topicNum || ti.proportion < parasiticConcernThreshold);
 
 				for (int i = 0; i < significantTopicItems.size(); i++) {
-					if(Constants._DEBUG)
-						logger.debug(cluster.getName()
-							+ " has spf with scattered concern " + topicNum);
+					logger.debug(cluster.getName()
+						+ " has spf with scattered concern " + topicNum);
 
 					clusterSmellsMap.putIfAbsent(cluster.getName(), new HashSet<>());
 					clusterSmellsMap.get(cluster.getName()).add("spf");
@@ -695,19 +688,17 @@ public class ArchSmellDetector {
 		StandardDeviation stdDev = new StandardDeviation();
 		topicCountStdDev = stdDev.evaluate(topicCounts);
 		
-		if(Constants._DEBUG) {
-			logger.debug("topic count mean: " + topicCountMean);
-			logger.debug("topic count standard deviation: " + topicCountStdDev);
+		logger.debug("topic count mean: " + topicCountMean);
+		logger.debug("topic count standard deviation: " + topicCountStdDev);
 
-			logger.debug("topic num : count");
-			for (Map.Entry<Integer, Integer> entry : topicNumCountMap.entrySet()) {
-				logger.debug(entry.getKey() + " : " + entry.getValue() );
-			}
-			logger.debug("topic num : clusters with topic");
-			for (Map.Entry<Integer, Set<ConcernCluster>> entry 
-					: scatteredTopicToClustersMap.entrySet()) {
-				logger.debug(entry.getKey() + " : " + entry.getValue() );
-			}
+		logger.debug("topic num : count");
+		for (Map.Entry<Integer, Integer> entry : topicNumCountMap.entrySet()) {
+			logger.debug(entry.getKey() + " : " + entry.getValue() );
+		}
+		logger.debug("topic num : clusters with topic");
+		for (Map.Entry<Integer, Set<ConcernCluster>> entry 
+				: scatteredTopicToClustersMap.entrySet()) {
+			logger.debug(entry.getKey() + " : " + entry.getValue() );
 		}
 
 		return topicCountMean + topicCountStdDev;

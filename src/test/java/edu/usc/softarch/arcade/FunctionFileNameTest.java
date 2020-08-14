@@ -1,7 +1,5 @@
 package edu.usc.softarch.arcade;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;

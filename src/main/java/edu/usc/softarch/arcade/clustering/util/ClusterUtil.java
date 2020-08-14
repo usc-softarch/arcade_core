@@ -1019,10 +1019,7 @@ public class ClusterUtil {
 			e.printStackTrace();
 		} catch (TransformerException e) {
 			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
 		}
-
 	}
 	
 	public static Map<String, Set<String>> buildDependenciesMap(String depsRsfFilename) {

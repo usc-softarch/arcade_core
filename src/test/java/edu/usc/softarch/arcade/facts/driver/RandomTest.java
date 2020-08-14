@@ -1,7 +1,5 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import static org.junit.Assert.*;
-
 import java.util.Random;
 
 import org.junit.After;

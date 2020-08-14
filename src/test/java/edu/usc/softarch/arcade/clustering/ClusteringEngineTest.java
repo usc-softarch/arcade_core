@@ -2,13 +2,8 @@ package edu.usc.softarch.arcade.clustering;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 
 import edu.usc.softarch.arcade.classgraphs.SootClassEdge;
-import edu.usc.softarch.arcade.clustering.ClusteringEngine;
-import edu.usc.softarch.arcade.clustering.Feature;
-import edu.usc.softarch.arcade.clustering.FeatureVector;
-import edu.usc.softarch.arcade.clustering.SimCalcUtil;
 
 import junit.framework.TestCase;
 
@@ -199,9 +194,4 @@ public class ClusteringEngineTest extends TestCase {
 		assertEquals(2,SimCalcUtil.getNum01Features(fv1, fv2));
 		assertEquals(1,SimCalcUtil.getNum01Features(fv2, fv1));
 	}
-
-	/*public void testMain() {
-		fail("Not yet implemented");
-	}*/
-
 }

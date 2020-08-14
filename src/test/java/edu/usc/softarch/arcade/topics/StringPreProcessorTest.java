@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.topics;
 
-import edu.usc.softarch.arcade.topics.StringPreProcessor;
 import junit.framework.TestCase;
 
 /**

@@ -1,14 +1,8 @@
 package edu.usc.softarch.arcade.topics;
 
-import static org.junit.Assert.*;
-
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -28,7 +22,6 @@ import cc.mallet.pipe.Pipe;
 import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.TokenSequence2FeatureSequence;
 import cc.mallet.pipe.TokenSequenceRemoveStopwords;
-import cc.mallet.pipe.iterator.CsvIterator;
 import cc.mallet.topics.ParallelTopicModel;
 import cc.mallet.topics.TopicInferencer;
 import cc.mallet.types.Alphabet;
@@ -198,5 +191,4 @@ public class TopicModelTest {
 				testing.get(0), 10, 1, 5);
 		System.out.println("0\t" + testProbabilities[0]);
 	}
-
 }

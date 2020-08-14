@@ -36,7 +36,6 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
-import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -265,9 +264,7 @@ public class DependencyFinderProcessing {
 		try (BufferedReader in = new BufferedReader(new FileReader(filePath))) {
 			String line;
 			while ((line = in.readLine()) != null) {
-				if (Constants._DEBUG) {
-					logger.debug(line);
-				}
+				logger.debug(line);
 
 				if (line.trim().isEmpty()) {
 					continue;
@@ -280,9 +277,7 @@ public class DependencyFinderProcessing {
 				final String startNode = s.findInLine(expr);
 				final String endNode = s.findInLine(expr);
 				final List<String> fact = Lists.newArrayList(arcType, startNode, endNode);
-				if (Constants._DEBUG) {
-					logger.debug(fact);
-				}
+				logger.debug(fact);
 				facts.add(fact);
 				// add to cluster
 				List<String> currentCluster = clusterList.get(startNode);

@@ -307,8 +307,13 @@ public class ReverseAnalysisOverTopics {
 					TopicUtil.docTopics = TopicUtil
 							.getDocTopicsFromFile(filename);
 
-				if (entity.docTopicItem == null)
-					TopicUtil.setDocTopicForEntity(TopicUtil.docTopics, entity, type);
+				if (entity.docTopicItem == null) {
+					try {
+						TopicUtil.setDocTopicForEntity(TopicUtil.docTopics, entity, type);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 

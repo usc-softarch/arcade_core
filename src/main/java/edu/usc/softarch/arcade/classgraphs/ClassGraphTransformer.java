@@ -8,11 +8,9 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -65,7 +63,6 @@ import weka.core.converters.ArffSaver;
  * @author joshua
  */
 public class ClassGraphTransformer extends SceneTransformer  {
-	private static Set<String> traversedMethodSet = new HashSet<>();
 	public static ClassGraph clg = new ClassGraph();
 	public static MyCallGraph mg = new MyCallGraph();
 	private static Map<String,MyClass> classesWithUsedMethods;
@@ -799,70 +796,6 @@ public class ClassGraphTransformer extends SceneTransformer  {
 					}
 				}
 			}
-		}
-	}
-	
-	private static void printPossibleCalledClasses_Recursive(SootMethod source,
-			int depth) throws IOException {
-		printTabByDepth(depth);
-		logger.debug("Analyzing " + source);
-		CallGraph cg = Scene.v().getCallGraph();
-		traversedMethodSet.add(source.toString());
-		Iterator<MethodOrMethodContext> targets = new Targets(cg
-				.edgesOutOf(source));
-		Set<SootClass> classes = new HashSet<>();
-
-		// iterate over all the targets of this source method
-		while (targets.hasNext()) {
-			SootMethod tgt = (SootMethod) targets.next();
-			if (!tgt.toString().startsWith("<java.")
-					&& !tgt.toString().startsWith("<javax.")
-					&& !tgt.toString().startsWith("<sun.")
-					&& !tgt.toString().startsWith("<com.")
-					&& !tgt.toString().startsWith("<org.")) { // filter out the
-				// main java
-				// package
-				classes.add(tgt.getDeclaringClass()); // add to the classes
-				// working list
-				clg
-						.addEdge(source.getDeclaringClass(), tgt
-								.getDeclaringClass(),"call");
-			}
-		}
-
-		printTabByDepth(depth);
-		System.out
-				.println("List of classes that " + source + " might call(): ");
-		Iterator<SootClass> iter = classes.iterator();
-
-		while (iter.hasNext()) {
-			printTabByDepth(depth);
-			logger.debug("\t" + iter.next());
-		}
-
-		targets = new Targets(cg.edgesOutOf(source));
-		while (targets.hasNext()) {
-			SootMethod tgt = (SootMethod) targets.next();
-			if (!tgt.getDeclaringClass().toString().startsWith("java.")
-					&& !tgt.getDeclaringClass().toString().startsWith("javax.")
-					&& !tgt.getDeclaringClass().toString().startsWith("sun.")
-					&& !tgt.getDeclaringClass().toString().startsWith("com.")
-					&& !tgt.getDeclaringClass().toString().startsWith("org.")
-					&& !traversedMethodSet.contains(tgt.toString())
-
-			) {
-				printPossibleCalledClasses_Recursive(tgt, depth + 1);
-			} else if (traversedMethodSet.contains(tgt.toString()) && Constants._DEBUG) {
-					printTabByDepth(depth);
-					logger.debug("\tSkipping " + tgt
-							+ " because it is in the traversedMethodSet");
-			}
-		}
-	}
-
-	private static void printTabByDepth(int depth) {
-		for (int i = 0; i < depth; i++) {
-			System.out.print("\t");
 		}
 	}
 }

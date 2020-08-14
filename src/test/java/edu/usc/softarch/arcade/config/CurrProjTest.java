@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.config;
 
-import edu.usc.softarch.arcade.config.Config;
 import junit.framework.TestCase;
 
 /**
@@ -25,6 +24,4 @@ public class CurrProjTest extends TestCase {
 		Config.initConfigFromFile("/home/joshua/workspace/MyExtractors/hadoop-0.20.2-mapred.cfg");
 		Config.initConfigFromFile("/home/joshua/workspace/MyExtractors/pushpull-0.2.cfg");
 	}
-	
-
 }

@@ -37,7 +37,6 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
-import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -121,7 +120,7 @@ public class DependencyFinderProcessing_ExportJSON {
 
 		List<File> fileList = FileListing.getFileListing(depFinderDir);
 		fileList = FileUtil.sortFileListByVersion(fileList);
-		final Set<File> orderedSerFiles = new LinkedHashSet<File>();
+		final Set<File> orderedSerFiles = new LinkedHashSet<>();
 		for (final File file : fileList) {
 			if (file.getName().endsWith(".xml")) {
 				orderedSerFiles.add(file);
@@ -130,7 +129,7 @@ public class DependencyFinderProcessing_ExportJSON {
 		
 		fileList = FileListing.getFileListing(clustersDir);
 		fileList = FileUtil.sortFileListByVersion(fileList);
-		final Set<File> clusterFiles = new LinkedHashSet<File>();
+		final Set<File> clusterFiles = new LinkedHashSet<>();
 		for (final File file : fileList) {
 			if (file.getName().endsWith(".rsf")) {
 				clusterFiles.add(file);
@@ -139,7 +138,7 @@ public class DependencyFinderProcessing_ExportJSON {
 		
 		fileList = FileListing.getFileListing(cloneDir);
 		fileList = FileUtil.sortFileListByVersion(fileList);
-		final Set<File> cloneFiles = new LinkedHashSet<File>();
+		final Set<File> cloneFiles = new LinkedHashSet<>();
 		for (final File file : fileList) {
 			if (file.getName().endsWith(".xml")) {
 				cloneFiles.add(file);
@@ -304,13 +303,9 @@ public class DependencyFinderProcessing_ExportJSON {
 		try (BufferedReader in = new BufferedReader(new FileReader(filePath))) {
 			String line;
 			while ((line = in.readLine()) != null) {
-				if (Constants._DEBUG) {
-					logger.debug(line);
-				}
+				logger.debug(line);
 
-				if (line.trim().isEmpty()) {
-					continue;
-				}
+				if (line.trim().isEmpty()) continue;
 
 				final Scanner s = new Scanner(line);
 				final String expr = "([^\"\\s][^\\s]*[^\"\\s]*)|([\"][^\"]*[\"])";
@@ -319,15 +314,12 @@ public class DependencyFinderProcessing_ExportJSON {
 				final String startNode = s.findInLine(expr);
 				final String endNode = s.findInLine(expr);
 				final List<String> fact = Lists.newArrayList(arcType, startNode, endNode);
-				if (Constants._DEBUG) {
-					logger.debug(fact);
-				}
+				logger.debug(fact);
 				facts.add(fact);
 				// add to cluster
 				List<String> currentCluster = clusterList.get(startNode);
-				if (currentCluster == null) {
-					currentCluster = new ArrayList<String>();
-				}
+				if (currentCluster == null)
+					currentCluster = new ArrayList<>();
 				currentCluster.add(endNode);
 				clusterList.put(startNode, currentCluster);
 				class2component.put(endNode, startNode);
@@ -478,7 +470,7 @@ public class DependencyFinderProcessing_ExportJSON {
 			
 			//Keep tracks of duplicated class files
 			// Handle className
-			Set<String> tmp = new HashSet<String>();
+			Set<String> tmp = new HashSet<>();
 			for (int i = 0; i < duplicatedFiles.getLength();  i++){
 				Element e = (Element) duplicatedFiles.item(i);
 				if (! e.getAttribute(PATH).contains("src"))
@@ -572,7 +564,7 @@ public class DependencyFinderProcessing_ExportJSON {
 		}
 		
 		// check unused component
-		Set<String> unsedCompSmell = new HashSet<String>();
+		Set<String> unsedCompSmell = new HashSet<>();
 		logger.info("\nUnused components:");
 		content += "\nUnused components:\n";
 		content += "component Name,\n";

@@ -406,8 +406,13 @@ public class ReverseAnalysis
 				Entity entity = nameToEntity.get(entityName);
 				if (TopicUtil.docTopics == null)
 					TopicUtil.docTopics = TopicUtil.getDocTopicsFromFile(docTopicsFilename);
-				if (entity.docTopicItem == null)
-					 TopicUtil.setDocTopicForEntity(TopicUtil.docTopics, entity, type);
+				if (entity.docTopicItem == null){
+					try {
+						TopicUtil.setDocTopicForEntity(TopicUtil.docTopics, entity, type);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 	}

@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
-import static org.junit.Assert.*;
 import junit.framework.Assert;
 
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;

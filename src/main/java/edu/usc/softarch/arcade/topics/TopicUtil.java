@@ -269,7 +269,7 @@ public class TopicUtil {
 	 * @param docTopics
 	 * @param leaf
 	 */
-	public static void setDocTopicForEntity(DocTopics docTopics, Entity leaf, String type) {
+	public static void setDocTopicForEntity(DocTopics docTopics, Entity leaf, String type) throws Exception {
 		if (type.equals("java")) {
 			String strippedLeafClassName = ConfigUtil
 					.stripParensEnclosedClassNameWithPackageName(leaf);
