@@ -14,6 +14,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 import com.ginsberg.junit.exit.ExpectSystemExit;
 
@@ -838,6 +840,31 @@ public class FileUtilTest {
                 Paths.get(filePath), StandardCharsets.UTF_8); });
         assertDoesNotThrow(() ->
             { return FileUtil.collectionToString(inputList); });
+    }
+
+    @Test
+    public void collectionToStringTest2() {
+        // Input is an empty List
+        List<String> inputList = new ArrayList<>();
+        assertDoesNotThrow(() ->
+            { return FileUtil.collectionToString(inputList); });
+    }
+
+    @Test
+    public void collectionToStringTest3() {
+        // Input is an empty Set
+        Set<String> inputSet = new HashSet<>();
+        assertDoesNotThrow(() ->
+            { return FileUtil.collectionToString(inputSet); });
+    }
+
+    @Test
+    public void collectionToStringTest4() {
+        // Input contains null values
+        Set<String> inputSet = new HashSet<>();
+        inputSet.add(null);
+        assertDoesNotThrow(() ->
+            { return FileUtil.collectionToString(inputSet); });
     }
     // #endregion TESTS collectionToString -------------------------------------
 }

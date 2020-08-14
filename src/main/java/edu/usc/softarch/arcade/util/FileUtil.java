@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -340,7 +341,10 @@ public class FileUtil {
 	 */
 	public static <E extends Object> List<String>
 			collectionToString(Collection<E> collection) {
-		return collection.stream().map(E::toString).collect(Collectors.toList());
+		return collection.stream()
+			.map(E::toString)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
 	}
 
 	/**
