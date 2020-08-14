@@ -1,12 +1,9 @@
 package edu.usc.softarch.arcade.clustering.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -16,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,9 +51,7 @@ import edu.usc.softarch.arcade.clustering.FeatureVector;
 import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.ConfigUtil;
-import edu.usc.softarch.arcade.facts.ExpertDecomposition;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
-import edu.usc.softarch.arcade.facts.Group;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 import edu.usc.softarch.arcade.smellarchgraph.ClusterEdge;
 import edu.usc.softarch.arcade.smellarchgraph.SmellArchGraph;
@@ -91,18 +85,6 @@ public class ClusterUtil {
 		}
 	}
 
-	public static void printItemsInClusters(List<Cluster> clusters) {
-		logger.debug("Listing items in each cluster of the clusters...");
-		for (Cluster c : clusters) {
-			logger.debug("Cluster: " + c.name);
-			int fvCount = 0;
-			for (FeatureVector fv : c.items) {
-				logger.debug("\t " + fvCount + ": " + fv.name);
-				fvCount++;
-			}
-		}
-	}
-
 	private static List<Cluster> getLeafClusters(Cluster c,
 			List<Cluster> startClusters) {
 		if (c.left == null && c.right == null) {
@@ -114,94 +96,6 @@ public class ClusterUtil {
 			if (c.right != null)
 				getLeafClusters(c.right, startClusters);
 			return startClusters;
-		}
-
-	}
-
-	public static List<Cluster> splitClusters(List<Cluster> clusters) {
-		Cluster root = clusters.get(0);
-
-		Cluster curr = root;
-		LinkedList<Cluster> queue = new LinkedList<>();
-		List<Cluster> splitClusters = new ArrayList<>();
-		splitClusters.add(curr);
-
-		logger.debug("Initial split clusters size: " + splitClusters.size());
-		logger.debug("Initial split clusters: ");
-		prettyPrintSplitClusters(splitClusters);
-
-		queue.offer(curr);
-		curr = queue.pop();
-		while (curr != null) {
-
-			logger.debug("--------------------");
-			logger.debug("curr: " + curr);
-			logger.debug("--------------------");
-			logger.debug("left: " + curr.left);
-			logger.debug("--------------------");
-			logger.debug("right: " + curr.right);
-			logger.debug("--------------------");
-
-			logger.debug("Item size of current cluster: " + curr.items.size());
-			if (curr.items.size() >= 1 && (curr.left != null || curr.right != null))
-				splitClusters.remove(curr);
-
-			if (curr.left != null) {
-				if (curr.right != null) {
-					System.out
-							.println("Testing similiarity of left and right cluster: ");
-					logger.debug("Left: " + curr.left.simLeftRight + ", : "
-							+ curr.right.simLeftRight);
-					if (curr.left.simLeftRight < curr.right.simLeftRight) {
-						logger.debug("Splitting left then right");
-						queue.offer(curr.left);
-						splitClusters.add(curr.left);
-
-						queue.offer(curr.right);
-						splitClusters.add(curr.right);
-					} else {
-						logger.debug("Splitting right then left");
-						queue.offer(curr.right);
-						splitClusters.add(curr.right);
-
-						queue.offer(curr.left);
-						splitClusters.add(curr.left);
-					}
-
-				} else {
-					logger.debug("Splitting only left");
-					queue.offer(curr.left);
-					splitClusters.add(curr.left);
-				}
-			} else if (curr.right != null) {
-				logger.debug("Splitting only right");
-				queue.offer(curr.right);
-				splitClusters.add(curr.right);
-			}
-
-			logger.debug("Current split clusters size: " + splitClusters.size());
-			logger.debug("Current split clusters: ");
-			prettyPrintSplitClusters(splitClusters);
-			logger.debug("\n");
-
-			if (splitClusters.size() == Config.getNumClusters())
-				break;
-
-			if (queue.isEmpty())
-				break;
-			else
-				curr = queue.pop();
-		}
-
-		return splitClusters;
-	}
-
-	public static void prettyPrintSplitClusters(List<Cluster> splitClusters) {
-
-		int count = 1;
-		for (Cluster c : splitClusters) {
-			logger.debug(count + ":" + c);
-			count++;
 		}
 	}
 	
@@ -711,28 +605,6 @@ public class ClusterUtil {
 		return centroidSum / clusterCentroids.size();
 	}
 
-	public static double computeClusterGainUsingStructuralDataFromFeatureVectorMap(
-			List<Cluster> clusters) {
-		ArrayList<Double> clusterCentroids = new ArrayList<>();
-
-		for (Cluster c : clusters) {
-			clusterCentroids.add(Double.valueOf(
-					computeCentroidUsingStructuralData(c)));
-		}
-
-		double globalCentroid = computeGlobalCentroidForStructuralData(clusterCentroids);
-
-		double clusterGain = 0;
-		for (int i = 0; i < clusterCentroids.size(); i++) {
-			clusterGain += (clusters.get(i).items.size() - 1)
-					* Math.pow(
-							Math.abs(globalCentroid
-									- clusterCentroids.get(i).doubleValue()), 2);
-		}
-
-		return clusterGain;
-	}
-
 	public static double computeClusterGainUsingStructuralDataFromFastFeatureVectors(
 			List<FastCluster> fastClusters) {
 		ArrayList<Double> clusterCentroids = new ArrayList<>();
@@ -792,17 +664,6 @@ public class ClusterUtil {
 		}
 
 		return clusterGain;
-
-	}
-
-	public static Map<String, Integer> createClusterNameToNodeNumberMap(
-			List<Cluster> clusters) {
-		HashMap<String, Integer> clusterNameToNodeNumberMap = new HashMap<>();
-		for (int i = 0; i < clusters.size(); i++) {
-			Cluster cluster = clusters.get(i);
-			clusterNameToNodeNumberMap.put(cluster.name, Integer.valueOf(i));
-		}
-		return clusterNameToNodeNumberMap;
 	}
 
 	public static Map<String, Integer> createFastClusterNameToNodeNumberMap(
@@ -813,19 +674,6 @@ public class ClusterUtil {
 			clusterNameToNodeNumberMap.put(cluster.getName(), Integer.valueOf(i));
 		}
 		return clusterNameToNodeNumberMap;
-	}
-
-	public static Map<Integer, String> createNodeNumberToClusterNameMap(
-			List<Cluster> clusters,
-			Map<String, Integer> clusterNameToNodeNumberMap) {
-		Map<Integer, String> nodeNumberToClusterNameMap = new TreeMap<>();
-
-		for (Cluster cluster : clusters) {
-			nodeNumberToClusterNameMap.put(
-					clusterNameToNodeNumberMap.get(cluster.name), cluster.name);
-		}
-
-		return nodeNumberToClusterNameMap;
 	}
 
 	public static Map<Integer, String> createNodeNumberToFastClusterNameMap(
@@ -842,65 +690,9 @@ public class ClusterUtil {
 		return nodeNumberToClusterNameMap;
 	}
 
-	public static ByteArrayOutputStream writeRSFToByteArrayOutputStream(
-			Map<String, Integer> clusterNameToNodeNumberMap,
-			List<Cluster> clusters) {
-
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		OutputStreamWriter osw = new OutputStreamWriter(bos);
-		PrintWriter out = new PrintWriter(osw);
-
-		logger.debug("Printing each cluster and its leaves...");
-		for (Cluster cluster : clusters) {
-			Integer currentNodeNumber = clusterNameToNodeNumberMap
-					.get(cluster.name);
-			logger.debug("Cluster name: " + currentNodeNumber);
-			logger.debug("Cluster node number: " + cluster);
-			for (Cluster leafCluster : cluster.leafClusters) {
-				logger.debug("\t" + leafCluster);
-				out.write("contain " + currentNodeNumber + " "
-						+ leafCluster.name + '\n');
-			}
-		}
-
-		out.close();
-
-		logger.debug("Printing sourceStream from writeRSFToByteArrayOutputStream...");
-		logger.debug(DebugUtil.convertByteArrayOutputStreamToString(bos));
-
-		return bos;
-
-	}
-
-	public static void writeClusterRSFFile(
-			Map<String, Integer> clusterNameToNodeNumberMap,
-			List<Cluster> clusters) throws FileNotFoundException {
-		File rsfFile = new File(Config.getClustersRSFFilename(clusters.size()));
-
-		FileOutputStream fos = new FileOutputStream(rsfFile);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-		PrintWriter out = new PrintWriter(osw);
-
-		logger.debug("Printing each cluster and its leaves...");
-		for (Cluster cluster : clusters) {
-			Integer currentNodeNumber = clusterNameToNodeNumberMap
-					.get(cluster.name);
-			logger.debug("Cluster name: " + currentNodeNumber);
-			logger.debug("Cluster node number: " + cluster);
-			for (Cluster leafCluster : cluster.leafClusters) {
-				logger.debug("\t" + leafCluster);
-				out.println("contain " + currentNodeNumber + " "
-						+ leafCluster.name);
-			}
-		}
-
-		out.close();
-	}
-
 	public static void writeFastClusterRSFFileUsingConfigName(
 			Map<String, Integer> clusterNameToNodeNumberMap,
-			List<FastCluster> clusters) throws FileNotFoundException,
-			UnsupportedEncodingException {
+			List<FastCluster> clusters) throws FileNotFoundException {
 		String currentClustersDetailedRsfFilename = Config.getClustersRSFFilename(clusters.size());
 		writeFastClustersRsfFile(clusterNameToNodeNumberMap, clusters,
 				currentClustersDetailedRsfFilename);
@@ -924,7 +716,7 @@ public class ClusterUtil {
 			logger.trace("Cluster name: " + currentNodeNumber);
 			logger.trace("Cluster node number: " + cluster);
 			String[] entities = cluster.getName().split(",");
-			Set<String> entitiesSet = new HashSet<String>( Arrays.asList(entities) );
+			Set<String> entitiesSet = new HashSet<>( Arrays.asList(entities) );
 			int entityCount = 0;
 			for (String entity : entitiesSet) {
 				logger.trace(entityCount + ":\t" + entity);
@@ -958,32 +750,6 @@ public class ClusterUtil {
 			}
 		}
 
-	}
-
-	public static FastFeatureVectors deserializeFastFeatureVectors() {
-		File fastFeatureVectorsFile = new File(
-				Config.getFastFeatureVectorsFilename());
-		FastFeatureVectors fastFeatureVectors = null;
-		try {
-			ObjectInputStream objInStream = new ObjectInputStream(
-					new FileInputStream(fastFeatureVectorsFile));
-
-			
-
-			// Deserialize the object
-
-			fastFeatureVectors = (FastFeatureVectors) objInStream.readObject();
-			logger.debug("Names in Feature Set:");
-			logger.debug(fastFeatureVectors.getNamesInFeatureSet());
-
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		logger.debug("Read in serialized feature vectors...");
-
-		return fastFeatureVectors;
 	}
 
 	public static Set<String> getNodesInClusterGraph(StringGraph cg) {
@@ -1059,8 +825,6 @@ public class ClusterUtil {
 			}
 		}
 		
-		
-		
 		return cg;
 	}
 	
@@ -1109,35 +873,8 @@ public class ClusterUtil {
 		}
 		return clusters;
 	}
-
-	public static ByteArrayOutputStream convertExpertDecompositionToByteArrayOutputStream(
-			ExpertDecomposition decomposition) {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		OutputStreamWriter osw = new OutputStreamWriter(bos);
-		PrintWriter out = new PrintWriter(osw);
-
-		logger.debug("Printing each expert decompostion in rsf format that is being converted to ByteArrayOutputStream...");
-		int groupCount = 0;
-		for (Group group : decomposition.groups) {
-			for (String element : group.elements) {
-				String rsfTriple = "contain " + groupCount + " " + element + "\n";
-				logger.debug(rsfTriple);
-				out.write(rsfTriple); 
-			}
-			groupCount++;
-		}
-
-		out.close();
-
-		logger.debug("Printing sourceStream from writeRSFToByteArrayOutputStream...");
-		logger.debug(DebugUtil.convertByteArrayOutputStreamToString(bos));
-
-		return bos;
-	}
-	
 	
 	/**
-	 * 
 	 * Creates a map of a cluster name to its entities
 	 * 
 	 * @param clusterFacts
@@ -1214,29 +951,6 @@ public class ClusterUtil {
 				}
 				if (!(clusterMap.get(clusterName).contains(source)) && clusterMap.get(clusterName).contains(target)) { // target is in cluster, but source is not
 					// Add external edge 
-					MutablePair<String, String> edge = new MutablePair<>();
-					edge.setLeft(source);
-					edge.setRight(target);
-					edges.add(edge);
-				}
-			}
-			map.put(clusterName, edges);
-		}
-
-
-		return map;
-	}
-	
-	public static Map<String,Set<MutablePair<String,String>>> buildEdgesIntoEachCluster(Map<String,Set<String>> clusterMap, List<List<String>> depFacts) {
-		Map<String,Set<MutablePair<String,String>>> map = new HashMap<>();
-
-		for (String clusterName : clusterMap.keySet()) { // for each cluster name
-			Set<MutablePair<String,String>> edges = new HashSet<>();
-			for (List<String> depFact : depFacts) {
-				String source = depFact.get(1);
-				String target = depFact.get(2);
-				if (!(clusterMap.get(clusterName).contains(source)) && clusterMap.get(clusterName).contains(target)) { // target is in cluster, but source is not
-					// Add edge that goes into cluster 
 					MutablePair<String, String> edge = new MutablePair<>();
 					edge.setLeft(source);
 					edge.setRight(target);

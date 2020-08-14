@@ -17,7 +17,6 @@ public class GroundTruthValidator {
 	public static void main(String[] args) {
 		String clustersFilename = args[0];
 		String depsRsfFilename = args[1];
-		String packageSelectExpr = args[2];
 		
 		RsfReader.loadRsfDataFromFile(depsRsfFilename);
 		List<List<String>> depFacts = RsfReader.unfilteredFacts;
@@ -25,13 +24,13 @@ public class GroundTruthValidator {
 		RsfReader.loadRsfDataFromFile(clustersFilename);
 		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
 		
-		Map<String,Set<String>> clusterMap = new HashMap<String,Set<String>>();
+		Map<String,Set<String>> clusterMap = new HashMap<>();
 		
 		for (List<String> fact : clusterFacts) {
 			String clusterName = fact.get(1);
 			String entity = fact.get(2);
 			if (clusterMap.get(clusterName) == null) {
-				Set<String> entities = new HashSet<String>();
+				Set<String> entities = new HashSet<>();
 				entities.add(entity);
 				clusterMap.put(clusterName,entities);
 			}
@@ -42,8 +41,8 @@ public class GroundTruthValidator {
 			}
 		}
 		
-		Map<String,Set<String>> matchingClassesMap = new HashMap<String,Set<String>>();
-		Map<String,Set<String>> errMatchClassesMap = new HashMap<String,Set<String>>();
+		Map<String,Set<String>> matchingClassesMap = new HashMap<>();
+		Map<String,Set<String>> errMatchClassesMap = new HashMap<>();
 		
 		findMatchingClasses(depFacts, clusterMap, matchingClassesMap);
 		
@@ -58,8 +57,6 @@ public class GroundTruthValidator {
 		
 		System.out.println("Printing erroneous entries...");
 		System.out.println(Joiner.on("\n").withKeyValueSeparator(":").join(errMatchClassesMap));
-		
-
 	}
 
 	private static void findMatchingClasses(List<List<String>> depFacts,
@@ -84,7 +81,7 @@ public class GroundTruthValidator {
 						
 						
 						if (matchingClassesMap.get(entity) == null) {
-							Set<String> classes = new HashSet<String>();
+							Set<String> classes = new HashSet<>();
 							classes.add(matchingClass);
 							matchingClassesMap.put(entity.trim(),classes);
 						}
@@ -99,5 +96,4 @@ public class GroundTruthValidator {
 			}
 		}
 	}
-
 }

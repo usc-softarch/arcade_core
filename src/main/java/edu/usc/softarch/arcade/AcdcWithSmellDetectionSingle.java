@@ -3,7 +3,6 @@ package edu.usc.softarch.arcade;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 
@@ -11,8 +10,6 @@ import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class AcdcWithSmellDetectionSingle {
-
-	static Logger logger = Logger.getLogger(AcdcWithSmellDetectionSingle.class);
 
 	public static void main(String[] args) throws IOException {
 

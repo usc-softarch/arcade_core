@@ -7,13 +7,8 @@ import edu.usc.softarch.arcade.clustering.Cluster;
 
 /**
  * @author joshua
- *
  */
 public class ClusterEdge implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5252058761923559301L;
 	private Cluster src;
 	private Cluster tgt;

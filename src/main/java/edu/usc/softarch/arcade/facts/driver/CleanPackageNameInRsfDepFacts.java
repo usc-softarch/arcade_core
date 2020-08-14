@@ -5,10 +5,6 @@ import java.io.IOException;
 import java.util.List;
 
 public class CleanPackageNameInRsfDepFacts {
-
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String depsFilename = args[0];
 		String cleanDepsFilename = args[1];
@@ -16,7 +12,6 @@ public class CleanPackageNameInRsfDepFacts {
 		
 		RsfReader.loadRsfDataFromFile(depsFilename);
 		List<List<String>> depFacts = RsfReader.unfilteredFacts;
-		
 		
 		try (FileWriter out = new FileWriter(cleanDepsFilename)) {
 			for (List<String> fact : depFacts) {
@@ -26,18 +21,13 @@ public class CleanPackageNameInRsfDepFacts {
 				String cleanSource = source;
 				String cleanTarget = target;
 				
-				if (source.contains(stripBeforePackageName)) {
+				if (source.contains(stripBeforePackageName))
 					cleanSource = source.substring(source.indexOf(stripBeforePackageName),source.length());
-				}
-				if (target.contains(stripBeforePackageName)) {
+				if (target.contains(stripBeforePackageName))
 					cleanTarget = target.substring(target.indexOf(stripBeforePackageName),target.length());
-				}
-				
+
 				out.write(rel + " " + cleanSource + " " + cleanTarget + "\n");
-				
 			}
-			
-			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

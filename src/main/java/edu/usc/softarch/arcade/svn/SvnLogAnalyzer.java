@@ -22,7 +22,7 @@ import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.LogUtil;
 
 public class SvnLogAnalyzer {
-	static Logger logger = Logger.getLogger(SvnLogAnalyzer.class);
+	private static Logger logger = Logger.getLogger(SvnLogAnalyzer.class);
     /*
      * args parameter is used to obtain a repository location URL, a start
      * revision number, an end revision number, user's account name & password

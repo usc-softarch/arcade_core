@@ -18,7 +18,7 @@ import edu.usc.softarch.arcade.util.FileUtil;
 
 public class DependencyExtractorSingle {
 
-	static Logger logger = Logger.getLogger(DependencyExtractorSingle.class);
+	private static Logger logger = Logger.getLogger(DependencyExtractorSingle.class);
 	
 	public static void main(String[] args) throws IOException {
 

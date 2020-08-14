@@ -102,5 +102,4 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 	public FastFeatureVectors getFfVecs() {
 		return ffVecs;
 	}
-
 }

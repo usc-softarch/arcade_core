@@ -5,11 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-	}
-
 	public static String extractVersionPretty(final String name) {
 		final Pattern p = Pattern
 				.compile("[0-9]+\\.[0-9]+(\\.[0-9]+)*(-(RC|ALPHA|BETA|M|Rc|Alpha|Beta|rc|alpha|beta|deb|b|a|final|Final|FINAL)([0-9])*)*");

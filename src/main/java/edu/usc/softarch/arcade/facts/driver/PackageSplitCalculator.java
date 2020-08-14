@@ -19,9 +19,6 @@ public class PackageSplitCalculator {
 	private static String exprToGrabPackageName = "(.+)\\..+$"; // for java packages
 	private static Pattern grabPkgPattern = Pattern.compile(exprToGrabPackageName);
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 		
@@ -111,7 +108,7 @@ public class PackageSplitCalculator {
 			splitClusters.addAll(splitClustersOfSinglePkg);
 		}
 		
-		Set<String> clustersWherePkgsIsNotEnough = new HashSet<String>(splitClusters);
+		Set<String> clustersWherePkgsIsNotEnough = new HashSet<>(splitClusters);
 		clustersWherePkgsIsNotEnough.addAll(clustersWithEntitiesNotInSamePackage);
 		
 		double proportionOfSplitClusters = (double)numOfSplitClusters/(double)clusters.size();
@@ -149,5 +146,4 @@ public class PackageSplitCalculator {
 		}
 		throw new RuntimeException("Should not exit for loop above");
 	}
-
 }

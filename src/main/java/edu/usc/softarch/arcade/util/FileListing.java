@@ -62,7 +62,7 @@ public final class FileListing {
   private static List<File> getFileListingNoSort(
     File aStartingDir, String extension
   ) throws FileNotFoundException {
-    List<File> result = new ArrayList<File>();
+    List<File> result = new ArrayList<>();
     File[] filesAndDirs = aStartingDir.listFiles();
     List<File> filesDirs = Arrays.asList(filesAndDirs);
     for(File file : filesDirs) {

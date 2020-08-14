@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
@@ -14,12 +13,6 @@ import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class ClusterGraphToDotConverter {
-	
-	static Logger logger = Logger.getLogger(ClusterGraphToDotConverter.class);
-
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 		

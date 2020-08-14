@@ -21,11 +21,8 @@ import edu.usc.softarch.arcade.config.Config;
  * @author joshua
  */
 public class CleanAuthRsfWithRelFacts {
-	static Logger logger = Logger.getLogger(CleanAuthRsfWithRelFacts.class);
+	private static Logger logger = Logger.getLogger(CleanAuthRsfWithRelFacts.class);
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 		
@@ -70,7 +67,5 @@ public class CleanAuthRsfWithRelFacts {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
- 
 	}
-
 }

@@ -8,22 +8,16 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
 import edu.usc.softarch.arcade.classgraphs.ClassGraphTransformer;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
-import edu.usc.softarch.arcade.config.datatypes.Proj;
-import edu.usc.softarch.arcade.config.datatypes.RunType;
-import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.util.FileUtil;
-import edu.usc.softarch.arcade.weka.ClassValueMap;
 
 //TODO This class is an abomination and must be destroyed.
 /**
@@ -42,19 +36,12 @@ public class Config {
 	private static String projConfigFilename = 
 		"cfg" + File.separator + "oodt-resource-0.2.cfg";
 	private static String currProjName = "";
-	public static String homeLoc = File.separator + "home" + File.separator + 
-		"joshua" + File.separator;
 	public static Language selectedLanguage = Language.java;
 	
-	//TODO This also doesn't look particularly alluring
-	public static String workspaceLoc = homeLoc + "workspace" + File.separator;
 	private static String loggingConfigFilename = "cfg" + File.separator + 
 		"extractor_logging.cfg";
 	public static String DATADIR = "data" + File.separator + currProjName;
-	private static String projSrcDir = "";
 	private static String[] selectedPkgsArray;
-	private static String sootClasspathStr;
-	private static String[] deselectedPkgsArray;
 	private static String odemFile = "";
 	
 	/* Clustering configuration data */
@@ -69,18 +56,9 @@ public class Config {
 	public static StoppingCriterionConfig stoppingCriterion = 
 		StoppingCriterionConfig.clustergain;
 	private static int numClusters = 1;
-	private static String stopWordsFilename =
-		"cfg" + File.separator + "stopwords.txt";
-	public static boolean isExcelFileWritingEnabled = false;
 	public static ClusteringAlgorithmType getCurrentClusteringAlgorithm() {
 		return currentClusteringAlgorithm; }
 
-	public static void setCurrentClusteringAlgorithm(
-			ClusteringAlgorithmType currentClusteringAlgorithm) {
-		Config.currentClusteringAlgorithm = currentClusteringAlgorithm;	}
-
-	public static boolean runMojo = false;
-	public static boolean usingFvMap = true;
 	public static boolean ignoreDependencyFilters = false;
 	
 	/* Concern properties data */
@@ -111,47 +89,16 @@ public class Config {
 	public static void setNumTopics(int numTopics) {
 		Config.numTopics = numTopics;	}
 	
-	public static TopicModelExtractionMethod tmeMethod = 
-		TopicModelExtractionMethod.VAR_MALLET_FILE;
 	public static String srcDir = ".";
-	private static String TME_METHOD = "topic_model_extraction_method";
 
 	/* DriverEngine options */
-	public static RunType runType = RunType.whole;
-	public static boolean useSerializedClassGraph = true;
-	public static boolean useXMLClassGraph = true;
-	public static boolean forceClustering = true;
-	public static boolean enableClustering = true;
-	public static boolean enablePostClusteringTasks = false;
-	public static boolean forceClassAndMyMethodGraphsConstruction = false;
-	// setting performPRCalculation to true prevents other phases from running
-	public static boolean performPRCalculation = true;
 	public static boolean useFastFeatureVectorsFile = false;
-	private static String USE_FAST_FEATURE_VECTORS_FILE =
-		"use_fast_feature_vectors_file";
-	
-	/* Config data to be REMOVED in the future */
-	//TODO Remove it
-	public static Proj proj = Proj.OODT_Filemgr;
-	public static final String lucene1_9FinalStr = "lucene-1.9-final";
-	public static final String llamaChatStr = "LlamaChat";
-	public static final String freecsStr = "freecs";
-	public static final String gujChatStr = "gujChat";
-	public static final String lcdClockStr = "LCDClock";
-	public static final String jeditStr = "jedit";
-	public static final String oodtFilemgrStr = "oodt-filemgr";
-	public static final String klaxStr = "KLAX";
-	public static final String jigsawStr = "jigsaw2.2.6";
-	public static boolean performingTwoProjectTest = false;
-	public static boolean performingThreeProjectTest = true;
-
 	private static String depsRsfFilename;
 	private static String groundTruthFile;
 	private static String smellClustersFile;
 	public static void setSmellClustersFile(String smellClustersFile) {
 		Config.smellClustersFile = smellClustersFile;	}
 
-	private static String mojoTargetFile;
 	private static int startNumClustersRange;
 	private static int endNumClustersRange;
 	private static int rangeNumClustersStep;
@@ -166,16 +113,12 @@ public class Config {
 	private static int endNumTopicsRange;
 	private static int rangeNumTopicsStep;
 	private static String topicsDir;
-	private static String expertDecompositionFile;
-	private static String concernRecoveryFilePrefix;
 	private static List<Integer> clustersToWriteList = null;
 	private static Granule clusteringGranule = Granule.file;
 	private static List<String> excludedEntities;
 	private static String clusterStartsWith;
 	public static String getClusterStartsWith() {	return clusterStartsWith;	}
 	public static Granule getClusteringGranule() { return clusteringGranule; }
-	public static void setClusteringGranule(Granule clusteringGranule) {
-		Config.clusteringGranule = clusteringGranule;	}
 	public static boolean isUsingPreselectedRange() {
 		return usingPreselectedRange; }
 	public static boolean isUsingNumTopicsRange() { return usingNumTopicsRange; }
@@ -184,16 +127,11 @@ public class Config {
 	public static int getRangeNumClustersStep() { return rangeNumClustersStep; }
 	public static String getGroundTruthFile() { return groundTruthFile;	}
 	public static String getSmellClustersFile() {	return smellClustersFile;	}
-	public static void setGroundTruthFile(String groundTruthFile) {
-		Config.groundTruthFile = groundTruthFile;	}
 	public static String getOdemFile() { return odemFile;	}
-	public static void setOdemFile(String odemFile) {
-		Config.odemFile = odemFile; }
 	public static String getCurrProjStr() {	return currProjName; }
 	public static int getNumClusters() { return numClusters; }
 	public static void setNumClusters(int inNumClusters) {
 		numClusters = inNumClusters; }
-	public static String getProjSrcDir() { return projSrcDir;	}
 
 	private static void setConcernProperties(Properties prop) {
 		malletTopicKeysFilename = prop.getProperty("topic_keys_file");
@@ -284,7 +222,6 @@ public class Config {
 			odemFile = prop.getProperty("odem_file");
 			groundTruthFile = prop.getProperty("ground_truth_file");
 			smellClustersFile = prop.getProperty("smell_clusters_file");
-			mojoTargetFile = prop.getProperty("mojo_target_file");
 			String preselectedRange = prop.getProperty("preselected_range");
 			if (preselectedRange != null) {
 				String[] tokens = preselectedRange.split(",");
@@ -324,9 +261,6 @@ public class Config {
 				logger.debug("start: " + startNumTopicsRange + ", " + "range: "
 						+ endNumTopicsRange + ", " + "step: " + rangeNumTopicsStep);
 			}
-			
-			expertDecompositionFile = prop.getProperty("expert_decomposition_file");
-			concernRecoveryFilePrefix = prop.getProperty("concern_recovery_file_prefix");
 
 			String currSimMeasureStr = prop.getProperty("sim_measure");
 			if (currSimMeasureStr != null) {
@@ -359,15 +293,12 @@ public class Config {
 					clusteringGranule = Granule.clazz;
 				}
 
-				excludedEntities = new ArrayList<String>();
-				String excludedEntitiesStr = prop
-						.getProperty("excluded_entities");
+				excludedEntities = new ArrayList<>();
+				String excludedEntitiesStr = prop.getProperty("excluded_entities");
 				if (excludedEntitiesStr != null) {
-					String[] excludedEntitiesArray = excludedEntitiesStr
-							.split(",");
-					for (String excludedEntity : excludedEntitiesArray) {
+					String[] excludedEntitiesArray = excludedEntitiesStr.split(",");
+					for (String excludedEntity : excludedEntitiesArray)
 						excludedEntities.add(excludedEntity.trim());
-					}
 				}
 			}
 			else {
@@ -392,27 +323,15 @@ public class Config {
 				}
 			}
 			
-			if (prop.getProperty(TME_METHOD ) != null) {
-				if (prop.getProperty(TME_METHOD).equals("var_mallet_file")) {
-					tmeMethod = TopicModelExtractionMethod.VAR_MALLET_FILE;
-				}
-				else if (prop.getProperty(TME_METHOD).equals("mallet_api")) {
-					tmeMethod = TopicModelExtractionMethod.MALLET_API;
-				}
-				else {
-					tmeMethod = TopicModelExtractionMethod.VAR_MALLET_FILE;
-				}
-			}
-			
 			if (prop.getProperty("src_dir") !=null) {
 				srcDir = FileUtil.tildeExpandPath(prop.getProperty("src_dir"));
 			}
 			
-			if (prop.getProperty(USE_FAST_FEATURE_VECTORS_FILE) != null) {
-				if (prop.getProperty(USE_FAST_FEATURE_VECTORS_FILE).equals("true")) {
+			if (prop.getProperty("use_fast_feature_vectors_file") != null) {
+				if (prop.getProperty("use_fast_feature_vectors_file").equals("true")) {
 					useFastFeatureVectorsFile = true;
 				}
-				else if (prop.getProperty(USE_FAST_FEATURE_VECTORS_FILE).equals("false")) {
+				else if (prop.getProperty("use_fast_feature_vectors_file").equals("false")) {
 					useFastFeatureVectorsFile = false;
 				}
 			}
@@ -437,19 +356,6 @@ public class Config {
 		return new String(buffer);
 	}
 
-	public static Map<String, String> getCurrProjMap() {
-		ClassValueMap.init();
-		if (proj.equals(Proj.LlamaChat)) {
-			return ClassValueMap.LlamaChatMap;
-		} else if (proj.equals(Proj.FreeCS)) {
-			return ClassValueMap.freecsMap;
-		} else if (proj.equals(Proj.GujChat)) {
-			return null;
-		} else {
-			return null;
-		}
-	}
-
 	public static boolean isMethodInSelectedPackages(SootMethod src) {
 		char leading = '<';
 		
@@ -462,15 +368,6 @@ public class Config {
 	}
 	
 	public static boolean isMethodInDeselectedPackages(SootMethod src) {
-		String leading = "<";
-
-		if (deselectedPkgsArray != null) {
-			for (String pkg : deselectedPkgsArray) {
-				if (src.toString().startsWith(leading + pkg))
-					return true;
-			}
-			return false;
-		}
 		return false;
 	}
 
@@ -483,53 +380,12 @@ public class Config {
 		t.freecsTMD.docTopicsFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/freecs/freecs-doc-topics.txt";
 		t.freecsTMD.topicKeysFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/freecs/freecs-topic-keys.txt";
 
-		String twoProjDocTopicsFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/LlamaChat_freecs/Llamachat_freecs-doc-topics.txt";
-		String twoProjTopicKeysFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/LlamaChat_freecs/Llamachat_freecs-topic-keys.txt";
-
 		String threeProjDocTopicsFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/threeChatServerSystems/threeChatServerSystems-doc-topics.txt";
 		String threeProjTopicKeysFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/threeChatServerSystems/threeChatServerSystems-topic-keys.txt";
 
-		if (Config.performingThreeProjectTest) {
-			t.currDocTopicsFilename = threeProjDocTopicsFilename;
-			t.currTopicKeysFilename = threeProjTopicKeysFilename;
-		} else if (Config.performingTwoProjectTest) {
-			t.currDocTopicsFilename = twoProjDocTopicsFilename;
-			t.currTopicKeysFilename = twoProjTopicKeysFilename;
-		} else if (Config.proj.equals(Proj.FreeCS)) {
-			t.currDocTopicsFilename = t.freecsTMD.docTopicsFilename;
-			t.currTopicKeysFilename = t.freecsTMD.topicKeysFilename;
-		} else if (Config.proj.equals(Proj.LlamaChat)) {
-			t.currDocTopicsFilename = t.LlamaChatTMD.docTopicsFilename;
-			t.currTopicKeysFilename =t. LlamaChatTMD.topicKeysFilename;
-		} else {
-			System.err
-					.println("Couldn't identiy the doc-topics and topic-keys files");
-			System.exit(1);
-		}
-
-		if (Config.proj.equals(Proj.GujChat))
-			t.datasetName = Config.gujChatStr;
-		else if (Config.proj.equals(Proj.LlamaChat))
-			t.datasetName = Config.llamaChatStr;
-		else if (Config.proj.equals(Proj.FreeCS))
-			t.datasetName = Config.freecsStr;
-		else if (Config.proj.equals(Proj.LCDClock))
-			t.datasetName = Config.lcdClockStr;
-		else if (Config.proj.equals(Proj.JEdit))
-			t.datasetName = Config.jeditStr;
-		else if (Config.proj.equals(Proj.Lucene1_9Final))
-			t.datasetName = Config.lucene1_9FinalStr;
-		else if (Config.proj.equals(Proj.OODT_Filemgr))
-			t.datasetName = Config.oodtFilemgrStr;
-		else if (Config.proj.equals(Proj.KLAX))
-			t.datasetName = Config.klaxStr;
-		else if (Config.proj.equals(Proj.Jigsaw))
-			t.datasetName = Config.jigsawStr;
-		else {
-			System.err
-					.println("Could not identify project string, so couldn't save to arff file");
-			System.exit(1);
-		}
+		t.currDocTopicsFilename = threeProjDocTopicsFilename;
+		t.currTopicKeysFilename = threeProjTopicKeysFilename;
+		t.datasetName = "oodt-filemgr";
 	}
 	
 	public static boolean isClassInSelectedPackages(String clazz) {	
@@ -545,24 +401,6 @@ public class Config {
 		return false;
 	}
 	
-	public static boolean isClassInDeselectedPackages(SootClass src) {
-		if (deselectedPkgsArray != null) {
-			for (String pkg : deselectedPkgsArray)
-				if (src.toString().startsWith(pkg)) return true;
-			return false;
-		}
-		return false;
-	}
-	
-	public static void setupSootClassPath() {	
-		logger.debug("original SOOT_CLASSPATH: " + Scene.v().getSootClassPath());
-		
-		Scene.v().setSootClassPath(sootClasspathStr);
-		
-		logger.debug("with correct classes.jar - SOOT_CLASSPATH: "
-			+ Scene.v().getSootClassPath());
-	}
-	
 	public static String getXMLFeatureVectorMapFilename() {
 		return DATADIR + File.separator + getCurrProjStr() + "_fvMap.xml"; }
 
@@ -574,9 +412,6 @@ public class Config {
 	
 	public static String getXMLClassGraphFilename() {
 		return DATADIR + File.separator + getCurrProjStr() + "_clg.xml"; }
-
-	public static String getSerializedClassGraphFilename() {
-		return DATADIR + File.separator + getCurrProjStr() +"_clg.data"; }
 	
 	public static String getSerializedClustersFilename() {
 		return DATADIR + File.separator + getCurrProjStr() +"_clusters.data"; }
@@ -586,9 +421,6 @@ public class Config {
 
 	public static String getMyCallGraphFilename() {
 		return DATADIR + File.separator + getCurrProjStr() + "_mycallgraph.data"; }
-
-	public static String getClassGraphFilename() {
-		return DATADIR + File.separator + Config.getCurrProjStr() + ".data"; }
 
 	public static String getClassesWithUsedMethodsFilename() {
 		return DATADIR + File.separator + Config.getCurrProjStr()
@@ -634,21 +466,6 @@ public class Config {
 		return DATADIR + File.separator + getCurrProjStr()
 			+ "_cluster_graph.xml";
 	}
-
-	public static String getTopicsFilename() {
-		return Config.getCurrProjFilenamePrefix() + "_" + Config.getNumTopics()
-			+ "_topics.mallet";
-	}
-	
-	public static String getDocTopicsFilename() {
-		return Config.getCurrProjFilenamePrefix() + "_" + Config.getNumTopics()
-			+ "_doc_topics.txt";
-	}
-	
-	public static String getTopWordsFilename() {
-		return Config.getCurrProjFilenamePrefix() + "_" + Config.getNumTopics()
-			+ "_top_words_per_topic.txt";
-	}
 	
 	public static String getClustersRSFFilename(int clustersSize) {
 		if (Config.currentClusteringAlgorithm.equals(ClusteringAlgorithmType.ARC)) {
@@ -666,16 +483,8 @@ public class Config {
 		}
 	}
 	
-	public static String getDetailedClustersRsfFilename() {
-		return Config.getCurrProjFilenamePrefix()
-			+ Config.stoppingCriterion.toString() + "_"
-			+ Config.currSimMeasure.toString() + "_" + Config.getNumClusters()
-			+ "_clusters.rsf";
-	}
-	
 	public static String getCurrProjFilenamePrefix() {
 		return DATADIR + File.separator + getCurrProjStr(); }
-
 
 	public static String getClassGraphDotFilename() {
 		return DATADIR + File.separator + getCurrProjStr() + "_class_graph.dot"; }
@@ -689,12 +498,6 @@ public class Config {
 	public static String getProjConfigFilename() {
 		return projConfigFilename; }
 
-	public static String getStopWordsFilename() {
-		return stopWordsFilename;	}
-	
-	public static String getMojoTargetFile() {
-		return mojoTargetFile; }
-
 	public static String getXMLFunctionDepGraphFilename() {
 		return DATADIR + File.separator + getCurrProjStr() + "_func_dep_graph.xml";
 	}
@@ -703,15 +506,9 @@ public class Config {
 
 	public static void setSelectedLanguage(Language inLang) {
 		selectedLanguage = inLang; }
-	
-	public void setMalletTopicKeysFilename(String filename) {
-		this.malletTopicKeysFilename = filename; }
 
 	public static String getMalletTopicKeysFilename() {
 		return malletTopicKeysFilename;	}
-
-	public void setMalletWordTopicCountsFilename(String filename ) {
-		this.malletWordTopicCountsFilename = filename; }
 	
 	public static String getMalletWordTopicCountsFilename() {
 		return malletWordTopicCountsFilename;	}
@@ -739,7 +536,6 @@ public class Config {
 			+ "_names_in_feature_set.data";
 	}
 
-
 	public static String getFastFeatureVectorsFilename() {
 		return DATADIR + File.separator + getCurrProjStr()
 			+ "_fast_feature_vectors.data";
@@ -754,7 +550,6 @@ public class Config {
 		return DATADIR + File.separator + "internal_clusters" + File.separator 
 				+ getCurrProjStr() + "_" + cleanClusterName + "_internal_cluster_graph.dot";
 	}
-
 	
 	public static String getGroundTruthRsfFilename() {
 		return DATADIR + File.separator + getCurrProjStr() + "_ground_truth.rsf";
@@ -771,39 +566,13 @@ public class Config {
 	public static String getPkgBasedGroundTruthClusterGraphDotFilename() {
 		return DATADIR + File.separator + getCurrProjStr() + "_pkg_based_ground_truth_cluster_graph.dot";
 	}
-
-	public static String getTopicsPrecisionRecallCSVFilename(int numClusters) {
-		return Config.getCurrProjFilenamePrefix() + numClusters + "_clusters_topics_pr.csv";
-	}
-
-	public static String getExpertDecompositionFile() {
-		return expertDecompositionFile;
-	}
-
-	public static String getConcernRecoveryFilePrefix() {
-		return concernRecoveryFilePrefix;
-	}
-
-	public static String getMojoWithTopicsCSVFilename(int numClusters) {
-		return Config.getCurrProjFilenamePrefix() + numClusters + "_clusters_and_topics_mojo.csv";
-	}
 	
 	public static String getMojoToAuthCSVFilename(List<Integer> numClustersList, String selectedAlg, String simMeasure) {
 		return Config.getCurrProjFilenamePrefix() + numClustersList.get(0) + "-" + numClustersList.get(numClustersList.size()-1) + "_" + selectedAlg  + "_" + simMeasure + "_clusters_mojo.csv";
 	}
-	
-	public static String getMojoToNextCSVFilename(List<Integer> numClustersList, String selectedAlg, String simMeasure) {
-		return Config.getCurrProjFilenamePrefix() + numClustersList.get(0) + "-" + numClustersList.get(numClustersList.size()-1) + "_" + selectedAlg  + "_" + simMeasure + "_clusters_mojo_next.csv";
-	}
-
-	public static String getPrecisionRecallCSVFilename(
-			List<Integer> numClustersList) {
-		return Config.getCurrProjFilenamePrefix() + numClustersList.get(0) + "-" + numClustersList.get(numClustersList.size()-1) + "_clusters_pr.csv";
-	}
 
 	public static void setClustersToWriteList(List<Integer> inClustersToWriteList) {
 		clustersToWriteList  = inClustersToWriteList;
-		
 	}
 
 	public static List<Integer> getClustersToWriteList() {

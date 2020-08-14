@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.clustering;
 
 /**
  * @author joshua
- *
  */
 public class SimMeasureComparator {
 	Cluster refCluster = null;

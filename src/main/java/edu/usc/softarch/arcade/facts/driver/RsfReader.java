@@ -141,7 +141,7 @@ public class RsfReader {
 		return facts;
 	}
 	
-	public static void writeFilteredFactsToFile() {
+	private static void writeFilteredFactsToFile() {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 
@@ -297,10 +297,6 @@ public class RsfReader {
 			).iterator();
 	}
 
-	public static void setupLogging() {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
-	}
-
 	public static void performPreClusteringTasks()
 			throws ParserConfigurationException, TransformerException {
 		Config.setSelectedLanguage(Language.c);
@@ -322,7 +318,7 @@ public class RsfReader {
 		return graph;
 	}
 
-	public static void writeXMLTypedEdgeDepGraph(Iterable<List<String>> filteredFacts)
+	private static void writeXMLTypedEdgeDepGraph(Iterable<List<String>> filteredFacts)
 			throws ParserConfigurationException, TransformerException {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		  DocumentBuilder docBuilder = docFactory.newDocumentBuilder();

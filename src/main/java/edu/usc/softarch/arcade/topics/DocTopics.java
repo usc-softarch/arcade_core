@@ -22,7 +22,6 @@ import cc.mallet.pipe.TokenSequenceRemoveStopwords;
 import cc.mallet.topics.TopicInferencer;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
-import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -44,10 +43,10 @@ public class DocTopics {
 		}
 	}
 	
-	public DocTopics(String srcDir, String artifactsDir, int numTopics, String topicModelFilename, String docTopicsFilename, String topWordsFilename) throws Exception {
+	public DocTopics(String srcDir, String artifactsDir) throws Exception {
 		// Begin by importing documents from text to feature sequences
-		ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
-		numTopics =100;
+		List<Pipe> pipeList = new ArrayList<>();
+		int numTopics = 100;
 		// Pipes: alphanumeric only, camel case separation, lowercase, tokenize,
 		// remove stopwords english, remove stopwords java, stem, map to
 		// features
@@ -143,10 +142,9 @@ public class DocTopics {
 	
 	public DocTopicItem getDocTopicItemForJava(String name) {
 		for (DocTopicItem dti : dtItemList) {
-			String altName = name.replaceAll("/", ".").replaceAll(".java", "").trim();
-			if (dti.source.endsWith(name) || altName.equals(dti.source.trim())) {
+			String altName = name.replace("/", ".").replace(".java", "").trim();
+			if (dti.source.endsWith(name) || altName.equals(dti.source.trim()))
 				return dti;
-			}
 		}
 		return null;
 	}
@@ -157,27 +155,23 @@ public class DocTopics {
 			String nameWithoutQuotations = null;
 			if (dti.source.endsWith(".func")) {
 				strippedSource = dti.source.substring(dti.source.lastIndexOf('/')+1,dti.source.lastIndexOf(".func"));
-				nameWithoutQuotations = name.replaceAll("\"", "");
-				if (strippedSource.contains(nameWithoutQuotations)) {
+				nameWithoutQuotations = name.replace("\"", "");
+				if (strippedSource.contains(nameWithoutQuotations))
 					return dti;
-				}
 			} else if (dti.source.endsWith(".c") || dti.source.endsWith(".h")
 					|| dti.source.endsWith(".tbl") || dti.source.endsWith(".p")
 					|| dti.source.endsWith(".cpp") || dti.source.endsWith(".s")
-					|| dti.source.endsWith(".hpp")
-					|| dti.source.endsWith(".icc")
+					|| dti.source.endsWith(".hpp") || dti.source.endsWith(".icc")
 					|| dti.source.endsWith(".ia")) {
-				nameWithoutQuotations = name.replaceAll("\"", "");
-				if (dti.source.endsWith(nameWithoutQuotations)) {
+				nameWithoutQuotations = name.replace("\"", "");
+				if (dti.source.endsWith(nameWithoutQuotations))
 					return dti;
-				}
 			}
 			else if (dti.source.endsWith(".S")) {
 				String dtiSourceRenamed = dti.source.replace(".S", ".c");
-				nameWithoutQuotations = name.replaceAll("\"", "");
-				if (dtiSourceRenamed.endsWith(nameWithoutQuotations)) {
+				nameWithoutQuotations = name.replace("\"", "");
+				if (dtiSourceRenamed.endsWith(nameWithoutQuotations))
 					return dti;
-				}
 			}
 		}
 		logger.error("Cannot find doc topic for: " + name);
@@ -220,15 +214,12 @@ public class DocTopics {
 				}
 			}
 			dtItemList.add(dtItem);
-			if (Constants._DEBUG)
-				logger.debug(line);
+			logger.debug(line);
 		}
 		
-		if (Constants._DEBUG)
-			logger.debug("\n");
+		logger.debug("\n");
 		for (DocTopicItem dtItem : dtItemList) {
-			if (Constants._DEBUG)
-				logger.debug(dtItem);
+			logger.debug(dtItem);
 		}
 	}	
 }

@@ -1,17 +1,8 @@
 package edu.usc.softarch.arcade;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -23,23 +14,15 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.xml.sax.SAXException;
 
-import edu.usc.softarch.arcade.antipattern.detection.ADADetector;
-import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.ClusteringEngine;
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.config.datatypes.RunType;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 /**
  * @author joshua
  */
 public class DriverEngine {
-
-	private static ArrayList<Cluster> clusters = null;
-	
 	private static Logger logger = Logger.getLogger(DriverEngine.class);
 
 	/**
@@ -83,18 +66,12 @@ public class DriverEngine {
 		
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 
-		if (Config.runType.equals(RunType.whole)) {
-			run();
-		} else {
-			logger.error("Cannot determine run type");
-		}
+		run();
 	}
 
 	public static void run() throws Exception {
-
 		Config.initConfigFromFile(Config.getProjConfigFilename());
 
-		File clustersFile = new File(Config.getSerializedClustersFilename());
 		File fastFeatureVectorsFile = new File(
 				Config.getFastFeatureVectorsFilename());
 
@@ -104,142 +81,54 @@ public class DriverEngine {
 			RsfReader.performPreClusteringTasks();
 		}
 
-		if (Config.enableClustering) {
-			if (!clustersFile.exists()
-					|| fastFeatureVectorsFile.exists()
-					|| Config.forceClustering) {
-				System.out.println("Performing clustering tasks...");
+		System.out.println("Performing clustering tasks...");
 
-				// Common setup for clustering
-				int clustersToStop = Config.getStartNumClustersRange();
-				logger.debug("clustersToStop: " + clustersToStop);
-				System.out.println("Stopping using " + Config.stoppingCriterion
-						+ " criterion...");
-				System.out.println("Will stop at " + clustersToStop
-						+ " clusters...");
-				System.out.println("Using "
-						+ Config.getCurrentClusteringAlgorithm()
-						+ " clustering algorithm...");
-				System.out.println("Using " + Config.getCurrSimMeasure()
-						+ " as the similarity measure...");
-				Config.setNumClusters(clustersToStop);
-				// end common setup for clustering
+		// Common setup for clustering
+		int clustersToStop = Config.getStartNumClustersRange();
+		logger.debug("clustersToStop: " + clustersToStop);
+		System.out.println("Stopping using " + Config.stoppingCriterion
+				+ " criterion...");
+		System.out.println("Will stop at " + clustersToStop
+				+ " clusters...");
+		System.out.println("Using "
+				+ Config.getCurrentClusteringAlgorithm()
+				+ " clustering algorithm...");
+		System.out.println("Using " + Config.getCurrSimMeasure()
+				+ " as the similarity measure...");
+		Config.setNumClusters(clustersToStop);
+		// end common setup for clustering
 
-				if (Config.isUsingPreselectedRange()) {
-					List<Integer> clustersToWriteList = new ArrayList<>();
+		if (Config.isUsingPreselectedRange()) {
+			List<Integer> clustersToWriteList = new ArrayList<>();
 
-					for (int clustersToWrite = Config
-							.getStartNumClustersRange(); clustersToWrite <= Config
-							.getEndNumClustersRange(); clustersToWrite += Config
-							.getRangeNumClustersStep()) {
-						clustersToWriteList.add(clustersToWrite);
-					}
-
-					Config.setClustersToWriteList(clustersToWriteList);
-
-					if (Config.isUsingNumTopicsRange()) {
-						List<Integer> numTopicsList = new ArrayList<>();
-						for (int numTopics = Config.getStartNumTopicsRange(); numTopics <= Config
-								.getEndNumTopicsRange(); numTopics += Config
-								.getRangeNumTopicsStep()) {
-							logger.debug("numTopics: " + numTopics);
-							System.out.println("Clustering using " + numTopics
-									+ " topics...");
-							numTopicsList.add(numTopics);
-						}
-						Config.setNumTopicsList(numTopicsList);
-					}
-
-				}
-
-				ClusteringEngine ce = new ClusteringEngine();
-				ce.run();
+			for (int clustersToWrite = Config
+					.getStartNumClustersRange(); clustersToWrite <= Config
+					.getEndNumClustersRange(); clustersToWrite += Config
+					.getRangeNumClustersStep()) {
+				clustersToWriteList.add(clustersToWrite);
 			}
+
+			Config.setClustersToWriteList(clustersToWriteList);
+
+			if (Config.isUsingNumTopicsRange()) {
+				List<Integer> numTopicsList = new ArrayList<>();
+				for (int numTopics = Config.getStartNumTopicsRange(); numTopics <= Config
+						.getEndNumTopicsRange(); numTopics += Config
+						.getRangeNumTopicsStep()) {
+					logger.debug("numTopics: " + numTopics);
+					System.out.println("Clustering using " + numTopics
+							+ " topics...");
+					numTopicsList.add(numTopics);
+				}
+				Config.setNumTopicsList(numTopicsList);
+			}
+
 		}
 
-		if (Config.enablePostClusteringTasks) {
-			System.out.println("Running post-clustering tasks...");
-			runPostClusteringTasksUsingClusterFile();
-		}
+		ClusteringEngine ce = new ClusteringEngine();
+		ce.run();
 
 		System.out.println("Exiting...");
 
-	}
-
-	private static void runPostClusteringTasksUsingClusterFile() throws IOException,
-			ClassNotFoundException, SAXException, ParserConfigurationException, TransformerException {
-		boolean enableSplitClusters = false;
-		boolean enablePrintSplitClusters = true;
-		boolean enableSmellDetection = false;
-		
-		deserializeClusters();
-		logger.debug("Pre-computed clusters: ");
-		logger.debug(clusters);
-		
-		logger.debug("Pretty printing deserialized clusters: ");
-		ClusterUtil.prettyPrintSplitClusters(clusters);
-
-		if (enableSplitClusters) {
-			List<Cluster> splitClusters = ClusterUtil
-					.splitClusters(clusters);
-
-			if (enablePrintSplitClusters) {
-				logger.debug("In "
-						+ Thread.currentThread().getStackTrace()[1]
-								.getClassName()
-						+ "."
-						+ Thread.currentThread().getStackTrace()[1]
-								.getMethodName() + ", printing split clusters");
-				ClusterUtil.printItemsInClusters(splitClusters);
-				logger.debug("Pretty printing splitclusters: ");
-				ClusterUtil.prettyPrintSplitClusters(splitClusters);
-			}
-		}
-
-		if (enableSmellDetection)
-			ADADetector.runSmellDetectionAlgorithms(clusters);
-	}
-	private static void deserializeClusters() {
-		ObjectInputStream in = null;
-		String filename = Config.getSerializedClustersFilename();
-		logger.debug("Will try to deserialize from file " + filename);
-		try (FileInputStream fis = new FileInputStream(filename)) {
-			in = new ObjectInputStream(fis);
-			logger.debug("Reading in serialized clusters...");
-			int clustersSize = in.readInt();
-			Cluster c = null;
-			clusters = new ArrayList<>();
-			for (int i = 0; i < clustersSize; i++) {
-				c = (Cluster) in.readObject();
-				clusters.add(c);
-			}
-			logger.debug("Closing serialized cluster file...");
-			in.close();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} catch (ClassNotFoundException ex) {
-			ex.printStackTrace();
-		}
-		
-		for (Cluster c : clusters) {
-			c.preparePriorityQueue();
-		}
-
-	}
-
-	public static void redirectSystemErr(String stdErrFilename) {
-		try {
-			System.setErr(new PrintStream(new FileOutputStream(stdErrFilename)));
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
-	}
-
-	public static void redirectSystemOut(String stdOutFilename) {
-		try {
-			System.setOut(new PrintStream(new FileOutputStream(stdOutFilename)));
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
 	}
 }

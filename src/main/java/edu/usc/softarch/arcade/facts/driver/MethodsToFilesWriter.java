@@ -32,12 +32,8 @@ import org.w3c.dom.NodeList;
 import edu.usc.softarch.arcade.config.Config;
 
 public class MethodsToFilesWriter {
+	private static Logger logger = Logger.getLogger(MethodsToFilesWriter.class);
 
-	static Logger logger = Logger.getLogger(MethodsToFilesWriter.class);
-	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 		
@@ -45,9 +41,9 @@ public class MethodsToFilesWriter {
 		String langKeywordsFilename = args[1];
 		String malletInstancesFilename = args[2];
 		
-		Map<String,String> methodToContentMap = new HashMap<String,String>();
+		Map<String,String> methodToContentMap = new HashMap<>();
 		
-		Set<String> langKeywords = new HashSet<String>();
+		Set<String> langKeywords = new HashSet<>();
 		try (BufferedReader in = new BufferedReader(new FileReader(langKeywordsFilename))) {
 			String word = null;
 			while ((word = in.readLine()) != null) {
@@ -61,12 +57,10 @@ public class MethodsToFilesWriter {
 		}
 		
 		extractMethodInfo(fileName, methodToContentMap);
+		Charset charset = StandardCharsets.UTF_8;
+		Path path = Paths.get(malletInstancesFilename);
 
-		try {
-			Charset charset = StandardCharsets.UTF_8;
-			Path path = Paths.get(malletInstancesFilename);
-			BufferedWriter out = Files.newBufferedWriter(path, charset);
-
+		try (BufferedWriter out = Files.newBufferedWriter(path, charset)) {
 			for (Entry<String, String> entry : methodToContentMap.entrySet()) {
 				String methodNameNoSpaces = entry.getKey();
 				String methodContentClean = entry.getValue();

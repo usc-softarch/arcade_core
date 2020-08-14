@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import edu.usc.softarch.arcade.callgraph.MyClass;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.topics.TopicUtil;
@@ -15,6 +18,7 @@ import edu.usc.softarch.arcade.util.ExtractionContext;
  * @author joshua
  */
 public class Cluster extends FeatureVector {
+	private static final Logger logger = LogManager.getLogger(Cluster.class);
 	private static final long serialVersionUID = -5521307722955232634L;
 	public Set<FeatureVector> items = new HashSet<>();
 	public List<Cluster> leafClusters = new ArrayList<>();
@@ -28,9 +32,6 @@ public class Cluster extends FeatureVector {
 	public Cluster right = null;
 	
 	public double simLeftRight = 0;
-	
-	public boolean DEBUG = false;
-	
 	public String type;
 	
 	
@@ -68,24 +69,19 @@ public class Cluster extends FeatureVector {
 					this.left, this.right);
 		}
 		setFeatureVectorAndName(left);
-		if (DEBUG) {
-			System.out.println("Set feature vector of left in Cluster constructor: " + this.toBinaryForm());
-		}
+		logger.debug("Set feature vector of left in Cluster constructor: " + this.toBinaryForm());
 		if (Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.WCA) || Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC) )
 			addClusterUsingWCAMerge(right);
-		if (DEBUG) {
-			System.out.println("Added feature vector of right in Cluster constructor: " + this.toBinaryForm());
-			if (this.equals(this.left)) {
-				System.out.println("this is equal to left");
-			} else {
-				System.out.println("this is not equal to left");
-			}
+		logger.debug("Added feature vector of right in Cluster constructor: " + this.toBinaryForm());
+		if (this.equals(this.left))
+			logger.debug("this is equal to left");
+		else
+			logger.debug("this is not equal to left");
 
-			System.out.println(this.name + ":");
-			System.out.println(this.toBinaryForm());
-			System.out.println(this.name + "'s left: " + this.left);
-			System.out.println(this.left.toBinaryForm());
-		}
+		logger.debug(this.name + ":");
+		logger.debug(this.toBinaryForm());
+		logger.debug(this.name + "'s left: " + this.left);
+		logger.debug(this.left.toBinaryForm());
 		
 		preparePriorityQueue();
 	}
@@ -109,11 +105,8 @@ public class Cluster extends FeatureVector {
 		
 		this.clear();
 		this.addAll(copyFV);
-		if (DEBUG) {
-			System.out.println("In "
-					+ ExtractionContext.getCurrentClassAndMethodName() + ": "
-					+ itemsToString());
-		}
+		logger.debug("In " + ExtractionContext.getCurrentClassAndMethodName() + ": "
+				+ itemsToString());
 		this.name = itemsToString();
 	}
 	
@@ -169,12 +162,10 @@ public class Cluster extends FeatureVector {
 	private void plainCAMerge(FeatureVector inFV) {
 		for (Feature f1 : this) {
 			for (Feature f2 : inFV) {
-				if (DEBUG) {
-					System.out.println("f1.edge.tgtStr: " + f1.edge.tgtStr);
-					System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
-					System.out.println("f1.value : " + f1.value);
-					System.out.println("f2.value : " + f2.value);
-				}
+				logger.debug("f1.edge.tgtStr: " + f1.edge.tgtStr);
+				logger.debug("f2.edge.tgtStr: " + f2.edge.tgtStr);
+				logger.debug("f1.value : " + f1.value);
+				logger.debug("f2.value : " + f2.value);
 				if (f1.edge.tgtStr.equals(f2.edge.tgtStr) && (f1.value == 1 || f2.value == 1)) {
 					if (f1.value == 1)
 						f1.edge.srcStr = f1.edge.srcStr;
@@ -252,7 +243,6 @@ public class Cluster extends FeatureVector {
 
 	public void clearPriorityQueue() {
 		clusterSimQueue.clear();
-
 	}
 
 	public Set<MyClass> getClasses() {

@@ -46,9 +46,6 @@ public class DominatorGroundTruthAnalyzer {
 		}
 	};
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 		

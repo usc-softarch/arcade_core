@@ -60,9 +60,6 @@ public class FlatDecompositionBuilder {
 	public static void main(String[] args) {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 
-		// String filename = "data/generated/generated_tree_5mc_5mh.rsf";
-		// String filename =
-		// "/home/joshua/recovery/Expert Decompositions/linux.Nested.Autho#254C003D.rsf";
 		String nestedFilename = "";
 		String flatFilename = "";
 		FlatDecompType fdt = FlatDecompType.compact;
@@ -70,10 +67,7 @@ public class FlatDecompositionBuilder {
 		
 		Options options = new Options();
 		
-		
-		
 		Option help = new Option( "help", "print this message" );
-		Option visualizeOption = new Option( "visualize", "show visualization of tree" );
 		Option nestedFilenameOption = OptionBuilder.withArgName( "file" )
                 .hasArg()
                 .withDescription(  "nested file to flatten" )

@@ -26,7 +26,7 @@ import edu.usc.softarch.arcade.util.LogUtil;
 import edu.usc.softarch.arcade.util.MapUtil;
 
 public class SmellToIssuesCorrelation {
-	static Logger logger = Logger.getLogger(SmellToIssuesCorrelation.class);
+	private static Logger logger = Logger.getLogger(SmellToIssuesCorrelation.class);
 
 	public static void main(String[] args) throws FileNotFoundException {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
@@ -117,7 +117,5 @@ public class SmellToIssuesCorrelation {
 		
 		SpearmansCorrelation spearmans = new SpearmansCorrelation();
 		System.out.println("Spearman's correlation: " + spearmans.correlation(smellCountsArr, issueCountsArr));
-
 	}
-
 }

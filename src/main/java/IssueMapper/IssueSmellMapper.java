@@ -1,14 +1,12 @@
 package IssueMapper;
 
 import java.util.HashSet;
-//import java.util.Scanner;
 import java.util.Set;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import util.Config;
-import util.Constant;
 import util.JSONUtil;
 import util.StringUtil;
 
@@ -22,7 +20,6 @@ public class IssueSmellMapper {
 	static Config projectConfig = null;
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		projectName = globalConfig.getValue("project");
 		projectConfig = new Config("config/" + projectName + ".properties");
 		
@@ -101,53 +98,31 @@ public class IssueSmellMapper {
 							tmpSmell = (JSONObject) file.get("smells");
 							int tmpSmellNum = Integer.parseInt(smellPerVersion
 									.get("bco").toString());
-							if (tmpSmellNum != 0) {
+							if (tmpSmellNum != 0)
 								tmpSmell.put("Concern_Overload", tmpSmellNum);
-							}
-							// exclude dependency cycle for now
-							// tmpSmellNum = Integer.parseInt(smellPerVersion
-							// .get("bdc").toString());
-							//	if (tmpSmellNum != 0) {
-							//		tmpSmell.put("Dependency_Cycle", tmpSmellNum);
-							//	}
 							
 							tmpSmellNum = Integer.parseInt(smellPerVersion.get(
 									"buo").toString());
-							if (tmpSmellNum != 0) {
+							if (tmpSmellNum != 0)
 								tmpSmell.put("Link_Overload", tmpSmellNum);
-							}
 							tmpSmellNum = Integer.parseInt(smellPerVersion.get(
 									"spf").toString());
-							if (tmpSmellNum != 0) {
-								tmpSmell.put(
-										"Scattered_Parasitic_Functionality",
-										tmpSmellNum);
-							}
+							if (tmpSmellNum != 0)
+								tmpSmell.put("Scattered_Parasitic_Functionality",	tmpSmellNum);
 						} else {
 							tmpSmell = new JSONObject();
 							int tmpSmellNum = Integer.parseInt(smellPerVersion
 									.get("bco").toString());
-							if (tmpSmellNum != 0) {
+							if (tmpSmellNum != 0)
 								tmpSmell.put("Concern_Overload", tmpSmellNum);
-							}
-							// exclude dependency cycle for now
-							// tmpSmellNum = Integer.parseInt(smellPerVersion
-							// .get("bdc").toString());
-							//	if (tmpSmellNum != 0) {
-							//		tmpSmell.put("Dependency_Cycle", tmpSmellNum);
-							//	}
-							tmpSmellNum = Integer.parseInt(smellPerVersion.get(
-									"buo").toString());
-							if (tmpSmellNum != 0) {
+							tmpSmellNum = Integer.parseInt(
+								smellPerVersion.get("buo").toString());
+							if (tmpSmellNum != 0)
 								tmpSmell.put("Link_Overload", tmpSmellNum);
-							}
 							tmpSmellNum = Integer.parseInt(smellPerVersion.get(
 									"spf").toString());
-							if (tmpSmellNum != 0) {
-								tmpSmell.put(
-										"Scattered_Parasitic_Functionality",
-										tmpSmellNum);
-							}
+							if (tmpSmellNum != 0)
+								tmpSmell.put("Scattered_Parasitic_Functionality",	tmpSmellNum);
 							file.put("smells", tmpSmell);
 						}
 					}
@@ -158,7 +133,7 @@ public class IssueSmellMapper {
 	}
 
 	public static Set<String> getDirectoryPrefix() {
-		Set<String> prefixs = new HashSet<String>();
+		Set<String> prefixs = new HashSet<>();
 		for (int i = 0; i < issues.size(); i++) {
 			JSONObject issue = (JSONObject) issues.get(i);
 			JSONArray commits = (JSONArray) issue.get("commits");

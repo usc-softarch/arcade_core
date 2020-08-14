@@ -1,11 +1,8 @@
 package edu.usc.softarch.arcade.util.graph;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -40,9 +37,7 @@ public class NestedArchToGraphMLConverter {
 		Map<String,Set<String>> clusterMap = ClusterUtil.buildClusterMap(clusterFacts);
 
 		try {
-
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
 			// root elements
@@ -126,9 +121,6 @@ public class NestedArchToGraphMLConverter {
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 			DOMSource source = new DOMSource(doc);
 			StreamResult result = new StreamResult(new File(graphMLFilename));
-	 
-			// Output to console for testing
-			// StreamResult result = new StreamResult(System.out);
 	 
 			transformer.transform(source, result);
 	 

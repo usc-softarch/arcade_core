@@ -1,7 +1,6 @@
 package edu.usc.softarch.arcade;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
@@ -20,11 +19,11 @@ import edu.usc.softarch.arcade.util.FileUtil;
 public class PkgsWithSmellDetection {
 	private static Logger logger = Logger.getLogger(PkgsWithSmellDetection.class);
 	
-	public static void main(String[] args) throws IOException  {
+	public static void main(String[] args) {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 		
 		PkgsWithSmellDetectionOptions psdOptions = new PkgsWithSmellDetectionOptions();
-		JCommander jcmd = new JCommander(psdOptions);;
+		JCommander jcmd = new JCommander(psdOptions);
 		
 		try {
 			jcmd.parse(args); 

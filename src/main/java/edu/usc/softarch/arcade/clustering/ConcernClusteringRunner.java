@@ -146,7 +146,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		}
 		else if (tmeMethod == TopicModelExtractionMethod.MALLET_API) {
 			try {
-				TopicUtil.docTopics = new DocTopics(srcDir,artifactsDir,numTopics,topicModelFilename,docTopicsFilename,topWordsFilename);
+				TopicUtil.docTopics = new DocTopics(srcDir,artifactsDir);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

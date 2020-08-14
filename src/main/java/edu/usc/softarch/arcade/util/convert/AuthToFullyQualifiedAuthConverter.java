@@ -13,11 +13,6 @@ import com.google.common.base.Joiner;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class AuthToFullyQualifiedAuthConverter {
-
-	/**
-	 * @param args
-	 */
-
 	public static void main(String[] args) {
 		String clustersFilename = args[0];
 		String depsRsfFilename = args[1];
@@ -66,8 +61,7 @@ public class AuthToFullyQualifiedAuthConverter {
 		System.out.println("List of entities not a source or target:");
 		System.out.println(Joiner.on("\n").join(unmatchedEntities));
 		
-		try {
-			FileWriter out = new FileWriter(fullyQualifiedGroundTruthFilename);
+		try (FileWriter out = new FileWriter(fullyQualifiedGroundTruthFilename)) {
 			for (String clusterName : clusterMap.keySet()) {
 				for (String entity : clusterMap.get(clusterName)) {
 					for (String matchingClass : matchingClassesMap.get(entity)) {
@@ -75,7 +69,6 @@ public class AuthToFullyQualifiedAuthConverter {
 					}
 				}
 			}
-			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -101,12 +94,10 @@ public class AuthToFullyQualifiedAuthConverter {
 
 					if (entity.trim().equals(sourceClassNameOnly) || entity.trim().equals(targetClassNameOnly) ) {
 						String matchingClass = null;
-						if (entity.trim().equals(sourceClassNameOnly)) {
+						if (entity.trim().equals(sourceClassNameOnly))
 							matchingClass = source;
-						}
-						else {
+						else
 							matchingClass = target;
-						}
 
 						if (matchingClassesMap.get(entity) == null) {
 							Set<String> classes = new HashSet<>();

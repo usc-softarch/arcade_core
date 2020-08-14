@@ -44,8 +44,7 @@ public class C2C2CSV {
 					while (!(sCurrentLine = br.readLine()).equals("")) {
 					}
 					sCurrentLine = br.readLine();
-				} else
-					continue;
+				}
 			}
 			br.close();
 		} catch (IOException ex) {

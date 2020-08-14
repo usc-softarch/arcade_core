@@ -1,14 +1,9 @@
 package edu.usc.softarch.arcade.topics;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -23,7 +18,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import cc.mallet.util.Maths;
-import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.Entity;
 import edu.usc.softarch.arcade.clustering.FastCluster;
@@ -37,7 +31,6 @@ import edu.usc.softarch.arcade.util.DebugUtil;
  * @author joshua
  */
 public class TopicUtil {
-	
 	public static DocTopics docTopics;
 	private static Logger logger = Logger.getLogger(TopicUtil.class);
 	
@@ -97,22 +90,20 @@ public class TopicUtil {
 		}
 		
 		divergence = .5*( klDivergence(sortedP,sortedQ) + klDivergence(sortedQ,sortedP) );
-		if (Constants._DEBUG) {
-			logger.debug("P distribution values: ");
-			for (int i = 0; i < sortedP.length; i++) {
-				System.out.format("%.3f,", sortedP[i]);
-			}
-			logger.debug("\n");
-
-			logger.debug("Q distribution values: ");
-			for (int i = 0; i < sortedQ.length; i++) {
-				System.out.format("%.3f,", sortedQ[i]);
-			}
-			logger.debug("\n");
-
-			logger.debug("Symmetric Kullback Leibler Divergence: "
-					+ divergence);
+		logger.debug("P distribution values: ");
+		for (int i = 0; i < sortedP.length; i++) {
+			System.out.format("%.3f,", sortedP[i]);
 		}
+		logger.debug("\n");
+
+		logger.debug("Q distribution values: ");
+		for (int i = 0; i < sortedQ.length; i++) {
+			System.out.format("%.3f,", sortedQ[i]);
+		}
+		logger.debug("\n");
+
+		logger.debug("Symmetric Kullback Leibler Divergence: "
+				+ divergence);
 		
 		return divergence;
 	}
@@ -141,23 +132,21 @@ public class TopicUtil {
 
 		divergence = Maths.jensenShannonDivergence(sortedP, sortedQ);
 		
-		if (Constants._DEBUG) {
-			logger.debug("P distribution values: ");
-			for (int i = 0; i < sortedP.length; i++) {
-				System.out.format("%.3f,", sortedP[i]);
-			}
-			logger.debug("\n");
-
-			logger.debug("Q distribution values: ");
-			for (int i = 0; i < sortedQ.length; i++) {
-				System.out.format("%.3f,", sortedQ[i]);
-			}
-			logger.debug("\n");
-
-			logger.debug("Jensen Shannon Divergence: " + divergence);
-			logger.debug("Symmetric Kullback Leibler Divergence: "
-					+ symmKLDivergence(pDocTopicItem, qDocTopicItem));
+		logger.debug("P distribution values: ");
+		for (int i = 0; i < sortedP.length; i++) {
+			System.out.format("%.3f,", sortedP[i]);
 		}
+		logger.debug("\n");
+
+		logger.debug("Q distribution values: ");
+		for (int i = 0; i < sortedQ.length; i++) {
+			System.out.format("%.3f,", sortedQ[i]);
+		}
+		logger.debug("\n");
+
+		logger.debug("Jensen Shannon Divergence: " + divergence);
+		logger.debug("Symmetric Kullback Leibler Divergence: "
+				+ symmKLDivergence(pDocTopicItem, qDocTopicItem));
 		
 		return divergence;
 	}
@@ -207,20 +196,6 @@ public class TopicUtil {
 		}
 		return topicKeys;
 	}
-
-	public static Set<String> getStopWordSet() throws IOException {
-		File f = new File(Config.getStopWordsFilename());
-		
-		BufferedReader input =  new BufferedReader(new FileReader(f));
-		
-		HashSet<String> stopWordsSet = new HashSet<String>();
-		String line;
-		while ((line = input.readLine()) != null) {
-			stopWordsSet.add(line.trim());
-		}
-		
-		return stopWordsSet;
-	}
 	
 	public static TopicKeySet getTopicKeyListForCurrProj() throws FileNotFoundException {
 		return new TopicKeySet(Config.getMalletTopicKeysFilename());
@@ -251,16 +226,6 @@ public class TopicUtil {
 		}
 		return docTopics;
 	}
-	
-	public static DocTopics getDocTopicsFromHardcodedDocTopicsFile() {
-		DocTopics docTopics = null;
-		try {
-			docTopics = new DocTopics("/home/joshua/ser/subject_systems/archstudio4/archstudio4-550-doc-topics.txt");
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
-		return docTopics;
-	}
 
 	public static DocTopics getDocTopicsFromVariableMalletDocTopicsFile() {
 		DocTopics docTopics = null;
@@ -282,26 +247,20 @@ public class TopicUtil {
 			String anonInnerClassRegExpr = ".*\\$\\D.*";
 			if (Pattern.matches(anonInnerClassRegExpr,
 					strippedLeafClassName)) {
-				if (Constants._DEBUG)
-					logger.debug("\t\tfound inner class: "
-						+ strippedLeafClassName);
+				logger.debug("\t\tfound inner class: " + strippedLeafClassName);
 				
 				strippedLeafClassName = strippedLeafClassName.substring(
 						strippedLeafClassName.lastIndexOf('$') + 1,
 						strippedLeafClassName.length());
 				
-				if (Constants._DEBUG)
-					logger.debug("\t\tstripped to name to: "
-						+ strippedLeafClassName);
+				logger.debug("\t\tstripped to name to: " + strippedLeafClassName);
 			}
 		}
 		
-		if (Constants._DEBUG)
-			logger.debug("\t" + strippedLeafClassName);
+		logger.debug("\t" + strippedLeafClassName);
 		leaf.docTopicItem = docTopics
 				.getDocTopicItemForJava(strippedLeafClassName);
-		if (Constants._DEBUG)
-			logger.debug("\t" + "doc-topic: " + leaf.docTopicItem);
+		logger.debug("\t" + "doc-topic: " + leaf.docTopicItem);
 	}
 	
 	/** pretty much the same method as above, except uses Entities instead
@@ -319,22 +278,16 @@ public class TopicUtil {
 			if (strippedLeafClassName.contains(dollarSign)) {
 				String anonInnerClassRegExpr = ".*\\$\\D.*";
 				if (Pattern.matches(anonInnerClassRegExpr, strippedLeafClassName)) {
-					if (Constants._DEBUG)
-						logger.debug("\t\tfound inner class: "
-								+ strippedLeafClassName);
+					logger.debug("\t\tfound inner class: " + strippedLeafClassName);
 
 					strippedLeafClassName = strippedLeafClassName.substring(
 							strippedLeafClassName.lastIndexOf('$') + 1,
 							strippedLeafClassName.length());
 
-					if (Constants._DEBUG)
-						logger.debug("\t\tstripped to name to: "
-								+ strippedLeafClassName);
+					logger.debug("\t\tstripped to name to: " + strippedLeafClassName);
 				}
 			} else {
-
-				if (Constants._DEBUG)
-					logger.debug("\t" + strippedLeafClassName);
+				logger.debug("\t" + strippedLeafClassName);
 				StringBuilder sb = new StringBuilder(strippedLeafClassName);
 				sb.append(".java");
 				leaf.docTopicItem = docTopics.getDocTopicItemForJava(sb.toString());
@@ -343,22 +296,14 @@ public class TopicUtil {
 		else if (type.equals("c")) {
 			leaf.docTopicItem = docTopics.getDocTopicItemForC(leaf.name);
 			if (leaf.docTopicItem == null) {
-				try {
-					throw new Exception("Could not obtain doc topic item for: " + leaf.name);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				throw new Exception("Could not obtain doc topic item for: " + leaf.name);
 			}
 		}
 		else {
-			try {
-				throw new Exception("cannot set doc topic for entity with type: " + type);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			throw new Exception("cannot set doc topic for entity with type: " + type);
 		}
-		
 	}
+
 	public static void setDocTopicForFastClusterForMalletFile(DocTopics docTopics, FastCluster leaf) {
 		String strippedLeafClasName = leaf.getName();
 		String dollarSign = "$";
@@ -366,22 +311,17 @@ public class TopicUtil {
 			String anonInnerClassRegExpr = ".*\\$\\D.*";
 			if (Pattern.matches(anonInnerClassRegExpr,
 					strippedLeafClasName)) {
-				if (Constants._DEBUG)
-					logger.debug("\t\tfound inner class: "
-						+ strippedLeafClasName);
+				logger.debug("\t\tfound inner class: " + strippedLeafClasName);
 				
 				strippedLeafClasName = strippedLeafClasName.substring(
 						strippedLeafClasName.lastIndexOf('$') + 1,
 						strippedLeafClasName.length());
 				
-				if (Constants._DEBUG)
-					logger.debug("\t\tstripped to name to: "
-						+ strippedLeafClasName);
+				logger.debug("\t\tstripped to name to: " + strippedLeafClasName);
 			}
 		}
 		
-		if (Constants._DEBUG)
-			logger.debug("\t" + strippedLeafClasName);
+		logger.debug("\t" + strippedLeafClasName);
 		if (Config.getSelectedLanguage().equals(Language.c)) {
 			leaf.docTopicItem = docTopics.getDocTopicItemForC(strippedLeafClasName);
 			logger.debug("set " + ((leaf.docTopicItem == null) ? "null" : leaf.docTopicItem.source)  + " as doc topic for " +  strippedLeafClasName);
@@ -390,11 +330,9 @@ public class TopicUtil {
 			String docTopicName = convertJavaClassWithPackageNameToDocTopicName( leaf.getName() );
 			leaf.docTopicItem = docTopics.getDocTopicItemForJava(docTopicName);
 		}
-		else {
+		else
 			leaf.docTopicItem = docTopics.getDocTopicItemForJava(strippedLeafClasName);
-		}
-		if (Constants._DEBUG)
-			logger.debug("\t" + "doc-topic: " + leaf.docTopicItem);
+		logger.debug("\t" + "doc-topic: " + leaf.docTopicItem);
 	}
 	
 	public static DocTopicItem getDocTopicForString(DocTopics docTopics, String element) {
@@ -402,36 +340,26 @@ public class TopicUtil {
 		String dollarSign = "$";
 		if (strippedLeafClasName.contains(dollarSign)) {
 			String anonInnerClassRegExpr = ".*\\$\\D.*";
-			if (Pattern.matches(anonInnerClassRegExpr,
-					strippedLeafClasName)) {
-				if (Constants._DEBUG)
-					logger.debug("\t\tfound inner class: "
-						+ strippedLeafClasName);
+			if (Pattern.matches(anonInnerClassRegExpr, strippedLeafClasName)) {
+				logger.debug("\t\tfound inner class: " + strippedLeafClasName);
 				
 				strippedLeafClasName = strippedLeafClasName.substring(
 						strippedLeafClasName.lastIndexOf('$') + 1,
 						strippedLeafClasName.length());
 				
-				if (Constants._DEBUG)
-					logger.debug("\t\tstripped to name to: "
-						+ strippedLeafClasName);
+				logger.debug("\t\tstripped to name to: " + strippedLeafClasName);
 			}
 		}
 		
 		DocTopicItem docTopicItem = null;
-		if (Constants._DEBUG)
-			logger.debug("\t" + strippedLeafClasName);
-		if (Config.getSelectedLanguage().equals(Language.c)) {
+		logger.debug("\t" + strippedLeafClasName);
+		if (Config.getSelectedLanguage().equals(Language.c))
 			docTopicItem =  docTopics.getDocTopicItemForC(strippedLeafClasName);
-		}
-		else if (Config.getSelectedLanguage().equals(Language.java)) {
+		else if (Config.getSelectedLanguage().equals(Language.java))
 			docTopicItem =  docTopics.getDocTopicItemForJava(strippedLeafClasName);
-		}
-		else {
+		else
 			docTopicItem =  docTopics.getDocTopicItemForJava(strippedLeafClasName);
-		}
-		if (Constants._DEBUG)
-			logger.debug("\t" + "doc-topic: " + docTopicItem);
+		logger.debug("\t" + "doc-topic: " + docTopicItem);
 		
 		return docTopicItem;
 	}
@@ -463,8 +391,6 @@ public class TopicUtil {
 			
 			logger.debug("mergedTopicItem.topicNum: " + mergedTopicItem.topicNum);
 			logger.debug("mergedTopicItem.proportion: " + mergedTopicItem.proportion);
-			
-			
 		}
 		return mergedDocTopicItem;
 	}
@@ -486,9 +412,8 @@ public class TopicUtil {
 		
 		logger.debug(String.format("%5s%64s%64s\n", "", docTopicItem.source, docTopicItem2.source));
 		
-		for (int i=0; i < docTopicItem.topics.size(); i ++) {
+		for (int i=0; i < docTopicItem.topics.size(); i ++)
 			logger.debug(String.format("%32s%32f%32f\n", docTopicItem.topics.get(i).topicNum, docTopicItem.topics.get(i).proportion, docTopicItem2.topics.get(i).proportion));
-		}
 	}
 
 	public static TopicItem getMatchingTopicItem(List<TopicItem> topics,
@@ -507,22 +432,15 @@ public class TopicUtil {
 			return;
 		}
 		double sum = 0;
-		for (TopicItem ti : docTopicItem.topics) {
+		for (TopicItem ti : docTopicItem.topics)
 			sum += ti.proportion;
-		}
 		logger.debug("doc-topic proportion sum: " + sum);
-		
 	}
 
-	public static void setDocTopicForFastClusterForMalletApi(
-			FastCluster c) {
-		if (Config.getSelectedLanguage().equals(Language.java)) {
+	public static void setDocTopicForFastClusterForMalletApi(FastCluster c) {
+		if (Config.getSelectedLanguage().equals(Language.java))
 			c.docTopicItem = docTopics.getDocTopicItemForJava(c.getName());
-		}
-		if (Config.getSelectedLanguage().equals(Language.c)) {
+		if (Config.getSelectedLanguage().equals(Language.c))
 			c.docTopicItem = docTopics.getDocTopicItemForC(c.getName());
-		}
-		
 	}
-
 }

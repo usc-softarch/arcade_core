@@ -50,7 +50,7 @@ public class GroundTruthFileParser {
 				}
 				if (!strLine.matches(filenameWithExtensionPattern)) { // found cluster name
 					logger.debug("Found cluster title: " + strLine);
-					currentClusterName = strLine.trim().replaceAll(" ", "_");
+					currentClusterName = strLine.trim().replace(" ", "_");
 					
 					ConcernCluster newCluster = new ConcernCluster();
 					newCluster.setName(currentClusterName);
@@ -81,15 +81,13 @@ public class GroundTruthFileParser {
 	}
 
 	public static void parseHadoopStyle(String groundTruthFile) {
-		clusters = new HashSet<ConcernCluster>();
+		clusters = new HashSet<>();
 		try (FileInputStream fstream = new FileInputStream(groundTruthFile)) {
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
 			// Pattern to match the title of a cluster (a number followed by zero or more lowercase letters a colon followed by zero or more whitespace and one or more of any character
 			String titleClusterPattern = "\\d+[a-z]*:\\s*.+"; 
-			// Ends with .java
-			String javaClassPattern = "^.+\\.java$";
 			String cleanJavaClassPatternStr = ".*(org/.+)\\.java$";
 			ConcernCluster newCluster = null;
 			while ((strLine = br.readLine()) != null) {
@@ -104,7 +102,7 @@ public class GroundTruthFileParser {
 				if (m.matches()) {
 					String firstGroup = m.group(1);
 					logger.debug("g1: " + firstGroup);
-					String javaClassName = firstGroup.replaceAll("/", ".");
+					String javaClassName = firstGroup.replace("/", ".");
 					logger.debug("renamed: " + javaClassName);
 					newCluster.addEntity(javaClassName);
 				}

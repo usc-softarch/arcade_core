@@ -58,13 +58,9 @@ static Logger logger = Logger.getLogger(ExpertRecoveryDriver.class);
 		System.out.println("Creating expert decomposition...");
 		System.out.println("Reading in rsf file...");
 		RsfReader.loadRsfDataForCurrProj();
-		//RsfReader.performPreClusteringTasks();
 		ExpertDecompositionBuilder.readInExpertDecomposition("/home/joshua/recovery/Expert Decompositions/Bash expert decompositions.txt");
 		ExpertDecompositionBuilder.buildExpertDecompositionClusters(RsfReader.startNodesSet);
 		ExpertDecompositionBuilder.findMissingElementsInExpertDecomposition();
 		ExpertDecompositionBuilder.buildMojoTargetFilesForFunctions();
-		//ExpertDecompositionBuilder.buildDocTopicsForClusters();
 	}
-	
-	
 }

@@ -1,11 +1,7 @@
 package edu.usc.softarch.gexf;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,20 +44,12 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.ojn.gexf4j.core.EdgeType;
-import com.ojn.gexf4j.core.Gexf;
-import com.ojn.gexf4j.core.Graph;
-import com.ojn.gexf4j.core.Mode;
-import com.ojn.gexf4j.core.Node;
-import com.ojn.gexf4j.core.impl.GexfImpl;
-import com.ojn.gexf4j.core.impl.StaxGraphWriter;
 
-import edu.usc.softarch.arcade.ExpertRecoveryDriver;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class ConvertRsfToGexf {
-	static Logger logger = Logger.getLogger(ConvertRsfToGexf.class);
+	private static Logger logger = Logger.getLogger(ConvertRsfToGexf.class);
 
 	public static void main(String[] args) {
 		String containerRsfFilename = "/home/joshua/recovery/Expert Decompositions/linuxFullAuthcontain.rsf";
@@ -130,26 +118,19 @@ public class ConvertRsfToGexf {
 
 		Config.initConfigFromFile(Config.getProjConfigFilename());
 
-
-
-
 		RsfReader.loadRsfDataFromFile(containerRsfFilename);
 		Iterable<List<String>> containerFacts = RsfReader.filteredRoutineFacts;
 
 		RsfReader.loadRsfDataFromFile(depsFilename);
 		Iterable<List<String>> depsFacts = RsfReader.filteredRoutineFacts;
 
-		//transformContaineesToMatchDepNodes(containerFacts, depsFacts);
-
-		if (isStrippingExtensions) {
+		if (isStrippingExtensions)
 			stripExtensions(containerFacts, depsFacts);
-		}
 
-		for (List<String> fact : containerFacts) {
+		for (List<String> fact : containerFacts)
 			logger.debug(fact);
-		}
 
-		Set<String> allNodesSet = new HashSet<String>();
+		Set<String> allNodesSet = new HashSet<>();
 		for (List<String> fact : containerFacts) {
 			allNodesSet.add(fact.get(1));
 			allNodesSet.add(fact.get(2));
@@ -163,7 +144,7 @@ public class ConvertRsfToGexf {
 					}
 				});
 
-		Set<String> containerSet = new HashSet<String>(containersList);
+		Set<String> containerSet = new HashSet<>(containersList);
 
 		logger.debug("The containers...");
 		logger.debug(Joiner.on("\n").join(containerSet));
@@ -180,7 +161,6 @@ public class ConvertRsfToGexf {
 		logger.debug("The dependencies...");
 		logger.debug(Joiner.on("\n").join(depsFacts));
 
-		// attemptToUseGexfJavaLibrary(containerFacts, containerSet);
 		try {
 			JAXBContext jc = JAXBContext.newInstance(GexfContent.class);
 
@@ -202,7 +182,7 @@ public class ConvertRsfToGexf {
 			gexfContent.setGraph(graphContent);
 
 			// create NodeContent map
-			Map<String,NodeContent> nodeContentMap = new HashMap<String,NodeContent>();
+			Map<String,NodeContent> nodeContentMap = new HashMap<>();
 			for (String node : allNodesSet) {
 				NodeContent nodeContent = objFactory.createNodeContent();
 				nodeContent.setId(node);
@@ -211,7 +191,7 @@ public class ConvertRsfToGexf {
 			}
 
 			// add child nodes to parents
-			Set<String> accountedNodes = new HashSet<String>();
+			Set<String> accountedNodes = new HashSet<>();
 			for (String container : containerSet) {
 				for (List<String> fact : containerFacts) {
 					if (container.equals(fact.get(2)) && !fact.get(1).equals(fact.get(2))) {
@@ -231,18 +211,18 @@ public class ConvertRsfToGexf {
 			}
 
 
-			Set<String> remainingContainerNodes = new HashSet<String>(containerSet);
+			Set<String> remainingContainerNodes = new HashSet<>(containerSet);
 			remainingContainerNodes.removeAll(accountedNodes);
 
 			for (String node : remainingContainerNodes) {
 				nodesContent.getNode().add(nodeContentMap.get(node));
 			}
 
-			Set<String> remainingNonContainerNodes = new HashSet<String>(allNodesSet);
+			Set<String> remainingNonContainerNodes = new HashSet<>(allNodesSet);
 			remainingNonContainerNodes.removeAll(accountedNodes);
 			remainingNonContainerNodes.removeAll(remainingContainerNodes);
 
-			Map<String,List<String>> containerMap = new HashMap<String,List<String>>();
+			Map<String,List<String>> containerMap = new HashMap<>();
 
 			for (List<String> fact : containerFacts) {
 				containerMap.put(fact.get(2), fact);
@@ -282,16 +262,12 @@ public class ConvertRsfToGexf {
 			FileOutputStream fos = new FileOutputStream(outputGexfFile);
 			m.marshal(gexfContent, fos);
 		} catch (PropertyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch blocks
 			e.printStackTrace();
 		} catch (DatatypeConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -322,58 +298,6 @@ public class ConvertRsfToGexf {
 			fact.remove(fact.size()-1);
 			fact.add(source);
 			fact.add(target);
-		}
-	}
-
-	private static void transformContaineesToMatchDepNodes(
-			Iterable<List<String>> containerFacts,
-			Iterable<List<String>> depsFacts) {
-		List<String> containeesList = Lists.transform(
-				Lists.newArrayList(containerFacts),
-				new Function<List<String>, String>() {
-					public String apply(List<String> fact) {
-						return fact.get(2);
-					}
-				});
-
-		List<String> depSourceNodes = Lists.transform(
-				Lists.newArrayList(depsFacts),
-				new Function<List<String>, String>() {
-					public String apply(List<String> fact) {
-						return fact.get(1);
-					}
-				});
-
-		List<String> depTargetNodes = Lists.transform(
-				Lists.newArrayList(depsFacts),
-				new Function<List<String>, String>() {
-					public String apply(List<String> fact) {
-						return fact.get(2);
-					}
-				});
-		List<String> allDepNodesList = new ArrayList<String>(depSourceNodes);
-		allDepNodesList.addAll(depTargetNodes);
-
-		Set<String> containeesSet = new HashSet<String>(containeesList);
-
-		Set<String> allDepNodesSet = new HashSet<String>(allDepNodesList);
-
-		for (String containee : containeesSet) {
-			for (String depNode : allDepNodesSet) {
-				String[] depNodeTokens = depNode.split("/");
-				String cutDepNode = depNodeTokens[depNodeTokens.length-1];
-				if (cutDepNode.trim().equals(containee.trim())) {
-					for (List<String> fact : containerFacts) {
-
-						if (fact.get(2).equals(cutDepNode)) {
-							logger.debug("Changing fact: " + fact);
-							fact.remove(2);
-							fact.add(depNode);
-							logger.debug("New fact: " + fact);
-						}
-					}
-				}
-			}
 		}
 	}
 
@@ -410,52 +334,4 @@ public class ConvertRsfToGexf {
             datatypeFactory.newXMLGregorianCalendar(gregorianCalendar);
         return now;
     }
-
-	private static void attemptToUseGexfJavaLibrary(
-			Iterable<List<String>> containerFacts, Set<String> containerSet) {
-		Gexf gexf = new GexfImpl();
-		Calendar date = Calendar.getInstance();
-
-		gexf.getMetadata().setLastModified(date.getTime())
-				.setCreator("extractors").setDescription("A hierarchical brick dependency graph");
-
-		Graph graph = gexf.getGraph();
-		graph.setDefaultEdgeType(EdgeType.DIRECTED).setMode(Mode.STATIC);
-
-		for (String container : containerSet) {
-			graph.createNode(container).setLabel(container);
-		}
-
-		for (List<String> fact : containerFacts) {
-			for (String container : containerSet) {
-				if (
-						fact.get(2).equals(container) &&
-						!fact.get(1).equals(fact.get(2))
-					) {
-					Node parentNode = getNode(fact.get(1),graph.getNodes());
-					parentNode.createNode(fact.get(2));
-				}
-			}
-
-		}
-
-		StaxGraphWriter graphWriter = new StaxGraphWriter();
-		File f = new File("linux_auth_recovery.gexf");
-		FileOutputStream fos;
-		try {
-			fos = new FileOutputStream(f, false);
-			graphWriter.writeToStream(gexf, fos);
-			System.out.println(f.getAbsolutePath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static Node getNode(String container, List<Node> nodes) {
-		for (Node node : nodes) {
-			if (node.getId().equals(container))
-				return node;
-		}
-		return null;
-	}
 }

@@ -7,10 +7,6 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 public class RsfSourceTargetCounter {
-
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String firstRsfFilename = args[0];
 		

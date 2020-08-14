@@ -8,10 +8,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
 public class RsfTargetsDifferencer {
-
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String firstRsfFilename = args[0];
 		String secondRsfFilename = args[1];
@@ -22,20 +18,20 @@ public class RsfTargetsDifferencer {
 		RsfReader.loadRsfDataFromFile(secondRsfFilename);
 		Set<List<String>> secondFacts = Sets.newHashSet(RsfReader.filteredRoutineFacts);
 		
-		Set<String> firstTargets = new HashSet<String>();
+		Set<String> firstTargets = new HashSet<>();
 		for (List<String> fact : firstFacts) {
 			firstTargets.add(fact.get(2));
 		}
 		
-		Set<String> secondTargets = new HashSet<String>();
+		Set<String> secondTargets = new HashSet<>();
 		for (List<String> fact : secondFacts) {
 			secondTargets.add(fact.get(2));
 		}
 		
-		Set<String> firstDiffSecondSet = new HashSet<String>(firstTargets);
+		Set<String> firstDiffSecondSet = new HashSet<>(firstTargets);
 		firstDiffSecondSet.removeAll(secondTargets);
 		
-		Set<String> secondDiffFirstSet = new HashSet<String>(secondTargets);
+		Set<String> secondDiffFirstSet = new HashSet<>(secondTargets);
 		secondDiffFirstSet.removeAll(firstTargets);
 		
 		System.out.println("First file: " + firstRsfFilename);
@@ -48,7 +44,5 @@ public class RsfTargetsDifferencer {
 		System.out.println();
 		System.out.println("second file - first file:");
 		System.out.println(Joiner.on("\n").join(secondDiffFirstSet));
- 
 	}
-
 }

@@ -32,7 +32,6 @@ public class WcaRunner extends ClusteringAlgoRunner {
 
 		int clusterStepCount = 0;
 		int stepCountToStop = 5;
-		boolean stopAtClusterStep = false; // for debugging purposes
 		while (stopCriterion.notReadyToStop()) {
 			if (Config.stoppingCriterion
 					.equals(Config.StoppingCriterionConfig.clustergain)) {
@@ -57,20 +56,6 @@ public class WcaRunner extends ClusteringAlgoRunner {
 			FastCluster newCluster = new FastCluster(cluster, otherCluster);
 			
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data,newCluster,simMatrix);
-			
-			if (stopAtClusterStep)
-				clusterStepCount++;
-
-			if (stopAtClusterStep) {
-				if (clusterStepCount == stepCountToStop) {
-					loopSummaryStopwatch.stop();
-
-					logger.debug("Time in milliseconds to compute clusters after priority queue initialization: "
-							+ loopSummaryStopwatch.getElapsedTime());
-
-					DebugUtil.earlyExit();
-				}
-			}
 			
 			performPostProcessingConditionally();
 		}

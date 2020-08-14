@@ -39,14 +39,13 @@ public class IssuesAnalyzer {
 		for (File file : filesList) {
 			if (file.getName().endsWith(".ser")) {
 				List<Issue> issues = JiraUtil.deserializeIssues(file.getAbsolutePath());
-				//System.out.println(Joiner.on("\n").join(issues));
 				allIssues.addAll(issues);
 				System.out.println("Loaded file: " + file.getName());
 			}
 		}
 		
-		Map<String,Issue> issuesMap = new HashMap<String,Issue>();
-		List<Issue> allIssuesNoDupes = new ArrayList<Issue>();
+		Map<String,Issue> issuesMap = new HashMap<>();
+		List<Issue> allIssuesNoDupes = new ArrayList<>();
 		for (Issue issue : allIssues) {
 			if (!issuesMap.containsKey(issue.getKey())) {
 				issuesMap.put(issue.getKey(),issue);
@@ -59,7 +58,7 @@ public class IssuesAnalyzer {
 		
 		
 		// key: version number, value: count of issues for that version
-		Map<String,Integer> versionToIssueCountMap = new HashMap<String,Integer>();
+		Map<String,Integer> versionToIssueCountMap = new HashMap<>();
 		for (Issue issue : allIssues) {
 			for (Version version : issue.getVersions()) {
 				Integer issueCount = versionToIssueCountMap.get(version.toString());
@@ -67,9 +66,8 @@ public class IssuesAnalyzer {
 					issueCount=issueCount+1;
 					versionToIssueCountMap.put(version.toString(), issueCount);
 				}
-				else {
+				else
 					versionToIssueCountMap.put(version.toString(), 1);
-				}
 			}
 			for (Version version : issue.getFixVersions()) {
 				Integer issueCount = versionToIssueCountMap.get(version.toString());
@@ -77,9 +75,8 @@ public class IssuesAnalyzer {
 					issueCount=issueCount+1;
 					versionToIssueCountMap.put(version.toString(), issueCount);
 				}
-				else {
+				else
 					versionToIssueCountMap.put(version.toString(), 1);
-				}
 			}
 		}
 		
@@ -88,16 +85,14 @@ public class IssuesAnalyzer {
 		
 		System.out.println(Joiner.on("\n").withKeyValueSeparator("=").join(versionToIssueCountMap));
 		
-        System.out.println("Running time: " + stopWatch.getElapsedTimeSecs());
-        
-        // The filename that is generated based on the supplied issuesDir
-        String mapFilename = issuesDir + File.separatorChar + "version2issuecountmap.obj";
-        XStream xstream = new XStream();
-        String xml = xstream.toXML(versionToIssueCountMap);
-        PrintWriter writer = new PrintWriter(FileUtil.tildeExpandPath(mapFilename));
-        writer.print(xml);
-        writer.close();
-
+		System.out.println("Running time: " + stopWatch.getElapsedTimeSecs());
+		
+		// The filename that is generated based on the supplied issuesDir
+		String mapFilename = issuesDir + File.separatorChar + "version2issuecountmap.obj";
+		XStream xstream = new XStream();
+		String xml = xstream.toXML(versionToIssueCountMap);
+		PrintWriter writer = new PrintWriter(FileUtil.tildeExpandPath(mapFilename));
+		writer.print(xml);
+		writer.close();
 	}
-
 }

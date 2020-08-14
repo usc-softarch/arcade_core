@@ -17,7 +17,7 @@ import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchDecayMetricsAnalyzer {
-	static Logger logger = Logger.getLogger(BatchDecayMetricsAnalyzer.class);
+	private static Logger logger = Logger.getLogger(BatchDecayMetricsAnalyzer.class);
 
 	public static void main(String[] args) throws FileNotFoundException {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
@@ -32,7 +32,7 @@ public class BatchDecayMetricsAnalyzer {
 		
 		clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
 		
-		Map<String,List<Double>> decayMetrics = new LinkedHashMap<String,List<Double>>();
+		Map<String,List<Double>> decayMetrics = new LinkedHashMap<>();
 
 		String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*";
 		for (File clusterFile : clusterFiles) {
@@ -52,7 +52,7 @@ public class BatchDecayMetricsAnalyzer {
 								rciVals = decayMetrics.get("rci");
 							}
 							else {
-								rciVals = new ArrayList<Double>();
+								rciVals = new ArrayList<>();
 							}
 							rciVals.add(DecayMetricAnalyzer.rciVal);
 							decayMetrics.put("rci", rciVals);
@@ -62,7 +62,7 @@ public class BatchDecayMetricsAnalyzer {
 								twoWayRatios = decayMetrics.get("twoway");
 							}
 							else {
-								twoWayRatios = new ArrayList<Double>();
+								twoWayRatios = new ArrayList<>();
 							}
 							twoWayRatios.add(DecayMetricAnalyzer.twoWayPairRatio);
 							decayMetrics.put("twoway", twoWayRatios);
@@ -72,7 +72,7 @@ public class BatchDecayMetricsAnalyzer {
 								stabilityVals = decayMetrics.get("stability");
 							}
 							else {
-								stabilityVals = new ArrayList<Double>();
+								stabilityVals = new ArrayList<>();
 							}
 							stabilityVals.add(DecayMetricAnalyzer.avgStability);
 							decayMetrics.put("stability", stabilityVals);
@@ -82,7 +82,7 @@ public class BatchDecayMetricsAnalyzer {
 								mqRatios = decayMetrics.get("mq");
 							}
 							else {
-								mqRatios = new ArrayList<Double>();
+								mqRatios = new ArrayList<>();
 							}
 							mqRatios.add(DecayMetricAnalyzer.mqRatio);
 							decayMetrics.put("mq", mqRatios);
@@ -91,7 +91,6 @@ public class BatchDecayMetricsAnalyzer {
 						}
 					}
 				}
-				
 			}
 		}
 		
@@ -105,9 +104,5 @@ public class BatchDecayMetricsAnalyzer {
 			logger.info(stats);
 			System.out.println(stats);
 		}
-		
-		
-
 	}
-
 }

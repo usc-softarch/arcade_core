@@ -8,36 +8,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.facts.driver.RsfReader;
-import edu.usc.softarch.arcade.topics.DocTopicItem;
-import edu.usc.softarch.arcade.topics.TopicUtil;
 
 public class ExpertDecompositionBuilder {
 	private static Logger logger = Logger.getLogger(ExpertDecompositionBuilder.class);
-	public static List<ExpertDecomposition> expertDecompositions = null;
-	
-	public static void testFactFiltering() {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
-		
-		Iterator<String> startNodesIterator = RsfReader.startNodesSet.iterator();
-		
-		logger.debug("Printing start nodes from shell.c...");
-		
-		while (startNodesIterator.hasNext()) {
-			String startNodeStr = startNodesIterator.next();
-			if (startNodeStr.contains("shell.c")) {
-				logger.debug(startNodeStr);
-			}
-		}
-	}
+	private static List<ExpertDecomposition> expertDecompositions = null;
 	
 	public static void readInExpertDecomposition(String filename) {
 		try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
@@ -125,92 +105,6 @@ public class ExpertDecompositionBuilder {
 			}
 			decompositionCounter++;
 		}
-		
-		
-	}
-
-	public static void buildIntraPairsForExpertDecompositions() {
-		int decompositionCounter = 1;
-		for (ExpertDecomposition expertDecomposition : expertDecompositions) {
-			logger.debug("Building intrapairs for expert decomposition " + decompositionCounter);
-			for (Group group : expertDecomposition.groups) {
-				for (String element1 : group.elements) {
-					for (String element2 : group.elements) {
-						Set<String> intraPair = new HashSet<>();
-						intraPair.add(element1);
-						intraPair.add(element2);
-						group.intraPairs.add(intraPair);
-					}
-				}
-			}
-			decompositionCounter++;
-		}
-		
-		decompositionCounter = 1;
-		for (ExpertDecomposition expertDecomposition : expertDecompositions) {
-			logger.debug("Printing intrapairs for expert decomposition " + decompositionCounter);
-			for (Group group : expertDecomposition.groups) {
-				logger.debug("\t" + group);
-				logger.debug("\t\t" + group.elements);
-				for (Set<String> intraPair : group.intraPairs) {
-					logger.debug("\t\t\t" + intraPair);
-				}
-			}
-		}
-		
-		decompositionCounter = 1;
-		for (ExpertDecomposition expertDecomposition : expertDecompositions) {
-			logger.debug("Building all intrapairs for expert decomposition " + decompositionCounter);
-			for (Group group : expertDecomposition.groups) {
-				expertDecomposition.allIntraPairs.addAll(group.intraPairs);
-			}
-		}
-		
-		for (ExpertDecomposition expertDecomposition : expertDecompositions) {
-			logger.debug("Printing all intrapairs for expert decomposition " + decompositionCounter);
-			for (Set<String> intraPair : expertDecomposition.allIntraPairs) {
-				logger.debug("\t" + intraPair);
-			}
-		}
-		
-	}
-
-	public static void buildDocTopicsForClusters() {
-		int decompositionCounter = 1;
-		for (ExpertDecomposition expertDecomposition : expertDecompositions) {
-			logger.debug("Printing intrapairs for expert decomposition " + decompositionCounter);
-			for (Group group : expertDecomposition.groups) {
-				logger.debug("group summary info:\n\t" + group);
-				logger.debug("\t\tgroup elements: " + group.elements);
-				DocTopicItem prevDocTopicItem = null;
-				DocTopicItem mergedDocTopicItem = null;
-				for (String element : group.elements) {
-					if (TopicUtil.docTopics == null)
-						TopicUtil.docTopics = TopicUtil.getDocTopicsFromFile();
-						
-					boolean docTopicDebug = false;
-					DocTopicItem currDocTopicItem = TopicUtil.getDocTopicForString(TopicUtil.docTopics, element);
-					if (prevDocTopicItem != null) {
-						if (docTopicDebug)
-							logger.debug("Merging " + prevDocTopicItem + " with " + currDocTopicItem);
-						mergedDocTopicItem = TopicUtil.mergeDocTopicItems(prevDocTopicItem,currDocTopicItem);
-					}
-					else {
-						if (docTopicDebug)
-							logger.debug("Merging " + mergedDocTopicItem + " with " + currDocTopicItem);
-						mergedDocTopicItem = TopicUtil.mergeDocTopicItems(mergedDocTopicItem,currDocTopicItem);
-					}
-				}
-				group.docTopicItem = mergedDocTopicItem;
-				if (group.docTopicItem != null)
-					logger.debug("doc-topic for group:\n" + group.docTopicItem.toStringWithLeadingTabsAndLineBreaks(2));
-				else 
-					logger.debug("group has no doc-topics");
-				
-				TopicUtil.printDocTopicProportionSum(group.docTopicItem);
-			}
-		}
-		
 	}
 
 	public static void buildMojoTargetFilesForFunctions() {
@@ -236,9 +130,7 @@ public class ExpertDecompositionBuilder {
 				e.printStackTrace();
 			}
 			decompositionCounter++;
-			
 		}
-		
 	}
 	
 	public static void buildMojoTargetFilesForFiles() {
@@ -264,9 +156,7 @@ public class ExpertDecompositionBuilder {
 				e.printStackTrace();
 			}
 			decompositionCounter++;
-			
 		}
-		
 	}
 
 	public static void findMissingElementsInExpertDecomposition() {
@@ -281,7 +171,6 @@ public class ExpertDecompositionBuilder {
 			listOfElementsOfDecomp.add(elementsOfDecomp);
 		}
 		
-		
 		for (int i=0;i<listOfElementsOfDecomp.size();i++) {
 			for (int j=0;j<listOfElementsOfDecomp.size();j++) {
 				if (i!=j) {
@@ -293,6 +182,5 @@ public class ExpertDecompositionBuilder {
 			}
 			
 		}
-		
 	}
 }

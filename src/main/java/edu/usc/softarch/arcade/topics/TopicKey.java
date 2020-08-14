@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.topics;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author joshua
@@ -9,26 +10,26 @@ import java.util.ArrayList;
 public class TopicKey {
 	public int topicNum;
 	double alpha;
-	ArrayList<String> words;
+	List<String> words;
 	public String type;
 	
-	public ArrayList<String> getWords() {
-		return new ArrayList<String>(words);
+	public List<String> getWords() {
+		return new ArrayList<>(words);
 	}
 
 
 	public TopicKey() {
 		super();
-		words = new ArrayList<String>();
+		words = new ArrayList<>();
 	}
 	
 	public boolean equals(Object o) {
-		TopicKey topicKey = (TopicKey) o;
-		if (this.topicNum == topicKey.topicNum) {
-			return true;
-		}
-		else
+		if(!(o instanceof TopicKey))
 			return false;
+
+		TopicKey topicKey = (TopicKey) o;
+
+		return this.topicNum == topicKey.topicNum;
 	}
 	
 	public int hashCode() {
@@ -46,5 +47,4 @@ public class TopicKey {
 		tkStr += "]]";
 		return tkStr;
 	}
-	
 }

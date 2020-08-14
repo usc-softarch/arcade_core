@@ -9,7 +9,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import util.Config;
-import util.Constant;
 import util.JSONUtil;
 import util.StringUtil;
 
@@ -21,7 +20,6 @@ public class IssueVersionFilter {
 	static Config projectConfig = null;
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		projectName = globalConfig.getValue("project");
 		projectConfig = new Config("config/" + projectName + ".properties");
 		
@@ -51,7 +49,6 @@ public class IssueVersionFilter {
 		for (int i = 0; i < issues.size(); i++) {
 			JSONObject issue = (JSONObject) issues.get(i);
 			String affectVersion = (String) issue.get("affect");
-			String issueID = (String) issue.get("issue_id");
 			if (!versions.contains(affectVersion)) {
 				issues.remove(i);
 				// remove one issue, the index should be reduced by 1!!!
@@ -95,7 +92,7 @@ public class IssueVersionFilter {
 	 */
 	public static Set<String> getVersionsFromSmell(final String inputFile) {
 		JSONArray smells = (JSONArray) JSONUtil.readJsonFromFile(inputFile);
-		Set<String> versions = new HashSet<String>();
+		Set<String> versions = new HashSet<>();
 		for (int i = 0; i < smells.size(); i++) {
 			JSONObject smell = (JSONObject) smells.get(i);
 			versions.add(smell.get("version").toString());
@@ -111,7 +108,7 @@ public class IssueVersionFilter {
 	 */
 	public static Set<String> getVersionsFromIssue(final String issueFile) {
 		JSONArray issues = (JSONArray) JSONUtil.readJsonFromFile(issueFile);
-		Set<String> versions = new HashSet<String>();
+		Set<String> versions = new HashSet<>();
 		for (int i = 0; i < issues.size(); i++) {
 			JSONObject issue = (JSONObject) issues.get(i);
 			versions.add(issue.get("affect").toString());

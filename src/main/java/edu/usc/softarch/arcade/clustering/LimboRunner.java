@@ -11,7 +11,6 @@ import edu.usc.softarch.arcade.util.DebugUtil;
 import edu.usc.softarch.arcade.util.StopWatch;
 
 public class LimboRunner extends ClusteringAlgoRunner {
-	
 	private static Logger logger = Logger.getLogger(LimboRunner.class);
 
 	public static void computeClusters(StoppingCriterion stopCriterion) {

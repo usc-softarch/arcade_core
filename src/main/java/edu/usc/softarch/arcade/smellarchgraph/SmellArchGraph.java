@@ -26,7 +26,6 @@ import org.w3c.dom.Element;
 
 import edu.usc.softarch.arcade.clustering.Cluster;
 
-
 /**
  * @author joshua
  */

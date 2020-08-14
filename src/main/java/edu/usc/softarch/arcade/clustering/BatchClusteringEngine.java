@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.clustering;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -25,7 +24,7 @@ import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchClusteringEngine {
-	static Logger logger = Logger.getLogger(BatchClusteringEngine.class);
+	private static Logger logger = Logger.getLogger(BatchClusteringEngine.class);
 
 	public static void main(String[] args) throws Exception {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
@@ -38,7 +37,7 @@ public class BatchClusteringEngine {
 		String outputDirName = args[1];
 		
 		File[] files = inputDir.listFiles();
-		Set<File> fileSet = new TreeSet<File>(Arrays.asList(files));
+		Set<File> fileSet = new TreeSet<>(Arrays.asList(files));
 		logger.debug("All files in " + inputDir + ":");
 		logger.debug(Joiner.on("\n").join(fileSet));
 		for (File file : fileSet) {
@@ -52,8 +51,8 @@ public class BatchClusteringEngine {
 		for (File file : fileSet) {
 			single(file, args, outputDirName, inClassesDir);
 		}
-
 	}
+	
 	public static void single (File folder,String[] args,String outputDirName,String inClassesDir) throws Exception{
 		if (folder.isDirectory()) {
 			logger.debug("Processing directory: " + folder.getName());

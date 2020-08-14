@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
-import edu.usc.softarch.arcade.Constants;
-
 /**
  * @author joshua
  */
@@ -56,8 +54,7 @@ public class TopicKeySet {
 			
 			set.add(tk);
 			
-			if (Constants._DEBUG)
-				printStringArray(items);
+			printStringArray(items);
 		}
 		
 		System.out.println();

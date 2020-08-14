@@ -16,7 +16,6 @@ import edu.usc.softarch.arcade.config.Config.Language;
 import edu.usc.softarch.arcade.util.FileListing;
 
 public class ClusteringAlgoRunner {
-
 	private static Logger logger = Logger.getLogger(ClusteringAlgoRunner.class);
 	protected static List<FastCluster> fastClusters;
 	public static List<FastCluster> getFastClusters() {

@@ -16,7 +16,7 @@ import edu.usc.softarch.arcade.facts.ExpertDecompositionBuilder;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class CreateRsfForFilesForExpertRecoveries {
-static Logger logger = Logger.getLogger(CreateRsfForFilesForExpertRecoveries.class);
+private static Logger logger = Logger.getLogger(CreateRsfForFilesForExpertRecoveries.class);
 	
 	public static void main(String[] args) {
 		Options options = new Options();
@@ -58,13 +58,9 @@ static Logger logger = Logger.getLogger(CreateRsfForFilesForExpertRecoveries.cla
 		System.out.println("Creating expert decomposition...");
 		System.out.println("Reading in rsf file...");
 		RsfReader.loadRsfDataForCurrProj();
-		//RsfReader.performPreClusteringTasks();
 		ExpertDecompositionBuilder.readInExpertDecomposition("/home/joshua/recovery/Expert Decompositions/Bash expert decompositions.txt");
 		ExpertDecompositionBuilder.buildExpertDecompositionClusters(RsfReader.startNodesSet);
 		ExpertDecompositionBuilder.findMissingElementsInExpertDecomposition();
 		ExpertDecompositionBuilder.buildMojoTargetFilesForFiles();
-		//ExpertDecompositionBuilder.buildDocTopicsForClusters();
 	}
-	
-	
 }

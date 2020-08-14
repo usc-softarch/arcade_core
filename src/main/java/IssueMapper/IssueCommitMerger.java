@@ -8,13 +8,11 @@ import util.JSONUtil;
 import util.StringUtil;
 
 public class IssueCommitMerger {
-
 	static Config globalConfig = new Config("config/global.properties");
 	static String projectName = null;
 	static Config projectConfig = null;
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		projectName = globalConfig.getValue("project");
 		projectConfig = new Config("config/" + projectName + ".properties");
 

@@ -11,25 +11,21 @@ import org.apache.log4j.Logger;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class IntraPairFromClustersRsfBuilder {
-	static Logger logger = Logger.getLogger(IntraPairFromClustersRsfBuilder.class);
+	private static Logger logger = Logger.getLogger(IntraPairFromClustersRsfBuilder.class);
 	
 	public static Set<Set<String>>  buildIntraPairsFromClustersRsf(String rsfFilename) {
 		List<List<String>> facts = RsfReader.extractFactsFromRSF(rsfFilename);
 		Map<String, Set<String>> clusterMap = buildClusterMapFromRsfFile(facts);
 		Map<String, Set<Set<String>>> clusterIntraPairsMap = buildClusterIntraPairsMap(clusterMap);
-		Set<Set<String>> allIntraPairs = buildAllIntraPairs(clusterIntraPairsMap);
-		
-		return allIntraPairs;
+		return buildAllIntraPairs(clusterIntraPairsMap);
 	}
 
 	private static Set<Set<String>> buildAllIntraPairs(
 			Map<String, Set<Set<String>>> clusterIntraPairsMap) {
 		Set<Set<String>> allIntraPairs = new HashSet<>();
-		for (String clusterNumber : clusterIntraPairsMap.keySet()) {
-			for (Set<String> intraPair : clusterIntraPairsMap.get(clusterNumber)) {
+		for (String clusterNumber : clusterIntraPairsMap.keySet())
+			for (Set<String> intraPair : clusterIntraPairsMap.get(clusterNumber))
 				allIntraPairs.add(intraPair);
-			}
-		}
 		return allIntraPairs;
 	}
 

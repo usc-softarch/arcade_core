@@ -21,7 +21,7 @@ public class ModifiedCallGraphExample {
 	static ClassGraph clg = new ClassGraph();
 
 	public static void main(String[] args) {
-		List<String> argsList = new ArrayList<String>(Arrays.asList(args));
+		List<String> argsList = new ArrayList<>(Arrays.asList(args));
 		argsList.addAll(Arrays.asList(new String[] { "-p", "cg",
 				"verbose:true", "-w", "-main-class",
 				"MTSGenerator.Generator_app",// main-class

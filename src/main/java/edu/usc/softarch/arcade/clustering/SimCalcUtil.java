@@ -9,14 +9,11 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.config.ConfigUtil;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 
-
 /**
  * @author joshua
- *
  */
 public class SimCalcUtil {
 	public static Map<Set<FeatureVector>, Integer> sharedFeaturesMap = new HashMap<>();
@@ -46,43 +43,34 @@ public class SimCalcUtil {
 				
 			}
 		}
-		if (Constants._DEBUG)
-			System.out.println("In, " + Thread.currentThread().getStackTrace()[1].getMethodName() + "Feature order correct...continuing");
+		System.out.println("In, " + Thread.currentThread().getStackTrace()[1].getMethodName() + "Feature order correct...continuing");
 	}
 	
 	public static double getJSDivergence(FastCluster cluster, FastCluster otherCluster) {
-		double divergence = TopicUtil.jsDivergence(cluster.docTopicItem, otherCluster.docTopicItem);
-		
-		return divergence;
+		return TopicUtil.jsDivergence(cluster.docTopicItem, otherCluster.docTopicItem);
 	}
 	
 	public static double getJSDivergence(Entity entity1, Entity entity2) {
-		double divergence = TopicUtil.jsDivergence(entity1.docTopicItem, entity2.docTopicItem);
-		
-		return divergence;
+		return TopicUtil.jsDivergence(entity1.docTopicItem, entity2.docTopicItem);
 	}
 	
 	
 	public static double getJSDivergence(FeatureVector fv1, FeatureVector fv2) {
 		String strippedLeafSplitClusterName = ConfigUtil.stripParensEnclosedClassNameWithPackageName(fv1);
 		
-		if (Pattern.matches(ConfigUtil.anonymousInnerClassRegExpr, strippedLeafSplitClusterName)) {
+		if (Pattern.matches(ConfigUtil.anonymousInnerClassRegExpr, strippedLeafSplitClusterName))
 			return Integer.MAX_VALUE;
-		}
 		
-		if (Pattern.matches(ConfigUtil.doubleInnerClassRegExpr, strippedLeafSplitClusterName)) {
+		if (Pattern.matches(ConfigUtil.doubleInnerClassRegExpr, strippedLeafSplitClusterName))
 			return Integer.MAX_VALUE;
-		}
 		
 		strippedLeafSplitClusterName = ConfigUtil.stripParensEnclosedClassNameWithPackageName(fv2);
 		
-		if (Pattern.matches(ConfigUtil.anonymousInnerClassRegExpr, strippedLeafSplitClusterName)) {
+		if (Pattern.matches(ConfigUtil.anonymousInnerClassRegExpr, strippedLeafSplitClusterName))
 			return Integer.MAX_VALUE;
-		}
 		
-		if (Pattern.matches(ConfigUtil.doubleInnerClassRegExpr, strippedLeafSplitClusterName)) {
+		if (Pattern.matches(ConfigUtil.doubleInnerClassRegExpr, strippedLeafSplitClusterName))
 			return Integer.MAX_VALUE;
-		}
 		
 		List<FeatureVector> featureVecPair = new ArrayList<>(2);
 		featureVecPair.add(fv1);
@@ -90,9 +78,8 @@ public class SimCalcUtil {
 		
 		double divergence = 0; 
 		
-		if (divergenceMap.containsKey(featureVecPair)) {
+		if (divergenceMap.containsKey(featureVecPair))
 			divergence = divergenceMap.get(featureVecPair);
-		}
 		else {
 			divergence = TopicUtil.jsDivergence(fv1.docTopicItem, fv2.docTopicItem);
 			divergenceMap.put(new ArrayList<>(featureVecPair), divergence);
@@ -182,18 +169,15 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			if (Constants._DEBUG) {
 			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
 			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();
-			}
 			
 			if (f.value > 0 && f2.value == 0) {
 				count++;
-				if (Constants._DEBUG) 
-					System.out.println("Increased 11 count to: " + count);
+				System.out.println("Increased 11 count to: " + count);
 			}
 		}
 		return count;
@@ -205,18 +189,15 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			if (Constants._DEBUG) {
 			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
 			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();
-			}
 			
 			if (f.value == 0 && f2.value > 0) {
 				count++;
-				if (Constants._DEBUG) 
-					System.out.println("Increased 11 count to: " + count);
+				System.out.println("Increased 11 count to: " + count);
 			}
 		}
 		return count;
@@ -228,18 +209,15 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			if (Constants._DEBUG) {
 			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
 			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();
-			}
 			
 			if (f.edge.tgtStr.equals(f2.edge.tgtStr) && f.value == 1 && f2.value == 1) {
 				count++;
-				if (Constants._DEBUG) 
-					System.out.println("Increased 11 count to: " + count);
+				System.out.println("Increased 11 count to: " + count);
 			}
 		}
 		
@@ -251,17 +229,14 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			if (Constants._DEBUG) {
 			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
 			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();
-			}
 			
-			if (f.value > 0 && f2.value > 0) {
+			if (f.value > 0 && f2.value > 0)
 				sharedFeatureSum = f.value + f2.value;
-			}
 		}
 		
 		return sharedFeatureSum;
@@ -272,17 +247,14 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			if (Constants._DEBUG) {
 			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
 			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();
-			}
 			
-			if (f.value > 0 && f2.value == 0) {
+			if (f.value > 0 && f2.value == 0)
 				oneZeroFeatureSum = f.value + f2.value;
-			}
 		}
 		
 		return oneZeroFeatureSum;
@@ -293,17 +265,14 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			if (Constants._DEBUG) {
 			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
 			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();
-			}
 			
-			if (f.value == 0 && f2.value > 0) {
+			if (f.value == 0 && f2.value > 0)
 				zeroOneFeatureSum = f.value + f2.value;
-			}
 		}
 		
 		return zeroOneFeatureSum;

@@ -19,7 +19,6 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 
-import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.callgraph.MethodEdge;
 import edu.usc.softarch.arcade.callgraph.MyCallGraph;
 import edu.usc.softarch.arcade.callgraph.MyClass;
@@ -400,7 +399,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		return dtItem;
 	}
 
-	public boolean isIntNumber(String num) {
+	private boolean isIntNumber(String num) {
 		try {
 			Integer.parseInt(num);
 		} catch (NumberFormatException nfe) {
@@ -440,7 +439,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		return ((double) numCallers / (double) (numCallers + numCallees)) * 100d;
 	}
 
-	public static void constructClassGraph() {
+	private static void constructClassGraph() {
 		CallGraph cg = Scene.v().getCallGraph();
 		addCallGraphEdgesToClassGraph(cg);
 		addSuperClassEdgesToClassGraph();
@@ -580,9 +579,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	private static boolean isEdgeValidForClassGraph(SootClass srcClass,
 			SootClass tgtClass) {
 		return Config.isClassInSelectedPackages(srcClass)
-				&& Config.isClassInSelectedPackages(tgtClass)
-				&& !Config.isClassInDeselectedPackages(srcClass)
-				&& !Config.isClassInDeselectedPackages(tgtClass);
+				&& Config.isClassInSelectedPackages(tgtClass);
 	}
 
 	private static void addInterfacesToClassGraph() {
@@ -613,7 +610,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	}
 
 	private static boolean isClassValidForClassGraph(SootClass src) {
-		return Config.isClassInSelectedPackages(src) && !Config.isClassInDeselectedPackages(src);
+		return Config.isClassInSelectedPackages(src);
 	}
 
 	private static void addSuperClassEdgesToClassGraph() {
@@ -805,12 +802,10 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		}
 	}
 	
-	public static void printPossibleCalledClasses_Recursive(SootMethod source,
+	private static void printPossibleCalledClasses_Recursive(SootMethod source,
 			int depth) throws IOException {
 		printTabByDepth(depth);
-		if (Constants._DEBUG) {
-			logger.debug("Analyzing " + source);
-		}
+		logger.debug("Analyzing " + source);
 		CallGraph cg = Scene.v().getCallGraph();
 		traversedMethodSet.add(source.toString());
 		Iterator<MethodOrMethodContext> targets = new Targets(cg

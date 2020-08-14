@@ -42,7 +42,6 @@ public class FeatureVector extends ArrayList<Feature> {
 			if (tgtStr.equals(f.edge.tgtStr)) {
 				f.value = value;
 			}
-			
 		}
 	}
 	

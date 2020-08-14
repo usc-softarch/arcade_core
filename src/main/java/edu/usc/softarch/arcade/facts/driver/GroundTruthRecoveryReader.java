@@ -11,7 +11,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import edu.usc.softarch.arcade.config.Config;
@@ -19,8 +18,6 @@ import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
 
 public class GroundTruthRecoveryReader {
-
-	static Logger logger = Logger.getLogger(GroundTruthRecoveryReader.class);
 	private static Set<ConcernCluster> clusters = new HashSet<>();
 
 	public static Set<ConcernCluster> getClusters() {

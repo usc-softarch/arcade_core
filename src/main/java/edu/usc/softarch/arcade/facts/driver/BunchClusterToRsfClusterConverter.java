@@ -8,16 +8,11 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class BunchClusterToRsfClusterConverter {
-
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String inBunchClusterFilename = args[0];
 		String outClusterRsfFilename = args[1];
 		
-		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter(new File(outClusterRsfFilename)));
+		try (BufferedWriter out = new BufferedWriter(new FileWriter(new File(outClusterRsfFilename)))) {
 			Scanner scanner = new Scanner(new File(inBunchClusterFilename));
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
@@ -34,8 +29,6 @@ public class BunchClusterToRsfClusterConverter {
 				}
 				System.out.println(clusterName);
 			}
-			
-			out.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

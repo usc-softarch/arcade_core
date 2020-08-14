@@ -75,5 +75,4 @@ public class GexfExample {
 			e.printStackTrace();
 		}
 	}
-
 }

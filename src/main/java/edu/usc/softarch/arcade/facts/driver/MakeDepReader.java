@@ -21,7 +21,7 @@ import org.apache.log4j.PropertyConfigurator;
 import edu.usc.softarch.arcade.config.Config;
 
 public class MakeDepReader {
-	static Logger logger = Logger.getLogger(MakeDepReader.class);
+	private static Logger logger = Logger.getLogger(MakeDepReader.class);
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());

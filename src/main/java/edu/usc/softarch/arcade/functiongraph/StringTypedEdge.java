@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
-import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
 
 //TODO Replace all occurrences of this with the superclass
@@ -27,16 +26,14 @@ public class StringTypedEdge extends StringEdge implements Serializable {
 		
 		StringTypedEdge e = (StringTypedEdge) o;
 		
-		if (Constants._DEBUG) {
-			logger.debug("e.arcTypeStr: " + e.arcTypeStr);
-			logger.debug("this.arcTypeStr: " + this.arcTypeStr);
-			
-			logger.debug("e.srcStr: " + e.srcStr);
-			logger.debug("this.srcStr: " + this.srcStr);
-			
-			logger.debug("e.tgtStr: " + e.tgtStr);
-			logger.debug("this.tgtStr: " + this.tgtStr);
-		}
+		logger.debug("e.arcTypeStr: " + e.arcTypeStr);
+		logger.debug("this.arcTypeStr: " + this.arcTypeStr);
+		
+		logger.debug("e.srcStr: " + e.srcStr);
+		logger.debug("this.srcStr: " + this.srcStr);
+		
+		logger.debug("e.tgtStr: " + e.tgtStr);
+		logger.debug("this.tgtStr: " + this.tgtStr);
 
 		return (e.srcStr.equals(this.srcStr) &&
 			e.tgtStr.equals(this.tgtStr) &&

@@ -1,15 +1,12 @@
 package edu.usc.softarch.arcade.clustering;
 
 import java.io.File;
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import edu.usc.softarch.arcade.config.Config;
 
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchClusteringEngineSingle {
-	static Logger logger = Logger.getLogger(BatchClusteringEngineSingle.class);
-
 	public static void main(String[] args) throws Exception {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 		// directory where each subdirectory is a different version or revision of the system you want to analyze

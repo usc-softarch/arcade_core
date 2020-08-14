@@ -64,9 +64,9 @@ public class SystemEvo {
 		logger.debug("source entities: " + sourceEntities);
 		logger.debug("target entities: " + targetEntities);
 		
-		Set<String> entitiesToRemove = new HashSet<String>(sourceEntities);
+		Set<String> entitiesToRemove = new HashSet<>(sourceEntities);
 		entitiesToRemove.removeAll(targetEntities);
-		Set<String> entitiesToAdd = new HashSet<String>(targetEntities);
+		Set<String> entitiesToAdd = new HashSet<>(targetEntities);
 		entitiesToAdd.removeAll(sourceEntities);
 		
 		logger.debug("\n");

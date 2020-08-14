@@ -15,7 +15,7 @@ import com.google.common.collect.Lists;
 import edu.usc.softarch.arcade.config.Config;
 
 public class KeepRsfTargetsByPackage {
-	static Logger logger = Logger.getLogger(KeepRsfTargetsByPackage.class);
+	private static Logger logger = Logger.getLogger(KeepRsfTargetsByPackage.class);
 
 	public static void main(String[] args) {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());

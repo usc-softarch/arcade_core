@@ -44,13 +44,10 @@ public class DecayMetricAnalyzer {
 		logger.info(readingClustersFile);
 		
 		Set<ConcernCluster> clusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(clustersFilename);
-		
-		boolean showBuiltClusters = true;
-		if (showBuiltClusters) {
-			logger.debug("Found and built clusters:");
-			for (ConcernCluster cluster : clusters) {
-				logger.debug(cluster.getName());
-			}
+
+		logger.debug("Found and built clusters:");
+		for (ConcernCluster cluster : clusters) {
+			logger.debug(cluster.getName());
 		}
 		
 		String readingDepsFile = "Reading in deps file: " + depsRsfFilename;
@@ -85,7 +82,7 @@ public class DecayMetricAnalyzer {
 		Map<String,Set<MutablePair<String,String>>> internalEdgeMap = ClusterUtil.buildInternalEdgesPerCluster(clusterMap, depFacts);
 		Map<String,Set<MutablePair<String,String>>> externalEdgeMap = ClusterUtil.buildExternalEdgesPerCluster(clusterMap, depFacts);
 		
-		Map<String,Double> clusterFactors = new LinkedHashMap<String,Double>();
+		Map<String,Double> clusterFactors = new LinkedHashMap<>();
 		for (ConcernCluster cluster : clusters) {
 			Set<MutablePair<String,String>> internalEdges = internalEdgeMap.get(cluster.getName());
 			Set<MutablePair<String,String>> externalEdges = externalEdgeMap.get(cluster.getName());

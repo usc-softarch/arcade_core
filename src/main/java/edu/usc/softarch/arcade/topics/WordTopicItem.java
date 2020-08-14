@@ -1,18 +1,20 @@
 package edu.usc.softarch.arcade.topics;
 
-import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author joshua
- *
  */
 public class WordTopicItem {
+	private static final Logger logger = LogManager.getLogger(WordTopicItem.class);
 	public int id;
 	public String name;
-	public HashMap<Integer,Integer> topicIDWordCountMap;
+	public Map<Integer,Integer> topicIDWordCountMap;
 	
 	public double probabilityWordGivenTopic(Integer topicNum) {
-		boolean debug = false;
 		if (!topicIDWordCountMap.containsKey(topicNum)) {
 			return 0;
 		}
@@ -20,12 +22,10 @@ public class WordTopicItem {
 		for (Integer wordCount : topicIDWordCountMap.values()) {
 			wordCountSum += wordCount;
 		}
-		Integer wordCountTopic = (Integer) topicIDWordCountMap.get(topicNum);
-		if (debug) {
-			System.out.println("wordCountTopic: " + wordCountTopic);
-			System.out.println("wordCountSum: " + wordCountSum);
-		}
-		return (double)((double)wordCountTopic/(double)wordCountSum);
+		Integer wordCountTopic = topicIDWordCountMap.get(topicNum);
+		logger.debug("wordCountTopic: " + wordCountTopic);
+		logger.debug("wordCountSum: " + wordCountSum);
+		return ((double)wordCountTopic/(double)wordCountSum);
 	}
 	
 	public String toString() {
@@ -37,15 +37,13 @@ public class WordTopicItem {
 	}
 	
 	public boolean equals(Object o) {
-		WordTopicItem wordTopicItem = (WordTopicItem)o;
-		if (wordTopicItem.name.equals(this.name) &&
-			 wordTopicItem.topicIDWordCountMap.equals(this.topicIDWordCountMap)
-			) {
-			return true;
-		}
-		else {
+		if(!(o instanceof WordTopicItem))
 			return false;
-		}
+
+		WordTopicItem wordTopicItem = (WordTopicItem)o;
+
+		return wordTopicItem.name.equals(this.name) &&
+			 wordTopicItem.topicIDWordCountMap.equals(this.topicIDWordCountMap);
 	}
 	
 	public int hashCode() {

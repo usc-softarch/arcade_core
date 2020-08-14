@@ -18,10 +18,6 @@ import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
 
 public class ClusterSizeCalculator {
-
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
 		String rsfFilename = args[0];
@@ -44,7 +40,7 @@ public class ClusterSizeCalculator {
 			}
 		}
 		
-		Map<String,Integer> clusterEntityCountMap = new HashMap<String,Integer>();
+		Map<String,Integer> clusterEntityCountMap = new HashMap<>();
 		
 		for (ConcernCluster cluster : clusters) {
 			clusterEntityCountMap.put(cluster.getName(), cluster.getEntities().size());
@@ -56,8 +52,6 @@ public class ClusterSizeCalculator {
 			clusterEntityCounts[i] = clusterEntityCount;
 			i++;
 		}
-		
-		
 		
 		double clusterEntityCountsMean = StatUtils.mean(clusterEntityCounts);
 		StandardDeviation stdDev = new StandardDeviation();
@@ -75,10 +69,10 @@ public class ClusterSizeCalculator {
 		double stdDevSmallClusterFactor = 0.5;
 		double smallClustersThreshold = clusterEntityCountsMean*stdDevSmallClusterFactor;
 		double largeClustersThreshold = stdDevLargeClusterFactor*clusterEntityCountsStdDev+clusterEntityCountsMean;
-		Set<String> smallClusters = new HashSet<String>();
-		Set<String> medClusters = new HashSet<String>();
-		Set<String> largeClusters = new HashSet<String>();
-		Set<String> belowMeanClusters = new HashSet<String>();
+		Set<String> smallClusters = new HashSet<>();
+		Set<String> medClusters = new HashSet<>();
+		Set<String> largeClusters = new HashSet<>();
+		Set<String> belowMeanClusters = new HashSet<>();
 		for (Entry<String,Integer> entry : clusterEntityCountMap.entrySet()) {
 			if (entry.getValue() > largeClustersThreshold) {
 				largeClusters.add(entry.getKey());
@@ -96,7 +90,7 @@ public class ClusterSizeCalculator {
 		}
 		
 		// Determine singleton clusters
-		Set<String> singletonClusters = new HashSet<String>();
+		Set<String> singletonClusters = new HashSet<>();
 		for (Entry<String,Integer> entry : clusterEntityCountMap.entrySet()) {
 			if (entry.getValue() == 1) {
 				singletonClusters.add(entry.getKey());
@@ -126,15 +120,12 @@ public class ClusterSizeCalculator {
 		System.out.println("Proportion of singleton clusters: " + singletonClusterProportion);
 		System.out.println("Proportion of below mean clusters: " + belowMeanClusterProportion);
 		
-		
 		System.out.println("Statistics: ");
 		System.out.println("\tNo. of clusters: " + clusters.size());
 		System.out.println("\tNo. of entities in system: " + entityCount);
 		System.out.println("\tmean cluster size: " + clusterEntityCountsMean);
-		System.out.println("\tmean cluster size as proportion of total entities in system: " + (double)clusterEntityCountsMean/(double)entityCount);
+		System.out.println("\tmean cluster size as proportion of total entities in system: " + clusterEntityCountsMean/(double)entityCount);
 		System.out.println("\tstandard deviation cluster size: " + clusterEntityCountsStdDev);
 		System.out.println("\tskewness cluster size: " + clusterEntityCountsSkewness);
-
 	}
-
 }
