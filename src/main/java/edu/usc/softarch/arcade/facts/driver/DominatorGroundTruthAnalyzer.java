@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.collections15.Factory;
+import org.apache.commons.collections4.Factory;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;

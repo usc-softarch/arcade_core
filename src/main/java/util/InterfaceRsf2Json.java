@@ -27,12 +27,9 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.google.common.collect.Lists;
-
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class InterfaceRsf2Json {
-	// static Logger logger = org.apache.logging.log4j.LogManager.getLogger(DepRsf2Json.class);
 	// Define XML TAGs
 	private static String COMPONENT_NAME 				= "name";
 	private static String CHIDREN 			= "children";
@@ -43,11 +40,7 @@ public class InterfaceRsf2Json {
 	
 	private static String FEATURE 		= "feature";
 	private static String NAME 		= "name";
-	private static String INBOUND 		= "inbound";
-	private static String OUTBOUND 	= "outbound";
 	private static String CLASS		= "class";
-	
-	
 	
 	public static String PKGNAME;
 	

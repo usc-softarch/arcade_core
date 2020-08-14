@@ -82,10 +82,10 @@ public class JSONUtil {
 					while (cellIterator.hasNext()) {
 						Cell cell = cellIterator.next();
 						switch(cell.getCellType()){
-						case Cell.CELL_TYPE_NUMERIC:
+						case NUMERIC:
 							smellPerClass.put(smellPerClassHeader[headerIdx++], (int)cell.getNumericCellValue());
 							break;
-						case Cell.CELL_TYPE_STRING:
+						case STRING:
 							smellPerClass.put(smellPerClassHeader[headerIdx++], cell.getStringCellValue());
 							break;
 						}

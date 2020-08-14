@@ -20,7 +20,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.collections15.Factory;
+import org.apache.commons.collections4.Factory;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -30,11 +30,8 @@ import edu.uci.ics.jung.graph.DelegateTree;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Tree;
-import edu.usc.softarch.arcade.MetricsDriver;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
-
-
 
 public class FlatDecompositionBuilder {
 	

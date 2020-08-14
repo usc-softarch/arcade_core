@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -66,10 +65,7 @@ public class ExcelToRsfConverter {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			e.printStackTrace();
 		}
-
 	}
 
 	private static void buildFact(Row row, List<String> fact, Cell cell) {
@@ -79,23 +75,23 @@ public class ExcelToRsfConverter {
 		System.out.print(" - ");
 
 		switch (cell.getCellType()) {
-		case Cell.CELL_TYPE_STRING:
+		case STRING:
 			String cellValue = cell.getRichStringCellValue()
 					.getString().trim().replaceAll("\\s", "_");
 			fact.add(cellValue);
 			System.out.println(cellValue);
 			break;
-		case Cell.CELL_TYPE_NUMERIC:
+		case NUMERIC:
 			if (DateUtil.isCellDateFormatted(cell)) {
 				System.out.println(cell.getDateCellValue());
 			} else {
 				System.out.println(cell.getNumericCellValue());
 			}
 			break;
-		case Cell.CELL_TYPE_BOOLEAN:
+		case BOOLEAN:
 			System.out.println(cell.getBooleanCellValue());
 			break;
-		case Cell.CELL_TYPE_FORMULA:
+		case FORMULA:
 			System.out.println(cell.getCellFormula());
 			break;
 		default:

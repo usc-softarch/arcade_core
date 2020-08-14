@@ -32,22 +32,17 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
-import org.apache.commons.collections15.Factory;
-import org.apache.commons.collections15.functors.ConstantTransformer;
+import org.apache.commons.collections4.Factory;
+import org.apache.commons.collections4.functors.ConstantTransformer;
 
 import edu.uci.ics.jung.algorithms.layout.PolarPoint;
 import edu.uci.ics.jung.algorithms.layout.RadialTreeLayout;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
-import edu.uci.ics.jung.graph.DelegateForest;
 import edu.uci.ics.jung.graph.DelegateTree;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
-import edu.uci.ics.jung.graph.Forest;
 import edu.uci.ics.jung.graph.Tree;
-import edu.uci.ics.jung.io.GraphFile;
 import edu.uci.ics.jung.io.GraphMLWriter;
-import edu.uci.ics.jung.io.MatrixFile;
-import edu.uci.ics.jung.samples.TreeLayoutDemo;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationServer;
@@ -72,17 +67,18 @@ public class TreeGraphGenerator extends JApplet {
     	new Factory<DirectedGraph<String,Integer>>() {
 
 			public DirectedGraph<String, Integer> create() {
-				return new DirectedSparseMultigraph<String,Integer>();
+				return new DirectedSparseMultigraph<>();
 			}
 		};
 			
-	Factory<Tree<String,Integer>> treeFactory =
-		new Factory<Tree<String,Integer>> () {
+		//TODO jung namespace errors
+	// Factory<Tree<String,Integer>> treeFactory =
+	// 	new Factory<Tree<String,Integer>> () {
 
-		public Tree<String, Integer> create() {
-			return new DelegateTree<String,Integer>(graphFactory);
-		}
-	};
+	// 	public Tree<String, Integer> create() {
+	// 		return new DelegateTree<String,Integer>(graphFactory);
+	// 	}
+	// };
 	
 	Factory<Integer> edgeFactory = new Factory<Integer>() {
 		int i=0;
@@ -100,19 +96,15 @@ public class TreeGraphGenerator extends JApplet {
      * the visual component and renderer for the graph
      */
     VisualizationViewer<String,Integer> vv;
-    
     VisualizationServer.Paintable rings;
-    
     String root;
-    
     TreeLayout<String,Integer> treeLayout;
-    
     RadialTreeLayout<String,Integer> radialLayout;
 
     public TreeGraphGenerator() {
         
         // create a simple graph for the demo
-        graph = new DelegateTree<String,Integer>();
+        graph = new DelegateTree<>();
 
         createTree();
         
@@ -126,16 +118,18 @@ public class TreeGraphGenerator extends JApplet {
     }
 
 	private void buildViewer() {
-		treeLayout = new TreeLayout<String,Integer>(graph);
-        radialLayout = new RadialTreeLayout<String,Integer>(graph);
+		treeLayout = new TreeLayout<>(graph);
+        radialLayout = new RadialTreeLayout<>(graph);
         radialLayout.setSize(new Dimension(600,600));
-        vv =  new VisualizationViewer<String,Integer>(treeLayout, new Dimension(600,600));
-        vv.setBackground(Color.white);
-        vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line());
+        vv =  new VisualizationViewer<>(treeLayout, new Dimension(600,600));
+				vv.setBackground(Color.white);
+				//TODO Line below commented because of jung namespace problems
+        // vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line());
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
         // add a listener for ToolTips
-        vv.setVertexToolTipTransformer(new ToStringLabeller());
-        vv.getRenderContext().setArrowFillPaintTransformer(new ConstantTransformer(Color.lightGray));
+				vv.setVertexToolTipTransformer(new ToStringLabeller());
+				//TODO Line below commented because of jung namespace problems
+        // vv.getRenderContext().setArrowFillPaintTransformer(new ConstantTransformer(Color.lightGray));
         rings = new Rings();
 
         Container content = getContentPane();
@@ -172,14 +166,14 @@ public class TreeGraphGenerator extends JApplet {
 				if(e.getStateChange() == ItemEvent.SELECTED) {
 					
 					LayoutTransition<String,Integer> lt =
-						new LayoutTransition<String,Integer>(vv, treeLayout, radialLayout);
+						new LayoutTransition<>(vv, treeLayout, radialLayout);
 					Animator animator = new Animator(lt);
 					animator.start();
 					vv.getRenderContext().getMultiLayerTransformer().setToIdentity();
 					vv.addPreRenderPaintable(rings);
 				} else {
 					LayoutTransition<String,Integer> lt =
-						new LayoutTransition<String,Integer>(vv, radialLayout, treeLayout);
+						new LayoutTransition<>(vv, radialLayout, treeLayout);
 					Animator animator = new Animator(lt);
 					animator.start();
 					vv.getRenderContext().getMultiLayerTransformer().setToIdentity();
@@ -202,7 +196,6 @@ public class TreeGraphGenerator extends JApplet {
 	}
     
     class Rings implements VisualizationServer.Paintable {
-    	
     	Collection<Double> depths;
     	
     	public Rings() {
@@ -210,7 +203,7 @@ public class TreeGraphGenerator extends JApplet {
     	}
     	
     	private Collection<Double> getDepths() {
-    		Set<Double> depths = new HashSet<Double>();
+    		Set<Double> depths = new HashSet<>();
     		Map<String,PolarPoint> polarLocations = radialLayout.getPolarLocations();
     		for(String v : graph.getVertices()) {
     			PolarPoint pp = polarLocations.get(v);
@@ -219,65 +212,55 @@ public class TreeGraphGenerator extends JApplet {
     		return depths;
     	}
 
-		public void paint(Graphics g) {
-			g.setColor(Color.lightGray);
-		
-			Graphics2D g2d = (Graphics2D)g;
-			Point2D center = radialLayout.getCenter();
+			public void paint(Graphics g) {
+				g.setColor(Color.lightGray);
+			
+				Graphics2D g2d = (Graphics2D)g;
+				Point2D center = radialLayout.getCenter();
 
-			Ellipse2D ellipse = new Ellipse2D.Double();
-			for(double d : depths) {
-				ellipse.setFrameFromDiagonal(center.getX()-d, center.getY()-d, 
-						center.getX()+d, center.getY()+d);
-				Shape shape = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).transform(ellipse);
-				g2d.draw(shape);
+				Ellipse2D ellipse = new Ellipse2D.Double();
+				for(double d : depths) {
+					ellipse.setFrameFromDiagonal(center.getX()-d, center.getY()-d, 
+							center.getX()+d, center.getY()+d);
+					Shape shape = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).transform(ellipse);
+					g2d.draw(shape);
+				}
 			}
-		}
 
-		public boolean useTransform() {
-			return true;
-		}
+			public boolean useTransform() {
+				return true;
+			}
     }
     
-    /**
-     * 
-     */
     private void createTree() {
-    	
     	int maxChildren = 5;
     	int maxHeight = 5;
-    	
-		
-		
-		Random random = new Random();
-		
-		String currVertex = vertexFactory.create();
-		graph.addVertex(currVertex);
-		
-		growTree(maxChildren, maxHeight, random, currVertex);
-		
-		String dirStr = "data" + File.separator + "generated" + File.separator;
-		String graphMlFilename = "generated_tree_" + maxChildren + "mc_" + maxHeight + "mh.graphml";
-		String rsfFilename = "generated_tree_" + maxChildren + "mc_" + maxHeight + "mh.rsf";
-		File dir = new File(dirStr);
-		dir.mkdirs();
-		GraphMLWriter<String,Integer> graphMLWriter = new GraphMLWriter<String, Integer>();
-		Collection<Integer> edges = graph.getEdges();
-		try {
-			graphMLWriter.save(graph, new FileWriter(dirStr + graphMlFilename));
+			Random random = new Random();
 			
-			FileWriter fileWriter = new FileWriter(dirStr + rsfFilename);
-			BufferedWriter out = new BufferedWriter(fileWriter);
-			for (Integer edge : edges) {
-				out.write("depends " + graph.getSource(edge) + " " + graph.getDest(edge) + "\n");
+			String currVertex = vertexFactory.create();
+			graph.addVertex(currVertex);
+			
+			growTree(maxChildren, maxHeight, random, currVertex);
+			
+			String dirStr = "data" + File.separator + "generated" + File.separator;
+			String graphMlFilename = "generated_tree_" + maxChildren + "mc_" + maxHeight + "mh.graphml";
+			String rsfFilename = "generated_tree_" + maxChildren + "mc_" + maxHeight + "mh.rsf";
+			File dir = new File(dirStr);
+			dir.mkdirs();
+			GraphMLWriter<String,Integer> graphMLWriter = new GraphMLWriter<String, Integer>();
+			Collection<Integer> edges = graph.getEdges();
+			try {
+				graphMLWriter.save(graph, new FileWriter(dirStr + graphMlFilename));
+				
+				FileWriter fileWriter = new FileWriter(dirStr + rsfFilename);
+				BufferedWriter out = new BufferedWriter(fileWriter);
+				for (Integer edge : edges) {
+					out.write("depends " + graph.getSource(edge) + " " + graph.getDest(edge) + "\n");
+				}
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			out.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
-       	
     }
 
 	private void growTree(int maxChildren, int maxHeight, Random random, String currVertex) {
@@ -292,78 +275,21 @@ public class TreeGraphGenerator extends JApplet {
 
 	private void createChildren(int maxChildren, Random random,
 			String currVertex) {
-		
 		for (int i = 0; i < maxChildren; i++) {
 			if (random.nextInt(100) > 50) {
 				graph.addEdge(edgeFactory.create(), currVertex,
 						vertexFactory.create());
 			}
 		}
-
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		
-		
 		JFrame frame = new JFrame();
-        Container content = frame.getContentPane();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		Container content = frame.getContentPane();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        content.add(new TreeGraphGenerator());
-        frame.pack();
-        frame.setVisible(true);
-		
-		
-		
-
-		/*for (int i=0;i<numEntities;i++) {
-			for (int j=0;j<numEntities;j++) {
-				depMatrix[i][j] = random.nextInt(2);
-			}
-		}
-		
-		for (int i=0;i<numEntities;i++) {
-			for (int j = 0; j < numEntities; j++) {
-				System.out.print(depMatrix[i][j] + " ");
-			}
-			System.out.println();
-		}
-		
-		
-		for (int i=0;i<numEntities;i++) {
-			for (int j=0;j<numEntities;j++) {
-				if (depMatrix[i][j] == 1)  {
-					System.out.println("depends e" + i + " e" + j);
-				}
-			}
-		}
-		
-		
-		
-		try {
-			String dirStr = "data" + File.separator + "generated" + File.separator;
-			File dir = new File(dirStr);
-			dir.mkdirs();
-			FileWriter fstream = new FileWriter(dirStr + "generated_deps_" + numEntities + ".rsf");
-			BufferedWriter out = new BufferedWriter(fstream);
-			
-			for (int i=0;i<numEntities;i++) {
-				for (int j=0;j<numEntities;j++) {
-					if (depMatrix[i][j] == 1)  {
-						out.write("depends e" + i + ".c e" + j + ".c\n");
-					}
-				}
-			}
-			
-			out.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		
+		content.add(new TreeGraphGenerator());
+		frame.pack();
+		frame.setVisible(true);
 	}
-
 }
