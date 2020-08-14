@@ -4,7 +4,7 @@
   <groupId>edu.usc.softarch.arcade</groupId>
   <artifactId>arcade_core</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.0.3</version>
   <name>arcade_core</name>
   <url>https://github.com/usc-softarch/arcade_core</url>
   <properties>
@@ -161,13 +161,13 @@
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
-      <version>3.8</version>
+      <version>4.1.2</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
-      <version>3.8</version>
+      <version>4.1.2</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/net.rcarz/jira-client -->
     <dependency>
@@ -222,13 +222,13 @@
     <dependency>
       <groupId>net.sourceforge.pmd</groupId>
       <artifactId>pmd-java</artifactId>
-      <version>5.3.3</version>
+      <version>6.26.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd-core -->
     <dependency>
       <groupId>net.sourceforge.pmd</groupId>
       <artifactId>pmd-core</artifactId>
-      <version>5.3.3</version>
+      <version>6.26.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/net.sourceforge.jexcelapi/jxl -->
     <dependency>
@@ -246,12 +246,12 @@
       <artifactId>gexf4j</artifactId>
       <version>local</version>
     </dependency>
-	<!-- https://mvnrepository.com/artifact/oro/oro -->
-	<dependency>
+	  <!-- https://mvnrepository.com/artifact/oro/oro -->
+    <dependency>
       <groupId>oro</groupId>
       <artifactId>oro</artifactId>
       <version>2.0.8</version>
-	</dependency>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
