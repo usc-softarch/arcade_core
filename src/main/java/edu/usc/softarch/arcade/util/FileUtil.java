@@ -9,16 +9,16 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import edu.usc.softarch.arcade.Constants;
 
 public class FileUtil {
 	private static Logger logger = LogManager.getLogger(FileUtil.class);
@@ -40,11 +40,8 @@ public class FileUtil {
 	 * @param theFile Name or path to desired file's prefix.
 	 */
 	public static String extractFilenamePrefix(final File theFile) {
-		if(Constants._DEBUG)
-		{
-			logger.entry(theFile);
-			logger.traceExit();
-		}
+		logger.entry(theFile);
+		logger.traceExit();
 		return FilenameUtils.getBaseName(theFile.getName());
 	}
 
@@ -64,11 +61,8 @@ public class FileUtil {
 	 * @param theFile Name or path to desired file's extension.
 	 */
 	public static String extractFilenameSuffix(final File theFile) {
-		if(Constants._DEBUG)
-		{
-			logger.entry(theFile);
-			logger.traceExit();
-		}
+		logger.entry(theFile);
+		logger.traceExit();
 		return FilenameUtils.getExtension(theFile.getName());
 	}
 
@@ -161,16 +155,14 @@ public class FileUtil {
 						Integer part2 = Integer.parseInt(parts2[i]);
 						int compareToVal = part1.compareTo(part2);
 						if (compareToVal != 0) {
-							if(Constants._DEBUG)
-								logger.debug("compareTo " + version1 + " to "
-									+ version2 + ": " + compareToVal);
+							logger.debug("compareTo " + version1 + " to "
+								+ version2 + ": " + compareToVal);
 							return compareToVal;
 						}
 					} catch (NumberFormatException e) {
-						if(Constants._DEBUG)
-							logger.debug("Invalid part using string comparison for "
-								+ version1 + " to " + version2 + ": "
-								+ version1.compareTo(version2));
+						logger.debug("Invalid part using string comparison for "
+							+ version1 + " to " + version2 + ": "
+							+ version1.compareTo(version2));
 						//TODO Check if this can't replace the rest of this try/catch
 						return version1.compareTo(version2);
 					}
@@ -203,7 +195,7 @@ public class FileUtil {
 	public static File checkFile(final String fileName, final boolean create,
 		final boolean exitOnNoExist) {
 
-		if(Constants._DEBUG) logger.entry(fileName, create, exitOnNoExist);
+		logger.entry(fileName, create, exitOnNoExist);
 
 		final File f = new File(fileName);
 
@@ -219,14 +211,14 @@ public class FileUtil {
 						logger.trace(" succeeded");
 					} else {
 						logger.trace(" failed ");
-						if(Constants._DEBUG) logger.traceExit();
+						logger.traceExit();
 						System.out.println("### Could not create file: " + fileName);
 						System.out.println("Exiting");
 						System.exit(-1);
 					}
 				} catch (final IOException e) {
 					logger.trace(" failed due to IOException");
-					if(Constants._DEBUG) logger.traceExit();
+					logger.traceExit();
 					System.exit(-1);
 				}
 			}
@@ -240,7 +232,7 @@ public class FileUtil {
 			}
 		}
 
-		if(Constants._DEBUG) logger.traceExit();
+		logger.traceExit();
 		return f;
 	}
 
@@ -256,7 +248,7 @@ public class FileUtil {
 		final boolean exitOnNoExist) {
 		//TODO Check if create should have priority over exitOnNoExist
 
-		if(Constants._DEBUG) logger.entry(dirName, create, exitOnNoExist);
+		logger.entry(dirName, create, exitOnNoExist);
 		final File f = new File(dirName);
 
 		// Check if given file is a directory
@@ -268,10 +260,8 @@ public class FileUtil {
 				System.out.println("### Directory that must exist does not exist: "
 					+ dirName);
 				System.out.println("Exiting");
-				if(Constants._DEBUG) {
-					logger.trace("exiting");
-					logger.traceExit();
-				}
+				logger.trace("exiting");
+				logger.traceExit();
 				System.exit(-1);
 			}
 
@@ -282,7 +272,7 @@ public class FileUtil {
 					logger.trace(" succeeded");
 				} else {
 					logger.trace(" failed");
-					if(Constants._DEBUG) logger.traceExit();
+					logger.traceExit();
 					System.out.println("### Could not create directory: " + dirName);
 					System.out.println("Exiting");
 					System.exit(-1);
@@ -290,7 +280,7 @@ public class FileUtil {
 			}
 		}
 
-		if(Constants._DEBUG) logger.traceExit();
+		logger.traceExit();
 		return f;
 	}
 
@@ -329,7 +319,7 @@ public class FileUtil {
 	 */
 	public static String extractVersionPretty(final String name) {
 		//TODO Refactor to call extractVersionFromFilename()
-		if(Constants._DEBUG) logger.entry(name);
+		logger.entry(name);
 
 		String patternString = "[0-9]+\\.[0-9]+(\\.[0-9]+)*+(-(RC|ALPHA|BETA|M" +
 			"|Rc|Alpha|Beta|rc|alpha|beta|deb|b|a|final|Final|FINAL)[0-9]+)*";
@@ -337,11 +327,29 @@ public class FileUtil {
 		final Matcher m = p.matcher(name);
 
 		if (m.find()) {
-			if(Constants._DEBUG) logger.traceExit();
+			logger.traceExit();
 			return m.group(0);
 		}
 
-		if(Constants._DEBUG) logger.traceExit();
+		logger.traceExit();
 		return null;
+	}
+
+	/**
+	 * Makes a List by calling "toString" on every item of collection
+	 */
+	public static <E extends Object> List<String>
+			collectionToString(Collection<E> collection) {
+		return collection.stream().map(E::toString).collect(Collectors.toList());
+	}
+
+	/**
+	 * Casts an Iterable into a List
+	 */
+	public static <E extends Object> List<E> iterableToCollection
+			(Iterable<E> iterable) {
+		List<E> toReturn = new ArrayList<>();
+		iterable.forEach(toReturn::add);
+		return toReturn;
 	}
 }

@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -823,4 +825,19 @@ public class FileUtilTest {
         assertEquals("2.5", result);
     }
     // #endregion TESTS extractVersionPretty -----------------------------------
+
+    // #region TESTS collectionToString ----------------------------------------
+    @Test
+    public void collectionToStringTest1() {
+        // Input is a valid cluster file
+        String fs = File.separator;
+        String filePath = "src" + fs + "test" + fs + "resources" + fs +
+            "FileUtilTest_resources" + fs + "orca-sim-1.0_cluster.rsf";
+        List<String> inputList = assertDoesNotThrow(() ->
+            { return Files.readAllLines(
+                Paths.get(filePath), StandardCharsets.UTF_8); });
+        assertDoesNotThrow(() ->
+            { return FileUtil.collectionToString(inputList); });
+    }
+    // #endregion TESTS collectionToString -------------------------------------
 }

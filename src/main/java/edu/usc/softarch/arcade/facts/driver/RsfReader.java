@@ -7,12 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,21 +38,16 @@ import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
-import edu.usc.softarch.arcade.Constants;
 import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.Language;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
+import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.StopWatch;
 
 public class RsfReader {
 
-	static Logger logger = Logger.getLogger(RsfReader.class);
+	private static Logger logger = Logger.getLogger(RsfReader.class);
 	public static Set<List<String>> untypedEdgesSet;
 	public static Set<String> startNodesSet;
 	public static Iterable<List<String>> filteredRoutineFacts;
@@ -68,8 +64,8 @@ public class RsfReader {
 		Option writeFilteredData = new Option("w", "write filtered rsf data from deps_rsf_file property in project file");
 
 		Option projFile = OptionBuilder.withArgName("file").hasArg()
-				.withDescription("project configuration file")
-				.create("projfile");
+			.withDescription("project configuration file")
+			.create("projfile");
 
 		options.addOption(help);
 		options.addOption(projFile);
@@ -110,26 +106,18 @@ public class RsfReader {
 	
 	public static List<List<String>> extractFactsFromRSF(String rsfFilename) {
 		// List of facts extracted from RSF File
-		List<List<String>> facts = Lists.newArrayList();
+		List<List<String>> facts = new ArrayList<>();
 
-		if(Constants._DEBUG)
-			logger.debug("Attempting to read " + rsfFilename);
+		logger.debug("Attempting to read " + rsfFilename);
 		
 		try (BufferedReader in = new BufferedReader(new FileReader(rsfFilename))) {
 			String line;
-			int lineCount = 0;
-			int limit = 0;
+
 			while ((line = in.readLine()) != null) {
-				if (lineCount == limit && limit != 0) {
-					break;
-				}
-				if (Constants._DEBUG) {
-					logger.debug(line);
-				}
+				logger.debug(line);
 				
-				if (line.trim().isEmpty()) {
+				if (line.trim().isEmpty())
 					continue;
-				}
 
 				Scanner s = new Scanner(line);
 				String expr = "([^\"\\s][^\\s]*[^\"\\s]*)|([\"][^\"]*[\"])";
@@ -137,23 +125,18 @@ public class RsfReader {
 				String arcType = s.findInLine(expr);
 				String startNode = s.findInLine(expr);
 				String endNode = s.findInLine(expr);
-				List<String> fact = Lists.newArrayList(arcType, startNode,
-						endNode);
-				if (Constants._DEBUG) {
-					logger.debug(fact);
-				}
+				List<String> fact = Arrays.asList(arcType, startNode, endNode);
+				logger.debug(fact);
 				facts.add(fact);
 
 				if (s.findInLine(expr) != null) {
 					logger.error("Found non-triple in file: " + line);
-					System.exit(1);
+					System.exit(1); //TODO Remove
 				}
 				s.close();
-
-				lineCount++;
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			e.printStackTrace(); //TODO Treat properly
 		}
 		return facts;
 	}
@@ -166,23 +149,32 @@ public class RsfReader {
 
 		List<List<String>> facts = extractFactsFromRSF(rsfFilename);
 
+		List<String> factsText = FileUtil.collectionToString(facts);
 		logger.debug("Printing stored facts...");
-		logger.debug(Joiner.on("\n").join(facts));
-		
+		logger.debug(String.join("\n", factsText));
 		
 		filteredRoutineFacts = filterRoutinesFromFacts(facts);
+		
+		// Turn Iterable into Collection
+		List<List<String>> filteredRoutineFactsCollection = new ArrayList<>();
+		filteredRoutineFacts.forEach(filteredRoutineFactsCollection::add);
+		// Turn Collection into List<String>
+		List<String> filteredRoutineFactsText =
+			FileUtil.collectionToString(filteredRoutineFactsCollection);
+
 		logger.debug("Printing filtered routine facts...");
-		logger.debug(Joiner.on("\n").join(filteredRoutineFacts));
+		logger.debug(String.join("\n", filteredRoutineFactsText));
 		
 		Iterable<List<String>> filteredDepFacts = filterFacts(facts);
-		
 
-		List<List<String>> filteredDepFactsList = Lists
-				.newArrayList(filteredDepFacts);
+		List<List<String>> filteredDepFactsList =
+			FileUtil.iterableToCollection(filteredDepFacts);
+		List<String> filteredDepFactsText =
+			FileUtil.collectionToString(filteredDepFactsList);
 		logger.debug("Printing filtered dependency facts....");
 		logger.debug("number of filtered dependency facts: "
 				+ filteredDepFactsList.size());
-		logger.debug(Joiner.on("\n").join(filteredDepFacts));
+		logger.debug(String.join("\n", filteredDepFactsText));
 		
 		try {
 			writeFactsToFile(filteredRoutineFacts,Config.getFilteredRoutineFactsFilename());
@@ -197,87 +189,10 @@ public class RsfReader {
 
 	private static void writeFactsToFile(
 			Iterable<List<String>> facts, String fileName) throws IOException {
-		FileWriter fstream = new FileWriter(fileName);
-		BufferedWriter out = new BufferedWriter(fstream);
-		
-		for (List<String> fact : facts) {
-			out.write(fact.get(0) + " " + fact.get(1) + " " + fact.get(2) + "\n");
+		try (BufferedWriter out = new BufferedWriter(new FileWriter(fileName))) {
+			for (List<String> fact : facts)
+				out.write(fact.get(0) + " " + fact.get(1) + " " + fact.get(2) + "\n");
 		}
-		
-		out.close();
-		
-	}
-	
-	public static void loadRsfDataAndFilter() {
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-
-		String rsfFilename = Config.getDepsRsfFilename();
-
-		List<List<String>> facts = extractFactsFromRSF(rsfFilename);
-
-		logger.debug("Printing stored facts...");
-		logger.debug(Joiner.on("\n").join(facts));
-		
-		
-		filteredRoutineFacts = filterRoutinesFromFacts(facts);
-		logger.debug("Printing filtered routine facts...");
-		logger.debug(Joiner.on("\n").join(filteredRoutineFacts));
-		
-		filteredRoutines = filterRoutinesFromRoutineFacts();
-		List<String> sortedFilteredRoutines = new ArrayList<>(filteredRoutines);
-		Collections.sort(sortedFilteredRoutines);
-		
-		logger.debug("Printing filtered routines...");
-		logger.debug("Number of filtered routines: " + sortedFilteredRoutines.size());
-		logger.debug(Joiner.on("\n").join(sortedFilteredRoutines));
-
-		Iterable<List<String>> filteredDepFacts = filterFacts(facts);
-		
-
-		List<List<String>> filteredDepFactsList = Lists
-				.newArrayList(filteredDepFacts);
-		logger.debug("Printing filtered dependency facts....");
-		logger.debug("number of filtered dependency facts: "
-				+ filteredDepFactsList.size());
-		logger.debug(Joiner.on("\n").join(filteredDepFacts));
-
-		List<List<String>> untypedEdges = convertFactsToUntypedEdges(filteredDepFacts);
-
-		untypedEdgesSet = Sets.newHashSet(untypedEdges);
-
-		logger.debug("Printing untyped edges....");
-		logger.debug("number of untyped edges as list: "
-				+ untypedEdges.size());
-		logger.debug("number of untyped edges as set: "
-				+ untypedEdgesSet.size());
-		logger.debug(Joiner.on("\n").join(untypedEdges));
-
-		List<String> startNodesList = convertFactsToStartNodesList(filteredDepFacts);
-		
-		Set<String> rawStartNodesSet = Sets.newHashSet(startNodesList);
-
-		logger.debug("Printing raw start nodes...");
-		logger.debug("number of raw start nodes: " + rawStartNodesSet.size());
-		logger.debug(Joiner.on("\n").join(rawStartNodesSet));
-
-		List<String> endNodesList = convertFactsToEndNodesList(filteredDepFacts);
-		Set<String> endNodesSet = Sets.newHashSet(endNodesList);
-
-		logger.debug("Printing end nodes...");
-		logger.debug("number of end nodes: " + endNodesSet.size());
-		logger.debug(Joiner.on("\n").join(endNodesSet));
-		
-		Set<String> sortedFilteredRoutinesSet = Sets.newTreeSet(sortedFilteredRoutines);
-		startNodesSet = new TreeSet<>(rawStartNodesSet);
-		startNodesSet.retainAll(sortedFilteredRoutinesSet);
-		
-		logger.debug("Printing start nodes...");
-		logger.debug("number of start nodes: " + startNodesSet.size());
-		logger.debug(Joiner.on("\n").join(startNodesSet));
-		
-		stopWatch.stop();
-		logger.debug("Elapsed time in milliseconds: " + stopWatch.getElapsedTime());
 	}
 
 	public static void loadRsfDataForCurrProj() {
@@ -292,55 +207,47 @@ public class RsfReader {
 
 		unfilteredFacts = extractFactsFromRSF(rsfFilename);
 
-		if (Constants._DEBUG) {
-			logger.debug("Printing stored facts...");
-			logger.debug(Joiner.on("\n").join(unfilteredFacts));
-		}
+		List<String> unfilteredFactsText =
+			FileUtil.collectionToString(unfilteredFacts);
+		logger.debug("Printing stored facts...");
+		logger.debug(String.join("\n", unfilteredFactsText));
 		
 		filteredRoutineFacts = unfilteredFacts;
 
 		List<List<String>> untypedEdges = convertFactsToUntypedEdges(unfilteredFacts);
+		untypedEdgesSet = new HashSet<>(untypedEdges);
 
-		untypedEdgesSet = Sets.newHashSet(untypedEdges);
+		List<String> untypedEdgesText = FileUtil.collectionToString(untypedEdges);
+		logger.debug("Printing untyped edges....");
+		logger.debug("number of untyped edges as list: " + untypedEdges.size());
+		logger.debug("number of untyped edges as set: "	+ untypedEdgesSet.size());
+		logger.debug(String.join("\n", untypedEdgesText));
 
-		if (Constants._DEBUG) {
-			logger.debug("Printing untyped edges....");
-			logger.debug("number of untyped edges as list: "
-					+ untypedEdges.size());
-			logger.debug("number of untyped edges as set: "
-					+ untypedEdgesSet.size());
-			logger.debug(Joiner.on("\n").join(untypedEdges));
-		}
 		List<String> startNodesList = convertFactsToStartNodesList(unfilteredFacts);
-		
-		HashSet<String> rawStartNodesSet = Sets.newHashSet(startNodesList);
+		HashSet<String> rawStartNodesSet = new HashSet<>(startNodesList);
 
-		if (Constants._DEBUG) {
-			logger.debug("Printing raw start nodes...");
-			logger.debug("number of raw start nodes: "
-					+ rawStartNodesSet.size());
-			logger.debug(Joiner.on("\n").join(rawStartNodesSet));
-		}
+		List<String> rawStartNodesSetText =
+			FileUtil.collectionToString(rawStartNodesSet);
+		logger.debug("Printing raw start nodes...");
+		logger.debug("number of raw start nodes: " + rawStartNodesSet.size());
+		logger.debug(String.join("\n", rawStartNodesSetText));
 
 		List<String> endNodesList = convertFactsToEndNodesList(unfilteredFacts);
-		endNodesSet = Sets.newHashSet(endNodesList);
+		endNodesSet = new HashSet<>(endNodesList);
 		
+		List<String> endNodesSetText = FileUtil.collectionToString(endNodesSet);
+		logger.debug("Printing end nodes...");
+		logger.debug("number of end nodes: " + endNodesSet.size());
+		logger.debug(String.join("\n", endNodesSetText));
+		
+		startNodesSet = new TreeSet<>(rawStartNodesSet);
 
-		if (Constants._DEBUG) {
-			logger.debug("Printing end nodes...");
-			logger.debug("number of end nodes: " + endNodesSet.size());
-			logger.debug(Joiner.on("\n").join(endNodesSet));
-		}
+		List<String> startNodesSetText = FileUtil.collectionToString(startNodesSet);
+		logger.debug("Printing start nodes...");
+		logger.debug("number of start nodes: " + startNodesSet.size());
+		logger.debug(String.join("\n", startNodesSetText));
 		
-		startNodesSet = new TreeSet<String>(rawStartNodesSet);
-
-		if (Constants._DEBUG) {
-			logger.debug("Printing start nodes...");
-			logger.debug("number of start nodes: " + startNodesSet.size());
-			logger.debug(Joiner.on("\n").join(startNodesSet));
-		}
-		
-		allNodesSet = new HashSet<String>(startNodesSet);
+		allNodesSet = new HashSet<>(startNodesSet);
 		allNodesSet.addAll(endNodesSet);
 		
 		stopWatch.stop();
@@ -348,59 +255,46 @@ public class RsfReader {
 	}
 
 	private static List<String> convertFactsToEndNodesList(
-			Iterable<List<String>> filteredFacts) {
-		return Lists.transform(
-				Lists.newArrayList(filteredFacts),
-				(List<String> fact) -> fact.get(2)
-				);
+			List<List<String>> filteredFacts) {
+		return filteredFacts.stream()
+			.map((List<String> fact) -> fact.get(2))
+			.collect(Collectors.toList());
 	}
 
 	private static List<String> convertFactsToStartNodesList(
-			Iterable<List<String>> filteredFacts) {
-		return Lists.transform(
-				Lists.newArrayList(filteredFacts),
-				(List<String> fact) -> fact.get(1)
-				);
+			List<List<String>> filteredFacts) {
+		return filteredFacts.stream()
+			.map((List<String> fact) -> fact.get(1))
+			.collect(Collectors.toList());
 	}
 
 	private static List<List<String>> convertFactsToUntypedEdges(
-			Iterable<List<String>> filteredFacts) {
-		return Lists.transform(
-				Lists.newArrayList(filteredFacts),
-				(List<String> fact) -> Lists.newArrayList(fact.get(1), fact.get(2))
-				);
-	}
-
-	private static List<String> filterRoutinesFromRoutineFacts() {
-		return Lists.transform(
-				Lists.newArrayList(filteredRoutineFacts),
-				(List<String> fact) -> fact.get(1)
-				);
+			List<List<String>> filteredFacts) {
+		return filteredFacts.stream()
+			.map((List<String> fact) -> Arrays.asList(fact.get(1), fact.get(2)))
+			.collect(Collectors.toList());
 	}
 
 	private static Iterable<List<String>> filterRoutinesFromFacts(
 			List<List<String>> facts) {
-		return Iterables.filter(facts,
-				(List<String> fact) -> {
+		return () -> facts.stream()
+			.filter((List<String> fact) ->
 				// Remove any startNode with a / in its name and any
 				// actType that is level, lino, type or file
-				return !fact.get(1).contains("/")
-						&& fact.get(0).matches("type")
-						&& fact.get(2).matches("\"Routine\"");
-			}
-		);
+				!fact.get(1).contains("/")
+				&& fact.get(0).matches("type")
+				&& fact.get(2).matches("\"Routine\"")
+			).iterator();
 	}
 
 	private static Iterable<List<String>> filterFacts(List<List<String>> facts) {
-		return Iterables.filter(facts,
-				(List<String> fact) -> {
-						// Remove any startNode with a / in its name and any
-						// actType that is level, lino, type or file
-						return !fact.get(1).contains("/")
-								&& !fact.get(0).matches(
-										"level|lineno|type|file");
-					}
-				);
+		return () -> facts.stream()
+			.filter((List<String> fact) ->
+				// Remove any startNode with a / in its name and any
+				// actType that is level, lino, type or file
+				!fact.get(1).contains("/")
+				&& !fact.get(0).matches("level|lineno|type|file")
+			).iterator();
 	}
 
 	public static void setupLogging() {
@@ -426,10 +320,10 @@ public class RsfReader {
 		}
 		
 		return graph;
-		
 	}
 
-	public static void writeXMLTypedEdgeDepGraph(Iterable<List<String>> filteredFacts) throws ParserConfigurationException, TransformerException {
+	public static void writeXMLTypedEdgeDepGraph(Iterable<List<String>> filteredFacts)
+			throws ParserConfigurationException, TransformerException {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		  DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 	 
@@ -467,8 +361,7 @@ public class RsfReader {
 		  transformer.transform(source, result);
 	 
 		  logger.debug("In " + Thread.currentThread().getStackTrace()[1].getClassName() 
-				  + ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
-				  + ", Wrote " + Config.getXMLFunctionDepGraphFilename());
-		
+				+ ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
+				+ ", Wrote " + Config.getXMLFunctionDepGraphFilename());
 	}
 }
