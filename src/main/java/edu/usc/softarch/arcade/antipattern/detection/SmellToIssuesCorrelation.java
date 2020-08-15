@@ -19,7 +19,6 @@ import org.apache.log4j.PropertyConfigurator;
 import com.google.common.base.Joiner;
 import com.thoughtworks.xstream.XStream;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.LogUtil;
@@ -29,7 +28,7 @@ public class SmellToIssuesCorrelation {
 	private static Logger logger = Logger.getLogger(SmellToIssuesCorrelation.class);
 
 	public static void main(String[] args) throws FileNotFoundException {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		LogUtil.printLogFiles();
 		
 		// inputDirFilename is the directory containing the .ser files which contain detected smells

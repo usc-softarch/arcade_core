@@ -1,5 +1,7 @@
 package edu.usc.softarch.arcade;
 
+import java.io.File;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -52,7 +54,7 @@ private static Logger logger = Logger.getLogger(CreateRsfForFilesForExpertRecove
 	        System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
 	    }
 		
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		logger.debug("Running from " + CreateRsfForFilesForExpertRecoveries.class.getName());
 		Config.initConfigFromFile(Config.getProjConfigFilename());
 		System.out.println("Creating expert decomposition...");

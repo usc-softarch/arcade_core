@@ -64,7 +64,7 @@ public class DriverEngine {
 	    }
 		
 		
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 
 		run();
 	}

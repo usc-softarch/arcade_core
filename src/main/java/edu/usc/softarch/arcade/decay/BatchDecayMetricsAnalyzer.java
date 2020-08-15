@@ -12,7 +12,6 @@ import org.apache.log4j.PropertyConfigurator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -20,7 +19,7 @@ public class BatchDecayMetricsAnalyzer {
 	private static Logger logger = Logger.getLogger(BatchDecayMetricsAnalyzer.class);
 
 	public static void main(String[] args) throws FileNotFoundException {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		// Directory containing all clustered rsf files
 		String clustersDir = FileUtil.tildeExpandPath(args[0]);
 		

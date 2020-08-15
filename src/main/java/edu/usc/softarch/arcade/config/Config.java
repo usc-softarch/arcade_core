@@ -38,8 +38,6 @@ public class Config {
 	private static String currProjName = "";
 	public static Language selectedLanguage = Language.java;
 	
-	private static String loggingConfigFilename = "cfg" + File.separator + 
-		"extractor_logging.cfg";
 	public static String DATADIR = "data" + File.separator + currProjName;
 	private static String[] selectedPkgsArray;
 	private static String odemFile = "";
@@ -488,9 +486,6 @@ public class Config {
 
 	public static String getClassGraphDotFilename() {
 		return DATADIR + File.separator + getCurrProjStr() + "_class_graph.dot"; }
-
-	public static String getLoggingConfigFilename() {
-		return loggingConfigFilename; }
 
 	public static void setProjConfigFilename(String projConfigFilename) {
 		Config.projConfigFilename = projConfigFilename;	}

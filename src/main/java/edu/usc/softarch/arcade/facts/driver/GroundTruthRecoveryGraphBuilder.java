@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.facts.driver;
 
+import java.io.File;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -66,7 +67,7 @@ public class GroundTruthRecoveryGraphBuilder {
 			System.err.println("Parsing failed.  Reason: " + exp.getMessage());
 		}
 		
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		Config.initConfigFromFile(Config.getProjConfigFilename());
 		

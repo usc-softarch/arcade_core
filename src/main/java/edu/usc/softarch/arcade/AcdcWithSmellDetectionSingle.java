@@ -5,15 +5,13 @@ import java.io.IOException;
 
 import org.apache.log4j.PropertyConfigurator;
 
-
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class AcdcWithSmellDetectionSingle {
 
 	public static void main(String[] args) throws IOException {
 
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 
 		// inputDirName is a directory where each subdirectory contains a
 		// revision or version of the system to be analyzed

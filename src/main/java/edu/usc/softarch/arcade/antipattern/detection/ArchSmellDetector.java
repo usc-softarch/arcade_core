@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -64,7 +65,7 @@ public class ArchSmellDetector {
 		};
 	
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		String detectedSmellsFilename = setupOld(args);
 		runAllDetectionAlgs(detectedSmellsFilename);
@@ -622,7 +623,7 @@ public class ArchSmellDetector {
 			}
 			
 			Smell spf = new SpfSmell(topicNum);
-			spf.clusters = new HashSet<ConcernCluster>(affectedClusters);
+			spf.clusters = new HashSet<>(affectedClusters);
 			detectedSmells.add(spf);
 		}
 	}
@@ -706,7 +707,7 @@ public class ArchSmellDetector {
 	// #endregion SCATTERED PARASITIC FUNCTIONALITY ------------------------------
 
 	/**
-	 * Adds a smell to the given cluster.
+	 * Adds a smell to the given cluster in clusterSmellMap.
 	 * 
 	 * @param clusterSmellMap Map of all clusters and their sets of smells.
 	 * @param clusterName Name of the cluster to add a smell to.

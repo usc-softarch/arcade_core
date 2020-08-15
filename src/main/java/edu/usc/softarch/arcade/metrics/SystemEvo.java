@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.metrics;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,7 +13,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.google.common.base.Joiner;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 
@@ -22,7 +22,7 @@ public class SystemEvo {
 	public static double sysEvo = 0;
 	
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		sysEvo = 0;
 		SystemEvoOptions options = new SystemEvoOptions();
 		JCommander jcmd = new JCommander(options);

@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.util.graph;
 
 import java.awt.Container;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +31,6 @@ import edu.uci.ics.jung.graph.DelegateTree;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Tree;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class FlatDecompositionBuilder {
@@ -58,7 +58,7 @@ public class FlatDecompositionBuilder {
 	}
 
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 
 		String nestedFilename = "";
 		String flatFilename = "";

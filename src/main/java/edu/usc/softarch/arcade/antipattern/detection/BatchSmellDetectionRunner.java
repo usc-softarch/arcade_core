@@ -30,7 +30,7 @@ public class BatchSmellDetectionRunner {
 			}
 		});
 
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 
 		Config.setMalletDocTopicsFilename(docTopicsFile);
 		if (selectedLang.equals("c")) {

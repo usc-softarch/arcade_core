@@ -36,7 +36,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -69,7 +68,7 @@ public class SmellDetectionEvaluator {
 
 	public static void main(String[] args) {
 		if (configureLogging) {
-			PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+			PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		}
 		
 		resetData();

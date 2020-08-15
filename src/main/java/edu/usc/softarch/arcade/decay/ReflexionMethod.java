@@ -14,7 +14,6 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -26,7 +25,7 @@ public class ReflexionMethod {
 	private static Logger logger = Logger.getLogger(ReflexionMethod.class);
 	
 	public static void main(String[] args) throws FileNotFoundException {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		LogUtil.printLogFiles();
 		
 		VCOptions vco = new VCOptions();

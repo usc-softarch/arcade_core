@@ -1,13 +1,11 @@
 package edu.usc.softarch.arcade;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder;
 import edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder;
 import edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder;
@@ -22,7 +20,7 @@ public class DependencyExtractorSingle {
 	
 	public static void main(String[] args) throws IOException {
 
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 
 		// inputDirName is a directory where each subdirectory contains a
 		// revision or version of the system to be analyzed
@@ -37,7 +35,7 @@ public class DependencyExtractorSingle {
 		single(inputDir, args, outputDir);
 	}
 
-	public static void single(File versionFolder, String[] args, File outputDir) throws FileNotFoundException, IOException {
+	public static void single(File versionFolder, String[] args, File outputDir) throws IOException {
 		
 		logger.debug("Processing directory: " + versionFolder.getName());
 		

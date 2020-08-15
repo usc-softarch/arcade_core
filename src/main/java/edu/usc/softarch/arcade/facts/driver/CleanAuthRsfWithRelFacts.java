@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.facts.driver;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,8 +16,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import edu.usc.softarch.arcade.config.Config;
-
 /**
  * @author joshua
  */
@@ -24,7 +23,7 @@ public class CleanAuthRsfWithRelFacts {
 	private static Logger logger = Logger.getLogger(CleanAuthRsfWithRelFacts.class);
 
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		String authRsfFilename = args[0];
 		String depsRsfFilename = args[1];

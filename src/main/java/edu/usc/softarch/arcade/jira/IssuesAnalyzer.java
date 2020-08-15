@@ -17,7 +17,6 @@ import org.apache.log4j.PropertyConfigurator;
 import com.google.common.base.Joiner;
 import com.thoughtworks.xstream.XStream;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.MapUtil;
@@ -27,7 +26,7 @@ public class IssuesAnalyzer {
 	static Logger logger = Logger.getLogger(IssuesAnalyzer.class);
 
 	public static void main(String[] args) throws FileNotFoundException {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		// The directory where the serialized issue files are stored

@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -122,7 +123,7 @@ public class MetricsDriver {
 	        System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
 	    }
 		
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		logger.debug("Running from " + MetricsDriver.class.getName());
 		Config.initConfigFromFile(Config.getProjConfigFilename());
 		

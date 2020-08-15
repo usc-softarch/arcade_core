@@ -29,13 +29,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import edu.usc.softarch.arcade.config.Config;
-
 public class MethodsToFilesWriter {
 	private static Logger logger = Logger.getLogger(MethodsToFilesWriter.class);
 
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		String fileName = args[0];
 		String langKeywordsFilename = args[1];

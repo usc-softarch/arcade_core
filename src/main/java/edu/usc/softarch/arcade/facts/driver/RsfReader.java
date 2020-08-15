@@ -88,7 +88,7 @@ public class RsfReader {
 				System.exit(0);
 			}
 			
-			PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+			PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 
 			Config.initConfigFromFile(Config.getProjConfigFilename());
 			

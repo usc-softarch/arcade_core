@@ -33,7 +33,7 @@ public class FunctionFileNameTest {
 	public void test() {
 		String projFile = "cfg/bash_concerns.cfg";
 		Config.setProjConfigFilename(projFile);
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		logger.debug("Logging from " + this.getClass());
 		Config.initConfigFromFile(Config.getProjConfigFilename());
 		
@@ -87,5 +87,4 @@ public class FunctionFileNameTest {
 			}	
 		}
 	}
-
 }

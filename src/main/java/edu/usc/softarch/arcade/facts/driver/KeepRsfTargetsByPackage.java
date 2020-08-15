@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.facts.driver;
 
+import java.io.File;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,13 +13,11 @@ import org.apache.log4j.PropertyConfigurator;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-import edu.usc.softarch.arcade.config.Config;
-
 public class KeepRsfTargetsByPackage {
 	private static Logger logger = Logger.getLogger(KeepRsfTargetsByPackage.class);
 
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		String inputRsfFilename = args[0];
 		String outputRsfFilename = args[1];

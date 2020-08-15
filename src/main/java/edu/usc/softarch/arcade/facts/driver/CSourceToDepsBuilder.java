@@ -15,7 +15,6 @@ import org.apache.log4j.PropertyConfigurator;
 
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -34,7 +33,7 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 
 	@Override
 	public void build(String classesDirPath, String depsRsfFilename) throws IOException {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		String inputDir = FileUtil.tildeExpandPath(classesDirPath);
 		String depsRsfFilepath = FileUtil.tildeExpandPath(depsRsfFilename);

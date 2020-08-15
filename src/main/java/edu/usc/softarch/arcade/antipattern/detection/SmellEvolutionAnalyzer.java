@@ -12,7 +12,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.LogUtil;
@@ -21,7 +20,7 @@ public class SmellEvolutionAnalyzer {
 	private static Logger logger = Logger.getLogger(SmellEvolutionAnalyzer.class);
 
 	public static void main(String[] args) throws FileNotFoundException {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		LogUtil.printLogFiles();
 		
 		// inputDirFilename is the directory containing the .ser files which contain detected smells

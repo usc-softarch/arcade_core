@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.facts;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,12 +11,11 @@ import org.apache.log4j.PropertyConfigurator;
 
 import com.google.common.collect.Lists;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class SymmetricRsfFactsTransformer {
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		String filename = "/home/joshua/recovery/RSFs/linuxRel.rsf";
 		RsfReader.loadRsfDataFromFile(filename);

@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.svn;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -18,7 +19,6 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.LogUtil;
 
 public class SvnLogAnalyzer {
@@ -29,7 +29,7 @@ public class SvnLogAnalyzer {
      * to authenticate him to the server.
      */
     public static void main(String[] args) {
-    	PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+    	PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
     	LogUtil.printLogFiles();
         /*
          * Default values:

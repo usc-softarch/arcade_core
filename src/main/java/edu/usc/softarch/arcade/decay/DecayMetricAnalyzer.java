@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.decay;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -15,7 +16,6 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
@@ -30,7 +30,7 @@ public class DecayMetricAnalyzer {
 	public static double mqRatio;
 
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		rciVal = null;
 		twoWayPairRatio = -1;

@@ -10,7 +10,6 @@ import org.apache.log4j.PropertyConfigurator;
 
 import com.thoughtworks.xstream.XStream;
 
-import edu.usc.softarch.arcade.config.Config;
 import net.rcarz.jiraclient.BasicCredentials;
 import net.rcarz.jiraclient.Issue;
 import net.rcarz.jiraclient.JiraClient;
@@ -22,7 +21,7 @@ public class JiraClientPrototype {
 	private static final String JIRA_URL = "https://issues.apache.org/jira";
 	
 	public static void main(String[] args) throws Exception {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 		// username and password to access Apache's JIRA repo

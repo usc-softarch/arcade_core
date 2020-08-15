@@ -27,7 +27,7 @@ public class BatchClusteringEngine {
 	private static Logger logger = Logger.getLogger(BatchClusteringEngine.class);
 
 	public static void main(String[] args) throws Exception {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		// directory where each subdirectory is a different version or revision of the system you want to analyze
 		String inputDirName = args[0];
@@ -117,8 +117,7 @@ public class BatchClusteringEngine {
 					+ runner.getFastClusters().size() + "_arc_clusters.rsf";
 			// need to build the map before writing the file
 			Map<String, Integer> clusterNameToNodeNumberMap = ClusterUtil
-					.createFastClusterNameToNodeNumberMap(runner
-							.getFastClusters());
+					.createFastClusterNameToNodeNumberMap(runner.getFastClusters());
 			ClusterUtil.writeFastClustersRsfFile(
 					clusterNameToNodeNumberMap, runner.getFastClusters(),
 					arcClustersFilename);

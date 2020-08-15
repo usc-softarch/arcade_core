@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.facts.driver;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,7 +12,6 @@ import org.apache.log4j.PropertyConfigurator;
 
 import com.google.common.base.Joiner;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
 
@@ -20,7 +20,7 @@ public class PackageSplitCalculator {
 	private static Pattern grabPkgPattern = Pattern.compile(exprToGrabPackageName);
 
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		String clusterRsfFilename = args[0];
 		String fileType = "java";

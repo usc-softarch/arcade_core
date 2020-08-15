@@ -1,5 +1,6 @@
 package edu.usc.softarch.gexf;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.GregorianCalendar;
@@ -114,7 +115,7 @@ public class ConvertRsfToGexf {
 	        System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
 	    }
 
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 
 		Config.initConfigFromFile(Config.getProjConfigFilename());
 

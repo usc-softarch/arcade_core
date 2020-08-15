@@ -62,7 +62,7 @@ public class ODEMReader {
 			System.err.println("Parsing failed.  Reason: " + exp.getMessage());
 		}
 		
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		Config.initConfigFromFile(Config.getProjConfigFilename());
 		

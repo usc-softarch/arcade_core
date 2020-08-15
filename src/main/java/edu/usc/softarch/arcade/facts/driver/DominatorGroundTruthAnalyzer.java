@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.facts.driver;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -25,7 +26,6 @@ import edu.uci.ics.jung.graph.Forest;
 import edu.uci.ics.jung.graph.Tree;
 import edu.uci.ics.jung.graph.util.Pair;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
-import edu.usc.softarch.arcade.config.Config;
 
 public class DominatorGroundTruthAnalyzer {
 	private static Logger logger = Logger.getLogger(DominatorGroundTruthAnalyzer.class);
@@ -47,7 +47,7 @@ public class DominatorGroundTruthAnalyzer {
 	};
 	
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		String depsFilename = args[0];
 		String clustersFilename = args[1];

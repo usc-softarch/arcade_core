@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.facts.driver;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -56,7 +57,7 @@ public class GroundTruthRecoveryReader {
 			System.err.println("Parsing failed.  Reason: " + exp.getMessage());
 		}
 
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 
 		Config.initConfigFromFile(Config.getProjConfigFilename());
 		System.out.println("Reading in ground truth file: " + Config.getGroundTruthFile());

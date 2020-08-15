@@ -13,14 +13,13 @@ import com.beust.jcommander.ParameterException;
 import com.google.common.base.Joiner;
 
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class PkgsWithSmellDetection {
 	private static Logger logger = Logger.getLogger(PkgsWithSmellDetection.class);
 	
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		PkgsWithSmellDetectionOptions psdOptions = new PkgsWithSmellDetectionOptions();
 		JCommander jcmd = new JCommander(psdOptions);

@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -21,14 +22,13 @@ import org.apache.log4j.PropertyConfigurator;
 
 import com.google.common.base.Joiner;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchSmellEvaluatorRunner {
 	private static Logger logger = Logger.getLogger(BatchSmellEvaluatorRunner.class);
 	
 	public static void main(String[] args) {
-		PropertyConfigurator.configure(Config.getLoggingConfigFilename());
+		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		
 		String smellTypeXTechSummaryFilename = args[0];
 		
