@@ -14,6 +14,7 @@ import java.util.TreeSet;
 
 import edu.usc.softarch.arcade.util.FileListing;
 
+// Was written by Duc for the ICSA smell analysis paper
 public class CountClassInterface {
 	public static void main(String[] args){
 		
