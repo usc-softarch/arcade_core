@@ -6,10 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.regex.Pattern;
 
 import edu.usc.softarch.arcade.config.ConfigUtil;
+import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 
 /**
@@ -18,9 +18,9 @@ import edu.usc.softarch.arcade.topics.TopicUtil;
 public class SimCalcUtil {
 	public static Map<Set<FeatureVector>, Integer> sharedFeaturesMap = new HashMap<>();
 	public static Map<List<FeatureVector>, Integer> oneZeroFeaturesMap = new HashMap<>();
-	public static Map<List<FeatureVector>, Integer> zeroOneFeaturesMap = new HashMap<>();
-	public static Map<Set<FeatureVector>, Double> sumSharedFeaturesMap = new HashMap<>();
-	public static Map<List<FeatureVector>, Double> divergenceMap = new HashMap<>();
+	private static Map<List<FeatureVector>, Integer> zeroOneFeaturesMap = new HashMap<>();
+	private static Map<Set<FeatureVector>, Double> sumSharedFeaturesMap = new HashMap<>();
+	private static Map<List<FeatureVector>, Double> divergenceMap = new HashMap<>();
 	
 	public static void verifySymmetricFeatureVectorOrdering(FeatureVector fv1, FeatureVector fv2) {
 		for (int i = 0;i<fv1.size();i++) {
@@ -32,8 +32,8 @@ public class SimCalcUtil {
 		System.out.println("In, " + Thread.currentThread().getStackTrace()[1].getMethodName() + ", Feature order correct...continuing");
 	}
 	
-	public static void verifySymmetricClusterOrdering(Vector<Cluster> clusters) {
-		Cluster firstCluster = clusters.firstElement();
+	public static void verifySymmetricClusterOrdering(List<Cluster> clusters) {
+		Cluster firstCluster = clusters.get(0);
 		for (Cluster c : clusters) {
 			for (int i=0;i<firstCluster.size();i++) {
 				if (!firstCluster.get(i).edge.tgtStr.equals(c.get(i).edge.tgtStr)) {
@@ -45,15 +45,6 @@ public class SimCalcUtil {
 		}
 		System.out.println("In, " + Thread.currentThread().getStackTrace()[1].getMethodName() + "Feature order correct...continuing");
 	}
-	
-	public static double getJSDivergence(FastCluster cluster, FastCluster otherCluster) {
-		return TopicUtil.jsDivergence(cluster.docTopicItem, otherCluster.docTopicItem);
-	}
-	
-	public static double getJSDivergence(Entity entity1, Entity entity2) {
-		return TopicUtil.jsDivergence(entity1.docTopicItem, entity2.docTopicItem);
-	}
-	
 	
 	public static double getJSDivergence(FeatureVector fv1, FeatureVector fv2) {
 		String strippedLeafSplitClusterName = ConfigUtil.stripParensEnclosedClassNameWithPackageName(fv1);
@@ -81,7 +72,11 @@ public class SimCalcUtil {
 		if (divergenceMap.containsKey(featureVecPair))
 			divergence = divergenceMap.get(featureVecPair);
 		else {
-			divergence = TopicUtil.jsDivergence(fv1.docTopicItem, fv2.docTopicItem);
+			try {
+				divergence = TopicUtil.jsDivergence(fv1.docTopicItem, fv2.docTopicItem);
+			} catch (DistributionSizeMismatchException e) {
+				e.printStackTrace(); //TODO handle it
+			}
 			divergenceMap.put(new ArrayList<>(featureVecPair), divergence);
 		}
 		

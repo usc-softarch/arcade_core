@@ -5,24 +5,33 @@ import java.util.List;
 
 /**
  * @author joshua
- *
  */
 public class TopicKey {
-	public int topicNum;
-	double alpha;
-	List<String> words;
-	public String type;
-	
-	public List<String> getWords() {
-		return new ArrayList<>(words);
-	}
+	// #region FIELDS ------------------------------------------------------------
+	private int topicNum;
+	private double alpha;
+	private List<String> words;
+	private String type;
+	// #endregion FIELDS ---------------------------------------------------------
 
+	// #region CONSTRUCTORS ------------------------------------------------------
+	public TopicKey() { words = new ArrayList<>(); }
+	// #endregion CONSTRUCTORS ---------------------------------------------------
 
-	public TopicKey() {
-		super();
-		words = new ArrayList<>();
-	}
+	// #region ACCESSORS ---------------------------------------------------------
+	public int getTopicNum() { return this.topicNum; }
+	public double getAlpha() { return this.alpha; }
+	public List<String> getWords() { return new ArrayList<>(this.words); }
+	public String getType() { return this.type; }
+
+	public void setTopicNum(int topicNum) { this.topicNum = topicNum; }
+	public void setAlpha(double alpha) { this.alpha = alpha; }
+	public boolean addWord(String word) { return this.words.add(word); }
+	public boolean removeWord(String word) { return this.words.remove(word); }
+	public void setType(String type) { this.type = type; }
+	// #endregion ACCESSORS ------------------------------------------------------
 	
+	// #region MISC --------------------------------------------------------------
 	public boolean equals(Object o) {
 		if(!(o instanceof TopicKey))
 			return false;
@@ -38,7 +47,6 @@ public class TopicKey {
 		return hash;
 	}
 	
-	
 	public String toString() {
 		String tkStr = "[" + topicNum + "," + alpha + "," + type + "[";
 		for (String word : words) {
@@ -47,4 +55,5 @@ public class TopicKey {
 		tkStr += "]]";
 		return tkStr;
 	}
+	// #endregion MISC -----------------------------------------------------------
 }

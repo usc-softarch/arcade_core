@@ -41,6 +41,7 @@ import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.ConfigUtil;
 import edu.usc.softarch.arcade.smellarchgraph.SmellArchGraph;
+import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.StringPreProcessor;
@@ -96,7 +97,7 @@ public class ADADetector {
 		writeOutGraphsAndSmellArchToFiles(splitClusters, clusterGraph,
 				smellArchGraph);
 		
-		Set<TopicKey> topicKeys = TopicUtil.getTopicKeyListForCurrProj().set;
+		Set<TopicKey> topicKeys = TopicUtil.getTopicKeyListForCurrProj().getSet();
 		ClusterUtil.readInSmellArchFromXML(
 				Config.getSpecifiedSmallArchFromXML(), splitClusters, topicKeys);
 		
@@ -108,7 +109,11 @@ public class ADADetector {
 			for (Cluster cluster2 : splitClusters) {
 				System.out.println("Computing JS divergence for " + cluster1 + " and " + cluster2);
 				if (!(cluster1.docTopicItem == null || cluster2.docTopicItem == null)) {
-					TopicUtil.jsDivergence(cluster1.docTopicItem,cluster2.docTopicItem);
+					try {
+						TopicUtil.jsDivergence(cluster1.docTopicItem,cluster2.docTopicItem);
+					} catch (DistributionSizeMismatchException e) {
+						e.printStackTrace(); //TODO handle it
+					}
 				}
 			}
 		}
@@ -289,7 +294,7 @@ public class ADADetector {
 	private static boolean haveMatchingTopicItem(List<TopicItem> topics,
 			TopicItem inTopicItem) {
 		for (TopicItem currTopicItem : topics) {
-			if (currTopicItem.topicNum == inTopicItem.topicNum) {
+			if (currTopicItem.getTopicNum() == inTopicItem.getTopicNum()) {
 				return true;
 			}
 		}
@@ -319,8 +324,7 @@ public class ADADetector {
 	
 	private static void writeMethodInfoToXML(
 			List<Cluster> splitClusters, MyCallGraph myCallGraph) throws ParserConfigurationException, TransformerException {
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
 		// classgraph elements
@@ -464,10 +468,10 @@ public class ADADetector {
 			throws IOException, ParserConfigurationException, SAXException {
 		int mostProbableTopic = -1;
 		double highestProbSoFar = 0;
-		for (TopicKey topicKey : topicKeySet.set) {
+		for (TopicKey topicKey : topicKeySet.getSet()) {
 			Double currProb = queryGivenTopicProbabilitiesMap
-					.get(topicKey.topicNum);
-			System.out.println("\t\t\ttopic: " + topicKey.topicNum);
+					.get(topicKey.getTopicNum());
+			System.out.println("\t\t\ttopic: " + topicKey.getTopicNum());
 
 			System.out
 					.println("\t\t\tcurrProb of query given topic: "
@@ -475,7 +479,7 @@ public class ADADetector {
 
 			if (currProb >= highestProbSoFar) {
 				highestProbSoFar = currProb;
-				mostProbableTopic = topicKey.topicNum;
+				mostProbableTopic = topicKey.getTopicNum();
 			}
 
 		}
@@ -487,7 +491,7 @@ public class ADADetector {
 				+ myMethod.name);
 		System.out.println("\t\t topic: " + mostProbableTopic);
 		String typeForMostProbableTopic = typedTopicKeySet
-		.getTopicKeyByID(mostProbableTopic).type;
+		.getTopicKeyByID(mostProbableTopic).getType();
 		System.out.println("\t\t topic's type: "
 				+ typeForMostProbableTopic);
 		System.out
@@ -502,7 +506,7 @@ public class ADADetector {
 			String processedMethodName,
 			Map<Integer, String> positionWordMap,
 			Map<Integer, Double> queryGivenTopicProbabilitiesMap) {
-		for (TopicKey topicKey : topicKeySet.set) {
+		for (TopicKey topicKey : topicKeySet.getSet()) {
 			String[] wordsInMethodName = processedMethodName
 					.split(" ");
 
@@ -515,14 +519,14 @@ public class ADADetector {
 				WordTopicItem wtItem = wordTopicCounts
 						.getWordTopicItems().get(word);
 
-				positionWordMap.put(topicKey.topicNum, wtItem.name);
+				positionWordMap.put(topicKey.getTopicNum(), wtItem.name);
 
 				double probWordGivenTopic = wtItem
-						.probabilityWordGivenTopic(topicKey.topicNum);
+						.probabilityWordGivenTopic(topicKey.getTopicNum());
 
 				System.out.println("\t\t\t\tProbability "
 						+ wtItem.name + " given "
-						+ topicKey.topicNum + ": "
+						+ topicKey.getTopicNum() + ": "
 						+ probWordGivenTopic);
 
 				probabilitySum += probWordGivenTopic;
@@ -530,14 +534,14 @@ public class ADADetector {
 			}
 
 			System.out.println("\t\t\tProbability sum for topic "
-					+ topicKey.topicNum + ": " + probabilitySum);
+					+ topicKey.getTopicNum() + ": " + probabilitySum);
 			double probabilityAverage = (probabilitySum / (double) wordsInMethodName.length);
 
 			System.out
 					.println("\t\t\tProbability avg for topic "
-							+ topicKey.topicNum + ": "
+							+ topicKey.getTopicNum() + ": "
 							+ probabilityAverage);
-			queryGivenTopicProbabilitiesMap.put(topicKey.topicNum,
+			queryGivenTopicProbabilitiesMap.put(topicKey.getTopicNum(),
 					Double.valueOf(probabilityAverage));
 		}
 	}
@@ -673,8 +677,8 @@ public class ADADetector {
 			int concernNumberThreshold = 1;
 
 			List<TopicItem> relevantTopics = new ArrayList<>();
-			for (TopicItem currTopicItem : firstCluster.docTopicItem.topics) {
-				if (currTopicItem.proportion >= proportionThreshold) {
+			for (TopicItem currTopicItem : firstCluster.docTopicItem.getTopics()) {
+				if (currTopicItem.getProportion() >= proportionThreshold) {
 					relevantTopics.add(currTopicItem);
 				}
 			}
@@ -875,8 +879,8 @@ public class ADADetector {
 				continue;
 			}
 
-			for (TopicItem firstTopicItem : firstCluster.docTopicItem.topics) {
-				if (firstTopicItem.proportion > threshold1) {
+			for (TopicItem firstTopicItem : firstCluster.docTopicItem.getTopics()) {
+				if (firstTopicItem.getProportion() > threshold1) {
 					for (Cluster secondCluster : splitClusters) {
 						String strippedSecondClusterName = ConfigUtil
 								.stripParensEnclosedClassNameWithPackageName(secondCluster);
@@ -891,12 +895,12 @@ public class ADADetector {
 								strippedSecondClusterName)) {
 							continue;
 						}
-						for (TopicItem secondTopicItem : secondCluster.docTopicItem.topics) {
+						for (TopicItem secondTopicItem : secondCluster.docTopicItem.getTopics()) {
 							
 
-							if (secondTopicItem.proportion > threshold2 && firstTopicItem.topicNum == secondTopicItem.topicNum) {
-								for (TopicItem thirdTopicItem : firstCluster.docTopicItem.topics) {
-									if (thirdTopicItem.proportion > threshold1 && !thirdTopicItem.equals(firstTopicItem)) {
+							if (secondTopicItem.getProportion() > threshold2 && firstTopicItem.getTopicNum() == secondTopicItem.getTopicNum()) {
+								for (TopicItem thirdTopicItem : firstCluster.docTopicItem.getTopics()) {
+									if (thirdTopicItem.getProportion() > threshold1 && !thirdTopicItem.equals(firstTopicItem)) {
 										
 										System.out.println("\t" + firstCluster + " has scattered topic " + firstTopicItem);
 										System.out.println("\t" + firstCluster + " has orthogonal topic " + thirdTopicItem);
@@ -937,10 +941,10 @@ public class ADADetector {
 			TopicKeySet topicKeySet, WordTopicCounts wordTopicCounts) {
 		for (WordTopicItem wtItem : wordTopicCounts.getWordTopicItems()
 				.values()) {
-			for (TopicKey topicKey : topicKeySet.set) {
-				System.out.println("P(" + wtItem.name + "," + topicKey.topicNum
+			for (TopicKey topicKey : topicKeySet.getSet()) {
+				System.out.println("P(" + wtItem.name + "," + topicKey.getTopicNum()
 						+ ") = "
-						+ wtItem.probabilityWordGivenTopic(topicKey.topicNum));
+						+ wtItem.probabilityWordGivenTopic(topicKey.getTopicNum()));
 			}
 		}
 	}
@@ -967,13 +971,13 @@ public class ADADetector {
 			if (splitCluster.type.equals("indep")) {
 				continue;
 			}
-			for (TopicItem topicItem : splitCluster.docTopicItem.topics) {
-				System.out.println("\ttopic id : " + topicItem.topicNum);
-				System.out.println("\ttopic type : " + topicItem.type);
+			for (TopicItem topicItem : splitCluster.docTopicItem.getTopics()) {
+				System.out.println("\ttopic id : " + topicItem.getTopicNum());
+				System.out.println("\ttopic type : " + topicItem.getType());
 				System.out.println("\ttopic proportion : "
-						+ topicItem.proportion);
-				if (topicItem.type.equals("indep")
-						&& topicItem.proportion > 0.10) {
+						+ topicItem.getProportion());
+				if (topicItem.getType().equals("indep")
+						&& topicItem.getProportion() > 0.10) {
 					System.out
 							.println("\t counting as unacceptably high connector concern: "
 									+ splitCluster);
@@ -1065,40 +1069,39 @@ public class ADADetector {
 				continue;
 			}
 			nonAnonInnerClassLeafCounter++;
-			for (int j = 0; j < leaf.docTopicItem.topics.size(); j++) {
-				TopicItem currLeafTopicItem = (TopicItem) leaf.docTopicItem.topics
+			for (int j = 0; j < leaf.docTopicItem.size(); j++) {
+				TopicItem currLeafTopicItem = (TopicItem) leaf.docTopicItem.getTopics()
 						.get(j);
 				if (haveMatchingTopicItem(topics, currLeafTopicItem)) {
 					TopicItem matchingTopicItem = TopicUtil.getMatchingTopicItem(topics,
 							currLeafTopicItem);
-					matchingTopicItem.proportion += currLeafTopicItem.proportion;
+					matchingTopicItem.increaseProportion(currLeafTopicItem.getProportion());
 				} else {
 					TopicItem newTopicItem = new TopicItem(currLeafTopicItem);
-					newTopicItem.proportion = newTopicItem.proportion;
+					newTopicItem.setProportion(newTopicItem.getProportion());
 					topics.add(newTopicItem);
 				}
 			}
 
 		}
 		splitCluster.docTopicItem = new DocTopicItem();
-		splitCluster.docTopicItem.topics = new ArrayList<TopicItem>();
 		for (TopicItem topicItem : topics) {
-			splitCluster.docTopicItem.topics.add(new TopicItem(topicItem));
+			splitCluster.docTopicItem.addTopic(new TopicItem(topicItem));
 		}
 
 		System.out.println("splitCluster " + splitCluster
 				+ "'s new topics summed only...");
-		System.out.println(splitCluster.docTopicItem.topics);
+		System.out.println(splitCluster.docTopicItem.getTopics());
 		System.out.println("nonAnonInnerClassLeafCounter: "
 				+ nonAnonInnerClassLeafCounter);
 
-		for (TopicItem topicItem : splitCluster.docTopicItem.topics) {
-			topicItem.proportion /= nonAnonInnerClassLeafCounter;
+		for (TopicItem topicItem : splitCluster.docTopicItem.getTopics()) {
+			topicItem.divideProportion(nonAnonInnerClassLeafCounter);
 		}
 
 		System.out.println("splitCluster " + splitCluster
 				+ "'s new topics averaged...");
-		System.out.println(splitCluster.docTopicItem.topics);
+		System.out.println(splitCluster.docTopicItem.getTopics());
 		return nonAnonInnerClassLeafCounter;
 	}
 
@@ -1106,20 +1109,20 @@ public class ADADetector {
 			Cluster refLeaf) {
 		System.out.println("Copying first leafs topics to new topics...");
 		List<TopicItem> topics = new ArrayList<>();
-		for (TopicItem topicItem : refLeaf.docTopicItem.topics) {
+		for (TopicItem topicItem : refLeaf.docTopicItem.getTopics()) {
 			topics.add(new TopicItem(topicItem));
 		}
 
 		System.out
 				.println("Zeroing out proportions for TopicItems in new topics...");
 		for (TopicItem topicItem : topics) {
-			topicItem.proportion = 0;
+			topicItem.setProportion(0);
 		}
 
 		System.out.println("Verifying zero out worked...");
 		for (TopicItem topicItem : topics) {
-			System.out.println("topicNum: " + topicItem.topicNum
-					+ ", proportion: " + topicItem.proportion);
+			System.out.println("topicNum: " + topicItem.getTopicNum()
+					+ ", proportion: " + topicItem.getProportion());
 		}
 		return topics;
 	}

@@ -54,10 +54,12 @@ import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 import edu.usc.softarch.arcade.smellarchgraph.ClusterEdge;
 import edu.usc.softarch.arcade.smellarchgraph.SmellArchGraph;
+import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.TopicItem;
 import edu.usc.softarch.arcade.topics.TopicKey;
 import edu.usc.softarch.arcade.topics.TopicUtil;
+import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.arcade.util.DebugUtil;
 import edu.usc.softarch.extractors.cda.odem.Dependencies;
 import edu.usc.softarch.extractors.cda.odem.DependsOn;
@@ -236,14 +238,14 @@ public class ClusterUtil {
 								strippedLeafSplitClusterName)) {
 							continue;
 						}
-						for (TopicItem topicItem : splitCluster.docTopicItem.topics) {
-							if (topicItem.topicNum == topicNum)
-								topicItem.type = topicItemTypeFromXML;
+						for (TopicItem topicItem : splitCluster.docTopicItem.getTopics()) {
+							if (topicItem.getTopicNum() == topicNum)
+								topicItem.setType(topicItemTypeFromXML);
 						}
 
 						for (TopicKey topicKey : topicKeys) {
-							if (topicKey.topicNum == topicNum) {
-								topicKey.type = topicItemTypeFromXML;
+							if (topicKey.getTopicNum() == topicNum) {
+								topicKey.setType(topicItemTypeFromXML);
 							}
 						}
 					}
@@ -266,9 +268,9 @@ public class ClusterUtil {
 					strippedLeafSplitClusterName)) {
 				continue;
 			}
-			for (TopicItem topicItem : splitCluster.docTopicItem.topics) {
-				logger.debug("topicNum: " + topicItem.topicNum);
-				logger.debug("topicItem.type: " + topicItem.type);
+			for (TopicItem topicItem : splitCluster.docTopicItem.getTopics()) {
+				logger.debug("topicNum: " + topicItem.getTopicNum());
+				logger.debug("topicItem.type: " + topicItem.getType());
 			}
 		}
 
@@ -334,9 +336,9 @@ public class ClusterUtil {
 
 		Element topicsElem = doc.createElement("topics");
 		rootElement.appendChild(topicsElem);
-		for (TopicKey topicKey : TopicUtil.getTopicKeyListForCurrProj().set) {
+		for (TopicKey topicKey : TopicUtil.getTopicKeyListForCurrProj().getSet()) {
 			Element topicElem = doc.createElement("topic");
-			topicElem.setAttribute("id", Integer.toString(topicKey.topicNum));
+			topicElem.setAttribute("id", Integer.toString(topicKey.getTopicNum()));
 			topicElem.setAttribute("type", "unspec");
 			topicsElem.appendChild(topicElem);
 
@@ -390,13 +392,13 @@ public class ClusterUtil {
 			Element docTopicElem = doc.createElement("doc-topic");
 			clusterElement.appendChild(docTopicElem);
 
-			for (TopicItem topicItem : cluster.docTopicItem.topics) {
+			for (TopicItem topicItem : cluster.docTopicItem.getTopics()) {
 				Element topicElem = doc.createElement("topic");
 				topicElem.setAttribute("id",
-						Integer.toString(topicItem.topicNum));
+						Integer.toString(topicItem.getTopicNum()));
 				topicElem.setAttribute("type", "unspec");
 				topicElem.appendChild(doc.createTextNode(Double
-						.toString(topicItem.proportion)));
+						.toString(topicItem.getProportion())));
 				docTopicElem.appendChild(topicElem);
 			}
 		}
@@ -441,11 +443,11 @@ public class ClusterUtil {
 				continue;
 			}
 
-			for (TopicItem topicItem : cluster.docTopicItem.topics) {
-				if (topicItem.type.equals("indep")) {
-					indepTypeWeight += topicItem.proportion;
-				} else if (topicItem.type.equals("spec")) {
-					specTypeWeight += topicItem.proportion;
+			for (TopicItem topicItem : cluster.docTopicItem.getTopics()) {
+				if (topicItem.getType().equals("indep")) {
+					indepTypeWeight += topicItem.getProportion();
+				} else if (topicItem.getType().equals("spec")) {
+					specTypeWeight += topicItem.getProportion();
 				} else {
 					logger.error("Invalid type for topicItem: " + topicItem
 							+ " in " + cluster);
@@ -478,8 +480,8 @@ public class ClusterUtil {
 		rootElement.appendChild(topicsElem);
 		for (TopicKey topicKey : topicKeys) {
 			Element topicElem = doc.createElement("topic");
-			topicElem.setAttribute("id", Integer.toString(topicKey.topicNum));
-			topicElem.setAttribute("type", topicKey.type);
+			topicElem.setAttribute("id", Integer.toString(topicKey.getTopicNum()));
+			topicElem.setAttribute("type", topicKey.getType());
 			topicsElem.appendChild(topicElem);
 
 			for (String word : topicKey.getWords()) {
@@ -532,13 +534,13 @@ public class ClusterUtil {
 			Element docTopicElem = doc.createElement("doc-topic");
 			clusterElement.appendChild(docTopicElem);
 
-			for (TopicItem topicItem : cluster.docTopicItem.topics) {
+			for (TopicItem topicItem : cluster.docTopicItem.getTopics()) {
 				Element topicElem = doc.createElement("topic");
 				topicElem.setAttribute("id",
-						Integer.toString(topicItem.topicNum));
-				topicElem.setAttribute("type", topicItem.type);
+						Integer.toString(topicItem.getTopicNum()));
+				topicElem.setAttribute("type", topicItem.getType());
 				topicElem.appendChild(doc.createTextNode(Double
-						.toString(topicItem.proportion)));
+						.toString(topicItem.getProportion())));
 				docTopicElem.appendChild(topicElem);
 			}
 		}
@@ -638,8 +640,12 @@ public class ClusterUtil {
 			if (docTopicItems.get(i) == null)
 				continue;
 			DocTopicItem currDocTopicItem = docTopicItems.get(i);
-			mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
+			try {
+				mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
 					mergedDocTopicItem, currDocTopicItem);
+			} catch (UnmatchingDocTopicItemsException e) {
+				e.printStackTrace(); //TODO handle it
+			}
 		}
 		return mergedDocTopicItem;
 	}
@@ -657,9 +663,12 @@ public class ClusterUtil {
 		double clusterGain = 0;
 
 		for (int i = 0; i < docTopicItems.size(); i++) {
-			clusterGain += (clusters.get(i).getNumEntities() - 1)
-					* TopicUtil.jsDivergence(docTopicItems.get(i),
-							globalDocTopicItem);
+			try {
+				clusterGain += (clusters.get(i).getNumEntities() - 1)
+					* TopicUtil.jsDivergence(docTopicItems.get(i), globalDocTopicItem);
+			} catch (DistributionSizeMismatchException e) {
+				e.printStackTrace(); //TODO handle it
+			}
 		}
 
 		return clusterGain;
@@ -975,7 +984,7 @@ public class ClusterUtil {
 					for (String clusterNameTarget : clusterMap.keySet()) {
 						if (clusterMap.get(clusterNameTarget).contains(target)) {
 							if (!clusterNameSource.equals(clusterNameTarget)) {
-								List<String> edge = new ArrayList<String>();
+								List<String> edge = new ArrayList<>();
 								edge.add(clusterNameSource);
 								edge.add(clusterNameTarget);
 								edges.add(edge);
@@ -1035,7 +1044,7 @@ public class ClusterUtil {
 				dependencies = depMap.get(source);
 			}
 			else {
-				dependencies = new HashSet<String>();
+				dependencies = new HashSet<>();
 			}
 			dependencies.add(target);
 			depMap.put(source, dependencies);

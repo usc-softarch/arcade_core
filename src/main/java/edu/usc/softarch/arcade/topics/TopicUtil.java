@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -32,116 +34,109 @@ import edu.usc.softarch.arcade.util.DebugUtil;
  */
 public class TopicUtil {
 	public static DocTopics docTopics;
-	private static Logger logger = Logger.getLogger(TopicUtil.class);
+	private static Logger logger = LogManager.getLogger(TopicUtil.class);
 	
-	public static String convertJavaClassWithPackageNameToDocTopicName(String name) {
-		return name.replaceAll("\\.", "/") + ".java";
+	public static String convertJavaClassWithPackageNameToDocTopicName
+			(String name) {
+		return name.replace("\\.", "/") + ".java";
 	}
 
 	public static double klDivergence(double[] sortedP, double[] sortedQ) {
 		double divergence = 0;
-		
 		double verySmallVal = 0.00000001;
 		
-		for (int i=0;i<sortedP.length;i++) {
-			
+		for (int i=0; i < sortedP.length; i++) {
 			double denominator = 0;
 			double numerator = 0;
-			
-			if ( sortedQ[i] == 0) {
-				denominator = verySmallVal;
-			}
-			else {
-				denominator = sortedQ[i];
-			}
-			if (sortedP[i] == 0) {
-				numerator = 2*verySmallVal;
-			}
-			else {
-				numerator = sortedP[i];
-			}
+
+			denominator = (sortedQ[i] == 0) ? verySmallVal : sortedQ[i];
+			numerator = (sortedP[i] == 0) ? 2 * verySmallVal : sortedP[i];
 					
-			divergence += sortedP[i]*Math.log(numerator/denominator);
+			divergence += sortedP[i] * Math.log(numerator / denominator);
 		}
 		
 		return divergence;
 	}
 	
-	public static double symmKLDivergence(DocTopicItem pDocTopicItem, DocTopicItem qDocTopicItem) {
+	public static double symmKLDivergence(
+			DocTopicItem pDocTopicItem,
+			DocTopicItem qDocTopicItem)
+			throws DistributionSizeMismatchException {
 		double divergence = 0;
 		
-		if (pDocTopicItem.topics.size() != qDocTopicItem.topics.size()) {
-			logger.error("P size: " + pDocTopicItem.topics.size());
-			logger.error("Q size: " + qDocTopicItem.topics.size());
-			logger.error("P and Q for Kullback Leibler Divergence not the same size...exiting");
-			System.exit(0);
+		// Error due to size mismatch
+		if (pDocTopicItem.size() != qDocTopicItem.size()) {
+			logger.error("P size: " + pDocTopicItem.size());
+			logger.error("Q size: " + qDocTopicItem.size());
+			logger.error("P and Q for Kullback Leibler Divergence not the same size");
+			throw new DistributionSizeMismatchException(
+				"P and Q for Kullback Leibler Divergence not the same size");
 		}
 		
-		double[] sortedP = new double[pDocTopicItem.topics.size()];
-		double[] sortedQ = new double[qDocTopicItem.topics.size()]; 
-		
-		for (TopicItem pTopicItem : pDocTopicItem.topics) {
-			for (TopicItem qTopicItem : qDocTopicItem.topics) {
-				if (pTopicItem.topicNum == qTopicItem.topicNum) {
-					sortedP[pTopicItem.topicNum] = pTopicItem.proportion;
-					sortedQ[qTopicItem.topicNum] = qTopicItem.proportion;
-				}
-			}
+		double[] sortedP = new double[pDocTopicItem.size()];
+		double[] sortedQ = new double[qDocTopicItem.size()];
+		List<Integer> intersect = pDocTopicItem.intersection(qDocTopicItem);
+		//TODO Test if topicNum is ever > DocTopicItem.size()
+		for (Integer topicNum : intersect) {
+			sortedP[topicNum] = pDocTopicItem.getTopic(topicNum).getProportion();
+			sortedQ[topicNum] = qDocTopicItem.getTopic(topicNum).getProportion();
 		}
 		
-		divergence = .5*( klDivergence(sortedP,sortedQ) + klDivergence(sortedQ,sortedP) );
+		divergence = 0.5 *
+			(klDivergence(sortedP,sortedQ) + klDivergence(sortedQ,sortedP));
 		logger.debug("P distribution values: ");
-		for (int i = 0; i < sortedP.length; i++) {
+		for (int i = 0; i < sortedP.length; i++)
 			System.out.format("%.3f,", sortedP[i]);
-		}
+		
 		logger.debug("\n");
 
 		logger.debug("Q distribution values: ");
-		for (int i = 0; i < sortedQ.length; i++) {
+		for (int i = 0; i < sortedQ.length; i++)
 			System.out.format("%.3f,", sortedQ[i]);
-		}
+
 		logger.debug("\n");
 
-		logger.debug("Symmetric Kullback Leibler Divergence: "
-				+ divergence);
+		logger.debug("Symmetric Kullback Leibler Divergence: " + divergence);
 		
 		return divergence;
 	}
 	
-	public static double jsDivergence(DocTopicItem pDocTopicItem, DocTopicItem qDocTopicItem) {
+	public static double jsDivergence(
+			DocTopicItem pDocTopicItem,
+			DocTopicItem qDocTopicItem)
+			throws DistributionSizeMismatchException {
 		double divergence = 0;
 		
-		if (pDocTopicItem.topics.size() != qDocTopicItem.topics.size()) {
-			logger.error("P size: " + pDocTopicItem.topics.size());
-			logger.error("Q size: " + qDocTopicItem.topics.size());
-			logger.error("P and Q for Jensen Shannon Divergence not the same size...exiting");
-			System.exit(0);
+		// Error due to size mismatch
+		if (pDocTopicItem.size() != qDocTopicItem.size()) {
+			logger.error("P size: " + pDocTopicItem.size());
+			logger.error("Q size: " + qDocTopicItem.size());
+			logger.error("P and Q for Jensen Shannon Divergence not the same size");
+			throw new DistributionSizeMismatchException(
+				"P and Q for Jensen Shannon Divergence not the same size");
 		}
 		
-		double[] sortedP = new double[pDocTopicItem.topics.size()];
-		double[] sortedQ = new double[qDocTopicItem.topics.size()];
+		double[] sortedP = new double[pDocTopicItem.size()];
+		double[] sortedQ = new double[qDocTopicItem.size()];
 		
+		for (TopicItem pTopicItem : pDocTopicItem.getTopics())
+			sortedP[pTopicItem.getTopicNum()] = pTopicItem.getProportion();
 		
-		for (TopicItem pTopicItem : pDocTopicItem.topics) {
-			sortedP[pTopicItem.topicNum] = pTopicItem.proportion;
-		}
-		
-		for (TopicItem qTopicItem : qDocTopicItem.topics) {
-			sortedQ[qTopicItem.topicNum] = qTopicItem.proportion;
-		}
+		for (TopicItem qTopicItem : qDocTopicItem.getTopics())
+			sortedQ[qTopicItem.getTopicNum()] = qTopicItem.getProportion();
 
 		divergence = Maths.jensenShannonDivergence(sortedP, sortedQ);
 		
 		logger.debug("P distribution values: ");
-		for (int i = 0; i < sortedP.length; i++) {
+		for (int i = 0; i < sortedP.length; i++)
 			System.out.format("%.3f,", sortedP[i]);
-		}
+
 		logger.debug("\n");
 
 		logger.debug("Q distribution values: ");
-		for (int i = 0; i < sortedQ.length; i++) {
+		for (int i = 0; i < sortedQ.length; i++)
 			System.out.format("%.3f,", sortedQ[i]);
-		}
+
 		logger.debug("\n");
 
 		logger.debug("Jensen Shannon Divergence: " + divergence);
@@ -151,21 +146,23 @@ public class TopicUtil {
 		return divergence;
 	}
 	
-	public static TopicKeySet getTypedTopicKeyList() throws IOException, ParserConfigurationException, SAXException {
+	public static TopicKeySet getTypedTopicKeyList() 
+			throws IOException, ParserConfigurationException, SAXException {
 		File smellArchXMLFile = new File(Config.getSpecifiedSmallArchFromXML());
+
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document doc = dBuilder.parse(smellArchXMLFile);
 		doc.getDocumentElement().normalize();
 		
-		logger.debug("Root element :"
-				+ doc.getDocumentElement().getNodeName());
+		logger.debug("Root element :" + doc.getDocumentElement().getNodeName());
 		NodeList topicsList = doc.getElementsByTagName("topics");
 		
-		
 		logger.debug("Getting info on topics...");
-		logger.debug("----------------------- size: "
-				+ topicsList.getLength());
+		logger.debug("----------------------- size: " + topicsList.getLength());
 
 		TopicKeySet topicKeys = TopicUtil.getTopicKeyListForCurrProj();
 		Node topicsNode = topicsList.item(0);
@@ -185,34 +182,33 @@ public class TopicUtil {
 							.getAttribute("type").trim();
 					logger.debug("\ttype: " + topicItemTypeFromXML);
 
-					for (TopicKey topicKey : topicKeys.set) {
-						if (topicKey.topicNum == topicNum) {
-							topicKey.type = topicItemTypeFromXML;
-						}
-					}
-
+					TopicKey topicKey = topicKeys.getTopicKeyByID(topicNum);
+					if (topicKey != null)
+						topicKey.setType(topicItemTypeFromXML);
 				}
 			}
 		}
 		return topicKeys;
 	}
 	
-	public static TopicKeySet getTopicKeyListForCurrProj() throws FileNotFoundException {
+	public static TopicKeySet getTopicKeyListForCurrProj()
+			throws FileNotFoundException {
 		return new TopicKeySet(Config.getMalletTopicKeysFilename());
 	}
 	
-	public static WordTopicCounts getWordTopicCountsForCurrProj() throws FileNotFoundException {
+	public static WordTopicCounts getWordTopicCountsForCurrProj() 
+			throws FileNotFoundException {
 		return new WordTopicCounts(Config.getMalletWordTopicCountsFilename());
 	}
 	
 	public static DocTopics getDocTopicsFromFile() {
 		DocTopics docTopics = null;
 		try {
-			System.out.println("Loading doc topic file from " + Config.getMalletDocTopicsFilename());
-			 docTopics = new DocTopics(
-					Config.getMalletDocTopicsFilename());
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+			System.out.println("Loading doc topic file from "
+				+ Config.getMalletDocTopicsFilename());
+			docTopics = new DocTopics(Config.getMalletDocTopicsFilename());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 		return docTopics;
 	}
@@ -221,8 +217,8 @@ public class TopicUtil {
 		DocTopics docTopics = null;
 		try {
 			docTopics = new DocTopics(filename);
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 		return docTopics;
 	}
@@ -240,18 +236,16 @@ public class TopicUtil {
 	
 	public static void setDocTopicForCluster(DocTopics docTopics, Cluster leaf) {
 		String strippedLeafClassName = ConfigUtil
-				.stripParensEnclosedClassNameWithPackageName(leaf);
+			.stripParensEnclosedClassNameWithPackageName(leaf);
 		String dollarSign = "$";
 		if (strippedLeafClassName.contains(dollarSign)) {
-			// ".*$[a-zA-Z]+
 			String anonInnerClassRegExpr = ".*\\$\\D.*";
-			if (Pattern.matches(anonInnerClassRegExpr,
-					strippedLeafClassName)) {
+			if (Pattern.matches(anonInnerClassRegExpr, strippedLeafClassName)) {
 				logger.debug("\t\tfound inner class: " + strippedLeafClassName);
 				
 				strippedLeafClassName = strippedLeafClassName.substring(
-						strippedLeafClassName.lastIndexOf('$') + 1,
-						strippedLeafClassName.length());
+					strippedLeafClassName.lastIndexOf('$') + 1,
+					strippedLeafClassName.length());
 				
 				logger.debug("\t\tstripped to name to: " + strippedLeafClassName);
 			}
@@ -259,7 +253,7 @@ public class TopicUtil {
 		
 		logger.debug("\t" + strippedLeafClassName);
 		leaf.docTopicItem = docTopics
-				.getDocTopicItemForJava(strippedLeafClassName);
+			.getDocTopicItemForJava(strippedLeafClassName);
 		logger.debug("\t" + "doc-topic: " + leaf.docTopicItem);
 	}
 	
@@ -324,7 +318,7 @@ public class TopicUtil {
 		logger.debug("\t" + strippedLeafClasName);
 		if (Config.getSelectedLanguage().equals(Language.c)) {
 			leaf.docTopicItem = docTopics.getDocTopicItemForC(strippedLeafClasName);
-			logger.debug("set " + ((leaf.docTopicItem == null) ? "null" : leaf.docTopicItem.source)  + " as doc topic for " +  strippedLeafClasName);
+			logger.debug("set " + ((leaf.docTopicItem == null) ? "null" : leaf.docTopicItem.getSource())  + " as doc topic for " +  strippedLeafClasName);
 		}
 		else if (Config.getSelectedLanguage().equals(Language.java)) {
 			String docTopicName = convertJavaClassWithPackageNameToDocTopicName( leaf.getName() );
@@ -334,63 +328,39 @@ public class TopicUtil {
 			leaf.docTopicItem = docTopics.getDocTopicItemForJava(strippedLeafClasName);
 		logger.debug("\t" + "doc-topic: " + leaf.docTopicItem);
 	}
-	
-	public static DocTopicItem getDocTopicForString(DocTopics docTopics, String element) {
-		String strippedLeafClasName = element;
-		String dollarSign = "$";
-		if (strippedLeafClasName.contains(dollarSign)) {
-			String anonInnerClassRegExpr = ".*\\$\\D.*";
-			if (Pattern.matches(anonInnerClassRegExpr, strippedLeafClasName)) {
-				logger.debug("\t\tfound inner class: " + strippedLeafClasName);
-				
-				strippedLeafClasName = strippedLeafClasName.substring(
-						strippedLeafClasName.lastIndexOf('$') + 1,
-						strippedLeafClasName.length());
-				
-				logger.debug("\t\tstripped to name to: " + strippedLeafClasName);
-			}
-		}
-		
-		DocTopicItem docTopicItem = null;
-		logger.debug("\t" + strippedLeafClasName);
-		if (Config.getSelectedLanguage().equals(Language.c))
-			docTopicItem =  docTopics.getDocTopicItemForC(strippedLeafClasName);
-		else if (Config.getSelectedLanguage().equals(Language.java))
-			docTopicItem =  docTopics.getDocTopicItemForJava(strippedLeafClasName);
-		else
-			docTopicItem =  docTopics.getDocTopicItemForJava(strippedLeafClasName);
-		logger.debug("\t" + "doc-topic: " + docTopicItem);
-		
-		return docTopicItem;
-	}
 
 	public static DocTopicItem mergeDocTopicItems(DocTopicItem docTopicItem,
-			DocTopicItem docTopicItem2) {
-		if (docTopicItem == null) {
+			DocTopicItem docTopicItem2) throws UnmatchingDocTopicItemsException {
+		// If either argument is null, then return the non-null argument
+		if (docTopicItem == null)
 			return new DocTopicItem(docTopicItem2);
-		}
-		if (docTopicItem2 == null) {
+		if (docTopicItem2 == null)
 			return new DocTopicItem(docTopicItem);
-		}
+
+		// If arguments do not match, throw exception
+		if (!docTopicItem.hasSameTopics(docTopicItem2))
+			throw new UnmatchingDocTopicItemsException(
+				"In mergeDocTopicItems, nonmatching docTopicItems");
+
 		DocTopicItem mergedDocTopicItem = new DocTopicItem(docTopicItem);
-		docTopicItem.sort(Sort.num);
-		docTopicItem2.sort(Sort.num);
-		mergedDocTopicItem.sort(Sort.num);
-		for (int i=0;i<docTopicItem.topics.size();i++) {
-			TopicItem ti1 = docTopicItem.topics.get(i);
-			TopicItem ti2 = docTopicItem2.topics.get(i);
-			TopicItem mergedTopicItem = mergedDocTopicItem.topics.get(i);
+
+		for (int i=0;i<docTopicItem.size();i++) {
+			TopicItem ti1 = docTopicItem.getTopic(i);
+			TopicItem ti2 = docTopicItem2.getTopic(i);
+			TopicItem mergedTopicItem = mergedDocTopicItem.getTopic(i);
 			
-			logger.debug("ti1.topicNum: " + ti1.topicNum);
-			logger.debug("ti2.topicNum: " + ti2.topicNum);
-			logger.debug("ti1.proportion: " + ti1.proportion);
-			logger.debug("ti2.proportion: " + ti2.proportion);
+			logger.debug("ti1.topicNum: " + ti1.getTopicNum());
+			logger.debug("ti2.topicNum: " + ti2.getTopicNum());
+			logger.debug("ti1.proportion: " + ti1.getProportion());
+			logger.debug("ti2.proportion: " + ti2.getProportion());
 			
-			assert ti1.topicNum == ti2.topicNum : "In mergeDocTopicItems, nonmatching docTopicItems";
-			mergedTopicItem.proportion = (ti1.proportion + ti2.proportion)/2;
+			mergedTopicItem.setProportion(
+				ti1.getProportion() + ti2.getProportion() / 2);
 			
-			logger.debug("mergedTopicItem.topicNum: " + mergedTopicItem.topicNum);
-			logger.debug("mergedTopicItem.proportion: " + mergedTopicItem.proportion);
+			logger.debug("mergedTopicItem.topicNum: "
+				+ mergedTopicItem.getTopicNum());
+			logger.debug("mergedTopicItem.proportion: "
+				+ mergedTopicItem.getProportion());
 		}
 		return mergedDocTopicItem;
 	}
@@ -410,31 +380,24 @@ public class TopicUtil {
 		docTopicItem.sort(Sort.num);
 		docTopicItem2.sort(Sort.num);
 		
-		logger.debug(String.format("%5s%64s%64s\n", "", docTopicItem.source, docTopicItem2.source));
+		logger.debug(String.format("%5s%64s%64s\n", "", docTopicItem.getSource(), docTopicItem2.getSource()));
 		
-		for (int i=0; i < docTopicItem.topics.size(); i ++)
-			logger.debug(String.format("%32s%32f%32f\n", docTopicItem.topics.get(i).topicNum, docTopicItem.topics.get(i).proportion, docTopicItem2.topics.get(i).proportion));
+		for (int i=0; i < docTopicItem.getTopics().size(); i ++)
+			logger.debug(String.format(
+				"%32s%32f%32f\n",
+				docTopicItem.getTopics().get(i).getTopicNum(),
+				docTopicItem.getTopics().get(i).getProportion(),
+				docTopicItem2.getTopics().get(i).getProportion()));
 	}
 
 	public static TopicItem getMatchingTopicItem(List<TopicItem> topics,
 			TopicItem inTopicItem) {
 		for (TopicItem currTopicItem : topics) {
-			if (currTopicItem.topicNum == inTopicItem.topicNum) {
+			if (currTopicItem.getTopicNum() == inTopicItem.getTopicNum()) {
 				return currTopicItem;
 			}
 		}
 		return null;
-	}
-
-	public static void printDocTopicProportionSum(DocTopicItem docTopicItem) {
-		if (docTopicItem == null) {
-			logger.debug("cannot sum doc-topic propoertion for null DocTopicItem");
-			return;
-		}
-		double sum = 0;
-		for (TopicItem ti : docTopicItem.topics)
-			sum += ti.proportion;
-		logger.debug("doc-topic proportion sum: " + sum);
 	}
 
 	public static void setDocTopicForFastClusterForMalletApi(FastCluster c) {

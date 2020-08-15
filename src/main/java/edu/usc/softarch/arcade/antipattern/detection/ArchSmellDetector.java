@@ -48,6 +48,7 @@ import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicItem;
 import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.topics.TopicUtil;
+import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ArchSmellDetector {
 	private static Logger logger = Logger.getLogger(ArchSmellDetector.class);
@@ -59,8 +60,8 @@ public class ArchSmellDetector {
 	
 	static final Comparator<TopicItem> TOPIC_PROPORTION_ORDER 
 		= (TopicItem t1, TopicItem t2) -> {
-			Double prop1 = t1.proportion;
-			Double prop2 = t2.proportion;
+			Double prop1 = t1.getProportion();
+			Double prop2 = t2.getProportion();
 			return prop1.compareTo(prop2);
 		};
 	
@@ -146,8 +147,8 @@ public class ArchSmellDetector {
 			if (cluster.getDocTopicItem() != null) {
 				logger.debug(cluster.getName() + " has topics: ");
 				DocTopicItem docTopicItem = cluster.getDocTopicItem();
-				Collections.sort(docTopicItem.topics,TOPIC_PROPORTION_ORDER);
-				for (TopicItem topicItem : docTopicItem.topics) {
+				Collections.sort(docTopicItem.getTopics(),TOPIC_PROPORTION_ORDER);
+				for (TopicItem topicItem : docTopicItem.getTopics()) {
 					logger.debug("\t" + topicItem);
 				}
 			}
@@ -424,8 +425,8 @@ public class ArchSmellDetector {
 				logger.debug("Have doc-topics for " + cluster.getName());
 				DocTopicItem docTopicItem = cluster.getDocTopicItem();
 				int concernCount = 0;
-				for (TopicItem topicItem : docTopicItem.topics)  {
-					if (topicItem.proportion > concernOverloadTopicThreshold) {
+				for (TopicItem topicItem : docTopicItem.getTopics())  {
+					if (topicItem.getProportion() > concernOverloadTopicThreshold) {
 						logger.debug("\t" + cluster.getName() + " is beyond concern overload threshold for " + topicItem);
 						concernCount++;
 					}
@@ -493,9 +494,12 @@ public class ArchSmellDetector {
 								entityDocTopicItem = setDocTopicItemForJavaFromMalletFile(entity);
 							}
 
-							mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
-									cluster.getDocTopicItem(),
-									entityDocTopicItem);
+							try {
+								mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
+									cluster.getDocTopicItem(), entityDocTopicItem);
+							} catch (UnmatchingDocTopicItemsException e) {
+								e.printStackTrace(); //TODO handle it
+							}
 							cluster.setDocTopicItem(mergedDocTopicItem);
 						}
 					}
@@ -518,9 +522,13 @@ public class ArchSmellDetector {
 								entityDocTopicItem = setDocTopicItemForJavaFromMalletApi(entity);
 							} 
 
-							mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
+							try {
+								mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
 									cluster.getDocTopicItem(),
 									entityDocTopicItem);
+							} catch (UnmatchingDocTopicItemsException e) {
+								e.printStackTrace(); //TODO handle it
+							}
 							cluster.setDocTopicItem(mergedDocTopicItem);
 						}
 					}
@@ -607,9 +615,9 @@ public class ArchSmellDetector {
 			for (ConcernCluster cluster : validScatteredClusters) {
 				// Filter out all topic items that aren't smelly
 				DocTopicItem dti = cluster.getDocTopicItem();
-				List<TopicItem> significantTopicItems = new ArrayList<>(dti.topics);
+				List<TopicItem> significantTopicItems = new ArrayList<>(dti.getTopics());
 				significantTopicItems.removeIf((TopicItem ti) -> 
-					ti.topicNum == topicNum || ti.proportion < parasiticConcernThreshold);
+					ti.getTopicNum() == topicNum || ti.getProportion() < parasiticConcernThreshold);
 
 				for (int i = 0; i < significantTopicItems.size(); i++) {
 					logger.debug(cluster.getName()
@@ -647,17 +655,17 @@ public class ArchSmellDetector {
 		for (ConcernCluster cluster : validClusters) {
 			// Filter out all topic items that aren't smelly
 			DocTopicItem dti = cluster.getDocTopicItem();
-			List<TopicItem> smellyTopicItems = new ArrayList<>(dti.topics);
+			List<TopicItem> smellyTopicItems = new ArrayList<>(dti.getTopics());
 			smellyTopicItems.removeIf((TopicItem ti) -> 
-				ti.proportion < scatteredConcernThreshold);
+				ti.getProportion() < scatteredConcernThreshold);
 
-			for (TopicItem ti : dti.topics) {
+			for (TopicItem ti : dti.getTopics()) {
 				// count the number of times the topic appears
-				topicNumCountMap.compute(ti.topicNum, (k, v) ->	(v == null) ? 1 : v++);
+				topicNumCountMap.compute(ti.getTopicNum(), (k, v) ->	(v == null) ? 1 : v++);
 				
 				// map cluster to the related topicItem
-				scatteredTopicToClustersMap.putIfAbsent(ti.topicNum, new HashSet<>());
-				scatteredTopicToClustersMap.get(ti.topicNum).add(cluster);
+				scatteredTopicToClustersMap.putIfAbsent(ti.getTopicNum(), new HashSet<>());
+				scatteredTopicToClustersMap.get(ti.getTopicNum()).add(cluster);
 			}
 		}
 	}

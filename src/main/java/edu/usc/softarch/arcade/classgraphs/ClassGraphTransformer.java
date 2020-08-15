@@ -257,24 +257,24 @@ public class ClassGraphTransformer extends SceneTransformer  {
 
 			logger.debug("mallet");
 
-			for (TopicKey tk : tkList.set) { // iterator over all possible
+			for (TopicKey tk : tkList.getSet()) { // iterator over all possible
 												// topics
 				boolean hasCurrTopicNum = false;
-				for (TopicItem t : dtItem.topics) { // iterate over topics
+				for (TopicItem t : dtItem.getTopics()) { // iterate over topics
 													// in this
 													// document/class
-					if (t.topicNum == tk.topicNum) { // if the document as
+					if (t.getTopicNum() == tk.getTopicNum()) { // if the document as
 														// the current topic
-						logger.debug(c + " has topic " + t.topicNum
-								+ " with proportion " + t.proportion);
-						vals[6 + 1 + tk.topicNum] = t.proportion;
+						logger.debug(c + " has topic " + t.getTopicNum()
+								+ " with proportion " + t.getProportion());
+						vals[6 + 1 + tk.getTopicNum()] = t.getProportion();
 						hasCurrTopicNum = true;
 					}
 				}
 				if (!hasCurrTopicNum) {
 					logger.debug(c + " does not have topic "
-							+ tk.topicNum);
-					vals[6 + 1 + tk.topicNum] = 0;
+							+ tk.getTopicNum());
+					vals[6 + 1 + tk.getTopicNum()] = 0;
 				}
 			}
 			logger.debug("\n");
@@ -408,7 +408,7 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	private DocTopicItem returnMatchingDocTopicItem(
 			List<DocTopicItem> dtItemList, String className) {
 		for (DocTopicItem dtItem : dtItemList) {
-			String[] sourceSplit = dtItem.source.split("/");
+			String[] sourceSplit = dtItem.getSource().split("/");
 			List<String> sourceSplitList = new ArrayList<>(Arrays
 					.asList(sourceSplit));
 			System.err.println("sourceSplit: " + sourceSplitList);

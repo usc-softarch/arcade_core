@@ -28,6 +28,7 @@ import edu.usc.softarch.arcade.MetricsDriver;
 import edu.usc.softarch.arcade.clustering.SimCalcUtil;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.clustering.Entity;
+import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 
 public class ReverseAnalysis 
@@ -438,7 +439,12 @@ public class ReverseAnalysis
 				if ((entity1.docTopicItem != null) && (entity2.docTopicItem != null)) //this makes sure anonymous inner classes don't get
 					//included in the computation
 				{
-					double simMeasure = SimCalcUtil.getJSDivergence(entity1, entity2);
+					double simMeasure = 0;
+					try {
+						simMeasure = TopicUtil.jsDivergence(entity1.docTopicItem, entity2.docTopicItem);
+					} catch (DistributionSizeMismatchException e) {
+						e.printStackTrace(); //TODO handle it
+					}
 					sum = sum + simMeasure;
 					n++;
 				}

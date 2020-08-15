@@ -14,9 +14,11 @@ import com.google.common.base.Joiner;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.SimMeasure;
+import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.topics.TopicUtil;
+import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.arcade.util.StopWatch;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
@@ -279,8 +281,12 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			FastCluster cluster, FastCluster otherCluster) {
 		FastCluster newCluster = new FastCluster(ClusteringAlgorithmType.LIMBO,cluster, otherCluster);
 		
-		newCluster.docTopicItem = TopicUtil.mergeDocTopicItems(
+		try {
+			newCluster.docTopicItem = TopicUtil.mergeDocTopicItems(
 				cluster.docTopicItem, otherCluster.docTopicItem);
+		} catch (UnmatchingDocTopicItemsException e) {
+			e.printStackTrace(); //TODO handle it
+		}
 		return newCluster;
 	}
 	
@@ -344,9 +350,13 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		
 		for (int i=0;i<fastClusters.size();i++) {
 			FastCluster currCluster = fastClusters.get(i);
-			double currJSDivergence;
+			double currJSDivergence = 0;
 			if (Config.getCurrSimMeasure().equals(SimMeasure.js)) {
-				currJSDivergence = SimCalcUtil.getJSDivergence(newCluster,currCluster);
+				try {
+					currJSDivergence = TopicUtil.jsDivergence(newCluster.docTopicItem, currCluster.docTopicItem);
+				} catch (DistributionSizeMismatchException e) {
+					e.printStackTrace(); //TODO handle it
+				}
 			}
 			else if (Config.getCurrSimMeasure().equals(SimMeasure.scm)) {
 				currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(newCluster, currCluster);
@@ -384,8 +394,11 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				double currJSDivergence = 0;
 
 				if (Config.getCurrSimMeasure().equals(SimMeasure.js)) {
-					currJSDivergence = SimCalcUtil.getJSDivergence(cluster,
-						otherCluster);
+					try {
+						currJSDivergence = TopicUtil.jsDivergence(cluster.docTopicItem, otherCluster.docTopicItem);
+					} catch (DistributionSizeMismatchException e) {
+						e.printStackTrace(); //TODO handle it
+					}
 				}
 				else if (Config.getCurrSimMeasure().equals(SimMeasure.scm)) {
 					currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(cluster, otherCluster);

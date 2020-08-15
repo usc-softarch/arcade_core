@@ -101,15 +101,34 @@ public class FileUtil {
 	}
 
 	/**
-	 * Extracts the name of a java code's package.
+	 * Extracts the name of a java code's package from a line.
 	 * 
 	 * @param entry String from which to extract the package name.
-	 * @return Code's package name.
+	 * @return Code's package name, if the line declares one.
 	 */
 	public static String findPackageName(String entry) {
 		Pattern pattern = Pattern.compile("\\s*package\\s+(.+)\\s*;\\s*");
 		Matcher matcher = pattern.matcher(entry);
 		if (matcher.find()) return matcher.group(1).trim();
+		return null;
+	}
+
+	/**
+	 * Extracts the name of a java code's package from a file.
+	 * 
+	 * @param file File from which to extract the package name.
+	 * @return Code's package name, if the file declares one.
+	 */
+	public static String findPackageName(File file) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				String packageName = findPackageName(line);
+				if (packageName != null) return packageName;
+			}
+		} catch (IOException e) { 
+			logger.error("Failure to read file " + file);
+		}
 		return null;
 	}
 
