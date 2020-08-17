@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -24,13 +23,19 @@ public class MyCallGraph implements Serializable {
 	
 	// #region ACCESSORS ---------------------------------------------------------
 	public Set<MethodEdge> getEdges() { return new HashSet<>(edges); }
+	/**
+	 * Returns all Methods that are target of the given src MyMethod.
+	 * 
+	 * @param src Source MyMethod to get targets from.
+	 * @return All target MyMethods of src.
+	 */
 	public Set<MyMethod> getTargetEdges(MyMethod src) {
 		Set<MyMethod> targetMethods = new HashSet<>();
-		for (MethodEdge me : edges) {
-			if ( me.getSrc().equals(src) ) {
+
+		for (MethodEdge me : edges)
+			if (me.getSrc().equals(src))
 				targetMethods.add(me.getTgt());
-			}
-		}
+
 		return targetMethods;
 	}
 	public boolean containsEdge(MyMethod src, MyMethod tgt) {
@@ -46,34 +51,28 @@ public class MyCallGraph implements Serializable {
 	// #endregion ACCESSORS ------------------------------------------------------
 	
 	// #region MISC --------------------------------------------------------------
+	@Override
 	public String toString() {
-		Iterator<MethodEdge> iter = edges.iterator();
 		String str = "";
-		
 		int edgeCount = 0;
-		while(iter.hasNext()) {
-			MethodEdge e = iter.next();
-			str += edgeCount + ": " + e.toString();
-			if(iter.hasNext()) {
-				str+="\n";
-			}
+
+		for (MethodEdge e : edges) {
+			str += edgeCount + ": " + e.toString() + "\n";
 			edgeCount++;
 		}
 		
-		return str;
+		// remove last line break before return
+		return str.substring(0, str.length() - 1);
 	}
 	// #endregion MISC -----------------------------------------------------------
 	
 	// #region IO ----------------------------------------------------------------
 	public void serialize(String filename) throws IOException {
-		// Write to disk with FileOutputStream
-		FileOutputStream f_out = new FileOutputStream(filename);
-
-		// Write object with ObjectOutputStream
-		ObjectOutputStream obj_out = new ObjectOutputStream (f_out);
-
-		// Write object out to disk
-		obj_out.writeObject ( this );
+		try (ObjectOutputStream obj_out =
+				new ObjectOutputStream(
+				new FileOutputStream(filename))) {
+			obj_out.writeObject(this);
+		}
 	}
 	// #endregion IO -------------------------------------------------------------
 }

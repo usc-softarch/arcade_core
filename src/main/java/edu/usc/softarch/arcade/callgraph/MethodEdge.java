@@ -29,13 +29,16 @@ public class MethodEdge implements Serializable {
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region MISC --------------------------------------------------------------
+	@Override
 	public boolean equals(Object o) {
-		if (o == null) return false;
+		if (!(o instanceof MethodEdge))
+			return false;
 
 		MethodEdge e = (MethodEdge) o;
 		return this.src.equals(e.src) && this.tgt.equals(e.tgt);
 	}
 	
+	@Override
 	public int hashCode() {
 		int hash = 7;
 		hash = 37 * hash + (src == null ? 0 : src.hashCode());
@@ -43,6 +46,7 @@ public class MethodEdge implements Serializable {
 		return hash;
 	}
 	
+	@Override
 	public String toString() {
 		return "(" + src.toString() + "," + tgt.toString() + ")";
 	}

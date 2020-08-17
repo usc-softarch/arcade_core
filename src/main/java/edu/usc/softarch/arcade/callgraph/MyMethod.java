@@ -64,21 +64,21 @@ public class MyMethod implements Serializable {
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region MISC --------------------------------------------------------------
+	@Override
 	public boolean equals (Object o) {
-		MyMethod method = (MyMethod) o;
-		if (
-				this.name.equals(method.name) &&
-				this.retVal.equals(method.retVal) &&
-				this.declaringClass.equals(method.declaringClass) &&
-				this.params.equals(method.params) &&
-				this.publicScope == method.publicScope
-			)
-			return true;
-		else 
+		if(!(o instanceof MyMethod))
 			return false;
-			
+		
+		MyMethod method = (MyMethod) o;
+		
+		return this.name.equals(method.name) &&
+			this.retVal.equals(method.retVal) &&
+			this.declaringClass.equals(method.declaringClass) &&
+			this.params.equals(method.params) &&
+			this.publicScope == method.publicScope;
 	}
 	
+	@Override
 	public int hashCode() {
 		int hash = 7;
 		hash = 37 * hash + (this.name == null ? 0 : this.name.hashCode());
@@ -89,8 +89,11 @@ public class MyMethod implements Serializable {
 		return hash;
 	}
 	
+	@Override
 	public String toString() {
-		return "(" + (this.publicScope ? "public" : "private") + "," + this.declaringClass.toString() + "." + this.name + ")";
+		String toReturn = "(" + (this.publicScope ? "public" : "private") + ",";
+		toReturn += this.declaringClass.toString() + "." + this.name + ")";
+		return toReturn;
 	}
 	// #endregion MISC -----------------------------------------------------------
 }

@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.callgraph;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import soot.SootClass;
@@ -13,6 +12,7 @@ import soot.SootClass;
 public class MyClass implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = 5575671464833110817L;
+
 	private String packageName;
 	private String className;
 	private Set<MyMethod> methods;
@@ -46,15 +46,13 @@ public class MyClass implements Serializable {
 	public String methodsToString(int tabCount) {
 		String methodsStr = "";
 		int methodCount = 0;
-		Iterator<MyMethod> iter = methods.iterator();
-		while (iter.hasNext()) {
-			MyMethod m = iter.next();
-			for (int i=0;i<tabCount;i++) {
-				methodsStr +='\t';
-			}
+
+		for (MyMethod m : methods) {
+			methodsStr += "\t".repeat(tabCount);
 			methodsStr += methodCount + ": " + m.toString() + "\n"; 
 			methodCount++;
 		}
+
 		return methodsStr;
 	}
 
