@@ -376,7 +376,7 @@ public class ClusterUtil {
 
 			for (MyClass myClass : cluster.getClasses()) {
 				Element classElem = doc.createElement("class");
-				classElem.appendChild(doc.createTextNode(myClass.className));
+				classElem.appendChild(doc.createTextNode(myClass.getClassName()));
 				classesElem.appendChild(classElem);
 
 				Element methodsElem = doc.createElement("methods");
@@ -518,7 +518,7 @@ public class ClusterUtil {
 
 			for (MyClass myClass : cluster.getClasses()) {
 				Element classElem = doc.createElement("class");
-				classElem.appendChild(doc.createTextNode(myClass.className));
+				classElem.appendChild(doc.createTextNode(myClass.getClassName()));
 				classesElem.appendChild(classElem);
 
 				Element methodsElem = doc.createElement("methods");

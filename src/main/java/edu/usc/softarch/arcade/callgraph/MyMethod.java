@@ -14,12 +14,13 @@ import soot.Type;
 public class MyMethod implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -268381565397216273L;
-	public String name;
-	Set<String> params;
-	public String retVal;
-	public MyClass declaringClass;
-	public boolean isPublic;
-	public String type;
+
+	private String name;
+	private Set<String> params;
+	private String retVal;
+	private MyClass declaringClass;
+	private boolean publicScope;
+	private String type;
 	// #endregion FIELDS ---------------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
@@ -28,7 +29,7 @@ public class MyMethod implements Serializable {
 		this.retVal = method.retVal;
 		this.declaringClass = method.declaringClass;
 		this.params = new HashSet<>(method.params);
-		this.isPublic = method.isPublic;
+		this.publicScope = method.publicScope;
 	}
 	
 	public MyMethod(SootMethod method) {
@@ -40,14 +41,26 @@ public class MyMethod implements Serializable {
 			this.params.add(t.toString());
 		}
 		this.declaringClass = new MyClass(method.getDeclaringClass()); 
-		this.isPublic = method.isPublic();
+		this.publicScope = method.isPublic();
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public Set<String> getParams() {
-		return new HashSet<>(params);
-	}
+	public String getName() { return this.name; }
+	public Set<String> getParams() { return new HashSet<>(params); }
+	public String getRetVal() { return this.retVal; }
+	public MyClass getDeclaringClass() { return new MyClass(declaringClass); }
+	public boolean isPublic() { return this.publicScope; }
+	public String getType() { return this.type; }
+
+	public void setName(String name) { this.name = name; }
+	public boolean addParam(String param) { return this.params.add(param); }
+	public boolean removeParam(String param) { return this.params.remove(param); }
+	public void setRetVal(String retVal) { this.retVal = retVal; }
+	public void setDeclaringClass(MyClass declaringClass) {
+		this.declaringClass = declaringClass; }
+	public void setPublic(boolean publicScope) { this.publicScope = publicScope; }
+	public void setType(String type) { this.type = type; }
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region MISC --------------------------------------------------------------
@@ -58,7 +71,7 @@ public class MyMethod implements Serializable {
 				this.retVal.equals(method.retVal) &&
 				this.declaringClass.equals(method.declaringClass) &&
 				this.params.equals(method.params) &&
-				this.isPublic == method.isPublic
+				this.publicScope == method.publicScope
 			)
 			return true;
 		else 
@@ -72,12 +85,12 @@ public class MyMethod implements Serializable {
 		hash = 37 * hash + (this.retVal == null ? 0 : this.retVal.hashCode());
 		hash = 37 * hash + (this.declaringClass == null ? 0 : this.declaringClass.hashCode());
 		hash = 37 * hash + (this.params == null ? 0 : this.params.hashCode());
-		hash = 37 * hash + (this.isPublic ? 1 : 0);
+		hash = 37 * hash + (this.publicScope ? 1 : 0);
 		return hash;
 	}
 	
 	public String toString() {
-		return "(" + (this.isPublic ? "public" : "private") + "," + this.declaringClass.toString() + "." + this.name + ")";
+		return "(" + (this.publicScope ? "public" : "private") + "," + this.declaringClass.toString() + "." + this.name + ")";
 	}
 	// #endregion MISC -----------------------------------------------------------
 }

@@ -13,9 +13,9 @@ import soot.SootClass;
 public class MyClass implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = 5575671464833110817L;
-	public String packageName;
-	public String className;
-	Set<MyMethod> methods;
+	private String packageName;
+	private String className;
+	private Set<MyMethod> methods;
 	// #endregion FIELDS ---------------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
@@ -33,13 +33,13 @@ public class MyClass implements Serializable {
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public void addMethod(MyMethod m) {
-		methods.add(m);
-	}
-
+	public String getPackageName() { return this.packageName; }
+	public String getClassName() { return this.className; }
 	public Set<MyMethod> getMethods() {
-		return new HashSet<>(methods);
-	}
+		return new HashSet<>(methods); }
+
+	public void addMethod(MyMethod m) {
+		methods.add(m);	}
 	// #endregion ACCESSORS ------------------------------------------------------
 	
 	// #region MISC --------------------------------------------------------------

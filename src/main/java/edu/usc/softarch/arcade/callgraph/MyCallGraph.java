@@ -14,34 +14,33 @@ import java.util.Set;
 public class MyCallGraph implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = 7989577593008055517L;
-	HashSet<MethodEdge> edges = new HashSet<>();
+
+	private Set<MethodEdge> edges;
 	// #endregion FIELDS ---------------------------------------------------------
+
+	// #region CONSTRUCTORS ------------------------------------------------------
+	public MyCallGraph() { this.edges = new HashSet<>(); }
+	// #endregion CONSTRUCTORS ---------------------------------------------------
 	
 	// #region ACCESSORS ---------------------------------------------------------
 	public Set<MethodEdge> getEdges() { return new HashSet<>(edges); }
-	
 	public Set<MyMethod> getTargetEdges(MyMethod src) {
 		Set<MyMethod> targetMethods = new HashSet<>();
 		for (MethodEdge me : edges) {
-			if ( me.src.equals(src) ) {
-				targetMethods.add(me.tgt);
+			if ( me.getSrc().equals(src) ) {
+				targetMethods.add(me.getTgt());
 			}
 		}
 		return targetMethods;
 	}
-
 	public boolean containsEdge(MyMethod src, MyMethod tgt) {
 		return edges.contains(new MethodEdge(src,tgt)); }
-	
 	public boolean containsEdge(MethodEdge e) { return edges.contains(e); }
 
 	public void addEdge(MyMethod src, MyMethod tgt) {
 		edges.add(new MethodEdge(src,tgt)); }
-	
 	public void addEdge(MethodEdge e) { edges.add(e); }
-
 	public void removeEdge(MethodEdge e) { edges.remove(e); }
-	
 	public void removeEdge(MyMethod src, MyMethod tgt) {
 		edges.remove(new MethodEdge(src,tgt)); }
 	// #endregion ACCESSORS ------------------------------------------------------

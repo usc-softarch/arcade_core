@@ -649,24 +649,24 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			MyClass srcClass = null;
 			MyClass tgtClass = null;
 			
-			if (classesWithUsedMethods.containsKey(edge.src.declaringClass.toString())) {
-				srcClass = classesWithUsedMethods.get(edge.src.declaringClass.toString());
+			if (classesWithUsedMethods.containsKey(edge.getSrc().getDeclaringClass().toString())) {
+				srcClass = classesWithUsedMethods.get(edge.getSrc().getDeclaringClass().toString());
 			}
 			else {
-				srcClass = new MyClass(edge.src.declaringClass);
-				classesWithUsedMethods.put(edge.src.declaringClass.toString(),srcClass);
+				srcClass = new MyClass(edge.getSrc().getDeclaringClass());
+				classesWithUsedMethods.put(edge.getSrc().getDeclaringClass().toString(),srcClass);
 			}
 
-			if (classesWithUsedMethods.containsKey(edge.tgt.declaringClass.toString())) {
-				tgtClass = classesWithUsedMethods.get(edge.tgt.declaringClass.toString());
+			if (classesWithUsedMethods.containsKey(edge.getTgt().getDeclaringClass().toString())) {
+				tgtClass = classesWithUsedMethods.get(edge.getTgt().getDeclaringClass().toString());
 			}
 			else {
-				tgtClass = new MyClass(edge.tgt.declaringClass);
-				classesWithUsedMethods.put(edge.tgt.declaringClass.toString(),tgtClass);
+				tgtClass = new MyClass(edge.getTgt().getDeclaringClass());
+				classesWithUsedMethods.put(edge.getTgt().getDeclaringClass().toString(),tgtClass);
 			}
-			if (!edge.src.declaringClass.equals(edge.tgt.declaringClass)) {
-				srcClass.addMethod(edge.src);
-				tgtClass.addMethod(edge.tgt);
+			if (!edge.getSrc().getDeclaringClass().equals(edge.getTgt().getDeclaringClass())) {
+				srcClass.addMethod(edge.getSrc());
+				tgtClass.addMethod(edge.getTgt());
 			}
 		}
 	}

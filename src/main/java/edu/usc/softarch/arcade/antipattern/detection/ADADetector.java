@@ -301,7 +301,7 @@ public class ADADetector {
 				System.out.println("\tCurrent class: " + myClass);
 				for (MyMethod myMethod : myClass.getMethods()) {
 					System.out.println("\t\tCurrent method: " + myMethod);
-					if (myMethod.getParams().size() == 1 && myMethod.isPublic) {
+					if (myMethod.getParams().size() == 1 && myMethod.isPublic()) {
 						System.out
 								.println("\t\t\tCandidate Ambiguous Interface");
 						Set<MyMethod> targetEdges = myCallGraph
@@ -311,7 +311,7 @@ public class ADADetector {
 						int relevantTgtMethodCount =0;
 						for (MyMethod tgtMethod : targetEdges) {
 							if (splitCluster.classes
-									.contains(tgtMethod.declaringClass)) {
+									.contains(tgtMethod.getDeclaringClass())) {
 								System.out.println("\t\t\t\tFound relevant taret method: " + tgtMethod);
 								relevantTgtMethodCount++;
 								
@@ -335,7 +335,7 @@ public class ADADetector {
 		System.out.println("Number of unused methods: "
 				+ unusedMethods.values().size());
 		for (MyMethod myMethod : unusedMethods.values()) {
-			if (myMethod.isPublic) {
+			if (myMethod.isPublic()) {
 				System.out.println("\tUnused public method found: " + myMethod);
 				unusedInterfaceCount++;
 			}
@@ -515,7 +515,7 @@ public class ADADetector {
 				for (MyMethod myMethod : myClass.getMethods()) {
 					System.out.println("\t\tCurrent method: " + myMethod);
 					String processedMethodName = StringPreProcessor
-							.camelCaseSeparateAndStem(myMethod.name);
+							.camelCaseSeparateAndStem(myMethod.getName());
 					System.out.println("\t\tProcssed method name: "
 							+ processedMethodName);
 
@@ -560,7 +560,7 @@ public class ADADetector {
 				.getTypedTopicKeyList();
 
 		System.out.println("\t\tTopic determined for "
-				+ myMethod.name);
+				+ myMethod.getName());
 		System.out.println("\t\t topic: " + mostProbableTopic);
 		String typeForMostProbableTopic = typedTopicKeySet
 		.getTopicKeyByID(mostProbableTopic).getType();
@@ -569,7 +569,7 @@ public class ADADetector {
 		System.out
 				.println("\t\t prob for method " + myMethod + " given topic: "
 						+ highestProbSoFar);
-		myMethod.type = typeForMostProbableTopic;
+		myMethod.setType(typeForMostProbableTopic);
 		System.out.println();
 	}
 
@@ -882,9 +882,9 @@ public class ADADetector {
 				System.out.println("\tCurrent class: " + myClass);
 				for (MyMethod myMethod : myClass.getMethods()) {
 					System.out.println("\t\tCurrent method: " + myMethod);
-					if (splitCluster.type.equals("spec") && myMethod.isPublic && myMethod.type.equals("indep")) {
+					if (splitCluster.type.equals("spec") && myMethod.isPublic() && myMethod.getType().equals("indep")) {
 						System.out.println("\t\t\tFound instance of connector interface implementation...");
-						System.out.println("\t\t\t" + myMethod + " of "+ splitCluster + " has type " + myMethod.type + " while " + splitCluster + " has " + splitCluster.type);
+						System.out.println("\t\t\t" + myMethod + " of "+ splitCluster + " has type " + myMethod.getType() + " while " + splitCluster + " has " + splitCluster.type);
 						connectorInterfaceImplCount++;
 					}
 				}
@@ -1050,7 +1050,7 @@ public class ADADetector {
 				System.out.println("\tCurrent class: " + myClass);
 				Element classElem = doc.createElement("class");
 				clusterElem.appendChild(classElem);
-				classElem.setAttribute("name",myClass.className);
+				classElem.setAttribute("name",myClass.getClassName());
 
 				for (MyMethod myMethod : myClass.getMethods()) {
 					System.out.println("\t\tCurrent method: " + myMethod);
@@ -1067,7 +1067,7 @@ public class ADADetector {
 					
 					Element retValElem = doc.createElement("retval");
 					methodElem.appendChild(retValElem);
-					retValElem.setAttribute("name",myMethod.retVal);
+					retValElem.setAttribute("name",myMethod.getRetVal());
 				}
 			}
 		}
