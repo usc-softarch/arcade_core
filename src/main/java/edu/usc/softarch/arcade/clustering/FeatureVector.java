@@ -8,18 +8,13 @@ import edu.usc.softarch.arcade.topics.DocTopicItem;
  * @author joshua
  */
 public class FeatureVector extends ArrayList<Feature> {
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -2684090300773683383L;
 	public String name = "";
 	public DocTopicItem docTopicItem;
+	// #endregion FIELDS ---------------------------------------------------------
 	
-	public DocTopicItem getDocTopicItem() {
-		return docTopicItem;
-	}
-
-	public void setDocTopicItem(DocTopicItem docTopicItem) {
-		this.docTopicItem = docTopicItem;
-	}
-
+	// #region CONSTRUCTORS ------------------------------------------------------
 	public FeatureVector() {
 		super();
 	}
@@ -27,7 +22,13 @@ public class FeatureVector extends ArrayList<Feature> {
 	public FeatureVector(String name) {
 		this.name = name;
 	}
-	
+	// #endregion CONSTRUCTORS ---------------------------------------------------
+
+	// #region ACCESSORS ---------------------------------------------------------
+	public DocTopicItem getDocTopicItem() {
+		return docTopicItem;
+	}
+
 	public String toBinaryForm() {
 		String str = "";
 		for (int i=0;i<this.size(); i++) {
@@ -36,7 +37,11 @@ public class FeatureVector extends ArrayList<Feature> {
 		}
 		return str;
 	}
-	
+
+	public void setDocTopicItem(DocTopicItem docTopicItem) {
+		this.docTopicItem = docTopicItem;
+	}
+
 	public void changeFeatureValue(String tgtStr, double value) {
 		for (Feature f : this) {
 			if (tgtStr.equals(f.edge.getTgtStr())) {
@@ -44,7 +49,9 @@ public class FeatureVector extends ArrayList<Feature> {
 			}
 		}
 	}
+	// #endregion ACCESSORS ------------------------------------------------------
 	
+	// #region MISC --------------------------------------------------------------
 	@Override
 	public boolean equals(Object o) {
 		if(!(o instanceof FeatureVector))
@@ -73,4 +80,5 @@ public class FeatureVector extends ArrayList<Feature> {
 		}
 		return isEqual;
 	}
+	// #endregion MISC -----------------------------------------------------------
 }

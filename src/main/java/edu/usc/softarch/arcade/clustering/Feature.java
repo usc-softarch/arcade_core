@@ -8,17 +8,23 @@ import edu.usc.softarch.arcade.classgraphs.StringEdge;
  * @author joshua
  */
 public class Feature implements Serializable {
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -2658336048930856739L;
+
 	public StringEdge edge;
 	public double value;
+	// #endregion FIELDS ---------------------------------------------------------
 	
+	// #region CONSTRUCTORS ------------------------------------------------------
 	Feature(StringEdge edge, double value) {
 		this.edge = edge;
 		this.value = value;
 	}
 	
 	public Feature() { super(); }
+	// #endregion CONSTRUCTORS ---------------------------------------------------
 
+	// #region MISC --------------------------------------------------------------
 	public String toString() {
 		if (this.value == 1) 
 			return edge + ":true";
@@ -40,4 +46,5 @@ public class Feature implements Serializable {
 		hash = 37 * hash + (Double.valueOf(this.value)).hashCode();
 		return hash;
 	}
+	// #endregion MISC -----------------------------------------------------------
 }

@@ -18,8 +18,10 @@ import edu.usc.softarch.arcade.util.ExtractionContext;
  * @author joshua
  */
 public class Cluster extends FeatureVector {
-	private static final Logger logger = LogManager.getLogger(Cluster.class);
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -5521307722955232634L;
+	private static final Logger logger = LogManager.getLogger(Cluster.class);
+	
 	public Set<FeatureVector> items = new HashSet<>();
 	public List<Cluster> leafClusters = new ArrayList<>();
 	public Set<MyClass> classes = new HashSet<>();
@@ -33,34 +35,14 @@ public class Cluster extends FeatureVector {
 	
 	public double simLeftRight = 0;
 	public String type;
+	// #endregion FIELDS ---------------------------------------------------------
 	
-	
-	public void instantiateClasses() {
-		classes = new HashSet<>();
-	}
-	
-	public void add(MyClass c) {
-		classes.add(c);
-	}
-	
+	// #region CONSTRUCTORS ------------------------------------------------------
 	public Cluster() {
 		super();
 		preparePriorityQueue();
 	}
 
-	public void preparePriorityQueue() {
-		if (!Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC)) {
-			DISTANCE_ORDER = new UnbiasedEllenbergComparator();
-			DISTANCE_ORDER.setRefCluster(this);
-			clusterSimQueue = new PriorityQueue<Cluster>(1500, DISTANCE_ORDER);
-		}
-		else {
-			CONCERN_ORDER = new ConcernComparator();
-			CONCERN_ORDER.setRefCluster(this);
-			clusterSimQueue = new PriorityQueue<Cluster>(1500, CONCERN_ORDER);
-		}
-	}
-	
 	public Cluster(Cluster left, Cluster right) {
 		this.left = left;
 		this.right = right;
@@ -95,6 +77,37 @@ public class Cluster extends FeatureVector {
 		}
 	}
 
+	public void instantiateClasses() {
+		classes = new HashSet<>();
+	}
+
+	public void preparePriorityQueue() {
+		if (!Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC)) {
+			DISTANCE_ORDER = new UnbiasedEllenbergComparator();
+			DISTANCE_ORDER.setRefCluster(this);
+			clusterSimQueue = new PriorityQueue<Cluster>(1500, DISTANCE_ORDER);
+		}
+		else {
+			CONCERN_ORDER = new ConcernComparator();
+			CONCERN_ORDER.setRefCluster(this);
+			clusterSimQueue = new PriorityQueue<Cluster>(1500, CONCERN_ORDER);
+		}
+	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
+	
+	// #region ACCESSORS ---------------------------------------------------------
+	public Cluster getMostSimilarCluster() {
+		return clusterSimQueue.peek();
+	}
+
+	public Set<MyClass> getClasses() {
+		return new HashSet<>(classes);
+	}
+
+	public void add(MyClass c) {
+		classes.add(c);
+	}
+
 	private void setFeatureVectorAndName(FeatureVector fv) {
 		FeatureVector copyFV = new FeatureVector(fv.name);
 		for (Feature f : fv) {
@@ -108,26 +121,6 @@ public class Cluster extends FeatureVector {
 		logger.debug("In " + ExtractionContext.getCurrentClassAndMethodName() + ": "
 				+ itemsToString());
 		this.name = itemsToString();
-	}
-	
-	public String itemsToStringOnLine() {
-		String str = "";
-		for (FeatureVector fv : items) {
-			str += fv.name + "\n";
-		}
-		
-		return str;
-	}
-	
-	public String itemsToString() {
-		String str = "(";
-		for (FeatureVector fv : items) {
-			str += fv.name + ",";
-		}
-		str = str.substring(0,str.length()-1);
-		str += ")";
-		
-		return str;
 	}
 
 	public void addClusterUsingPlainCAMerge(FeatureVector inFV) {
@@ -159,6 +152,25 @@ public class Cluster extends FeatureVector {
 
 	}
 
+	public void addClustersToPriorityQueue(List<Cluster> clusters) {
+		
+		if (TopicUtil.docTopics == null && Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC))
+			TopicUtil.docTopics = TopicUtil.getDocTopicsFromFile();
+		for (Cluster c : clusters) {
+			if (this.docTopicItem == null && Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC))
+				TopicUtil.setDocTopicForCluster(TopicUtil.docTopics, c);
+			if ( !c.name.equals(this.name) ) {
+				clusterSimQueue.add(c);
+			}
+		}
+	}
+
+	public void clearPriorityQueue() {
+		clusterSimQueue.clear();
+	}
+	// #endregion ACCESSORS ------------------------------------------------------
+
+	// #region PROCESSING --------------------------------------------------------
 	private void plainCAMerge(FeatureVector inFV) {
 		for (Feature f1 : this) {
 			for (Feature f2 : inFV) {
@@ -177,6 +189,28 @@ public class Cluster extends FeatureVector {
 				}
 			}
 		}
+	}
+	// #endregion PROCESSING -----------------------------------------------------
+	
+	// #region MISC --------------------------------------------------------------
+	public String itemsToStringOnLine() {
+		String str = "";
+		for (FeatureVector fv : items) {
+			str += fv.name + "\n";
+		}
+		
+		return str;
+	}
+	
+	public String itemsToString() {
+		String str = "(";
+		for (FeatureVector fv : items) {
+			str += fv.name + ",";
+		}
+		str = str.substring(0,str.length()-1);
+		str += ")";
+		
+		return str;
 	}
 
 	public String toString() {
@@ -223,29 +257,5 @@ public class Cluster extends FeatureVector {
 		}
 		return true;
 	}
-	
-	public void addClustersToPriorityQueue(List<Cluster> clusters) {
-		
-		if (TopicUtil.docTopics == null && Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC))
-			TopicUtil.docTopics = TopicUtil.getDocTopicsFromFile();
-		for (Cluster c : clusters) {
-			if (this.docTopicItem == null && Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC))
-				TopicUtil.setDocTopicForCluster(TopicUtil.docTopics, c);
-			if ( !c.name.equals(this.name) ) {
-				clusterSimQueue.add(c);
-			}
-		}
-	}
-	
-	public Cluster getMostSimilarCluster() {
-		return clusterSimQueue.peek();
-	}
-
-	public void clearPriorityQueue() {
-		clusterSimQueue.clear();
-	}
-
-	public Set<MyClass> getClasses() {
-		return new HashSet<>(classes);
-	}
+	// #endregion MISC -----------------------------------------------------------
 }
