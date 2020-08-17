@@ -12,26 +12,41 @@ import java.util.Set;
  * @author joshua
  */
 public class MyCallGraph implements Serializable {
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = 7989577593008055517L;
 	HashSet<MethodEdge> edges = new HashSet<>();
+	// #endregion FIELDS ---------------------------------------------------------
 	
+	// #region ACCESSORS ---------------------------------------------------------
 	public Set<MethodEdge> getEdges() { return new HashSet<>(edges); }
 	
-	public void addEdge(MyMethod src, MyMethod tgt) {
-		edges.add(new MethodEdge(src,tgt)); }
-	
-	public void addEdge(MethodEdge e) { edges.add(e); }
-	
+	public Set<MyMethod> getTargetEdges(MyMethod src) {
+		Set<MyMethod> targetMethods = new HashSet<>();
+		for (MethodEdge me : edges) {
+			if ( me.src.equals(src) ) {
+				targetMethods.add(me.tgt);
+			}
+		}
+		return targetMethods;
+	}
+
 	public boolean containsEdge(MyMethod src, MyMethod tgt) {
 		return edges.contains(new MethodEdge(src,tgt)); }
 	
 	public boolean containsEdge(MethodEdge e) { return edges.contains(e); }
+
+	public void addEdge(MyMethod src, MyMethod tgt) {
+		edges.add(new MethodEdge(src,tgt)); }
 	
+	public void addEdge(MethodEdge e) { edges.add(e); }
+
 	public void removeEdge(MethodEdge e) { edges.remove(e); }
 	
 	public void removeEdge(MyMethod src, MyMethod tgt) {
 		edges.remove(new MethodEdge(src,tgt)); }
+	// #endregion ACCESSORS ------------------------------------------------------
 	
+	// #region MISC --------------------------------------------------------------
 	public String toString() {
 		Iterator<MethodEdge> iter = edges.iterator();
 		String str = "";
@@ -48,7 +63,9 @@ public class MyCallGraph implements Serializable {
 		
 		return str;
 	}
+	// #endregion MISC -----------------------------------------------------------
 	
+	// #region IO ----------------------------------------------------------------
 	public void serialize(String filename) throws IOException {
 		// Write to disk with FileOutputStream
 		FileOutputStream f_out = new FileOutputStream(filename);
@@ -59,14 +76,5 @@ public class MyCallGraph implements Serializable {
 		// Write object out to disk
 		obj_out.writeObject ( this );
 	}
-
-	public Set<MyMethod> getTargetEdges(MyMethod src) {
-		Set<MyMethod> targetMethods = new HashSet<>();
-		for (MethodEdge me : edges) {
-			if ( me.src.equals(src) ) {
-				targetMethods.add(me.tgt);
-			}
-		}
-		return targetMethods;
-	}	
+	// #endregion IO -------------------------------------------------------------
 }

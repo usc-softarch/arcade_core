@@ -11,15 +11,38 @@ import soot.SootClass;
  * @author joshua
  */
 public class MyClass implements Serializable {
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = 5575671464833110817L;
 	public String packageName;
 	public String className;
 	Set<MyMethod> methods;
+	// #endregion FIELDS ---------------------------------------------------------
 	
+	// #region CONSTRUCTORS ------------------------------------------------------
+	public MyClass(MyClass declaringClass) {
+		this.className = declaringClass.className;
+		this.packageName = declaringClass.packageName;
+		this.methods = new HashSet<>(declaringClass.methods);
+	}
+	
+	public MyClass(SootClass declaringClass) {
+		this.className = declaringClass.getShortName();
+		this.packageName = declaringClass.getPackageName();
+		this.methods = new HashSet<>();
+	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
+
+	// #region ACCESSORS ---------------------------------------------------------
 	public void addMethod(MyMethod m) {
 		methods.add(m);
 	}
+
+	public Set<MyMethod> getMethods() {
+		return new HashSet<>(methods);
+	}
+	// #endregion ACCESSORS ------------------------------------------------------
 	
+	// #region MISC --------------------------------------------------------------
 	public String methodsToString(int tabCount) {
 		String methodsStr = "";
 		int methodCount = 0;
@@ -33,18 +56,6 @@ public class MyClass implements Serializable {
 			methodCount++;
 		}
 		return methodsStr;
-	}
-	
-	public MyClass(MyClass declaringClass) {
-		this.className = declaringClass.className;
-		this.packageName = declaringClass.packageName;
-		this.methods = new HashSet<>(declaringClass.methods);
-	}
-	
-	public MyClass(SootClass declaringClass) {
-		this.className = declaringClass.getShortName();
-		this.packageName = declaringClass.getPackageName();
-		this.methods = new HashSet<>();
 	}
 
 	@Override
@@ -69,8 +80,5 @@ public class MyClass implements Serializable {
 	public String toString() {
 		return this.packageName + "." + this.className;
 	}
-
-	public Set<MyMethod> getMethods() {
-		return new HashSet<>(methods);
-	}
+	// #endregion MISC -----------------------------------------------------------
 }

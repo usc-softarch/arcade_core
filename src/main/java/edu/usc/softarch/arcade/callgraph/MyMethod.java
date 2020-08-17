@@ -12,6 +12,7 @@ import soot.Type;
  * @author joshua
  */
 public class MyMethod implements Serializable {
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -268381565397216273L;
 	public String name;
 	Set<String> params;
@@ -19,7 +20,9 @@ public class MyMethod implements Serializable {
 	public MyClass declaringClass;
 	public boolean isPublic;
 	public String type;
+	// #endregion FIELDS ---------------------------------------------------------
 	
+	// #region CONSTRUCTORS ------------------------------------------------------
 	public MyMethod(MyMethod method) {
 		this.name = method.name;
 		this.retVal = method.retVal;
@@ -39,7 +42,15 @@ public class MyMethod implements Serializable {
 		this.declaringClass = new MyClass(method.getDeclaringClass()); 
 		this.isPublic = method.isPublic();
 	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
 
+	// #region ACCESSORS ---------------------------------------------------------
+	public Set<String> getParams() {
+		return new HashSet<>(params);
+	}
+	// #endregion ACCESSORS ------------------------------------------------------
+
+	// #region MISC --------------------------------------------------------------
 	public boolean equals (Object o) {
 		MyMethod method = (MyMethod) o;
 		if (
@@ -68,8 +79,5 @@ public class MyMethod implements Serializable {
 	public String toString() {
 		return "(" + (this.isPublic ? "public" : "private") + "," + this.declaringClass.toString() + "." + this.name + ")";
 	}
-
-	public Set<String> getParams() {
-		return new HashSet<>(params);
-	}
+	// #endregion MISC -----------------------------------------------------------
 }

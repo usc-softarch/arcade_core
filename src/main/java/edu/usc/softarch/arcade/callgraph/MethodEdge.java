@@ -6,15 +6,20 @@ import java.io.Serializable;
  * @author joshua
  */
 public class MethodEdge implements Serializable {
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = 5230066023797650367L;
 	public MyMethod src;
 	public MyMethod tgt;
+	// #endregion FIELDS ---------------------------------------------------------
 
+	// #region CONSTRUCTORS ------------------------------------------------------
 	public MethodEdge(MyMethod src, MyMethod tgt) {
 		this.src = new MyMethod(src);
 		this.tgt = new MyMethod(tgt);
 	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
 	
+	// #region MISC --------------------------------------------------------------
 	public boolean equals(Object o) {
 		if (o == null) return false;
 
@@ -32,8 +37,11 @@ public class MethodEdge implements Serializable {
 	public String toString() {
 		return "(" + src.toString() + "," + tgt.toString() + ")";
 	}
+	// #endregion MISC -----------------------------------------------------------
 	
+	// #region IO ----------------------------------------------------------------
 	public String toDotString() {
 		return "\t\"" + src.toString() + "\" -> \"" + tgt.toString() + "\";";
 	}
+	// #endregion IO -------------------------------------------------------------
 }
