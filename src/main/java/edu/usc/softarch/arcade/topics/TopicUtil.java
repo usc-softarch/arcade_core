@@ -322,8 +322,9 @@ public class TopicUtil {
 				"In mergeDocTopicItems, nonmatching docTopicItems");
 
 		DocTopicItem mergedDocTopicItem = new DocTopicItem(docTopicItem);
+		Set<Integer> topicNumbers = docTopicItem.getTopicNumbers();
 
-		for (int i=0;i<docTopicItem.size();i++) {
+		for (Integer i : topicNumbers) {
 			TopicItem ti1 = docTopicItem.getTopic(i);
 			TopicItem ti2 = docTopicItem2.getTopic(i);
 			TopicItem mergedTopicItem = mergedDocTopicItem.getTopic(i);
