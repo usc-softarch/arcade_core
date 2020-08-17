@@ -1,63 +1,73 @@
 package edu.usc.softarch.arcade.classgraphs;
 
-import java.io.Serializable;
-
 import soot.SootClass;
 
 /**
  * @author joshua
  */
-public class SootClassEdge extends StringEdge implements Serializable {
+public class SootClassEdge extends StringEdge {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = 1783211540062135043L;
 
-	public SootClass src = null;
-	public SootClass tgt = null;
-	public String type = "depends";
+	private transient SootClass src;
+	private transient SootClass tgt;
+	private String type;
 	// #endregion FIELDS ---------------------------------------------------------
 
 	// #region CONSTRUCTORS ------------------------------------------------------
 	public SootClassEdge(String srcStr, String tgtStr) {
-		super(srcStr,tgtStr);
+		super(srcStr, tgtStr);
+		initialize(null, null, "depends");
 	}
 	
 	public SootClassEdge(SootClassEdge edge) {
-		this.src = edge.src;
-		this.tgt = edge.tgt;
-		this.type = edge.type;
+		super();
+		initialize(edge.src, edge.tgt, edge.type);
 	}
 	
 	public SootClassEdge(SootClass src, SootClass tgt, String type) {
-		this.src = src;
-		this.tgt = tgt;
-		this.type = type;
+		super();
+		initialize(src, tgt, type);
+	}
+
+	private void initialize(SootClass src, SootClass tgt, String type) {
+		setSrc(src);
+		setTgt(tgt);
+		setType(type);
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
 	public SootClass getSrc() { return src; }
 	public SootClass getTgt() { return tgt; }
-	public String getType() { return type; }
 
-	public void setSrc(SootClass src) { this.src = src; }
-	public void setTgt(SootClass tgt) { this.tgt = tgt; }
-	public void setType(String type) { this.type = type; }
+	public void setSrc(SootClass src) {
+		this.src = src;
+		if (src != null)
+			setSrcStr(src.getName());
+	}
+	public void setTgt(SootClass tgt) {
+		this.tgt = tgt;
+		if (tgt != null)
+			setSrcStr(tgt.getName());
+	}
 	// #endregion ACCESSORS ------------------------------------------------------
 	
 	// #region MISC --------------------------------------------------------------
 	@Override
 	public boolean equals(Object o) {
-		SootClassEdge e = (SootClassEdge)o;
+		if (!(o instanceof SootClassEdge))
+			return false;
 		
-		if (e.src!=null && e.tgt!=null && this.src !=null && this.tgt != null ) {
-			if (e.src.getName().equals(this.src.getName()) &&
-				e.tgt.getName().equals(this.tgt.getName()) && 
-				e.getType().equals(this.getType()) ) {
-				return true;
-			}
-		}
+		SootClassEdge e = (SootClassEdge) o;
 		
-		return false;
+		// If any parts are missing, return false
+		if (e.src == null || e.tgt == null || this.src == null || this.tgt == null)
+			return false;
+		
+		return e.src.getName().equals(this.src.getName()) &&
+			e.tgt.getName().equals(this.tgt.getName()) && 
+			e.getType().equals(this.getType());
 	}
 
 	@Override
@@ -68,28 +78,30 @@ public class SootClassEdge extends StringEdge implements Serializable {
 		return result;
 	}
 	
+	@Override
 	public String toString() {
 		return "(" + src + "," + tgt + "," + type + ")";
 	}
 	
+	@Override
 	public String toDotString() {
 		return "\t\"" + src + "\" -> \"" + tgt + "\";";
 	}
 	
 	public String toStringWithArchElemType() {
-		return "(" + src + ":" + ArchElemType.typeToString(srcType) + "," + tgt
-				+ ":" + ArchElemType.typeToString(srcType) + ")";
+		return "(" + src + ":" + getSrcType().typeToString() + "," + tgt
+				+ ":" + getSrcType().typeToString() + ")";
 	}
+
 	public String toDotStringWithArchElemType() {
-		
 		String srcDef = "\"" + src + "\" ";
 		String tgtDef = "\"" + tgt + "\" ";
 		
-		srcDef += ArchElemType.typeToStyleString(srcType) + ";";
-		tgtDef += ArchElemType.typeToStyleString(tgtType) + ";";
+		srcDef += getSrcType().typeToStyleString() + ";";
+		tgtDef += getTgtType().typeToStyleString() + ";";
 		
 		String edgeStr = "\t\"" + src + "\" -> \"" + tgt + "\";";
-		
+	
 		return srcDef + "\n" + tgtDef + "\n" + edgeStr;
 	}
 	

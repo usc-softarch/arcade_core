@@ -30,4 +30,19 @@ enum ArchElemType {
 	public String typeToString() { return this.typeString; }
 	public String typeToStyleString() { return this.styleString; }
 	// #endregion ACCESSORS ------------------------------------------------------
+
+	// #region STATIC ------------------------------------------------------------
+	public static ArchElemType stringToType(String type) {
+		switch(type) {
+			case "p":
+				return proc;
+			case "d":
+				return data;
+			case "c":
+				return conn;
+			default:
+				throw new IllegalArgumentException("Unknown ArchElemType " + type);
+		}
+	}
+	// #endregion STATIC ---------------------------------------------------------
 }

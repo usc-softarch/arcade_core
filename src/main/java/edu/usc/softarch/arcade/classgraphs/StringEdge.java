@@ -48,7 +48,11 @@ public class StringEdge implements Serializable {
 	public String getType() { return this.type; }
 
 	public void setSrcType(ArchElemType srcType) { this.srcType = srcType; }
+	public void setSrcType(String srcType) {
+		this.srcType = ArchElemType.stringToType(srcType); }
 	public void setTgtType(ArchElemType tgtType) { this.tgtType = tgtType; }
+	public void setTgtType(String tgtType) {
+		this.tgtType = ArchElemType.stringToType(tgtType); }
 	public void setSrcStr(String srcStr) { this.srcStr = srcStr; }
 	public void setTgtStr(String tgtStr) { this.tgtStr = tgtStr; }
 	public void setType(String type) { this.type = type; }
