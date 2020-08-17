@@ -8,18 +8,15 @@ import soot.SootClass;
  * @author joshua
  */
 public class SootClassEdge extends StringEdge implements Serializable {
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = 1783211540062135043L;
+
 	public SootClass src = null;
 	public SootClass tgt = null;
 	public String type = "depends";
-	public String getType() {
-		return type;
-	}
+	// #endregion FIELDS ---------------------------------------------------------
 
-	public void setType(String type) {
-		this.type = type;
-	}
-
+	// #region CONSTRUCTORS ------------------------------------------------------
 	public SootClassEdge(String srcStr, String tgtStr) {
 		super(srcStr,tgtStr);
 	}
@@ -35,23 +32,19 @@ public class SootClassEdge extends StringEdge implements Serializable {
 		this.tgt = tgt;
 		this.type = type;
 	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
 
-	public SootClass getSrc() {
-		return src;
-	}
+	// #region ACCESSORS ---------------------------------------------------------
+	public SootClass getSrc() { return src; }
+	public SootClass getTgt() { return tgt; }
+	public String getType() { return type; }
 
-	public void setSrc(SootClass src) {
-		this.src = src;
-	}
-
-	public SootClass getTgt() {
-		return tgt;
-	}
-
-	public void setTgt(SootClass tgt) {
-		this.tgt = tgt;
-	}
+	public void setSrc(SootClass src) { this.src = src; }
+	public void setTgt(SootClass tgt) { this.tgt = tgt; }
+	public void setType(String type) { this.type = type; }
+	// #endregion ACCESSORS ------------------------------------------------------
 	
+	// #region MISC --------------------------------------------------------------
 	@Override
 	public boolean equals(Object o) {
 		SootClassEdge e = (SootClassEdge)o;
@@ -66,12 +59,7 @@ public class SootClassEdge extends StringEdge implements Serializable {
 		
 		return false;
 	}
-	
-	/**
-	 * hashCode that combines two strings
-	 * Source: http://www.javapractices.com/topic/TopicAction.do?Id=28
-	 * @return a hash code value on the pair of strings.
-	 */
+
 	@Override
 	public int hashCode() {
 		int result = src.getName().hashCode();
@@ -108,4 +96,5 @@ public class SootClassEdge extends StringEdge implements Serializable {
 	public String toRsf() {
 		return type + " " + src + " " + " " + tgt;
 	}
+	// #endregion MISC -----------------------------------------------------------
 }
