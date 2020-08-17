@@ -4,35 +4,30 @@ package edu.usc.softarch.arcade.classgraphs;
  * @author joshua
  */
 enum ArchElemType {
-	proc, data, conn;	
-	
-	public static String typeToString(ArchElemType t) {
-		if (t.equals(proc)) {
-			return "p";
-		}
-		else if (t.equals(data)) {
-			return "d";
-		}
-		else if (t.equals(conn)) {
-			return "c";
-		}
-		else {
-			return "u";
-		}
+	// #region FIELDS ------------------------------------------------------------
+	proc ("p", "[shape=box, style=\"rounded,filled\", fillcolor=purple]"),
+	data ("d", "[shape=hexagon, style=\"filled\", fillcolor=darkgreen]"),
+	conn ("c", "[shape=box, style=\"rounded,filled\", fillcolor=cyan]");
+
+	private String typeString;
+	private String styleString;
+	// #endregion FIELDS ---------------------------------------------------------
+
+	// #region CONSTRUCTORS ------------------------------------------------------
+	private ArchElemType() {
+		this.typeString = "u";
+		this.styleString = 
+			"[shape=doubleoctagon, style=\"rounded,filled\", fillcolor=white]";
 	}
-	
-	public static String typeToStyleString(ArchElemType t) {
-		if (t.equals(proc)) {
-			return "[shape=box, style=\"rounded,filled\", fillcolor=purple]";
-		}
-		else if (t.equals(data)) {
-			return "[shape=hexagon, style=\"filled\", fillcolor=darkgreen]";
-		}
-		else if (t.equals(conn)) {
-			return "[shape=box, style=\"rounded,filled\", fillcolor=cyan]";
-		}
-		else {
-			return "[shape=doubleoctagon, style=\"rounded,filled\", fillcolor=white]";
-		}
+
+	private ArchElemType(String typeString, String styleString) {
+		this.typeString = typeString;
+		this.styleString = styleString;
 	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
+	
+	// #region ACCESSORS ---------------------------------------------------------
+	public String typeToString() { return this.typeString; }
+	public String typeToStyleString() { return this.styleString; }
+	// #endregion ACCESSORS ------------------------------------------------------
 }
