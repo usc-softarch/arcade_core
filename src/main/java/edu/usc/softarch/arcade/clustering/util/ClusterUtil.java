@@ -115,7 +115,7 @@ public class ClusterUtil {
 					for (Cluster lc2 : c2.leafClusters) {
 						String lc2NameClean = lc2.name.substring(1,
 								lc2.name.length() - 1).trim();
-						String featureEdgeClean = f.edge.tgtStr.trim();
+						String featureEdgeClean = f.edge.getTgtStr().trim();
 						logger.debug("featureEdgeClean: " + featureEdgeClean);
 						logger.debug("lc2NameClean: " + lc2NameClean);
 
@@ -173,7 +173,7 @@ public class ClusterUtil {
 					for (Cluster lc2 : c2.leafClusters) {
 						String lc2NameClean = lc2.name.substring(1,
 								lc2.name.length() - 1).trim();
-						String featureEdgeClean = f.edge.tgtStr.trim();
+						String featureEdgeClean = f.edge.getTgtStr().trim();
 						if (debugMethod) {
 							logger.debug("featureEdgeClean: "
 									+ featureEdgeClean);
@@ -763,8 +763,8 @@ public class ClusterUtil {
 	public static Set<String> getNodesInClusterGraph(StringGraph cg) {
 		Set<String> nodes = new HashSet<>();
 		for (StringEdge edge : cg.edges) {
-			nodes.add(edge.srcStr.trim());
-			nodes.add(edge.tgtStr.trim());
+			nodes.add(edge.getSrcStr().trim());
+			nodes.add(edge.getTgtStr().trim());
 		}
 		return nodes;
 	}
@@ -1085,8 +1085,8 @@ public class ClusterUtil {
 		
 		
 		for (StringEdge stringEdge : clusterGraph.edges) {
-        	if (!stringEdge.srcStr.equals(stringEdge.tgtStr))
-        		directedGraph.addEdge(stringEdge.srcStr, stringEdge.tgtStr);
+        	if (!stringEdge.getSrcStr().equals(stringEdge.getTgtStr()))
+        		directedGraph.addEdge(stringEdge.getSrcStr(), stringEdge.getTgtStr());
         }
 		logger.debug("No. of edges: " + directedGraph.edgeSet().size());
 		

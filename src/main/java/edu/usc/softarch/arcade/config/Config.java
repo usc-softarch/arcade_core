@@ -372,11 +372,11 @@ public class Config {
 	//TODO I have a sneaking suspicion that this method is never actually used.
 	public static void initProjectData(
 			ClassGraphTransformer t) {
-		t.LlamaChatTMD.docTopicsFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/LlamaChat/LlamaChat-doc-topics.txt";
-		t.LlamaChatTMD.topicKeysFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/LlamaChat/LlamaChat-topic-keys.txt";
+		t.LlamaChatTMD.setDocTopicsFilename("/home/joshua/Documents/Software Engineering Research/Subjects/LlamaChat/LlamaChat-doc-topics.txt");
+		t.LlamaChatTMD.setTopicKeysFilename("/home/joshua/Documents/Software Engineering Research/Subjects/LlamaChat/LlamaChat-topic-keys.txt");
 
-		t.freecsTMD.docTopicsFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/freecs/freecs-doc-topics.txt";
-		t.freecsTMD.topicKeysFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/freecs/freecs-topic-keys.txt";
+		t.freecsTMD.setDocTopicsFilename("/home/joshua/Documents/Software Engineering Research/Subjects/freecs/freecs-doc-topics.txt");
+		t.freecsTMD.setTopicKeysFilename("/home/joshua/Documents/Software Engineering Research/Subjects/freecs/freecs-topic-keys.txt");
 
 		String threeProjDocTopicsFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/threeChatServerSystems/threeChatServerSystems-doc-topics.txt";
 		String threeProjTopicKeysFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/threeChatServerSystems/threeChatServerSystems-topic-keys.txt";

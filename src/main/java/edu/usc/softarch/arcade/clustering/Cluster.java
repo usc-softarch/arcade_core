@@ -162,18 +162,18 @@ public class Cluster extends FeatureVector {
 	private void plainCAMerge(FeatureVector inFV) {
 		for (Feature f1 : this) {
 			for (Feature f2 : inFV) {
-				logger.debug("f1.edge.tgtStr: " + f1.edge.tgtStr);
-				logger.debug("f2.edge.tgtStr: " + f2.edge.tgtStr);
+				logger.debug("f1.edge.tgtStr: " + f1.edge.getTgtStr());
+				logger.debug("f2.edge.tgtStr: " + f2.edge.getTgtStr());
 				logger.debug("f1.value : " + f1.value);
 				logger.debug("f2.value : " + f2.value);
-				if (f1.edge.tgtStr.equals(f2.edge.tgtStr) && (f1.value == 1 || f2.value == 1)) {
+				if (f1.edge.getTgtStr().equals(f2.edge.getTgtStr()) && (f1.value == 1 || f2.value == 1)) {
 					if (f1.value == 1)
-						f1.edge.srcStr = f1.edge.srcStr;
+						f1.edge.setSrcStr(f1.edge.getSrcStr());
 					else if (f2.value == 1)
-						f1.edge.srcStr = f2.edge.srcStr;
-					this.changeFeatureValue(f1.edge.tgtStr, 1);
-				} else if (f1.edge.tgtStr.equals(f2.edge.tgtStr) && !(f1.value == 1 || f2.value ==1)) {
-					this.changeFeatureValue(f1.edge.tgtStr, 0);
+						f1.edge.setSrcStr(f2.edge.getSrcStr());
+					this.changeFeatureValue(f1.edge.getTgtStr(), 1);
+				} else if (f1.edge.getTgtStr().equals(f2.edge.getTgtStr()) && !(f1.value == 1 || f2.value ==1)) {
+					this.changeFeatureValue(f1.edge.getTgtStr(), 0);
 				}
 			}
 		}
@@ -216,7 +216,7 @@ public class Cluster extends FeatureVector {
 	public boolean equals(Cluster c) {
 		for (Feature f1 : c) {
 			for (Feature f2 :this ) {
-				if (f1.edge.tgtStr.equals(f2.edge.tgtStr) && (f1.value != f2.value)) {
+				if (f1.edge.getTgtStr().equals(f2.edge.getTgtStr()) && (f1.value != f2.value)) {
 					return false;
 				}
 			}

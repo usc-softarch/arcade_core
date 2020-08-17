@@ -39,7 +39,7 @@ public class FeatureVector extends ArrayList<Feature> {
 	
 	public void changeFeatureValue(String tgtStr, double value) {
 		for (Feature f : this) {
-			if (tgtStr.equals(f.edge.tgtStr)) {
+			if (tgtStr.equals(f.edge.getTgtStr())) {
 				f.value = value;
 			}
 		}

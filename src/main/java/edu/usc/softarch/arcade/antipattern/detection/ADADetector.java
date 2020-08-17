@@ -175,14 +175,14 @@ public class ADADetector {
 			int fanOut = 0;
 			int fanIn = 0;
 			for (StringEdge stringEdge : clusterGraph.edges ) {
-				if (stringEdge.srcStr.equals(firstCluster.name)) {
+				if (stringEdge.getSrcStr().equals(firstCluster.name)) {
 					fanOut++;
 					brickFanOutMap.put(firstCluster.name, fanOut);
 					System.out.println("\tOutgoing edge" + stringEdge);
 				}
 			}
 			for (StringEdge stringEdge : clusterGraph.edges ) {
-				if (stringEdge.tgtStr.equals(firstCluster.name)) {
+				if (stringEdge.getTgtStr().equals(firstCluster.name)) {
 					fanIn++;
 					brickFanInMap.put(firstCluster.name, fanIn);
 					System.out.println("\tIncoming edge" + stringEdge);
@@ -194,8 +194,8 @@ public class ADADetector {
 		}
 		
 		for (StringEdge stringEdge : clusterGraph.edges ) {
-			double srcStability = brickStabilityMap.get(stringEdge.srcStr);
-			double tgtStability = brickStabilityMap.get(stringEdge.tgtStr);
+			double srcStability = brickStabilityMap.get(stringEdge.getSrcStr());
+			double tgtStability = brickStabilityMap.get(stringEdge.getTgtStr());
 			if (srcStability < tgtStability) {
 				System.out.println("\tUnstable brick dependency found " + stringEdge);
 				unstableBrickDependencyCount++;
@@ -209,8 +209,8 @@ public class ADADetector {
         }
         
         for (StringEdge stringEdge : clusterGraph.edges) {
-        	if (!stringEdge.srcStr.equals(stringEdge.tgtStr))
-        		directedGraph.addEdge(stringEdge.srcStr, stringEdge.tgtStr);
+        	if (!stringEdge.getSrcStr().equals(stringEdge.getTgtStr()))
+        		directedGraph.addEdge(stringEdge.getSrcStr(), stringEdge.getTgtStr());
         }
         
         System.out.println("Finding cycles...");	
@@ -406,10 +406,10 @@ public class ADADetector {
 			}
 			if (firstCluster.type.equals("spec")) {
 				for (StringEdge stringEdge : clusterGraph.edges) {
-					if (stringEdge.srcStr.equals(firstCluster.name)) {
+					if (stringEdge.getSrcStr().equals(firstCluster.name)) {
 
 						Cluster targetCluster = getClusterByName(
-								stringEdge.tgtStr, splitClusters);
+								stringEdge.getTgtStr(), splitClusters);
 
 						boolean invalidInnerClassCluster = false;
 						invalidInnerClassCluster = checkIfClusterIsAnInvalidInnerClass(
@@ -438,9 +438,9 @@ public class ADADetector {
 								procCallBasedExtraneousConnectorCount++;
 							}
 						}
-					} else if (stringEdge.tgtStr.equals(firstCluster.name)) {
+					} else if (stringEdge.getTgtStr().equals(firstCluster.name)) {
 						Cluster srcCluster = getClusterByName(
-								stringEdge.srcStr, splitClusters);
+								stringEdge.getSrcStr(), splitClusters);
 						boolean invalidInnerClassCluster = false;
 						invalidInnerClassCluster = checkIfClusterIsAnInvalidInnerClass(
 								srcCluster, invalidInnerClassCluster);
@@ -705,8 +705,8 @@ public class ADADetector {
 		for (Cluster cluster : splitClusters) {
 			if (!cluster.name.equals(compCluster.name)) {
 				for (StringEdge stringEdge : clusterGraph.edges ) {
-					if (stringEdge.srcStr.equals(cluster.name)) {
-						Cluster targetCluster = getClusterByName(stringEdge.tgtStr, splitClusters);
+					if (stringEdge.getSrcStr().equals(cluster.name)) {
+						Cluster targetCluster = getClusterByName(stringEdge.getTgtStr(), splitClusters);
 						boolean invalidInnerClassCluster = false;
 						invalidInnerClassCluster = checkIfClusterIsAnInvalidInnerClass(
 								targetCluster, invalidInnerClassCluster);
@@ -717,8 +717,8 @@ public class ADADetector {
 							return targetCluster;
 						}
 					}
-					else if (stringEdge.tgtStr.equals(cluster.name)) {
-						Cluster srcCluster = getClusterByName(stringEdge.srcStr, splitClusters);
+					else if (stringEdge.getTgtStr().equals(cluster.name)) {
+						Cluster srcCluster = getClusterByName(stringEdge.getSrcStr(), splitClusters);
 						boolean invalidInnerClassCluster = false;
 						invalidInnerClassCluster = checkIfClusterIsAnInvalidInnerClass(
 								srcCluster, invalidInnerClassCluster);
@@ -918,7 +918,7 @@ public class ADADetector {
 			}
 			nonAnonInnerClassLeafCounter++;
 			for (int j = 0; j < leaf.docTopicItem.size(); j++) {
-				TopicItem currLeafTopicItem = (TopicItem) leaf.docTopicItem.getTopics()
+				TopicItem currLeafTopicItem = leaf.docTopicItem.getTopics()
 						.get(j);
 				if (haveMatchingTopicItem(topics, currLeafTopicItem)) {
 					TopicItem matchingTopicItem = TopicUtil.getMatchingTopicItem(topics,

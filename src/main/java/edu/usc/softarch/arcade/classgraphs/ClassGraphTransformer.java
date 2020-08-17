@@ -82,6 +82,9 @@ public class ClassGraphTransformer extends SceneTransformer  {
 	
 	private static Logger logger = Logger.getLogger(ClassGraphTransformer.class);
 
+	private String rsfFilePath = "INSERT/PATH/HERE"; //TODO parameterize
+	private String xmlFilePath = "INSERT/PATH/HERE"; //TODO parameterize
+
 	@Override
 	protected void internalTransform(String phaseName, Map options) {
 		try {
@@ -103,13 +106,13 @@ public class ClassGraphTransformer extends SceneTransformer  {
 			logger.debug("Printing unused methods...");
 			printUnusedMethods(unusedMethods);
 			
-			outputGraphsAndClassesToFiles();
+			outputGraphsAndClassesToFiles(xmlFilePath);
 			outputUnusedMethodsToFile(unusedMethods);
 			Config.initProjectData(this);
 
 			fvMap = new FeatureVectorMap(clg);
 			fvMap.writeXMLFeatureVectorMapUsingSootClassEdges();
-			clg.generateRsf();
+			clg.generateRsf(rsfFilePath);
 
 			List<SootClass> selectedClasses = new ArrayList<>();
 			determineSelectedClasses(clg.getNodes(), selectedClasses);
@@ -298,17 +301,17 @@ public class ClassGraphTransformer extends SceneTransformer  {
 		}
 	}
 
-	private void outputGraphsAndClassesToFiles() throws ParserConfigurationException,
+	private void outputGraphsAndClassesToFiles(String xmlFilePath) throws ParserConfigurationException,
 			TransformerException, IOException {
-		writeXMLClassGraph();
+		writeXMLClassGraph(xmlFilePath);
 		serializeMyCallGraph();
 		serializeClassesWithUsedMethods();
 		serializeClassesWithAllMethods();
 	}
 
-	private void writeXMLClassGraph() throws ParserConfigurationException,
+	private void writeXMLClassGraph(String xmlFilePath) throws ParserConfigurationException,
 			TransformerException {
-		clg.writeXMLClassGraph();
+		clg.writeXMLClassGraph(xmlFilePath);
 		logger.debug("ClassGraph's no. of edges: " + clg.size());
 	}
 	

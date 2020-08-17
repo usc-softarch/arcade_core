@@ -161,11 +161,11 @@ public class GroundTruthRecoveryGraphBuilder {
 		logger.debug("Clusters that would be merged together...");
 		int mergeCount = 0;
 		for (StringEdge edge : fullClusterGraph.edges) {
-			StringEdge reversedEdge = new StringEdge(edge.tgtStr,edge.srcStr);
+			StringEdge reversedEdge = new StringEdge(edge.getTgtStr(),edge.getSrcStr());
 			if (fullClusterGraph.containsEdge(reversedEdge)) {
-				logger.debug("\t Would be merged: " + edge.srcStr + ", " + edge.tgtStr);
-				twoWayClusters.add(edge.srcStr.trim());
-				twoWayClusters.add(edge.tgtStr.trim());
+				logger.debug("\t Would be merged: " + edge.getSrcStr() + ", " + edge.getTgtStr());
+				twoWayClusters.add(edge.getSrcStr().trim());
+				twoWayClusters.add(edge.getTgtStr().trim());
 				mergeCount++;
 			}
 		}

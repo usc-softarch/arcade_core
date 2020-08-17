@@ -31,29 +31,29 @@ public class ClusteringEngineTest extends TestCase {
 				System.out.println(s1 + "" + s2);
 				e = new SootClassEdge(s1.toString(),s2.toString());
 				Feature f = null;
-				if (e.srcStr.equals("A") && e.tgtStr.equals("A")) {
+				if (e.getSrcStr().equals("A") && e.getTgtStr().equals("A")) {
 					f = new Feature(e,1);
 				}
-				else if (e.srcStr.equals("B") && e.tgtStr.equals("D")) {
+				else if (e.getSrcStr().equals("B") && e.getTgtStr().equals("D")) {
 					f = new Feature(e,1);
 				}
-				else if (e.srcStr.equals("B") && e.tgtStr.equals("A")) {
+				else if (e.getSrcStr().equals("B") && e.getTgtStr().equals("A")) {
 					f = new Feature(e,1);
 				}
-				else if (e.srcStr.equals("A") && e.tgtStr.equals("B")) {
+				else if (e.getSrcStr().equals("A") && e.getTgtStr().equals("B")) {
 					f = new Feature(e,1);
 				}
-				else if (e.srcStr.equals("B") && e.tgtStr.equals("C")) {
+				else if (e.getSrcStr().equals("B") && e.getTgtStr().equals("C")) {
 					f = new Feature(e,1);
 				}
 				else {
 					f = new Feature(e,0);
 				}
 				//System.out.println("f: " + f);
-				if (e.srcStr.equals("A")) {
+				if (e.getSrcStr().equals("A")) {
 					fv1.add(f);
 				}
-				else if (e.srcStr.equals("B")){
+				else if (e.getSrcStr().equals("B")){
 					fv2.add(f);
 				}
 				/*System.out.println(fv1.toBinaryForm());
@@ -74,29 +74,29 @@ public class ClusteringEngineTest extends TestCase {
 				System.out.println(s1 + "" + s2);
 				e = new SootClassEdge(s1.toString(),s2.toString());
 				Feature f = null;
-				if (e.tgtStr.equals("A")) {
+				if (e.getTgtStr().equals("A")) {
 					f = new Feature(e,1);
 				}
-				else if (e.tgtStr.equals("D")) {
+				else if (e.getTgtStr().equals("D")) {
 					f = new Feature(e,1);
 				}
-				else if (e.srcStr.equals("A") && e.tgtStr.equals("A")) {
+				else if (e.getSrcStr().equals("A") && e.getTgtStr().equals("A")) {
 					f = new Feature(e,1);
 				}
-				else if (e.srcStr.equals("B") && e.tgtStr.equals("B")) {
+				else if (e.getSrcStr().equals("B") && e.getTgtStr().equals("B")) {
 					f = new Feature(e,1);
 				}
-				else if (e.srcStr.equals("A") && e.tgtStr.equals("C")) {
+				else if (e.getSrcStr().equals("A") && e.getTgtStr().equals("C")) {
 					f = new Feature(e,1);
 				}
 				else {
 					f = new Feature(e,0);
 				}
 				//System.out.println("f: " + f);
-				if (e.srcStr.equals("A")) {
+				if (e.getSrcStr().equals("A")) {
 					fv3.add(f);
 				}
-				else if (e.srcStr.equals("B")){
+				else if (e.getSrcStr().equals("B")){
 					fv4.add(f);
 				}
 				/*System.out.println(fv1.toBinaryForm());

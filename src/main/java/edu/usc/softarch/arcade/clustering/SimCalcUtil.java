@@ -24,7 +24,7 @@ public class SimCalcUtil {
 	
 	public static void verifySymmetricFeatureVectorOrdering(FeatureVector fv1, FeatureVector fv2) {
 		for (int i = 0;i<fv1.size();i++) {
-			if (!fv1.get(i).edge.tgtStr.equals(fv2.get(i).edge.tgtStr)) {
+			if (!fv1.get(i).edge.getTgtStr().equals(fv2.get(i).edge.getTgtStr())) {
 				System.out.println("In, " + Thread.currentThread().getStackTrace()[1].getMethodName() + ", Feature order incorrect");
 				System.exit(0);
 			}
@@ -36,7 +36,7 @@ public class SimCalcUtil {
 		Cluster firstCluster = clusters.get(0);
 		for (Cluster c : clusters) {
 			for (int i=0;i<firstCluster.size();i++) {
-				if (!firstCluster.get(i).edge.tgtStr.equals(c.get(i).edge.tgtStr)) {
+				if (!firstCluster.get(i).edge.getTgtStr().equals(c.get(i).edge.getTgtStr())) {
 					System.out.println("In, " + Thread.currentThread().getStackTrace()[1].getMethodName() + "Feature order incorrect");
 					System.exit(0);
 				}
@@ -164,8 +164,8 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
-			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
+			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();
@@ -184,8 +184,8 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
-			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
+			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();
@@ -204,13 +204,13 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
-			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
+			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();
 			
-			if (f.edge.tgtStr.equals(f2.edge.tgtStr) && f.value == 1 && f2.value == 1) {
+			if (f.edge.getTgtStr().equals(f2.edge.getTgtStr()) && f.value == 1 && f2.value == 1) {
 				count++;
 				System.out.println("Increased 11 count to: " + count);
 			}
@@ -224,8 +224,8 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
-			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
+			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();
@@ -242,8 +242,8 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
-			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
+			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();
@@ -260,8 +260,8 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.tgtStr);
-			System.out.println("f2.edge.tgtStr: " + f2.edge.tgtStr);
+			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
 			System.out.println("f.value: " + f.value);
 			System.out.println("f2.value: " + f2.value);
 			System.out.println();

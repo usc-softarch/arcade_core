@@ -169,9 +169,9 @@ public class StringGraph implements Serializable {
 			Element ce = doc.createElement("StringEdge");
 			rootElement.appendChild(ce);
 			Element src = doc.createElement("src");
-			src.appendChild(doc.createTextNode(e.srcStr));
+			src.appendChild(doc.createTextNode(e.getSrcStr()));
 			Element tgt = doc.createElement("tgt");
-			tgt.appendChild(doc.createTextNode(e.tgtStr));
+			tgt.appendChild(doc.createTextNode(e.getTgtStr()));
 			ce.appendChild(src);
 			ce.appendChild(tgt);
 		}

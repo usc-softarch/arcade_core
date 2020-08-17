@@ -108,14 +108,14 @@ public class FeatureVectorMap {
 
 		List<String> startNodesList = Lists.transform(
 				new ArrayList<StringTypedEdge>(edges),
-				(StringTypedEdge edge) -> edge.srcStr
+				(StringTypedEdge edge) -> edge.getSrcStr()
 				);
 
 		startNodesSet = Sets.newHashSet(startNodesList);
 
 		List<String> endNodesList = Lists.transform(
 				new ArrayList<StringTypedEdge>(edges),
-				(StringTypedEdge edge) -> edge.tgtStr
+				(StringTypedEdge edge) -> edge.getTgtStr()
 				);
 		TreeSet<String> endNodesSet = Sets.newTreeSet(endNodesList);
 		endNodesListWithNoDupes = Lists.newArrayList(endNodesSet);
@@ -218,17 +218,17 @@ public class FeatureVectorMap {
 					fSootEdge = (SootClassEdge) f.edge;
 				}
 				if (fSootEdge != null) 
-					src.appendChild(doc.createTextNode(fSootEdge.src.toString()));
+					src.appendChild(doc.createTextNode(fSootEdge.getSrc().toString()));
 				else
-					src.appendChild(doc.createTextNode(f.edge.srcStr));
+					src.appendChild(doc.createTextNode(f.edge.getSrcStr()));
 				
 				
 				Element tgt = doc.createElement("tgt");
 				
 				if (fSootEdge !=null) 
-					tgt.appendChild(doc.createTextNode(fSootEdge.tgt.toString()));
+					tgt.appendChild(doc.createTextNode(fSootEdge.getTgt().toString()));
 				else 
-					tgt.appendChild(doc.createTextNode(f.edge.tgtStr));
+					tgt.appendChild(doc.createTextNode(f.edge.getTgtStr()));
 				
 				Element type = doc.createElement("type");
 				type.appendChild(doc.createTextNode(fSootEdge.getType()));
