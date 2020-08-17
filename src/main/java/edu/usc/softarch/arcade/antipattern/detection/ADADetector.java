@@ -56,6 +56,7 @@ import edu.usc.softarch.arcade.topics.WordTopicItem;
  * @author joshua
  */
 public class ADADetector {
+	// #region DRIVERS -----------------------------------------------------------
 	public static void runSmellDetectionAlgorithms(
 			List<Cluster> splitClusters) throws IOException,
 			ClassNotFoundException,
@@ -291,92 +292,6 @@ public class ADADetector {
 		System.out.println("Brick Use Overload count: " + brickUseOverloadCount);
 	}
 
-	private static boolean haveMatchingTopicItem(List<TopicItem> topics,
-			TopicItem inTopicItem) {
-		for (TopicItem currTopicItem : topics) {
-			if (currTopicItem.getTopicNum() == inTopicItem.getTopicNum()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static MyCallGraph deserializeMyCallGraph() throws IOException,
-			ClassNotFoundException {
-		String filename = Config.getMyCallGraphFilename();
-		// Read from disk using FileInputStream
-		FileInputStream f_in = new FileInputStream(filename);
-
-		// Read object using ObjectInputStream
-		ObjectInputStream obj_in = new ObjectInputStream(f_in);
-
-		// Read an object
-		Object obj = obj_in.readObject();
-
-		MyCallGraph locClg = null;
-		if (obj instanceof MyCallGraph) {
-			// Cast object to a Vector
-			locClg = (MyCallGraph) obj;
-		}
-
-		return locClg;
-	}
-	
-	private static void writeMethodInfoToXML(
-			List<Cluster> splitClusters, MyCallGraph myCallGraph) throws ParserConfigurationException, TransformerException {
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-		// classgraph elements
-		Document doc = docBuilder.newDocument();
-		Element rootElement = doc.createElement("SmellArchGraph");
-		doc.appendChild(rootElement);
-
-		for (Cluster splitCluster : splitClusters) {
-			System.out.println("Current cluster: " + splitCluster);
-			Element clusterElem = doc.createElement("cluster");
-			rootElement.appendChild(clusterElem);
-			clusterElem.setAttribute("name",splitCluster.toString());
-
-			for (MyClass myClass : splitCluster.classes) {
-				System.out.println("\tCurrent class: " + myClass);
-				Element classElem = doc.createElement("class");
-				clusterElem.appendChild(classElem);
-				classElem.setAttribute("name",myClass.className);
-
-				for (MyMethod myMethod : myClass.getMethods()) {
-					System.out.println("\t\tCurrent method: " + myMethod);
-					Element methodElem = doc.createElement("method");
-					classElem.appendChild(methodElem);
-					methodElem.setAttribute("name",myMethod
-							.toString());
-					for (String param : myMethod.getParams()) {
-						System.out.println("\t\t\tCurrent param: " + param);
-						Element paramElem = doc.createElement("param");
-						methodElem.appendChild(paramElem);
-						paramElem.setAttribute("name",param);
-					}
-					
-					Element retValElem = doc.createElement("retval");
-					methodElem.appendChild(retValElem);
-					retValElem.setAttribute("name",myMethod.retVal);
-				}
-			}
-		}
-		
-		 //write the content into xml file
-		  TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		  Transformer transformer = transformerFactory.newTransformer();
-		  transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		  DOMSource source = new DOMSource(doc);
-		  StreamResult result =  new StreamResult(new File(Config.getMethodInfoFilename()));
-		  transformer.transform(source, result);
-	 
-		  System.out.println("In " + Thread.currentThread().getStackTrace()[1].getClassName() 
-				  + ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
-				  + ", Wrote " + Config.getMethodInfoFilename());
-	}
-
 	private static int determineAmbiguousInterface(
 			List<Cluster> splitClusters, MyCallGraph myCallGraph,
 			int ambiguousInterfaceCount) {
@@ -413,239 +328,6 @@ public class ADADetector {
 			}
 		}
 		return ambiguousInterfaceCount;
-	}
-
-	private static void computeWordTopicProbabilitiesAndSpecifityTypesForMethods(
-			List<Cluster> splitClusters, TopicKeySet topicKeySet,
-			WordTopicCounts wordTopicCounts) throws IOException,
-			ParserConfigurationException, SAXException {
-		for (Cluster splitCluster : splitClusters) {
-			System.out.println("Current cluster: " + splitCluster);
-
-			String strippedLeafSplitClusterName = ConfigUtil
-					.stripParensEnclosedClassNameWithPackageName(splitCluster);
-
-			if (Pattern.matches(ConfigUtil.anonymousInnerClassRegExpr,
-					strippedLeafSplitClusterName)) {
-				continue;
-			}
-
-			if (Pattern.matches(ConfigUtil.doubleInnerClassRegExpr,
-					strippedLeafSplitClusterName)) {
-				continue;
-			}
-
-			if (splitCluster.type.equals("indep")) {
-				continue;
-			}
-			for (MyClass myClass : splitCluster.classes) {
-				System.out.println("\tCurrent class: " + myClass);
-				for (MyMethod myMethod : myClass.getMethods()) {
-					System.out.println("\t\tCurrent method: " + myMethod);
-					String processedMethodName = StringPreProcessor
-							.camelCaseSeparateAndStem(myMethod.name);
-					System.out.println("\t\tProcssed method name: "
-							+ processedMethodName);
-
-					Map<Integer, String> positionWordMap = new HashMap<>();
-					Map<Integer, Double> queryGivenTopicProbabilitiesMap = new HashMap<>();
-
-					computeQueryGivenTopicProbabilitiesMap(topicKeySet,
-							wordTopicCounts, processedMethodName,
-							positionWordMap, queryGivenTopicProbabilitiesMap);
-
-					System.out.println();
-					determineTopicForMethod(topicKeySet, myMethod,
-							queryGivenTopicProbabilitiesMap);
-
-				}
-			}
-		}
-	}
-
-	private static void determineTopicForMethod(TopicKeySet topicKeySet,
-			MyMethod myMethod, Map<Integer, Double> queryGivenTopicProbabilitiesMap)
-			throws IOException, ParserConfigurationException, SAXException {
-		int mostProbableTopic = -1;
-		double highestProbSoFar = 0;
-		for (TopicKey topicKey : topicKeySet.getSet()) {
-			Double currProb = queryGivenTopicProbabilitiesMap
-					.get(topicKey.getTopicNum());
-			System.out.println("\t\t\ttopic: " + topicKey.getTopicNum());
-
-			System.out
-					.println("\t\t\tcurrProb of query given topic: "
-							+ currProb);
-
-			if (currProb >= highestProbSoFar) {
-				highestProbSoFar = currProb;
-				mostProbableTopic = topicKey.getTopicNum();
-			}
-
-		}
-
-		TopicKeySet typedTopicKeySet = TopicUtil
-				.getTypedTopicKeyList();
-
-		System.out.println("\t\tTopic determined for "
-				+ myMethod.name);
-		System.out.println("\t\t topic: " + mostProbableTopic);
-		String typeForMostProbableTopic = typedTopicKeySet
-		.getTopicKeyByID(mostProbableTopic).getType();
-		System.out.println("\t\t topic's type: "
-				+ typeForMostProbableTopic);
-		System.out
-				.println("\t\t prob for method " + myMethod + " given topic: "
-						+ highestProbSoFar);
-		myMethod.type = typeForMostProbableTopic;
-		System.out.println();
-	}
-
-	private static void computeQueryGivenTopicProbabilitiesMap(
-			TopicKeySet topicKeySet, WordTopicCounts wordTopicCounts,
-			String processedMethodName,
-			Map<Integer, String> positionWordMap,
-			Map<Integer, Double> queryGivenTopicProbabilitiesMap) {
-		for (TopicKey topicKey : topicKeySet.getSet()) {
-			String[] wordsInMethodName = processedMethodName
-					.split(" ");
-
-			double probabilitySum = 0;
-			for (String word : wordsInMethodName) {
-				if (!wordTopicCounts.getWordTopicItems()
-						.containsKey(word)) {
-					continue;
-				}
-				WordTopicItem wtItem = wordTopicCounts
-						.getWordTopicItems().get(word);
-
-				positionWordMap.put(topicKey.getTopicNum(), wtItem.name);
-
-				double probWordGivenTopic = wtItem
-						.probabilityWordGivenTopic(topicKey.getTopicNum());
-
-				System.out.println("\t\t\t\tProbability "
-						+ wtItem.name + " given "
-						+ topicKey.getTopicNum() + ": "
-						+ probWordGivenTopic);
-
-				probabilitySum += probWordGivenTopic;
-
-			}
-
-			System.out.println("\t\t\tProbability sum for topic "
-					+ topicKey.getTopicNum() + ": " + probabilitySum);
-			double probabilityAverage = (probabilitySum / (double) wordsInMethodName.length);
-
-			System.out
-					.println("\t\t\tProbability avg for topic "
-							+ topicKey.getTopicNum() + ": "
-							+ probabilityAverage);
-			queryGivenTopicProbabilitiesMap.put(topicKey.getTopicNum(),
-					Double.valueOf(probabilityAverage));
-		}
-	}
-
-	private static void printUnusedMethods(
-			Map<String, MyMethod> unusedMethods) {
-		for (MyMethod m : unusedMethods.values()) {
-			System.out.println("\t" + m.toString());
-		}
-
-	}
-
-	private static void printInterfacesOfClusters(List<Cluster> splitClusters) {
-		for (Cluster cluster : splitClusters) {
-			System.out.println("Printing interfaces of cluster " + cluster);
-			for (MyClass myClass : cluster.getClasses()) {
-				System.out.println("\t comprising class: " + myClass);
-				System.out.println(myClass.methodsToString(2));
-			}
-		}
-
-	}
-
-	private static void determineInterfacesForClusters(
-			List<Cluster> splitClusters, Map<String, MyClass> classes) {
-		for (Cluster cluster : splitClusters) {
-			System.out.println("Determining interfaces for cluster " + cluster);
-			cluster.instantiateClasses();
-			for (Cluster leaf : cluster.leafClusters) {
-				String strippedLeafClusterName = leaf.toString().substring(1,
-						leaf.toString().length() - 1);
-				System.out.println("\t" + strippedLeafClusterName);
-				if (classes.containsKey(strippedLeafClusterName)) {
-					MyClass myClass = classes.get(strippedLeafClusterName);
-					cluster.add(myClass);
-				}
-
-			}
-		}
-
-	}
-
-	private static void printClassesWithUsedMethods(
-			Map<String, MyClass> classesWithMethodsInMyCallGraph) {
-		for (MyClass c : classesWithMethodsInMyCallGraph.values()) {
-			System.out.println("Showing linked methods in " + c + "...");
-			System.out.println(c.methodsToString(1));
-		}
-	}
-	
-	private static void printTopicsForSplitClusters(
-			List<Cluster> splitClusters) {
-		System.out
-				.println("Printing document-topic distribution for each split cluster...");
-		for (Cluster splitCluster : splitClusters) {
-			System.out.println("\t" + splitCluster);
-			System.out.println("\t\t" + splitCluster.docTopicItem);
-		}
-
-	}
-	
-	private static void generateTopicsForSplitClusters(
-			List<Cluster> splitClusters) {
-		DocTopics docTopics = null;
-		docTopics = TopicUtil.getDocTopicsFromFile();
-
-		for (Cluster splitCluster : splitClusters) {
-			System.out.println("Current split cluster: " + splitCluster);
-			List<Cluster> currLeafClusters = splitCluster.leafClusters;
-			int leafCounter = 0;
-
-			String strippedLeafSplitClusterName = ConfigUtil
-					.stripParensEnclosedClassNameWithPackageName(splitCluster);
-
-			if (Pattern.matches(ConfigUtil.anonymousInnerClassRegExpr,
-					strippedLeafSplitClusterName)) {
-				continue;
-			}
-
-			if (Pattern.matches(ConfigUtil.doubleInnerClassRegExpr,
-					strippedLeafSplitClusterName)) {
-				continue;
-			}
-
-			System.out.println("Setting doc-topic for each item...");
-			setDocTopicForEachLeafCluster(docTopics, currLeafClusters,
-					leafCounter);
-
-			Cluster refLeaf = getClusterForReferenceOfTopics(currLeafClusters);
-
-			List<TopicItem> topics = createZeroProportionTopicsFromReference(refLeaf);
-
-			calculateNewTopicProportionsForSplitClusters(
-					splitCluster, currLeafClusters, topics);
-
-		}
-	}
-	
-	private static void setDocTopicForEachLeafCluster(DocTopics docTopics,
-			List<Cluster> currLeafClusters, int leafCounter) {
-		for (Cluster leaf : currLeafClusters) {
-			System.out.println("\t" + leafCounter + ": " + leaf);
-			TopicUtil.setDocTopicForCluster(docTopics, leaf);
-		}
 	}
 	
 	private static int findUnusedInterfaceSmells(
@@ -792,6 +474,213 @@ public class ADADetector {
 		}
 		return procCallBasedExtraneousConnectorCount;
 	}
+	// #endregion DRIVERS --------------------------------------------------------
+
+	// #region PROCESSING --------------------------------------------------------
+	private static boolean haveMatchingTopicItem(List<TopicItem> topics,
+			TopicItem inTopicItem) {
+		for (TopicItem currTopicItem : topics) {
+			if (currTopicItem.getTopicNum() == inTopicItem.getTopicNum()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static void computeWordTopicProbabilitiesAndSpecifityTypesForMethods(
+			List<Cluster> splitClusters, TopicKeySet topicKeySet,
+			WordTopicCounts wordTopicCounts) throws IOException,
+			ParserConfigurationException, SAXException {
+		for (Cluster splitCluster : splitClusters) {
+			System.out.println("Current cluster: " + splitCluster);
+
+			String strippedLeafSplitClusterName = ConfigUtil
+					.stripParensEnclosedClassNameWithPackageName(splitCluster);
+
+			if (Pattern.matches(ConfigUtil.anonymousInnerClassRegExpr,
+					strippedLeafSplitClusterName)) {
+				continue;
+			}
+
+			if (Pattern.matches(ConfigUtil.doubleInnerClassRegExpr,
+					strippedLeafSplitClusterName)) {
+				continue;
+			}
+
+			if (splitCluster.type.equals("indep")) {
+				continue;
+			}
+			for (MyClass myClass : splitCluster.classes) {
+				System.out.println("\tCurrent class: " + myClass);
+				for (MyMethod myMethod : myClass.getMethods()) {
+					System.out.println("\t\tCurrent method: " + myMethod);
+					String processedMethodName = StringPreProcessor
+							.camelCaseSeparateAndStem(myMethod.name);
+					System.out.println("\t\tProcssed method name: "
+							+ processedMethodName);
+
+					Map<Integer, String> positionWordMap = new HashMap<>();
+					Map<Integer, Double> queryGivenTopicProbabilitiesMap = new HashMap<>();
+
+					computeQueryGivenTopicProbabilitiesMap(topicKeySet,
+							wordTopicCounts, processedMethodName,
+							positionWordMap, queryGivenTopicProbabilitiesMap);
+
+					System.out.println();
+					determineTopicForMethod(topicKeySet, myMethod,
+							queryGivenTopicProbabilitiesMap);
+
+				}
+			}
+		}
+	}
+
+	private static void determineTopicForMethod(TopicKeySet topicKeySet,
+			MyMethod myMethod, Map<Integer, Double> queryGivenTopicProbabilitiesMap)
+			throws IOException, ParserConfigurationException, SAXException {
+		int mostProbableTopic = -1;
+		double highestProbSoFar = 0;
+		for (TopicKey topicKey : topicKeySet.getSet()) {
+			Double currProb = queryGivenTopicProbabilitiesMap
+					.get(topicKey.getTopicNum());
+			System.out.println("\t\t\ttopic: " + topicKey.getTopicNum());
+
+			System.out
+					.println("\t\t\tcurrProb of query given topic: "
+							+ currProb);
+
+			if (currProb >= highestProbSoFar) {
+				highestProbSoFar = currProb;
+				mostProbableTopic = topicKey.getTopicNum();
+			}
+
+		}
+
+		TopicKeySet typedTopicKeySet = TopicUtil
+				.getTypedTopicKeyList();
+
+		System.out.println("\t\tTopic determined for "
+				+ myMethod.name);
+		System.out.println("\t\t topic: " + mostProbableTopic);
+		String typeForMostProbableTopic = typedTopicKeySet
+		.getTopicKeyByID(mostProbableTopic).getType();
+		System.out.println("\t\t topic's type: "
+				+ typeForMostProbableTopic);
+		System.out
+				.println("\t\t prob for method " + myMethod + " given topic: "
+						+ highestProbSoFar);
+		myMethod.type = typeForMostProbableTopic;
+		System.out.println();
+	}
+
+	private static void computeQueryGivenTopicProbabilitiesMap(
+			TopicKeySet topicKeySet, WordTopicCounts wordTopicCounts,
+			String processedMethodName,
+			Map<Integer, String> positionWordMap,
+			Map<Integer, Double> queryGivenTopicProbabilitiesMap) {
+		for (TopicKey topicKey : topicKeySet.getSet()) {
+			String[] wordsInMethodName = processedMethodName
+					.split(" ");
+
+			double probabilitySum = 0;
+			for (String word : wordsInMethodName) {
+				if (!wordTopicCounts.getWordTopicItems()
+						.containsKey(word)) {
+					continue;
+				}
+				WordTopicItem wtItem = wordTopicCounts
+						.getWordTopicItems().get(word);
+
+				positionWordMap.put(topicKey.getTopicNum(), wtItem.name);
+
+				double probWordGivenTopic = wtItem
+						.probabilityWordGivenTopic(topicKey.getTopicNum());
+
+				System.out.println("\t\t\t\tProbability "
+						+ wtItem.name + " given "
+						+ topicKey.getTopicNum() + ": "
+						+ probWordGivenTopic);
+
+				probabilitySum += probWordGivenTopic;
+
+			}
+
+			System.out.println("\t\t\tProbability sum for topic "
+					+ topicKey.getTopicNum() + ": " + probabilitySum);
+			double probabilityAverage = (probabilitySum / (double) wordsInMethodName.length);
+
+			System.out
+					.println("\t\t\tProbability avg for topic "
+							+ topicKey.getTopicNum() + ": "
+							+ probabilityAverage);
+			queryGivenTopicProbabilitiesMap.put(topicKey.getTopicNum(),
+					Double.valueOf(probabilityAverage));
+		}
+	}
+
+	private static void determineInterfacesForClusters(
+			List<Cluster> splitClusters, Map<String, MyClass> classes) {
+		for (Cluster cluster : splitClusters) {
+			System.out.println("Determining interfaces for cluster " + cluster);
+			cluster.instantiateClasses();
+			for (Cluster leaf : cluster.leafClusters) {
+				String strippedLeafClusterName = leaf.toString().substring(1,
+						leaf.toString().length() - 1);
+				System.out.println("\t" + strippedLeafClusterName);
+				if (classes.containsKey(strippedLeafClusterName)) {
+					MyClass myClass = classes.get(strippedLeafClusterName);
+					cluster.add(myClass);
+				}
+
+			}
+		}
+
+	}
+	
+	private static void generateTopicsForSplitClusters(
+			List<Cluster> splitClusters) {
+		DocTopics docTopics = null;
+		docTopics = TopicUtil.getDocTopicsFromFile();
+
+		for (Cluster splitCluster : splitClusters) {
+			System.out.println("Current split cluster: " + splitCluster);
+			List<Cluster> currLeafClusters = splitCluster.leafClusters;
+			int leafCounter = 0;
+
+			String strippedLeafSplitClusterName = ConfigUtil
+					.stripParensEnclosedClassNameWithPackageName(splitCluster);
+
+			if (Pattern.matches(ConfigUtil.anonymousInnerClassRegExpr,
+					strippedLeafSplitClusterName)) {
+				continue;
+			}
+
+			if (Pattern.matches(ConfigUtil.doubleInnerClassRegExpr,
+					strippedLeafSplitClusterName)) {
+				continue;
+			}
+
+			System.out.println("Setting doc-topic for each item...");
+			setDocTopicForEachLeafCluster(docTopics, currLeafClusters,
+					leafCounter);
+
+			Cluster refLeaf = getClusterForReferenceOfTopics(currLeafClusters);
+
+			List<TopicItem> topics = createZeroProportionTopicsFromReference(refLeaf);
+
+			calculateNewTopicProportionsForSplitClusters(
+					splitCluster, currLeafClusters, topics);
+
+		}
+	}
+	
+	private static void setDocTopicForEachLeafCluster(DocTopics docTopics,
+			List<Cluster> currLeafClusters, int leafCounter) {
+		for (Cluster leaf : currLeafClusters) {
+			System.out.println("\t" + leafCounter + ": " + leaf);
+			TopicUtil.setDocTopicForCluster(docTopics, leaf);
+		}
+	}
 	
 	private static boolean checkIfClusterIsAnInvalidInnerClass(
 			Cluster firstCluster, boolean invalidInnerClassCluster) {
@@ -916,26 +805,6 @@ public class ADADetector {
 		}
 		return scatteredTopics.size();
 	}
-	
-	private static void writeOutGraphsAndSmellArchToFiles(
-			List<Cluster> splitClusters, StringGraph clusterGraph,
-			SmellArchGraph smellArchGraph) {
-		try {
-			clusterGraph.writeDotFile(Config.getClusterGraphDotFilename());
-			clusterGraph.writeXMLClusterGraph(Config.getClusterGraphXMLFilename());
-			smellArchGraph.writeXMLSmellArchGraph(Config.getXMLSmellArchGraphFilename());
-
-			ClusterUtil.writeOutSmellArchToXML(splitClusters);
-			
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			e.printStackTrace();
-		}
-	}
 
 	private static void computeAndShowWordTopicProbabilitiesForAllWordsAndTopics(
 			TopicKeySet topicKeySet, WordTopicCounts wordTopicCounts) {
@@ -1024,27 +893,6 @@ public class ADADetector {
 		return connectorInterfaceImplCount;
 	}
 	
-	private static HashMap<?, ?> deserializeHashMap(String filename)
-			throws IOException, ClassNotFoundException {
-
-		// Read from disk using FileInputStream
-		FileInputStream f_in = new FileInputStream(filename);
-
-		// Read object using ObjectInputStream
-		ObjectInputStream obj_in = new ObjectInputStream(f_in);
-
-		// Read an object
-		Object obj = obj_in.readObject();
-
-		HashMap<?, ?> hashMap = null;
-		if (obj instanceof HashMap<?, ?>) {
-			// Cast object to a Vector
-			hashMap = (HashMap<?, ?>) obj;
-		}
-
-		return hashMap;
-	}
-
 	private static int calculateNewTopicProportionsForSplitClusters(
 			Cluster splitCluster, List<Cluster> currLeafClusters,
 			List<TopicItem> topics) {
@@ -1137,4 +985,162 @@ public class ADADetector {
 		}
 		return refLeaf;
 	}
+	// #endregion PROCESSING -----------------------------------------------------
+
+	// #region IO ----------------------------------------------------------------
+	private static MyCallGraph deserializeMyCallGraph() throws IOException,
+			ClassNotFoundException {
+		String filename = Config.getMyCallGraphFilename();
+		// Read from disk using FileInputStream
+		FileInputStream f_in = new FileInputStream(filename);
+
+		// Read object using ObjectInputStream
+		ObjectInputStream obj_in = new ObjectInputStream(f_in);
+
+		// Read an object
+		Object obj = obj_in.readObject();
+
+		MyCallGraph locClg = null;
+		if (obj instanceof MyCallGraph) {
+			// Cast object to a Vector
+			locClg = (MyCallGraph) obj;
+		}
+
+		return locClg;
+	}
+	
+	private static HashMap<?, ?> deserializeHashMap(String filename)
+			throws IOException, ClassNotFoundException {
+
+		// Read from disk using FileInputStream
+		FileInputStream f_in = new FileInputStream(filename);
+
+		// Read object using ObjectInputStream
+		ObjectInputStream obj_in = new ObjectInputStream(f_in);
+
+		// Read an object
+		Object obj = obj_in.readObject();
+
+		HashMap<?, ?> hashMap = null;
+		if (obj instanceof HashMap<?, ?>) {
+			// Cast object to a Vector
+			hashMap = (HashMap<?, ?>) obj;
+		}
+
+		return hashMap;
+	}
+
+	private static void writeMethodInfoToXML(
+			List<Cluster> splitClusters, MyCallGraph myCallGraph) throws ParserConfigurationException, TransformerException {
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+		// classgraph elements
+		Document doc = docBuilder.newDocument();
+		Element rootElement = doc.createElement("SmellArchGraph");
+		doc.appendChild(rootElement);
+
+		for (Cluster splitCluster : splitClusters) {
+			System.out.println("Current cluster: " + splitCluster);
+			Element clusterElem = doc.createElement("cluster");
+			rootElement.appendChild(clusterElem);
+			clusterElem.setAttribute("name",splitCluster.toString());
+
+			for (MyClass myClass : splitCluster.classes) {
+				System.out.println("\tCurrent class: " + myClass);
+				Element classElem = doc.createElement("class");
+				clusterElem.appendChild(classElem);
+				classElem.setAttribute("name",myClass.className);
+
+				for (MyMethod myMethod : myClass.getMethods()) {
+					System.out.println("\t\tCurrent method: " + myMethod);
+					Element methodElem = doc.createElement("method");
+					classElem.appendChild(methodElem);
+					methodElem.setAttribute("name",myMethod
+							.toString());
+					for (String param : myMethod.getParams()) {
+						System.out.println("\t\t\tCurrent param: " + param);
+						Element paramElem = doc.createElement("param");
+						methodElem.appendChild(paramElem);
+						paramElem.setAttribute("name",param);
+					}
+					
+					Element retValElem = doc.createElement("retval");
+					methodElem.appendChild(retValElem);
+					retValElem.setAttribute("name",myMethod.retVal);
+				}
+			}
+		}
+		
+		 //write the content into xml file
+		  TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		  Transformer transformer = transformerFactory.newTransformer();
+		  transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		  DOMSource source = new DOMSource(doc);
+		  StreamResult result =  new StreamResult(new File(Config.getMethodInfoFilename()));
+		  transformer.transform(source, result);
+	 
+		  System.out.println("In " + Thread.currentThread().getStackTrace()[1].getClassName() 
+				  + ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
+				  + ", Wrote " + Config.getMethodInfoFilename());
+	}
+	
+	private static void writeOutGraphsAndSmellArchToFiles(
+			List<Cluster> splitClusters, StringGraph clusterGraph,
+			SmellArchGraph smellArchGraph) {
+		try {
+			clusterGraph.writeDotFile(Config.getClusterGraphDotFilename());
+			clusterGraph.writeXMLClusterGraph(Config.getClusterGraphXMLFilename());
+			smellArchGraph.writeXMLSmellArchGraph(Config.getXMLSmellArchGraphFilename());
+
+			ClusterUtil.writeOutSmellArchToXML(splitClusters);
+			
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void printUnusedMethods(
+			Map<String, MyMethod> unusedMethods) {
+		for (MyMethod m : unusedMethods.values()) {
+			System.out.println("\t" + m.toString());
+		}
+
+	}
+	
+	private static void printInterfacesOfClusters(List<Cluster> splitClusters) {
+		for (Cluster cluster : splitClusters) {
+			System.out.println("Printing interfaces of cluster " + cluster);
+			for (MyClass myClass : cluster.getClasses()) {
+				System.out.println("\t comprising class: " + myClass);
+				System.out.println(myClass.methodsToString(2));
+			}
+		}
+
+	}
+	
+	private static void printClassesWithUsedMethods(
+			Map<String, MyClass> classesWithMethodsInMyCallGraph) {
+		for (MyClass c : classesWithMethodsInMyCallGraph.values()) {
+			System.out.println("Showing linked methods in " + c + "...");
+			System.out.println(c.methodsToString(1));
+		}
+	}
+	
+	private static void printTopicsForSplitClusters(
+			List<Cluster> splitClusters) {
+		System.out
+				.println("Printing document-topic distribution for each split cluster...");
+		for (Cluster splitCluster : splitClusters) {
+			System.out.println("\t" + splitCluster);
+			System.out.println("\t\t" + splitCluster.docTopicItem);
+		}
+
+	}
+	// #endregion IO -------------------------------------------------------------
 }
