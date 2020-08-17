@@ -15,8 +15,6 @@ public class TopicKeySet {
 	// #endregion FIELDS ---------------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
-	public TopicKeySet() { this.set = new HashSet<>(); }
-	
 	public TopicKeySet(String filename) throws FileNotFoundException {
 		this.set = loadFromFile(filename); }
 	// #endregion CONSTRUCTORS ---------------------------------------------------
@@ -36,7 +34,7 @@ public class TopicKeySet {
 	
 	// #region IO ----------------------------------------------------------------
 	private Set<TopicKey> loadFromFile(String filename)
-			throws FileNotFoundException {
+			throws FileNotFoundException { //TODO Figure out what this file looks like
 		File f = new File(filename);
 		String[] items;
 		Set<TopicKey> result = new HashSet<>();
@@ -54,7 +52,7 @@ public class TopicKeySet {
 				for (int i=2; i < items.length; i++)
 					tk.addWord(items[i]);
 				
-					result.add(tk);
+				result.add(tk);
 				
 				printStringArray(items);
 			}

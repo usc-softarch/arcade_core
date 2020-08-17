@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.topics;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,6 +53,7 @@ public class DocTopicItem implements Serializable {
 	public int size() { return this.topics.size(); }
 	public TopicItem getTopic(int topicNum) { return this.topics.get(topicNum); }
 	public boolean hasTopic(int topicNum) { return topics.containsKey(topicNum); }
+	public Set<Integer> getTopicNumbers() { return this.topics.keySet(); }
 
 	public void setDoc(int doc) { this.doc = doc; }
 	public void setSource(String source) { this.source = source; }

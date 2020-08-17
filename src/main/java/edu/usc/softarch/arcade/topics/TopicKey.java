@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Represents a topic number. Contains that topic number's alpha, words and
+ * type.
+ * 
  * @author joshua
  */
 public class TopicKey {
 	// #region FIELDS ------------------------------------------------------------
 	private int topicNum;
-	private double alpha;
+	private double alpha; //TODO Find out what this is
 	private List<String> words;
 	private String type;
 	// #endregion FIELDS ---------------------------------------------------------

@@ -193,6 +193,22 @@ public class DocTopics {
 	public List<DocTopicItem> getDocTopicItemList() { return dtItemList; }
 
 	/**
+	 * Gets the DocTopicItem for a given file name or entity.
+	 * 
+	 * @param name Name of the file or entity.
+	 * @param language Source language of the file.
+	 * @return Associated DocTopicItem
+	 */
+	public DocTopicItem getDocTopicItem(String name, String language) {
+		if (language.equalsIgnoreCase("java"))
+			return getDocTopicItemForJava(name);
+		if (language.equalsIgnoreCase("c"))
+			return getDocTopicItemForC(name);
+
+		throw new IllegalArgumentException("Unknown source language " + language);
+	}
+
+	/**
 	 * Gets the DocTopicItem for a given Java file name or Class name.
 	 * 
 	 * @param name Name of the file or Java class.

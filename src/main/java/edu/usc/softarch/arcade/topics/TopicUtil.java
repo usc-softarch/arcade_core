@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
@@ -26,7 +27,6 @@ import edu.usc.softarch.arcade.clustering.FastCluster;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.ConfigUtil;
 import edu.usc.softarch.arcade.config.Config.Language;
-import edu.usc.softarch.arcade.topics.DocTopicItem.Sort;
 import edu.usc.softarch.arcade.util.DebugUtil;
 
 /**
@@ -298,37 +298,16 @@ public class TopicUtil {
 		}
 	}
 
-	public static void setDocTopicForFastClusterForMalletFile(DocTopics docTopics, FastCluster leaf) {
-		String strippedLeafClasName = leaf.getName();
-		String dollarSign = "$";
-		if (strippedLeafClasName.contains(dollarSign)) {
-			String anonInnerClassRegExpr = ".*\\$\\D.*";
-			if (Pattern.matches(anonInnerClassRegExpr,
-					strippedLeafClasName)) {
-				logger.debug("\t\tfound inner class: " + strippedLeafClasName);
-				
-				strippedLeafClasName = strippedLeafClasName.substring(
-						strippedLeafClasName.lastIndexOf('$') + 1,
-						strippedLeafClasName.length());
-				
-				logger.debug("\t\tstripped to name to: " + strippedLeafClasName);
-			}
-		}
-		
-		logger.debug("\t" + strippedLeafClasName);
-		if (Config.getSelectedLanguage().equals(Language.c)) {
-			leaf.docTopicItem = docTopics.getDocTopicItemForC(strippedLeafClasName);
-			logger.debug("set " + ((leaf.docTopicItem == null) ? "null" : leaf.docTopicItem.getSource())  + " as doc topic for " +  strippedLeafClasName);
-		}
-		else if (Config.getSelectedLanguage().equals(Language.java)) {
-			String docTopicName = convertJavaClassWithPackageNameToDocTopicName( leaf.getName() );
-			leaf.docTopicItem = docTopics.getDocTopicItemForJava(docTopicName);
-		}
-		else
-			leaf.docTopicItem = docTopics.getDocTopicItemForJava(strippedLeafClasName);
-		logger.debug("\t" + "doc-topic: " + leaf.docTopicItem);
-	}
-
+	/**
+	 * Merges the proportions of two DocTopicItems that contain the same topic
+	 * numbers. Merging is done by taking the average of the proportions.
+	 * 
+	 * @param docTopicItem First DocTopicItem to merge.
+	 * @param docTopicItem2 Second DocTopicItem to merge.
+	 * @return Merged DocTopicItem.
+	 * @throws UnmatchingDocTopicItemsException If the two DocTopicItems contain
+	 * 	different topic numbers.
+	 */
 	public static DocTopicItem mergeDocTopicItems(DocTopicItem docTopicItem,
 			DocTopicItem docTopicItem2) throws UnmatchingDocTopicItemsException {
 		// If either argument is null, then return the non-null argument
@@ -365,45 +344,126 @@ public class TopicUtil {
 		return mergedDocTopicItem;
 	}
 
-	public static void printTwoDocTopics(DocTopicItem docTopicItem,
-			DocTopicItem docTopicItem2) {
-		if (docTopicItem == null) {
-			logger.debug(DebugUtil.addMethodInfo(" first arg is null...returning"));
-			return;
-		}
-		
-		if (docTopicItem2 == null) {
-			logger.debug(DebugUtil.addMethodInfo(" second arg is null...returning"));
-			return;
-		}
-		
-		docTopicItem.sort(Sort.num);
-		docTopicItem2.sort(Sort.num);
-		
-		logger.debug(String.format("%5s%64s%64s\n", "", docTopicItem.getSource(), docTopicItem2.getSource()));
-		
-		for (int i=0; i < docTopicItem.getTopics().size(); i ++)
-			logger.debug(String.format(
-				"%32s%32f%32f\n",
-				docTopicItem.getTopics().get(i).getTopicNum(),
-				docTopicItem.getTopics().get(i).getProportion(),
-				docTopicItem2.getTopics().get(i).getProportion()));
-	}
-
+	/**
+	 * Gets a TopicItem from a list based on its Topic Number.
+	 * 
+	 * @param topics A list of TopicItems.
+	 * @param inTopicItem The desired TopicItem.
+	 * @return The desired TopicItem if it is in the list, null otherwise.
+	 * @deprecated
+	 */
 	public static TopicItem getMatchingTopicItem(List<TopicItem> topics,
 			TopicItem inTopicItem) {
-		for (TopicItem currTopicItem : topics) {
-			if (currTopicItem.getTopicNum() == inTopicItem.getTopicNum()) {
+		for (TopicItem currTopicItem : topics)
+			if (currTopicItem.getTopicNum() == inTopicItem.getTopicNum())
 				return currTopicItem;
-			}
-		}
+
 		return null;
 	}
 
-	public static void setDocTopicForFastClusterForMalletApi(FastCluster c) {
-		if (Config.getSelectedLanguage().equals(Language.java))
-			c.docTopicItem = docTopics.getDocTopicItemForJava(c.getName());
-		if (Config.getSelectedLanguage().equals(Language.c))
-			c.docTopicItem = docTopics.getDocTopicItemForC(c.getName());
+	/**
+	 * Gets a TopicItem from a list based on its Topic Number.
+	 * 
+	 * @param topics A list of TopicItems.
+	 * @param inTopicItem The desired TopicItem's number.
+	 * @return The desired TopicItem if it is in the list, null otherwise.
+	 */
+	public static TopicItem getMatchingTopicItem(List<TopicItem> topics,
+			int inTopicItem) {
+		for (TopicItem currTopicItem : topics)
+			if (currTopicItem.getTopicNum() == inTopicItem)
+				return currTopicItem;
+
+		return null;
 	}
+
+	public static void setDocTopicForFastClusterForMalletFile(
+			DocTopics docTopics, FastCluster leaf) {
+		String strippedLeafClasName = leaf.getName();
+		String dollarSign = "$";
+
+		if (strippedLeafClasName.contains(dollarSign)) {
+			String anonInnerClassRegExpr = ".*\\$\\D.*";
+			if (Pattern.matches(anonInnerClassRegExpr,
+					strippedLeafClasName)) {
+				logger.debug("\t\tfound inner class: " + strippedLeafClasName);
+				
+				strippedLeafClasName = strippedLeafClasName.substring(
+						strippedLeafClasName.lastIndexOf('$') + 1,
+						strippedLeafClasName.length());
+				
+				logger.debug("\t\tstripped to name to: " + strippedLeafClasName);
+			}
+		}
+		
+		logger.debug("\t" + strippedLeafClasName);
+		if (Config.getSelectedLanguage().equals(Language.c)) {
+			leaf.docTopicItem = docTopics.getDocTopicItemForC(strippedLeafClasName);
+			logger.debug("set " + ((leaf.docTopicItem == null) ? "null" : leaf.docTopicItem.getSource())  + " as doc topic for " +  strippedLeafClasName);
+		}
+		else if (Config.getSelectedLanguage().equals(Language.java)) {
+			String docTopicName = convertJavaClassWithPackageNameToDocTopicName( leaf.getName() );
+			leaf.docTopicItem = docTopics.getDocTopicItemForJava(docTopicName);
+		}
+		else
+			leaf.docTopicItem = docTopics.getDocTopicItemForJava(strippedLeafClasName);
+		logger.debug("\t" + "doc-topic: " + leaf.docTopicItem);
+	}
+
+	/**
+	 * Sets the DocTopicItem of a FastCluster.
+	 * 
+	 * @deprecated
+	 */
+	public static void setDocTopicForFastClusterForMalletApi(FastCluster c) {
+		setDocTopicForFastClusterForMalletApi(c, Config.getSelectedLanguage().name());
+	}
+
+	/**
+	 * Sets the DocTopicItem of a FastCluster.
+	 */
+	public static void setDocTopicForFastClusterForMalletApi(
+			FastCluster c, String language) {
+		c.docTopicItem = docTopics.getDocTopicItem(c.getName(), language);
+	}
+
+	// #region DEBUG -------------------------------------------------------------
+	/**
+	 * Prints two DocTopicItems to the debug logger. The two DocTopicItems are
+	 * expected to contain the same TopicItem numbers.
+	 * 
+	 * @param docTopicItem
+	 * @param docTopicItem2
+	 */
+	public static void printTwoDocTopics(DocTopicItem docTopicItem,
+			DocTopicItem docTopicItem2) {
+		// If either argument is null, do nothing.
+		if (docTopicItem == null) {
+			logger.debug(DebugUtil.addMethodInfo(" first arg is null...returning"));
+			return; //TODO throw exception
+		}
+		if (docTopicItem2 == null) {
+			logger.debug(DebugUtil.addMethodInfo(" second arg is null...returning"));
+			return; //TODO throw exception
+		}
+		
+		// Get all topic numbers
+		Set<Integer> topicNumbers = docTopicItem.getTopicNumbers();
+		
+		// Print the source of each DocTopicItem
+		logger.debug(String.format(
+			"%5s%64s%64s\n",
+			"",
+			docTopicItem.getSource(),
+			docTopicItem2.getSource()));
+		
+		// For each topic number, print the proportions
+		for (Integer i : topicNumbers)
+			logger.debug(String.format(
+				"%32s%32f%32f\n",
+				docTopicItem.getTopic(i).getTopicNum(),
+				docTopicItem.getTopic(i).getProportion(),
+				docTopicItem2.getTopic(i).getProportion()));
+	}
+	// #endregion DEBUG ----------------------------------------------------------
 }
