@@ -1,7 +1,6 @@
 package edu.usc.softarch.arcade;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,146 +8,21 @@ import java.util.List;
 
 import mojo.MoJoCalculator;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import edu.usc.softarch.arcade.config.Config;
 
 public class MetricsDriver {
 	static Logger logger = Logger.getLogger(MetricsDriver.class);
-	
-	public static void main(String[] args) {
-		String computedFilePrefix = "/home/joshua/workspace/MyExtractors/data/linux/linux_";
-		String authClusteringFile = "/home/joshua/recovery/Expert Decompositions/linuxFullAuthcontain.rsf";
-		String selectedAlg = "arc";
-		String simMeasure = "uem";
-		String stoppingCriterion = "preselected";
-		String computedClustersFile = "/home/joshua/workspace/acdc/linux_acdc_clustered.rsf";
-		
-		Options options = new Options();
-		
-		Option help = new Option( "help", "print this message" );
-		Option useExpertDecompFile = new Option("use_expert_decomp_file","uses the expert decomposition file property from project config file");
-		
-		Option projFile   = OptionBuilder.withArgName( "file" )
-                .hasArg()
-                .withDescription(  "project configuration file" )
-                .create( "projfile" );
-		
-		Option computedFilePrefixOption = OptionBuilder.withArgName( "file" )
-                .hasArg()
-                .withDescription(  "prefix of computed clustering file" )
-                .create( "computedFilePrefix" );
-		
-		Option authClusteringFileOption = OptionBuilder.withArgName( "file" )
-                .hasArg()
-                .withDescription(  "authoritative clustering file" )
-                .create( "authClusteringFile" );
-		
-		Option algOption = OptionBuilder.withArgName( "selectedAlg" )
-                .hasArg()
-                .withDescription(  "Select the algorithm used to create computed clustering file [acdc|wca|arc]" )
-                .create( "alg" );
-		
-		Option simMeasureOption = OptionBuilder.withArgName( "simMeasure" )
-                .hasArg()
-                .withDescription(  "Select the similarity measured used to create computed clustering file [uem|uemnm|js]" )
-                .create( "simMeasure" );
-		
-		Option stoppingCriterionOption = OptionBuilder.withArgName( "criterion" )
-                .hasArg()
-                .withDescription(  "Select the stopping criterion [preselected|clustergain]" )
-                .create( "stoppingCriterion" ); 
-		
-		Option computedClustersFileOption = OptionBuilder.withArgName( "file" )
-                .hasArg()
-                .withDescription(  "File containing clusters computed by clustering algorithm" )
-                .create( "computedClustersFile" );
-		
-		options.addOption(help);
-		options.addOption(useExpertDecompFile);
-		options.addOption(projFile);
-		options.addOption(computedFilePrefixOption);
-		options.addOption(authClusteringFileOption);
-		options.addOption(algOption);
-		options.addOption(simMeasureOption);
-		options.addOption(stoppingCriterionOption);
-		options.addOption(computedClustersFileOption);
-		
-		
-		 // create the parser
-	    CommandLineParser parser = new GnuParser();
-	    try {
-	        // parse the command line arguments
-	        CommandLine line = parser.parse( options, args );
-	        
-	        if (line.hasOption("projfile")) {
-	        	Config.setProjConfigFilename(line.getOptionValue("projfile"));
-	        }
-	        if (line.hasOption("help")) {
-	        	// automatically generate the help statement
-	        	HelpFormatter formatter = new HelpFormatter();
-	        	formatter.printHelp( MetricsDriver.class.getName(), options );
-	        	System.exit(0);
-	        }
-	        if (line.hasOption("computedFilePrefix")) {
-	        	computedFilePrefix = line.getOptionValue("computedFilePrefix");
-	        }
-	        if (line.hasOption("authClusteringFile")) {
-	        	authClusteringFile = line.getOptionValue("authClusteringFile");
-	        }
-	        if (line.hasOption("alg")) {
-	        	selectedAlg = line.getOptionValue("alg");
-	        }
-	        if (line.hasOption("simMeasure")) {
-	        	simMeasure = line.getOptionValue("simMeasure");
-	        }
-	        if (line.hasOption("stoppingCriterion")) {
-	        	stoppingCriterion = line.getOptionValue("stoppingCriterion");
-	        }
-	        if (line.hasOption("computedClustersFile")) {
-	        	computedClustersFile = line.getOptionValue("computedClustersFile");
-	        }
-	    }
-	    catch( ParseException exp ) {
-	        // oops, something went wrong
-	        System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
-	    }
-		
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		logger.debug("Running from " + MetricsDriver.class.getName());
-		Config.initConfigFromFile(Config.getProjConfigFilename());
-		
-		if (selectedAlg.equals("wca") || selectedAlg.equals("limbo")) {
-			performMoJoOperationsForMultipleClustersOnSingleAuthClusteringFile(selectedAlg, simMeasure,
-					stoppingCriterion, computedFilePrefix, authClusteringFile);
-		}
-		
-		if (selectedAlg.equals("acdc")) {
-			performMojoForSingleAuthClustering(computedClustersFile,authClusteringFile);
-		}
 
-		if (selectedAlg.equals("arc")) {
-			performMoJoForMultiClustersOnFile(computedFilePrefix,authClusteringFile,selectedAlg, simMeasure,stoppingCriterion);
-		}
-	}
-
-	private static String constructTopicBasedComputedRsfFilename(
+	public static String constructTopicBasedComputedRsfFilename(
 			String computedFilePrex, String selectedAlg, String simMeasure,
 			String stoppingCriterion, int numClusters, int numTopics) {
 		return computedFilePrex + selectedAlg + "_"
 				+ stoppingCriterion + "_" + simMeasure + "_"  + numClusters + "_clusters_" + numTopics + "topics.rsf";
 	}
 
-	private static String constructNonTopicComputedRsfFilename(
+	public static String constructNonTopicComputedRsfFilename(
 			String computedFilePrex, String selectedAlg, String simMeasure,
 			String stoppingCriterion, int numClusters) {
 		return computedFilePrex + selectedAlg + "_"
@@ -156,7 +30,7 @@ public class MetricsDriver {
 				+ "_clusters.rsf";
 	}
 	
-	private static void performMoJoForMultiClustersOnFile(
+	public static void performMoJoForMultiClustersOnFile(
 			String computedFilePrex, String authClusteringFile, String selectedAlg, String simMeasure, String stoppingCriterion) {
 		List<Integer> numClustersList = new ArrayList<>();
 		List<Integer> numTopicsList = new ArrayList<>();
@@ -252,7 +126,7 @@ public class MetricsDriver {
 		
 	}
 	
-	private static void performMoJoOperationsForMultipleClustersOnSingleAuthClusteringFile(String selectedAlg, String simMeasure,
+	public static void performMoJoOperationsForMultipleClustersOnSingleAuthClusteringFile(String selectedAlg, String simMeasure,
 			String stoppingCriterion, String computedFilePrex, String authClusteringFile) {
 		List<Integer> numClustersList = new ArrayList<>();
 		List<Long> mojoList = new ArrayList<>();
@@ -324,7 +198,7 @@ public class MetricsDriver {
 		createMojoListsCSVFile(numClustersList,mojoList,mojoFmList,selectedAlg,simMeasure);
 	}
 
-	private static void performMojoForSingleAuthClustering(String computedRsfFilename, String authClusteringFile) {
+	public static void performMojoForSingleAuthClustering(String computedRsfFilename, String authClusteringFile) {
 		MoJoCalculator mojoCalc = new MoJoCalculator(computedRsfFilename,authClusteringFile, null);
 		long mojoValue = mojoCalc.mojo();
 		String mojoOutput = "MoJo of " + computedRsfFilename
@@ -342,7 +216,7 @@ public class MetricsDriver {
 		System.out.println(mojoOutput);
 	}
 	
-	private static void createMojoListsCSVFile(List<Integer> numClustersList, List<Long> mojoList,
+	public static void createMojoListsCSVFile(List<Integer> numClustersList, List<Long> mojoList,
 			List<Double> mojoFmList,String selectedAlg, String simMeasure) {
 		try (FileWriter fstream = new FileWriter(
 			Config.getMojoToAuthCSVFilename(numClustersList,selectedAlg, simMeasure))) {
@@ -362,7 +236,7 @@ public class MetricsDriver {
 		}
 	}
 	
-	private static void createMojoToAuthListsCSVFile(List<Integer> numClustersList, List<Long> mojoList,
+	public static void createMojoToAuthListsCSVFile(List<Integer> numClustersList, List<Long> mojoList,
 			List<Double> mojoFmList,String selectedAlg, String simMeasure, List<Integer> numTopicsList) {
 		try (FileWriter fstream = new FileWriter(
 			Config.getMojoToAuthCSVFilename(numClustersList,selectedAlg,simMeasure))) {
@@ -388,7 +262,7 @@ public class MetricsDriver {
 		}
 	}
 	
-	private static void writeMojoListsToFile(List<Long> mojoList,
+	public static void writeMojoListsToFile(List<Long> mojoList,
 			List<Double> mojoFmList, BufferedWriter out) throws IOException {
 		out.write("MoJo,");
 		for (long mojo : mojoList) {

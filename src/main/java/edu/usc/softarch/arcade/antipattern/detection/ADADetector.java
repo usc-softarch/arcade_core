@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -59,13 +60,11 @@ public class ADADetector {
 	// #region DRIVERS -----------------------------------------------------------
 	public static void runSmellDetectionAlgorithms(
 			List<Cluster> splitClusters) throws IOException,
-			ClassNotFoundException,
-			ParserConfigurationException, SAXException, TransformerException {
-		System.out.println("In "
-				+ Thread.currentThread().getStackTrace()[1].getClassName()
-				+ "."
-				+ Thread.currentThread().getStackTrace()[1].getMethodName()
-				+ ",");
+			ClassNotFoundException, ParserConfigurationException, 
+			SAXException, TransformerException {
+		System.out.println("In " //TODO logger
+			+ Thread.currentThread().getStackTrace()[1].getClassName()
+			+ "."	+ Thread.currentThread().getStackTrace()[1].getMethodName()	+ ",");
 		ClusterUtil.generateLeafClusters(splitClusters);
 
 		generateTopicsForSplitClusters(splitClusters);
@@ -121,7 +120,7 @@ public class ADADetector {
 
 		MyCallGraph myCallGraph = deserializeMyCallGraph();
 		
-		writeMethodInfoToXML(splitClusters,myCallGraph);
+		writeMethodInfoToXML(splitClusters);
 
 		int ambiguousInterfaceCount = 0;
 		ambiguousInterfaceCount = determineAmbiguousInterface(splitClusters,
@@ -988,51 +987,42 @@ public class ADADetector {
 	// #endregion PROCESSING -----------------------------------------------------
 
 	// #region IO ----------------------------------------------------------------
-	private static MyCallGraph deserializeMyCallGraph() throws IOException,
-			ClassNotFoundException {
+	private static MyCallGraph deserializeMyCallGraph()
+			throws IOException, ClassNotFoundException {
 		String filename = Config.getMyCallGraphFilename();
-		// Read from disk using FileInputStream
+
 		FileInputStream f_in = new FileInputStream(filename);
+		try (ObjectInputStream obj_in = new ObjectInputStream(f_in)) {
+			Object obj = obj_in.readObject();
+			MyCallGraph locClg = null;
 
-		// Read object using ObjectInputStream
-		ObjectInputStream obj_in = new ObjectInputStream(f_in);
+			if (obj instanceof MyCallGraph)
+				locClg = (MyCallGraph) obj;
 
-		// Read an object
-		Object obj = obj_in.readObject();
-
-		MyCallGraph locClg = null;
-		if (obj instanceof MyCallGraph) {
-			// Cast object to a Vector
-			locClg = (MyCallGraph) obj;
+			return locClg;
 		}
-
-		return locClg;
 	}
 	
 	private static HashMap<?, ?> deserializeHashMap(String filename)
 			throws IOException, ClassNotFoundException {
-
-		// Read from disk using FileInputStream
 		FileInputStream f_in = new FileInputStream(filename);
 
-		// Read object using ObjectInputStream
-		ObjectInputStream obj_in = new ObjectInputStream(f_in);
+		try (ObjectInputStream obj_in = new ObjectInputStream(f_in)) {
+			Object obj = obj_in.readObject();
+			HashMap<?, ?> hashMap = null;
 
-		// Read an object
-		Object obj = obj_in.readObject();
+			if (obj instanceof HashMap<?, ?>)
+				hashMap = (HashMap<?, ?>) obj;
 
-		HashMap<?, ?> hashMap = null;
-		if (obj instanceof HashMap<?, ?>) {
-			// Cast object to a Vector
-			hashMap = (HashMap<?, ?>) obj;
+			return hashMap;
 		}
-
-		return hashMap;
 	}
 
-	private static void writeMethodInfoToXML(
-			List<Cluster> splitClusters, MyCallGraph myCallGraph) throws ParserConfigurationException, TransformerException {
+	private static void writeMethodInfoToXML(List<Cluster> splitClusters)
+			throws ParserConfigurationException, TransformerException {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
 		// classgraph elements
@@ -1040,26 +1030,27 @@ public class ADADetector {
 		Element rootElement = doc.createElement("SmellArchGraph");
 		doc.appendChild(rootElement);
 
+		// Writing all elements
 		for (Cluster splitCluster : splitClusters) {
-			System.out.println("Current cluster: " + splitCluster);
+			System.out.println("Current cluster: " + splitCluster); //TODO logger
 			Element clusterElem = doc.createElement("cluster");
 			rootElement.appendChild(clusterElem);
 			clusterElem.setAttribute("name",splitCluster.toString());
 
 			for (MyClass myClass : splitCluster.getClasses()) {
-				System.out.println("\tCurrent class: " + myClass);
+				System.out.println("\tCurrent class: " + myClass); //TODO logger
 				Element classElem = doc.createElement("class");
 				clusterElem.appendChild(classElem);
 				classElem.setAttribute("name",myClass.getClassName());
 
 				for (MyMethod myMethod : myClass.getMethods()) {
-					System.out.println("\t\tCurrent method: " + myMethod);
+					System.out.println("\t\tCurrent method: " + myMethod); //TODO logger
 					Element methodElem = doc.createElement("method");
 					classElem.appendChild(methodElem);
-					methodElem.setAttribute("name",myMethod
-							.toString());
+					methodElem.setAttribute("name",myMethod.toString());
+
 					for (String param : myMethod.getParams()) {
-						System.out.println("\t\t\tCurrent param: " + param);
+						System.out.println("\t\t\tCurrent param: " + param); //TODO logger
 						Element paramElem = doc.createElement("param");
 						methodElem.appendChild(paramElem);
 						paramElem.setAttribute("name",param);
@@ -1072,17 +1063,20 @@ public class ADADetector {
 			}
 		}
 		
-		 //write the content into xml file
-		  TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		  Transformer transformer = transformerFactory.newTransformer();
-		  transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		  DOMSource source = new DOMSource(doc);
-		  StreamResult result =  new StreamResult(new File(Config.getMethodInfoFilename()));
-		  transformer.transform(source, result);
-	 
-		  System.out.println("In " + Thread.currentThread().getStackTrace()[1].getClassName() 
-				  + ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
-				  + ", Wrote " + Config.getMethodInfoFilename());
+		//write the content into xml file
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET,"");
+		Transformer transformer = transformerFactory.newTransformer();
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		DOMSource source = new DOMSource(doc);
+		StreamResult result =  new StreamResult(new File(Config.getMethodInfoFilename()));
+		transformer.transform(source, result);
+	
+		System.out.println("In "
+			+ Thread.currentThread().getStackTrace()[1].getClassName() 
+			+ ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
+			+ ", Wrote " + Config.getMethodInfoFilename()); //TODO logger
 	}
 	
 	private static void writeOutGraphsAndSmellArchToFiles(
@@ -1094,23 +1088,16 @@ public class ADADetector {
 			smellArchGraph.writeXMLSmellArchGraph(Config.getXMLSmellArchGraphFilename());
 
 			ClusterUtil.writeOutSmellArchToXML(splitClusters);
-			
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (TransformerException e) {
+		} catch (FileNotFoundException | ParserConfigurationException
+				| TransformerException e) {
 			e.printStackTrace();
 		}
 	}
 
 	private static void printUnusedMethods(
 			Map<String, MyMethod> unusedMethods) {
-		for (MyMethod m : unusedMethods.values()) {
-			System.out.println("\t" + m.toString());
-		}
-
+		for (MyMethod m : unusedMethods.values())
+			System.out.println("\t" + m.toString()); //TODO logger
 	}
 	
 	private static void printInterfacesOfClusters(List<Cluster> splitClusters) {
@@ -1121,7 +1108,6 @@ public class ADADetector {
 				System.out.println(myClass.methodsToString(2));
 			}
 		}
-
 	}
 	
 	private static void printClassesWithUsedMethods(
