@@ -252,9 +252,9 @@ public class TopicUtil {
 		}
 		
 		logger.debug("\t" + strippedLeafClassName);
-		leaf.docTopicItem = docTopics
-			.getDocTopicItemForJava(strippedLeafClassName);
-		logger.debug("\t" + "doc-topic: " + leaf.docTopicItem);
+		leaf.setDocTopicItem(docTopics
+			.getDocTopicItemForJava(strippedLeafClassName));
+		logger.debug("\t" + "doc-topic: " + leaf.getDocTopicItem());
 	}
 	
 	/** pretty much the same method as above, except uses Entities instead

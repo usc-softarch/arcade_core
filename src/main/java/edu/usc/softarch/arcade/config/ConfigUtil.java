@@ -13,7 +13,7 @@ public class ConfigUtil {
 	
 	public static String stripParensEnclosedClassNameWithPackageName(
 			FeatureVector leaf) {
-		return leaf.name.substring(leaf.name.lastIndexOf('.')+1,leaf.name.length()-1);
+		return leaf.getName().substring(leaf.getName().lastIndexOf('.')+1,leaf.getName().length()-1);
 	}
 	public static String stripParensEnclosedClassNameWithPackageName(
 			Entity leaf) {

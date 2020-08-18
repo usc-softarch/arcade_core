@@ -24,7 +24,7 @@ public class SimCalcUtil {
 	
 	public static void verifySymmetricFeatureVectorOrdering(FeatureVector fv1, FeatureVector fv2) {
 		for (int i = 0;i<fv1.size();i++) {
-			if (!fv1.get(i).edge.getTgtStr().equals(fv2.get(i).edge.getTgtStr())) {
+			if (!fv1.get(i).getEdge().getTgtStr().equals(fv2.get(i).getEdge().getTgtStr())) {
 				System.out.println("In, " + Thread.currentThread().getStackTrace()[1].getMethodName() + ", Feature order incorrect");
 				System.exit(0);
 			}
@@ -36,7 +36,7 @@ public class SimCalcUtil {
 		Cluster firstCluster = clusters.get(0);
 		for (Cluster c : clusters) {
 			for (int i=0;i<firstCluster.size();i++) {
-				if (!firstCluster.get(i).edge.getTgtStr().equals(c.get(i).edge.getTgtStr())) {
+				if (!firstCluster.get(i).getEdge().getTgtStr().equals(c.get(i).getEdge().getTgtStr())) {
 					System.out.println("In, " + Thread.currentThread().getStackTrace()[1].getMethodName() + "Feature order incorrect");
 					System.exit(0);
 				}
@@ -73,7 +73,7 @@ public class SimCalcUtil {
 			divergence = divergenceMap.get(featureVecPair);
 		else {
 			try {
-				divergence = TopicUtil.jsDivergence(fv1.docTopicItem, fv2.docTopicItem);
+				divergence = TopicUtil.jsDivergence(fv1.getDocTopicItem(), fv2.getDocTopicItem());
 			} catch (DistributionSizeMismatchException e) {
 				e.printStackTrace(); //TODO handle it
 			}
@@ -164,13 +164,13 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
-			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
-			System.out.println("f.value: " + f.value);
-			System.out.println("f2.value: " + f2.value);
+			System.out.println("f.edge.tgtStr: " + f.getEdge().getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.getEdge().getTgtStr());
+			System.out.println("f.value: " + f.getValue());
+			System.out.println("f2.value: " + f2.getValue());
 			System.out.println();
 			
-			if (f.value > 0 && f2.value == 0) {
+			if (f.getValue() > 0 && f2.getValue() == 0) {
 				count++;
 				System.out.println("Increased 11 count to: " + count);
 			}
@@ -184,13 +184,13 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
-			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
-			System.out.println("f.value: " + f.value);
-			System.out.println("f2.value: " + f2.value);
+			System.out.println("f.edge.tgtStr: " + f.getEdge().getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.getEdge().getTgtStr());
+			System.out.println("f.value: " + f.getValue());
+			System.out.println("f2.value: " + f2.getValue());
 			System.out.println();
 			
-			if (f.value == 0 && f2.value > 0) {
+			if (f.getValue() == 0 && f2.getValue() > 0) {
 				count++;
 				System.out.println("Increased 11 count to: " + count);
 			}
@@ -204,13 +204,13 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
-			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
-			System.out.println("f.value: " + f.value);
-			System.out.println("f2.value: " + f2.value);
+			System.out.println("f.edge.tgtStr: " + f.getEdge().getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.getEdge().getTgtStr());
+			System.out.println("f.value: " + f.getValue());
+			System.out.println("f2.value: " + f2.getValue());
 			System.out.println();
 			
-			if (f.edge.getTgtStr().equals(f2.edge.getTgtStr()) && f.value == 1 && f2.value == 1) {
+			if (f.getEdge().getTgtStr().equals(f2.getEdge().getTgtStr()) && f.getValue() == 1 && f2.getValue() == 1) {
 				count++;
 				System.out.println("Increased 11 count to: " + count);
 			}
@@ -224,14 +224,14 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
-			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
-			System.out.println("f.value: " + f.value);
-			System.out.println("f2.value: " + f2.value);
+			System.out.println("f.edge.tgtStr: " + f.getEdge().getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.getEdge().getTgtStr());
+			System.out.println("f.value: " + f.getValue());
+			System.out.println("f2.value: " + f2.getValue());
 			System.out.println();
 			
-			if (f.value > 0 && f2.value > 0)
-				sharedFeatureSum = f.value + f2.value;
+			if (f.getValue() > 0 && f2.getValue() > 0)
+				sharedFeatureSum = f.getValue() + f2.getValue();
 		}
 		
 		return sharedFeatureSum;
@@ -242,14 +242,14 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
-			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
-			System.out.println("f.value: " + f.value);
-			System.out.println("f2.value: " + f2.value);
+			System.out.println("f.edge.tgtStr: " + f.getEdge().getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.getEdge().getTgtStr());
+			System.out.println("f.value: " + f.getValue());
+			System.out.println("f2.value: " + f2.getValue());
 			System.out.println();
 			
-			if (f.value > 0 && f2.value == 0)
-				oneZeroFeatureSum = f.value + f2.value;
+			if (f.getValue() > 0 && f2.getValue() == 0)
+				oneZeroFeatureSum = f.getValue() + f2.getValue();
 		}
 		
 		return oneZeroFeatureSum;
@@ -260,14 +260,14 @@ public class SimCalcUtil {
 		for (int i=0;i<fv1.size();i++) {
 			Feature f = fv1.get(i);
 			Feature f2 = fv2.get(i);
-			System.out.println("f.edge.tgtStr: " + f.edge.getTgtStr());
-			System.out.println("f2.edge.tgtStr: " + f2.edge.getTgtStr());
-			System.out.println("f.value: " + f.value);
-			System.out.println("f2.value: " + f2.value);
+			System.out.println("f.edge.tgtStr: " + f.getEdge().getTgtStr());
+			System.out.println("f2.edge.tgtStr: " + f2.getEdge().getTgtStr());
+			System.out.println("f.value: " + f.getValue());
+			System.out.println("f2.value: " + f2.getValue());
 			System.out.println();
 			
-			if (f.value == 0 && f2.value > 0)
-				zeroOneFeatureSum = f.value + f2.value;
+			if (f.getValue() == 0 && f2.getValue() > 0)
+				zeroOneFeatureSum = f.getValue() + f2.getValue();
 		}
 		
 		return zeroOneFeatureSum;

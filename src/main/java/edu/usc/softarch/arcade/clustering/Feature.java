@@ -11,25 +11,30 @@ public class Feature implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -2658336048930856739L;
 
-	public StringEdge edge;
-	public double value;
+	private StringEdge edge;
+	private Double value;
 	// #endregion FIELDS ---------------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
-	Feature(StringEdge edge, double value) {
-		this.edge = edge;
-		this.value = value;
-	}
-	
 	public Feature() { super(); }
+
+	public Feature(StringEdge edge, Double value) {
+		setEdge(edge);
+		setValue(value);
+	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
+
+	// #region ACCESSORS ---------------------------------------------------------
+	public StringEdge getEdge() { return new StringEdge(edge); }
+	public Double getValue() { return this.value; }
+
+	public void setEdge(StringEdge edge) { this.edge = edge; }
+	public void setValue(Double value) { this.value = value; }
+	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region MISC --------------------------------------------------------------
 	public String toString() {
-		if (this.value == 1) 
-			return edge + ":true";
-		else 
-			return edge + ":false";
+		return edge + (this.value == 1 ? ":true" : ":false");
 	}
 	
 	public boolean equals(Object o) {
@@ -43,7 +48,7 @@ public class Feature implements Serializable {
 	public int hashCode() {
 		int hash = 7;
 		hash = 37 * hash + (this.edge == null ? 0 : this.edge.hashCode());
-		hash = 37 * hash + (Double.valueOf(this.value)).hashCode();
+		hash = 37 * hash + this.value.hashCode();
 		return hash;
 	}
 	// #endregion MISC -----------------------------------------------------------

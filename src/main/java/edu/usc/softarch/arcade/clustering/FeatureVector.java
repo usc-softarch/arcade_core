@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.clustering;
 import java.util.ArrayList;
 
 import edu.usc.softarch.arcade.topics.DocTopicItem;
+import edu.usc.softarch.arcade.topics.TopicItem;
 
 /**
  * @author joshua
@@ -10,44 +11,53 @@ import edu.usc.softarch.arcade.topics.DocTopicItem;
 public class FeatureVector extends ArrayList<Feature> {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -2684090300773683383L;
-	public String name = "";
-	public DocTopicItem docTopicItem;
+
+	private String name;
+	private DocTopicItem docTopicItem;
 	// #endregion FIELDS ---------------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
 	public FeatureVector() {
 		super();
+		setName("");
 	}
 	
 	public FeatureVector(String name) {
-		this.name = name;
+		super();
+		setName(name);
+	}
+
+	/**
+	 * Clone constructor.
+	 */
+	public FeatureVector(FeatureVector fve) {
+		super(fve);
+		setName(fve.getName());
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public DocTopicItem getDocTopicItem() {
-		return docTopicItem;
-	}
+	public String getName() { return this.name; }
+	public DocTopicItem getDocTopicItem() { return this.docTopicItem; }
+
+	public void setName(String name) { this.name = name; }
+	public void setDocTopicItem(DocTopicItem docTopicItem) {
+		this.docTopicItem = docTopicItem; }
+	public TopicItem addTopicItem(TopicItem topicItem) {
+		return this.docTopicItem.addTopic(topicItem); }
 
 	public String toBinaryForm() {
 		String str = "";
-		for (int i=0;i<this.size(); i++) {
-			Feature f = this.get(i);
-			str = (Double.valueOf(f.value)).toString();
-		}
+		for (Feature f : this)
+			str = f.getValue().toString();
+
 		return str;
 	}
 
-	public void setDocTopicItem(DocTopicItem docTopicItem) {
-		this.docTopicItem = docTopicItem;
-	}
-
 	public void changeFeatureValue(String tgtStr, double value) {
-		for (Feature f : this) {
-			if (tgtStr.equals(f.edge.getTgtStr())) {
-				f.value = value;
-			}
-		}
+		for (Feature f : this)
+			if (tgtStr.equals(f.getEdge().getTgtStr()))
+				f.setValue(value);
 	}
 	// #endregion ACCESSORS ------------------------------------------------------
 	
@@ -57,7 +67,7 @@ public class FeatureVector extends ArrayList<Feature> {
 		if(!(o instanceof FeatureVector))
 			return false;
 
-		FeatureVector fv = (FeatureVector)o;
+		FeatureVector fv = (FeatureVector) o;
 		return this.name.equals(fv.name);
 	}
 	
@@ -68,8 +78,11 @@ public class FeatureVector extends ArrayList<Feature> {
 		return hash;
 	}
 	
+	/**
+	 * @deprecated
+	 */
 	public boolean equals(FeatureVector fv) {
-		
+		//TODO this needs to be ported to the other equals method
 		boolean isEqual = true;
 		
 		for (int i=0;i<fv.size();i++) {

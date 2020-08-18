@@ -4,15 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import edu.usc.softarch.arcade.callgraph.MyClass;
 import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.topics.TopicUtil;
-import edu.usc.softarch.arcade.util.ExtractionContext;
 
 /**
  * @author joshua
@@ -20,215 +16,99 @@ import edu.usc.softarch.arcade.util.ExtractionContext;
 public class Cluster extends FeatureVector {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -5521307722955232634L;
-	private static final Logger logger = LogManager.getLogger(Cluster.class);
 	
-	public Set<FeatureVector> items = new HashSet<>();
-	public List<Cluster> leafClusters = new ArrayList<>();
-	public Set<MyClass> classes = new HashSet<>();
+	private Set<FeatureVector> items;
+	private List<Cluster> leafClusters;
+	private Set<MyClass> classes;
+	private Queue<Cluster> clusterSimQueue;
+	private Cluster left;
+	private Cluster right;
+	private Double simLeftRight;
+	private String type;
 	
-	private static UnbiasedEllenbergComparator DISTANCE_ORDER = null;
-	private static  ConcernComparator CONCERN_ORDER;
-	public PriorityQueue<Cluster> clusterSimQueue = null;
-	
-	public Cluster left = null;
-	public Cluster right = null;
-	
-	public double simLeftRight = 0;
-	public String type;
+	private static SimMeasureComparator _ORDER;
 	// #endregion FIELDS ---------------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
 	public Cluster() {
 		super();
-		preparePriorityQueue();
-	}
 
-	public Cluster(Cluster left, Cluster right) {
-		this.left = left;
-		this.right = right;
-		if (this.left != null && this.right != null) {
-			this.simLeftRight = SimCalcUtil.getUnbiasedEllenbergMeasure(
-					this.left, this.right);
-		}
-		setFeatureVectorAndName(left);
-		logger.debug("Set feature vector of left in Cluster constructor: " + this.toBinaryForm());
-		if (Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.WCA) || Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC) )
-			addClusterUsingWCAMerge(right);
-		logger.debug("Added feature vector of right in Cluster constructor: " + this.toBinaryForm());
-		if (this.equals(this.left))
-			logger.debug("this is equal to left");
+		if (!Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC))
+			_ORDER = new UnbiasedEllenbergComparator();
 		else
-			logger.debug("this is not equal to left");
+			_ORDER = new ConcernComparator();
 
-		logger.debug(this.name + ":");
-		logger.debug(this.toBinaryForm());
-		logger.debug(this.name + "'s left: " + this.left);
-		logger.debug(this.left.toBinaryForm());
-		
-		preparePriorityQueue();
+		_ORDER.setRefCluster(this);
+
+		this.items = new HashSet<>();
+		this.leafClusters = new ArrayList<>();
+		this.classes = new HashSet<>();
+		this.simLeftRight = 0.0;
+		this.clusterSimQueue = new PriorityQueue<>(1500, _ORDER);
 	}
 
-	public Cluster(FeatureVector fv) {
-		setFeatureVectorAndName(fv);
-		preparePriorityQueue();
-		if (this.left != null && this.right != null) {
-			this.simLeftRight = SimCalcUtil.getUnbiasedEllenbergMeasure(
-					this.left, this.right);
-		}
-	}
+	/**
+	 * Clone constructor.
+	 */
+	public Cluster(Cluster c) {
+		this();
+		if (c == null) return; // Recursion end
 
-	public void instantiateClasses() {
-		classes = new HashSet<>();
-	}
-
-	public void preparePriorityQueue() {
-		if (!Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC)) {
-			DISTANCE_ORDER = new UnbiasedEllenbergComparator();
-			DISTANCE_ORDER.setRefCluster(this);
-			clusterSimQueue = new PriorityQueue<Cluster>(1500, DISTANCE_ORDER);
-		}
-		else {
-			CONCERN_ORDER = new ConcernComparator();
-			CONCERN_ORDER.setRefCluster(this);
-			clusterSimQueue = new PriorityQueue<Cluster>(1500, CONCERN_ORDER);
-		}
+		this.items = new HashSet<>(c.getItems());
+		this.leafClusters = new ArrayList<>(c.getLeafClusters());
+		this.classes = new HashSet<>(c.getClasses());
+		this.clusterSimQueue = new PriorityQueue<>(c.getClusterSimQueue());
+		this.left = new Cluster(c.getLeft());
+		this.right = new Cluster(c.getRight());
+		this.simLeftRight = c.getSimLeftRight();
+		this.type = c.getType();
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 	
 	// #region ACCESSORS ---------------------------------------------------------
-	public Cluster getMostSimilarCluster() {
-		return clusterSimQueue.peek();
-	}
+	public Set<FeatureVector> getItems() { return new HashSet<>(items); }
+	public List<Cluster> getLeafClusters() {
+		return new ArrayList<>(leafClusters); }
+	public Set<MyClass> getClasses() { return new HashSet<>(classes); }
+	public PriorityQueue<Cluster> getClusterSimQueue() { 
+		return new PriorityQueue<>(clusterSimQueue); }
+	public Cluster getMostSimilarCluster() { return clusterSimQueue.peek(); }
+	public Cluster getLeft() { return this.left; }
+	public Cluster getRight() { return this.right; }
+	public Double getSimLeftRight() { return this.simLeftRight; }
+	public String getType() { return this.type; }
 
-	public Set<MyClass> getClasses() {
-		return new HashSet<>(classes);
-	}
-
-	public void add(MyClass c) {
-		classes.add(c);
-	}
-
-	private void setFeatureVectorAndName(FeatureVector fv) {
-		FeatureVector copyFV = new FeatureVector(fv.name);
-		for (Feature f : fv) {
-			copyFV.add(new Feature(f.edge,f.value));
-		}
-		
-		items.add(copyFV);
-		
-		this.clear();
-		this.addAll(copyFV);
-		logger.debug("In " + ExtractionContext.getCurrentClassAndMethodName() + ": "
-				+ itemsToString());
-		this.name = itemsToString();
-	}
-
-	public void addClusterUsingPlainCAMerge(FeatureVector inFV) {
-		FeatureVector copyFV = new FeatureVector(inFV.name);
-		for (Feature f : inFV) {
-			copyFV.add(new Feature(f.edge,f.value));
-		}
-		
-		items.add(copyFV);
-		plainCAMerge(copyFV);
-		this.name = itemsToString();
-
-	}
-	
-	public void addClusterUsingWCAMerge(FeatureVector inFV) {
-		FeatureVector copyFV = new FeatureVector(inFV.name);
-		for (Feature f : inFV) {
-			copyFV.add(new Feature(f.edge,f.value));
-		}
-		
-		items.add(copyFV);
-		
-		for (int i=0;i<this.size();i++) {
-			double featureSum = 0;
-			featureSum = this.get(i).value + copyFV.get(i).value;
-			this.get(i).value = featureSum / items.size();
-		}
-		this.name = itemsToString();
-
-	}
-
-	public void addClustersToPriorityQueue(List<Cluster> clusters) {
-		
-		if (TopicUtil.docTopics == null && Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC))
-			TopicUtil.docTopics = TopicUtil.getDocTopicsFromFile();
-		for (Cluster c : clusters) {
-			if (this.docTopicItem == null && Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.ARC))
-				TopicUtil.setDocTopicForCluster(TopicUtil.docTopics, c);
-			if ( !c.name.equals(this.name) ) {
-				clusterSimQueue.add(c);
-			}
-		}
-	}
-
-	public void clearPriorityQueue() {
-		clusterSimQueue.clear();
-	}
+	public boolean addItem(FeatureVector fv) { return this.items.add(fv); }
+	public boolean removeItem(FeatureVector fv) { return this.items.remove(fv); }
+	public void setLeafClusters(List<Cluster> leafClusters) {
+		this.leafClusters = leafClusters; }
+	public boolean addLeafCluster(Cluster leafCluster) {
+		return this.leafClusters.add(leafCluster); }
+	public boolean removeLeafCluster(Cluster leafCluster) {
+		return this.leafClusters.remove(leafCluster); }
+	public boolean addClass(MyClass c) { return this.classes.add(c); }
+	public boolean removeClass(MyClass c) { return this.classes.remove(c); }
+	public void resetClasses() { classes = new HashSet<>(); }
+	public void setLeft(Cluster left) { this.left = left; }
+	public void setRight(Cluster right) { this.right = right; }
+	public void setSimLeftRight(Double simLeftRight) {
+		this.simLeftRight = simLeftRight; }
+	public void setType(String type) { this.type = type; }
 	// #endregion ACCESSORS ------------------------------------------------------
-
-	// #region PROCESSING --------------------------------------------------------
-	private void plainCAMerge(FeatureVector inFV) {
-		for (Feature f1 : this) {
-			for (Feature f2 : inFV) {
-				logger.debug("f1.edge.tgtStr: " + f1.edge.getTgtStr());
-				logger.debug("f2.edge.tgtStr: " + f2.edge.getTgtStr());
-				logger.debug("f1.value : " + f1.value);
-				logger.debug("f2.value : " + f2.value);
-				if (f1.edge.getTgtStr().equals(f2.edge.getTgtStr()) && (f1.value == 1 || f2.value == 1)) {
-					if (f1.value == 1)
-						f1.edge.setSrcStr(f1.edge.getSrcStr());
-					else if (f2.value == 1)
-						f1.edge.setSrcStr(f2.edge.getSrcStr());
-					this.changeFeatureValue(f1.edge.getTgtStr(), 1);
-				} else if (f1.edge.getTgtStr().equals(f2.edge.getTgtStr()) && !(f1.value == 1 || f2.value ==1)) {
-					this.changeFeatureValue(f1.edge.getTgtStr(), 0);
-				}
-			}
-		}
-	}
-	// #endregion PROCESSING -----------------------------------------------------
 	
 	// #region MISC --------------------------------------------------------------
-	public String itemsToStringOnLine() {
-		String str = "";
-		for (FeatureVector fv : items) {
-			str += fv.name + "\n";
-		}
-		
-		return str;
-	}
-	
-	public String itemsToString() {
-		String str = "(";
-		for (FeatureVector fv : items) {
-			str += fv.name + ",";
-		}
-		str = str.substring(0,str.length()-1);
-		str += ")";
-		
-		return str;
-	}
-
+	@Override
 	public String toString() {
-		if (items == null) {
+		if (items == null || items.isEmpty())
 			return "empty cluster";
-		}
-		if (items.isEmpty()) {
-			return "empty cluster";
-		} else {
-			String str = "(";
-			for (FeatureVector fv : items) {
-				str += fv.name + ",";
-			}
-			str = str.substring(0,str.length()-1);
-			str += ")";
-			return str;
-		}
-
+		
+		String str = "(";
+		for (FeatureVector fv : items)
+			str += fv.getName() + ",";
+		
+		str = str.substring(0, str.length()-1);
+		str += ")";
+		return str;
 	}
 	
 	@Override
@@ -237,24 +117,25 @@ public class Cluster extends FeatureVector {
 			return false;
 
 		Cluster c = (Cluster) o;
-		return this.name.equals(c.name);
+		return this.getName().equals(c.getName());
 	}
 	
 	@Override
 	public int hashCode() {
 		int hash = 7;
-		hash = 37 * hash + (this.name == null ? 0 : this.name.hashCode());
+		hash = 37 * hash + (this.getName() == null ? 0 : this.getName().hashCode());
 		return hash;
 	}
 	
-	public boolean equals(Cluster c) {
-		for (Feature f1 : c) {
-			for (Feature f2 :this ) {
-				if (f1.edge.getTgtStr().equals(f2.edge.getTgtStr()) && (f1.value != f2.value)) {
+	/**
+	 * @deprecated
+	 */
+	public boolean equals(Cluster c) { //TODO replace with the other one
+		for (Feature f1 : c)
+			for (Feature f2 :this )
+				if (f1.getEdge().getTgtStr().equals(f2.getEdge().getTgtStr()) && (!f1.getValue().equals(f2.getValue())))
 					return false;
-				}
-			}
-		}
+
 		return true;
 	}
 	// #endregion MISC -----------------------------------------------------------

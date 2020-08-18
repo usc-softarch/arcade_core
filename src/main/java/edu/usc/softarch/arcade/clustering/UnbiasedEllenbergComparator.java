@@ -18,23 +18,23 @@ class UnbiasedEllenbergComparator extends SimMeasureComparator implements
 				+ ExtractionContext.getCurrentClassAndMethodName());
 		System.out.println("\tc1: " + c1);
 		System.out.println("\tc2: " + c2);
-		System.out.println("\trefCluster: " + refCluster);
+		System.out.println("\trefCluster: " + getRefCluster());
 
 		System.out.println("\tc1 in binary form: " + c1.toBinaryForm());
 		System.out.println("\trefCluster in binary form: "
-				+ refCluster.toBinaryForm());
+				+ getRefCluster().toBinaryForm());
 		System.out.println();
 		System.out.println("\tc2 in binary form: " + c2.toBinaryForm());
 		System.out.println("\trefCluster in binary form: "
-				+ refCluster.toBinaryForm());
-		if (refCluster == null)
+				+ getRefCluster().toBinaryForm());
+		if (getRefCluster() == null)
 			return 0;
 
 		Double unbiasedEllenbergC2 = Double.valueOf(SimCalcUtil.getUnbiasedEllenbergMeasure(c2,
-				refCluster));
+			getRefCluster()));
 
 		int returnValue = unbiasedEllenbergC2.compareTo(SimCalcUtil.getUnbiasedEllenbergMeasure(c1,
-				refCluster));
+			getRefCluster()));
 		System.out.println("\tUnbiasedEllenbergComparator's return value: " + returnValue);
 
 		return returnValue;

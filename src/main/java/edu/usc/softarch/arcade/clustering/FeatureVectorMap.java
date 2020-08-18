@@ -201,7 +201,7 @@ public class FeatureVectorMap {
 
 			// set attribute to staff element
 			Attr attr = doc.createAttribute("name");
-			attr.setValue(fv.name);
+			attr.setValue(fv.getName());
 			fvElem.setAttributeNode(attr);
 
 			rootElement.appendChild(fvElem);
@@ -214,13 +214,13 @@ public class FeatureVectorMap {
 				
 				SootClassEdge fSootEdge = null;
 				
-				if (f.edge instanceof SootClassEdge) {
-					fSootEdge = (SootClassEdge) f.edge;
+				if (f.getEdge() instanceof SootClassEdge) {
+					fSootEdge = (SootClassEdge) f.getEdge();
 				}
 				if (fSootEdge != null) 
 					src.appendChild(doc.createTextNode(fSootEdge.getSrc().toString()));
 				else
-					src.appendChild(doc.createTextNode(f.edge.getSrcStr()));
+					src.appendChild(doc.createTextNode(f.getEdge().getSrcStr()));
 				
 				
 				Element tgt = doc.createElement("tgt");
@@ -228,7 +228,7 @@ public class FeatureVectorMap {
 				if (fSootEdge !=null) 
 					tgt.appendChild(doc.createTextNode(fSootEdge.getTgt().toString()));
 				else 
-					tgt.appendChild(doc.createTextNode(f.edge.getTgtStr()));
+					tgt.appendChild(doc.createTextNode(f.getEdge().getTgtStr()));
 				
 				Element type = doc.createElement("type");
 				type.appendChild(doc.createTextNode(fSootEdge.getType()));
@@ -239,9 +239,9 @@ public class FeatureVectorMap {
 
 				Element valueElem = doc.createElement("value");
 				fElem.appendChild(valueElem);
-				if (f.value == 1)
+				if (f.getValue() == 1)
 					valueElem.appendChild(doc.createTextNode("1"));
-				else if (f.value == 0)
+				else if (f.getValue() == 0)
 					valueElem.appendChild(doc.createTextNode("0"));
 			}
 
@@ -269,16 +269,16 @@ public class FeatureVectorMap {
 	public void constructFeatureVectorMapFromClassGraph(ClassGraph clg) {
 		for (SootClass caller : clg.getNodes()) {
 			FeatureVector vec = new FeatureVector();
-			vec.name = caller.toString();
+			vec.setName(caller.toString());
 			for (SootClass c : clg.getNodes()) {
 				SootClassEdge currEdge = null;
 				for (SootClassEdge edge : clg.getEdges()) {
 					currEdge = edge;
 					if (edge.getSrc().getName().trim().equals(c.getName().trim())) {
-						vec.add(new Feature(new SootClassEdge(edge), 1));
+						vec.add(new Feature(new SootClassEdge(edge), 1.0));
 					}
 				}
-				vec.add(new Feature(new SootClassEdge(currEdge), 0));
+				vec.add(new Feature(new SootClassEdge(currEdge), 0.0));
 			}
 			sc_fv_map.put(caller, vec);
 		}

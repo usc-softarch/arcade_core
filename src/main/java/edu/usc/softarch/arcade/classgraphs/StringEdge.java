@@ -30,6 +30,14 @@ public class StringEdge implements Serializable {
 		initialize(null, null, srcStr, tgtStr, "");
 	}
 
+	/**
+	 * Clone constructor.
+	 */
+	public StringEdge(StringEdge e) {
+		initialize(e.getSrcType(), e.getTgtType(),
+			e.getSrcStr(), e.getTgtStr(), e.getType());
+	}
+
 	private void initialize(ArchElemType srcType, ArchElemType tgtType,
 			String srcStr, String tgtStr, String type) {
 		setSrcType(srcType);

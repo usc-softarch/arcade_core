@@ -109,9 +109,9 @@ public class ADADetector {
 		for (Cluster cluster1 : splitClusters) {
 			for (Cluster cluster2 : splitClusters) {
 				System.out.println("Computing JS divergence for " + cluster1 + " and " + cluster2);
-				if (!(cluster1.docTopicItem == null || cluster2.docTopicItem == null)) {
+				if (!(cluster1.getDocTopicItem() == null || cluster2.getDocTopicItem() == null)) {
 					try {
-						TopicUtil.jsDivergence(cluster1.docTopicItem,cluster2.docTopicItem);
+						TopicUtil.jsDivergence(cluster1.getDocTopicItem(),cluster2.getDocTopicItem());
 					} catch (DistributionSizeMismatchException e) {
 						e.printStackTrace(); //TODO handle it
 					}
@@ -175,22 +175,22 @@ public class ADADetector {
 			int fanOut = 0;
 			int fanIn = 0;
 			for (StringEdge stringEdge : clusterGraph.edges ) {
-				if (stringEdge.getSrcStr().equals(firstCluster.name)) {
+				if (stringEdge.getSrcStr().equals(firstCluster.getName())) {
 					fanOut++;
-					brickFanOutMap.put(firstCluster.name, fanOut);
+					brickFanOutMap.put(firstCluster.getName(), fanOut);
 					System.out.println("\tOutgoing edge" + stringEdge);
 				}
 			}
 			for (StringEdge stringEdge : clusterGraph.edges ) {
-				if (stringEdge.getTgtStr().equals(firstCluster.name)) {
+				if (stringEdge.getTgtStr().equals(firstCluster.getName())) {
 					fanIn++;
-					brickFanInMap.put(firstCluster.name, fanIn);
+					brickFanInMap.put(firstCluster.getName(), fanIn);
 					System.out.println("\tIncoming edge" + stringEdge);
 				}
 			}
 			double stability = ((double)fanOut/(double)(fanOut + fanIn));
 			System.out.println("\tstability: " + stability);
-			brickStabilityMap.put(firstCluster.name, stability);
+			brickStabilityMap.put(firstCluster.getName(), stability);
 		}
 		
 		for (StringEdge stringEdge : clusterGraph.edges ) {
@@ -205,7 +205,7 @@ public class ADADetector {
 		SimpleDirectedGraph<String, DefaultEdge>  directedGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
         
         for (Cluster splitCluster : splitClusters) {
-        	directedGraph.addVertex(splitCluster.name);
+        	directedGraph.addVertex(splitCluster.getName());
         }
         
         for (StringEdge stringEdge : clusterGraph.edges) {
@@ -238,8 +238,8 @@ public class ADADetector {
         
         int sumEdges = 0;
         for (Cluster splitCluster : splitClusters) {
-        	int currFanIn = (brickFanInMap.get(splitCluster.name) == null ? 0 : brickFanInMap.get(splitCluster.name));
-        	int currFanOut = (brickFanOutMap.get(splitCluster.name) == null ? 0 : brickFanOutMap.get(splitCluster.name));
+        	int currFanIn = (brickFanInMap.get(splitCluster.getName()) == null ? 0 : brickFanInMap.get(splitCluster.getName()));
+        	int currFanOut = (brickFanOutMap.get(splitCluster.getName()) == null ? 0 : brickFanOutMap.get(splitCluster.getName()));
         	int totalEdges = currFanIn + currFanOut;
         	sumEdges += totalEdges;
         }
@@ -248,8 +248,8 @@ public class ADADetector {
 		
         int sumForVar = 0;
         for (Cluster splitCluster : splitClusters) {
-        	int currFanIn = (brickFanInMap.get(splitCluster.name) == null ? 0 : brickFanInMap.get(splitCluster.name));
-        	int currFanOut = (brickFanOutMap.get(splitCluster.name) == null ? 0 : brickFanOutMap.get(splitCluster.name));
+        	int currFanIn = (brickFanInMap.get(splitCluster.getName()) == null ? 0 : brickFanInMap.get(splitCluster.getName()));
+        	int currFanOut = (brickFanOutMap.get(splitCluster.getName()) == null ? 0 : brickFanOutMap.get(splitCluster.getName()));
         	int totalEdges = currFanIn + currFanOut;
         	sumForVar += Math.pow(totalEdges-meanEdges,2);
         }
@@ -262,8 +262,8 @@ public class ADADetector {
         
         int brickUseOverloadCount = 0;
         for (Cluster splitCluster : splitClusters) {
-        	int currFanIn = (brickFanInMap.get(splitCluster.name) == null ? 0 : brickFanInMap.get(splitCluster.name));
-        	int currFanOut = (brickFanOutMap.get(splitCluster.name) == null ? 0 : brickFanOutMap.get(splitCluster.name));
+        	int currFanIn = (brickFanInMap.get(splitCluster.getName()) == null ? 0 : brickFanInMap.get(splitCluster.getName()));
+        	int currFanOut = (brickFanOutMap.get(splitCluster.getName()) == null ? 0 : brickFanOutMap.get(splitCluster.getName()));
         	int totalEdges = currFanIn + currFanOut;
         	
         	if (totalEdges > meanEdges + stdDev) {
@@ -297,7 +297,7 @@ public class ADADetector {
 			int ambiguousInterfaceCount) {
 		for (Cluster splitCluster : splitClusters) {
 			System.out.println("Current cluster: " + splitCluster);
-			for (MyClass myClass : splitCluster.classes) {
+			for (MyClass myClass : splitCluster.getClasses()) {
 				System.out.println("\tCurrent class: " + myClass);
 				for (MyMethod myMethod : myClass.getMethods()) {
 					System.out.println("\t\tCurrent method: " + myMethod);
@@ -310,7 +310,7 @@ public class ADADetector {
 								+ targetEdges.size());
 						int relevantTgtMethodCount =0;
 						for (MyMethod tgtMethod : targetEdges) {
-							if (splitCluster.classes
+							if (splitCluster.getClasses()
 									.contains(tgtMethod.getDeclaringClass())) {
 								System.out.println("\t\t\t\tFound relevant taret method: " + tgtMethod);
 								relevantTgtMethodCount++;
@@ -359,7 +359,7 @@ public class ADADetector {
 			int concernNumberThreshold = 1;
 
 			List<TopicItem> relevantTopics = new ArrayList<>();
-			for (TopicItem currTopicItem : firstCluster.docTopicItem.getTopics()) {
+			for (TopicItem currTopicItem : firstCluster.getDocTopicItem().getTopics()) {
 				if (currTopicItem.getProportion() >= proportionThreshold) {
 					relevantTopics.add(currTopicItem);
 				}
@@ -404,9 +404,9 @@ public class ADADetector {
 					strippedLeafSplitClusterName)) {
 				continue;
 			}
-			if (firstCluster.type.equals("spec")) {
+			if (firstCluster.getType().equals("spec")) {
 				for (StringEdge stringEdge : clusterGraph.edges) {
-					if (stringEdge.getSrcStr().equals(firstCluster.name)) {
+					if (stringEdge.getSrcStr().equals(firstCluster.getName())) {
 
 						Cluster targetCluster = getClusterByName(
 								stringEdge.getTgtStr(), splitClusters);
@@ -417,7 +417,7 @@ public class ADADetector {
 						if (invalidInnerClassCluster) {
 							continue;
 						}
-						if (targetCluster.type.equals("indep")) {
+						if (targetCluster.getType().equals("indep")) {
 							Cluster connCluster = targetCluster;
 							Cluster compCluster = firstCluster;
 							Cluster otherCompCluster = findDifferentClusterThatDependsOnConnector(
@@ -438,7 +438,7 @@ public class ADADetector {
 								procCallBasedExtraneousConnectorCount++;
 							}
 						}
-					} else if (stringEdge.getTgtStr().equals(firstCluster.name)) {
+					} else if (stringEdge.getTgtStr().equals(firstCluster.getName())) {
 						Cluster srcCluster = getClusterByName(
 								stringEdge.getSrcStr(), splitClusters);
 						boolean invalidInnerClassCluster = false;
@@ -447,7 +447,7 @@ public class ADADetector {
 						if (invalidInnerClassCluster) {
 							continue;
 						}
-						if (srcCluster.type.equals("indep")) {
+						if (srcCluster.getType().equals("indep")) {
 							Cluster connCluster = srcCluster;
 							Cluster compCluster = firstCluster;
 							Cluster otherCompCluster = findDifferentClusterThatDependsOnConnector(
@@ -507,10 +507,10 @@ public class ADADetector {
 				continue;
 			}
 
-			if (splitCluster.type.equals("indep")) {
+			if (splitCluster.getType().equals("indep")) {
 				continue;
 			}
-			for (MyClass myClass : splitCluster.classes) {
+			for (MyClass myClass : splitCluster.getClasses()) {
 				System.out.println("\tCurrent class: " + myClass);
 				for (MyMethod myMethod : myClass.getMethods()) {
 					System.out.println("\t\tCurrent method: " + myMethod);
@@ -622,14 +622,14 @@ public class ADADetector {
 			List<Cluster> splitClusters, Map<String, MyClass> classes) {
 		for (Cluster cluster : splitClusters) {
 			System.out.println("Determining interfaces for cluster " + cluster);
-			cluster.instantiateClasses();
-			for (Cluster leaf : cluster.leafClusters) {
+			cluster.resetClasses();
+			for (Cluster leaf : cluster.getLeafClusters()) {
 				String strippedLeafClusterName = leaf.toString().substring(1,
 						leaf.toString().length() - 1);
 				System.out.println("\t" + strippedLeafClusterName);
 				if (classes.containsKey(strippedLeafClusterName)) {
 					MyClass myClass = classes.get(strippedLeafClusterName);
-					cluster.add(myClass);
+					cluster.addClass(myClass);
 				}
 
 			}
@@ -644,7 +644,7 @@ public class ADADetector {
 
 		for (Cluster splitCluster : splitClusters) {
 			System.out.println("Current split cluster: " + splitCluster);
-			List<Cluster> currLeafClusters = splitCluster.leafClusters;
+			List<Cluster> currLeafClusters = splitCluster.getLeafClusters();
 			int leafCounter = 0;
 
 			String strippedLeafSplitClusterName = ConfigUtil
@@ -703,9 +703,9 @@ public class ADADetector {
 	private static Cluster findDifferentClusterThatDependsOnConnector(
 			Cluster compCluster, Cluster connCluster, List<Cluster> splitClusters, StringGraph clusterGraph) {
 		for (Cluster cluster : splitClusters) {
-			if (!cluster.name.equals(compCluster.name)) {
+			if (!cluster.getName().equals(compCluster.getName())) {
 				for (StringEdge stringEdge : clusterGraph.edges ) {
-					if (stringEdge.getSrcStr().equals(cluster.name)) {
+					if (stringEdge.getSrcStr().equals(cluster.getName())) {
 						Cluster targetCluster = getClusterByName(stringEdge.getTgtStr(), splitClusters);
 						boolean invalidInnerClassCluster = false;
 						invalidInnerClassCluster = checkIfClusterIsAnInvalidInnerClass(
@@ -713,11 +713,11 @@ public class ADADetector {
 						if (invalidInnerClassCluster) {
 							continue;
 						}
-						if (targetCluster.type.equals("spec") && !targetCluster.name.equals(compCluster.name)) {
+						if (targetCluster.getType().equals("spec") && !targetCluster.getName().equals(compCluster.getName())) {
 							return targetCluster;
 						}
 					}
-					else if (stringEdge.getTgtStr().equals(cluster.name)) {
+					else if (stringEdge.getTgtStr().equals(cluster.getName())) {
 						Cluster srcCluster = getClusterByName(stringEdge.getSrcStr(), splitClusters);
 						boolean invalidInnerClassCluster = false;
 						invalidInnerClassCluster = checkIfClusterIsAnInvalidInnerClass(
@@ -725,7 +725,7 @@ public class ADADetector {
 						if (invalidInnerClassCluster) {
 							continue;
 						}
-						if (srcCluster.type.equals("spec") && !srcCluster.name.equals(compCluster.name)) {
+						if (srcCluster.getType().equals("spec") && !srcCluster.getName().equals(compCluster.getName())) {
 							return srcCluster;
 						}
 					}
@@ -738,7 +738,7 @@ public class ADADetector {
 	private static Cluster getClusterByName(String tgtStr,
 			List<Cluster> splitClusters) {
 		for (Cluster cluster : splitClusters) {
-			if (cluster.name.equals(tgtStr))
+			if (cluster.getName().equals(tgtStr))
 				return cluster;
 		}
 		return null;
@@ -768,7 +768,7 @@ public class ADADetector {
 				continue;
 			}
 
-			for (TopicItem firstTopicItem : firstCluster.docTopicItem.getTopics()) {
+			for (TopicItem firstTopicItem : firstCluster.getDocTopicItem().getTopics()) {
 				if (firstTopicItem.getProportion() > threshold1) {
 					for (Cluster secondCluster : splitClusters) {
 						String strippedSecondClusterName = ConfigUtil
@@ -784,11 +784,11 @@ public class ADADetector {
 								strippedSecondClusterName)) {
 							continue;
 						}
-						for (TopicItem secondTopicItem : secondCluster.docTopicItem.getTopics()) {
+						for (TopicItem secondTopicItem : secondCluster.getDocTopicItem().getTopics()) {
 							
 
 							if (secondTopicItem.getProportion() > threshold2 && firstTopicItem.getTopicNum() == secondTopicItem.getTopicNum()) {
-								for (TopicItem thirdTopicItem : firstCluster.docTopicItem.getTopics()) {
+								for (TopicItem thirdTopicItem : firstCluster.getDocTopicItem().getTopics()) {
 									if (thirdTopicItem.getProportion() > threshold1 && !thirdTopicItem.equals(firstTopicItem)) {
 										
 										System.out.println("\t" + firstCluster + " has scattered topic " + firstTopicItem);
@@ -837,10 +837,10 @@ public class ADADetector {
 				continue;
 			}
 
-			if (splitCluster.type.equals("indep")) {
+			if (splitCluster.getType().equals("indep")) {
 				continue;
 			}
-			for (TopicItem topicItem : splitCluster.docTopicItem.getTopics()) {
+			for (TopicItem topicItem : splitCluster.getDocTopicItem().getTopics()) {
 				System.out.println("\ttopic id : " + topicItem.getTopicNum());
 				System.out.println("\ttopic type : " + topicItem.getType());
 				System.out.println("\ttopic proportion : "
@@ -875,16 +875,16 @@ public class ADADetector {
 				continue;
 			}
 
-			if (splitCluster.type.equals("indep")) {
+			if (splitCluster.getType().equals("indep")) {
 				continue;
 			}
-			for (MyClass myClass : splitCluster.classes) {
+			for (MyClass myClass : splitCluster.getClasses()) {
 				System.out.println("\tCurrent class: " + myClass);
 				for (MyMethod myMethod : myClass.getMethods()) {
 					System.out.println("\t\tCurrent method: " + myMethod);
-					if (splitCluster.type.equals("spec") && myMethod.isPublic() && myMethod.getType().equals("indep")) {
+					if (splitCluster.getType().equals("spec") && myMethod.isPublic() && myMethod.getType().equals("indep")) {
 						System.out.println("\t\t\tFound instance of connector interface implementation...");
-						System.out.println("\t\t\t" + myMethod + " of "+ splitCluster + " has type " + myMethod.getType() + " while " + splitCluster + " has " + splitCluster.type);
+						System.out.println("\t\t\t" + myMethod + " of "+ splitCluster + " has type " + myMethod.getType() + " while " + splitCluster + " has " + splitCluster.getType());
 						connectorInterfaceImplCount++;
 					}
 				}
@@ -903,7 +903,7 @@ public class ADADetector {
 		int nonAnonInnerClassLeafCounter = 0;
 		for (Cluster leaf : currLeafClusters) {
 			System.out.println("\t" + leafCounter + ": " + leaf);
-			System.out.println("\t" + "doc-topic: " + leaf.docTopicItem);
+			System.out.println("\t" + "doc-topic: " + leaf.getDocTopicItem());
 			leafCounter++;
 			String strippedClassName = ConfigUtil
 					.stripParensEnclosedClassNameWithPackageName(leaf);
@@ -917,8 +917,8 @@ public class ADADetector {
 				continue;
 			}
 			nonAnonInnerClassLeafCounter++;
-			for (int j = 0; j < leaf.docTopicItem.size(); j++) {
-				TopicItem currLeafTopicItem = leaf.docTopicItem.getTopics()
+			for (int j = 0; j < leaf.getDocTopicItem().size(); j++) {
+				TopicItem currLeafTopicItem = leaf.getDocTopicItem().getTopics()
 						.get(j);
 				if (haveMatchingTopicItem(topics, currLeafTopicItem)) {
 					TopicItem matchingTopicItem = TopicUtil.getMatchingTopicItem(topics,
@@ -932,24 +932,24 @@ public class ADADetector {
 			}
 
 		}
-		splitCluster.docTopicItem = new DocTopicItem();
+		splitCluster.setDocTopicItem(new DocTopicItem());
 		for (TopicItem topicItem : topics) {
-			splitCluster.docTopicItem.addTopic(new TopicItem(topicItem));
+			splitCluster.addTopicItem(new TopicItem(topicItem));
 		}
 
 		System.out.println("splitCluster " + splitCluster
 				+ "'s new topics summed only...");
-		System.out.println(splitCluster.docTopicItem.getTopics());
+		System.out.println(splitCluster.getDocTopicItem().getTopics());
 		System.out.println("nonAnonInnerClassLeafCounter: "
 				+ nonAnonInnerClassLeafCounter);
 
-		for (TopicItem topicItem : splitCluster.docTopicItem.getTopics()) {
+		for (TopicItem topicItem : splitCluster.getDocTopicItem().getTopics()) {
 			topicItem.divideProportion(nonAnonInnerClassLeafCounter);
 		}
 
 		System.out.println("splitCluster " + splitCluster
 				+ "'s new topics averaged...");
-		System.out.println(splitCluster.docTopicItem.getTopics());
+		System.out.println(splitCluster.getDocTopicItem().getTopics());
 		return nonAnonInnerClassLeafCounter;
 	}
 
@@ -957,7 +957,7 @@ public class ADADetector {
 			Cluster refLeaf) {
 		System.out.println("Copying first leafs topics to new topics...");
 		List<TopicItem> topics = new ArrayList<>();
-		for (TopicItem topicItem : refLeaf.docTopicItem.getTopics()) {
+		for (TopicItem topicItem : refLeaf.getDocTopicItem().getTopics()) {
 			topics.add(new TopicItem(topicItem));
 		}
 
@@ -979,7 +979,7 @@ public class ADADetector {
 			List<Cluster> currLeafClusters) {
 		Cluster refLeaf = null;
 		for (Cluster leaf : currLeafClusters) {
-			if (leaf.docTopicItem != null) {
+			if (leaf.getDocTopicItem() != null) {
 				refLeaf = leaf;
 			}
 		}
@@ -1046,7 +1046,7 @@ public class ADADetector {
 			rootElement.appendChild(clusterElem);
 			clusterElem.setAttribute("name",splitCluster.toString());
 
-			for (MyClass myClass : splitCluster.classes) {
+			for (MyClass myClass : splitCluster.getClasses()) {
 				System.out.println("\tCurrent class: " + myClass);
 				Element classElem = doc.createElement("class");
 				clusterElem.appendChild(classElem);
@@ -1138,7 +1138,7 @@ public class ADADetector {
 				.println("Printing document-topic distribution for each split cluster...");
 		for (Cluster splitCluster : splitClusters) {
 			System.out.println("\t" + splitCluster);
-			System.out.println("\t\t" + splitCluster.docTopicItem);
+			System.out.println("\t\t" + splitCluster.getDocTopicItem());
 		}
 
 	}

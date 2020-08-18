@@ -18,21 +18,21 @@ class JaccardComparator extends SimMeasureComparator implements Comparator<Clust
 				+ ExtractionContext.getCurrentClassAndMethodName());
 		System.out.println("\tc1: " + c1);
 		System.out.println("\tc2: " + c2);
-		System.out.println("\trefCluster: " + refCluster);
+		System.out.println("\trefCluster: " + getRefCluster());
 
 		System.out.println("\tc1 in binary form: " + c1.toBinaryForm());
 		System.out.println("\trefCluster in binary form: "
-				+ refCluster.toBinaryForm());
+				+ getRefCluster().toBinaryForm());
 		System.out.println();
 		System.out.println("\tc2 in binary form: " + c2.toBinaryForm());
 		System.out.println("\trefCluster in binary form: "
-				+ refCluster.toBinaryForm());
+				+ getRefCluster().toBinaryForm());
 
 		Double jaccardSimC2 = Double.valueOf(SimCalcUtil.getJaccardSim(c2,
-				refCluster));
+			getRefCluster()));
 
 		int returnValue = jaccardSimC2.compareTo(SimCalcUtil.getJaccardSim(c1,
-				refCluster));
+			getRefCluster()));
 		System.out.println("\tJaccardComparator's return value: " + returnValue);
 
 		return returnValue;

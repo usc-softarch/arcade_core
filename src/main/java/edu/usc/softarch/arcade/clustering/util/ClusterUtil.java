@@ -75,27 +75,27 @@ public class ClusterUtil {
 		for (Cluster c : clusters) {
 			List<Cluster> startClusters = new ArrayList<>();
 			List<Cluster> leafClusters = getLeafClusters(c, startClusters);
-			logger.debug("Listing each leaf cluster of cluster " + c.name
+			logger.debug("Listing each leaf cluster of cluster " + c.getName()
 					+ "...");
 			int clusterCount = 0;
 			for (Cluster leafC : leafClusters) {
-				logger.debug("\t " + clusterCount + ": " + leafC.name);
+				logger.debug("\t " + clusterCount + ": " + leafC.getName());
 				clusterCount++;
 			}
-			c.leafClusters = leafClusters;
+			c.setLeafClusters(leafClusters);
 		}
 	}
 
 	private static List<Cluster> getLeafClusters(Cluster c,
 			List<Cluster> startClusters) {
-		if (c.left == null && c.right == null) {
+		if (c.getLeft() == null && c.getRight() == null) {
 			startClusters.add(c);
 			return startClusters;
 		} else {
-			if (c.left != null)
-				getLeafClusters(c.left, startClusters);
-			if (c.right != null)
-				getLeafClusters(c.right, startClusters);
+			if (c.getLeft() != null)
+				getLeafClusters(c.getLeft(), startClusters);
+			if (c.getRight() != null)
+				getLeafClusters(c.getRight(), startClusters);
 			return startClusters;
 		}
 	}
@@ -112,17 +112,17 @@ public class ClusterUtil {
 		for (Cluster c1 : splitClusters) {
 			for (Cluster c2 : splitClusters) {
 				for (Feature f : c1) {
-					for (Cluster lc2 : c2.leafClusters) {
-						String lc2NameClean = lc2.name.substring(1,
-								lc2.name.length() - 1).trim();
-						String featureEdgeClean = f.edge.getTgtStr().trim();
+					for (Cluster lc2 : c2.getLeafClusters()) {
+						String lc2NameClean = lc2.getName().substring(1,
+								lc2.getName().length() - 1).trim();
+						String featureEdgeClean = f.getEdge().getTgtStr().trim();
 						logger.debug("featureEdgeClean: " + featureEdgeClean);
 						logger.debug("lc2NameClean: " + lc2NameClean);
 
 						if (featureEdgeClean.equals(lc2NameClean)
-								&& f.value > 0) {
-							clusterGraph.addEdge(new StringEdge(c1.name,
-									c2.name));
+								&& f.getValue() > 0) {
+							clusterGraph.addEdge(new StringEdge(c1.getName(),
+									c2.getName()));
 						}
 					}
 				}
@@ -170,10 +170,10 @@ public class ClusterUtil {
 		for (Cluster c1 : splitClusters) {
 			for (Cluster c2 : splitClusters) {
 				for (Feature f : c1) {
-					for (Cluster lc2 : c2.leafClusters) {
-						String lc2NameClean = lc2.name.substring(1,
-								lc2.name.length() - 1).trim();
-						String featureEdgeClean = f.edge.getTgtStr().trim();
+					for (Cluster lc2 : c2.getLeafClusters()) {
+						String lc2NameClean = lc2.getName().substring(1,
+								lc2.getName().length() - 1).trim();
+						String featureEdgeClean = f.getEdge().getTgtStr().trim();
 						if (debugMethod) {
 							logger.debug("featureEdgeClean: "
 									+ featureEdgeClean);
@@ -181,7 +181,7 @@ public class ClusterUtil {
 						}
 
 						if (featureEdgeClean.equals(lc2NameClean)
-								&& f.value > 0) {
+								&& f.getValue() > 0) {
 							smellArchGraph.addEdge(new ClusterEdge(c1, c2));
 						}
 					}
@@ -238,7 +238,7 @@ public class ClusterUtil {
 								strippedLeafSplitClusterName)) {
 							continue;
 						}
-						for (TopicItem topicItem : splitCluster.docTopicItem.getTopics()) {
+						for (TopicItem topicItem : splitCluster.getDocTopicItem().getTopics()) {
 							if (topicItem.getTopicNum() == topicNum)
 								topicItem.setType(topicItemTypeFromXML);
 						}
@@ -268,7 +268,7 @@ public class ClusterUtil {
 					strippedLeafSplitClusterName)) {
 				continue;
 			}
-			for (TopicItem topicItem : splitCluster.docTopicItem.getTopics()) {
+			for (TopicItem topicItem : splitCluster.getDocTopicItem().getTopics()) {
 				logger.debug("topicNum: " + topicItem.getTopicNum());
 				logger.debug("topicItem.type: " + topicItem.getType());
 			}
@@ -306,8 +306,8 @@ public class ClusterUtil {
 						continue;
 					}
 					logger.debug("Current cluster: " + splitCluster);
-					if (splitCluster.name.equals(clusterName)) {
-						splitCluster.type = clusterType;
+					if (splitCluster.getName().equals(clusterName)) {
+						splitCluster.setType(clusterType);
 					}
 				}
 			}
@@ -317,7 +317,7 @@ public class ClusterUtil {
 		logger.debug("Showing cluster types for all split clusters...");
 		for (Cluster splitCluster : splitClusters) {
 			logger.debug("Current cluster: " + splitCluster);
-			logger.debug("cluster type: " + splitCluster.type);
+			logger.debug("cluster type: " + splitCluster.getType());
 		}
 
 	}
@@ -368,7 +368,7 @@ public class ClusterUtil {
 			rootElement.appendChild(clusterElement);
 
 			Element nameElem = doc.createElement("name");
-			nameElem.appendChild(doc.createTextNode(cluster.name));
+			nameElem.appendChild(doc.createTextNode(cluster.getName()));
 			clusterElement.appendChild(nameElem);
 
 			Element classesElem = doc.createElement("classes");
@@ -392,7 +392,7 @@ public class ClusterUtil {
 			Element docTopicElem = doc.createElement("doc-topic");
 			clusterElement.appendChild(docTopicElem);
 
-			for (TopicItem topicItem : cluster.docTopicItem.getTopics()) {
+			for (TopicItem topicItem : cluster.getDocTopicItem().getTopics()) {
 				Element topicElem = doc.createElement("topic");
 				topicElem.setAttribute("id",
 						Integer.toString(topicItem.getTopicNum()));
@@ -443,7 +443,7 @@ public class ClusterUtil {
 				continue;
 			}
 
-			for (TopicItem topicItem : cluster.docTopicItem.getTopics()) {
+			for (TopicItem topicItem : cluster.getDocTopicItem().getTopics()) {
 				if (topicItem.getType().equals("indep")) {
 					indepTypeWeight += topicItem.getProportion();
 				} else if (topicItem.getType().equals("spec")) {
@@ -455,9 +455,9 @@ public class ClusterUtil {
 				}
 			}
 			if (indepTypeWeight > specTypeWeight) {
-				cluster.type = "indep";
+				cluster.setType("indep");
 			} else {
-				cluster.type = "spec";
+				cluster.setType("spec");
 			}
 		}
 
@@ -506,11 +506,11 @@ public class ClusterUtil {
 			}
 
 			Element clusterElement = doc.createElement("Cluster");
-			clusterElement.setAttribute("type", cluster.type);
+			clusterElement.setAttribute("type", cluster.getType());
 			rootElement.appendChild(clusterElement);
 
 			Element nameElem = doc.createElement("name");
-			nameElem.appendChild(doc.createTextNode(cluster.name));
+			nameElem.appendChild(doc.createTextNode(cluster.getName()));
 			clusterElement.appendChild(nameElem);
 
 			Element classesElem = doc.createElement("classes");
@@ -534,7 +534,7 @@ public class ClusterUtil {
 			Element docTopicElem = doc.createElement("doc-topic");
 			clusterElement.appendChild(docTopicElem);
 
-			for (TopicItem topicItem : cluster.docTopicItem.getTopics()) {
+			for (TopicItem topicItem : cluster.getDocTopicItem().getTopics()) {
 				Element topicElem = doc.createElement("topic");
 				topicElem.setAttribute("id",
 						Integer.toString(topicItem.getTopicNum()));
@@ -586,7 +586,7 @@ public class ClusterUtil {
 		double centroidSum = 0;
 
 		for (Feature f : fv) {
-			centroidSum += f.value;
+			centroidSum += f.getValue();
 		}
 
 		double centroidAvg = centroidSum / fv.size();

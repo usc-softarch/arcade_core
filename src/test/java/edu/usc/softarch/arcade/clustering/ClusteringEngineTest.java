@@ -32,22 +32,22 @@ public class ClusteringEngineTest extends TestCase {
 				e = new SootClassEdge(s1.toString(),s2.toString());
 				Feature f = null;
 				if (e.getSrcStr().equals("A") && e.getTgtStr().equals("A")) {
-					f = new Feature(e,1);
+					f = new Feature(e,1.0);
 				}
 				else if (e.getSrcStr().equals("B") && e.getTgtStr().equals("D")) {
-					f = new Feature(e,1);
+					f = new Feature(e,1.0);
 				}
 				else if (e.getSrcStr().equals("B") && e.getTgtStr().equals("A")) {
-					f = new Feature(e,1);
+					f = new Feature(e,1.0);
 				}
 				else if (e.getSrcStr().equals("A") && e.getTgtStr().equals("B")) {
-					f = new Feature(e,1);
+					f = new Feature(e,1.0);
 				}
 				else if (e.getSrcStr().equals("B") && e.getTgtStr().equals("C")) {
-					f = new Feature(e,1);
+					f = new Feature(e,1.0);
 				}
 				else {
-					f = new Feature(e,0);
+					f = new Feature(e,0.0);
 				}
 				//System.out.println("f: " + f);
 				if (e.getSrcStr().equals("A")) {
@@ -75,22 +75,22 @@ public class ClusteringEngineTest extends TestCase {
 				e = new SootClassEdge(s1.toString(),s2.toString());
 				Feature f = null;
 				if (e.getTgtStr().equals("A")) {
-					f = new Feature(e,1);
+					f = new Feature(e,1.0);
 				}
 				else if (e.getTgtStr().equals("D")) {
-					f = new Feature(e,1);
+					f = new Feature(e,1.0);
 				}
 				else if (e.getSrcStr().equals("A") && e.getTgtStr().equals("A")) {
-					f = new Feature(e,1);
+					f = new Feature(e,1.0);
 				}
 				else if (e.getSrcStr().equals("B") && e.getTgtStr().equals("B")) {
-					f = new Feature(e,1);
+					f = new Feature(e,1.0);
 				}
 				else if (e.getSrcStr().equals("A") && e.getTgtStr().equals("C")) {
-					f = new Feature(e,1);
+					f = new Feature(e,1.0);
 				}
 				else {
-					f = new Feature(e,0);
+					f = new Feature(e,0.0);
 				}
 				//System.out.println("f: " + f);
 				if (e.getSrcStr().equals("A")) {

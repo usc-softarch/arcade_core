@@ -37,11 +37,11 @@ public class ClusterEdge implements Serializable {
 	}
 	
 	public String toString() {
-		return "(" + getSrc().name + "," + getTgt().name + ")";
+		return "(" + getSrc().getName() + "," + getTgt().getName() + ")";
 	}
 	
 	public String toDotString() {
-		return "\t\"" + getSrc().name + "\" -> \"" + getTgt().name + "\";";
+		return "\t\"" + getSrc().getName() + "\" -> \"" + getTgt().getName() + "\";";
 	}
 
 	public void setSrc(Cluster src) {
