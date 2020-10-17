@@ -53,7 +53,7 @@ public class BatchClusteringEngine {
 		}
 	}
 	
-	public static void single (File folder,String[] args,String outputDirName,String inClassesDir) throws Exception{
+	public static void single (File folder,String[] args,String outputDirName,String inClassesDir) throws Exception {
 		if (folder.isDirectory()) {
 			logger.debug("Processing directory: " + folder.getName());
 			String revisionNumber = folder.getName();
@@ -71,10 +71,8 @@ public class BatchClusteringEngine {
 
 			logger.debug("Get deps for revision " + revisionNumber);
 			SourceToDepsBuilder builder = new JavaSourceToDepsBuilder();
-			if (args.length == 4) {
-				if (args[3].equals("c")) {
-					builder = new CSourceToDepsBuilder();
-				}
+			if (args.length == 4 && args[3].equals("c")) {
+				builder = new CSourceToDepsBuilder();
 			}
 			
 			builder.build(fullClassesDir, depsRsfFilename);
@@ -85,23 +83,15 @@ public class BatchClusteringEngine {
 
 			int numTopics = (int) ((double) builder.getNumSourceEntities() * 0.18);
 			String fullSrcDir = folder.getAbsolutePath() + File.separatorChar;
-			String topicModelFilename = outputDirName + File.separatorChar
-					+ revisionNumber + "_" + numTopics + "_topics.mallet";
-			String docTopicsFilename = outputDirName + File.separatorChar
-					+ revisionNumber + "_" + numTopics + "_doc_topics.txt";
-			String topWordsFilename = outputDirName + File.separatorChar
-					+ revisionNumber + "_" + numTopics + "_top_words_per_topic.txt";
 			
-			if (args.length == 4) {
-				if (args[3].equals("c")) {
-					Config.selectedLanguage = Config.Language.c;
-				}
+			if (args.length == 4 && args[3].equals("c")) {
+				Config.selectedLanguage = Config.Language.c;
 			}
 			
 			ConcernClusteringRunner runner = new ConcernClusteringRunner(
 					builder.getFfVecs(),
 					TopicModelExtractionMethod.MALLET_API, fullSrcDir,
-					outputDirName+"/base", numTopics, topicModelFilename, docTopicsFilename, topWordsFilename);
+					outputDirName+"/base", numTopics);
 
 			// have to set some Config settings before executing the runner
 			int numClusters = (int) ((double) runner.getFastClusters()

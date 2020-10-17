@@ -1,7 +1,5 @@
 package edu.usc.softarch.arcade.clustering;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,14 +29,15 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	 * @param numTopics number of topics to extract
 	 */
 	ConcernClusteringRunner(FastFeatureVectors vecs,
-			TopicModelExtractionMethod tmeMethod, String srcDir,String artifactsDir, int numTopics,
-			String topicModelFilename, String docTopicsFilename, String topWordsFilename) {
+			TopicModelExtractionMethod tmeMethod, String srcDir, String artifactsDir,
+			int numTopics) {
 		setFastFeatureVectors(vecs);
 		initializeClusters(srcDir);	
-		initializeDocTopicsForEachFastCluster(tmeMethod,srcDir,artifactsDir,numTopics,topicModelFilename,docTopicsFilename,topWordsFilename);
+		initializeDocTopicsForEachFastCluster(tmeMethod, srcDir, artifactsDir);
 	}
 	
-	public void computeClustersWithConcernsAndFastClusters(StoppingCriterion stoppingCriterion) {
+	public void computeClustersWithConcernsAndFastClusters(
+			StoppingCriterion stoppingCriterion) {
 		StopWatch loopSummaryStopwatch = new StopWatch();
 
 		loopSummaryStopwatch.start();
@@ -58,7 +57,6 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				checkAndUpdateClusterGain(clusterGain);
 			}
 
-			
 			StopWatch timer = new StopWatch();
 			timer.start();
 			MaxSimData data  = identifyMostSimClusters(simMatrix);
@@ -66,30 +64,15 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			logger.debug("time to identify two most similar clusters: "
 					+ timer.getElapsedTime());
 			
-			boolean isPrintingTwoMostSimilar = true;
-			if (isPrintingTwoMostSimilar) {
-				printDataForTwoMostSimilarClustersWithTopicsForConcerns(data);
-			}
+			printDataForTwoMostSimilarClustersWithTopicsForConcerns(data);
 
 			FastCluster newCluster = mergeFastClustersUsingTopics(data);
 
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix);
 			
-			
 			performPostProcessingConditionally();
 
-			boolean isShowingPostMergeClusterInfo = false;
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("after merge, clusters size: "
-						+ fastClusters.size());
-			}
-			if (isShowingPostMergeClusterInfo) {
-				if (logger.isDebugEnabled()) {
-					ClusterUtil.printFastClustersByLine(fastClusters);
-					logger.debug("\n");
-				}
-			}
+			logger.debug("after merge, clusters size: " + fastClusters.size());
 		}
 
 		loopSummaryStopwatch.stop();
@@ -133,34 +116,24 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 
 	private void initializeDocTopicsForEachFastCluster(
-			TopicModelExtractionMethod tmeMethod, String srcDir, String artifactsDir, int numTopics,
-			String topicModelFilename, String docTopicsFilename,
-			String topWordsFilename) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Initializing doc-topics for each cluster...");
-		}
+			TopicModelExtractionMethod tmeMethod, String srcDir,
+			String artifactsDir) {
+		logger.debug("Initializing doc-topics for each cluster...");
 
 		if (tmeMethod == TopicModelExtractionMethod.VAR_MALLET_FILE) {
 			TopicUtil.docTopics = TopicUtil.getDocTopicsFromVariableMalletDocTopicsFile();
-			for (FastCluster c : fastClusters) {
+			for (FastCluster c : fastClusters)
 				TopicUtil.setDocTopicForFastClusterForMalletFile(TopicUtil.docTopics, c);
-			}
 		}
 		else if (tmeMethod == TopicModelExtractionMethod.MALLET_API) {
 			try {
 				TopicUtil.docTopics = new DocTopics(srcDir,artifactsDir);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			for (FastCluster c : fastClusters) {
+			for (FastCluster c : fastClusters)
 				TopicUtil.setDocTopicForFastClusterForMalletApi(c);
-			}
 		}
-		
 		
 		List<FastCluster> jspRemoveList = new ArrayList<>();
 		for (FastCluster c : fastClusters) {
@@ -171,9 +144,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		}
 
 		logger.debug("Removing jspRemoveList from fastCluters");
-		for (FastCluster c : jspRemoveList) {
+		for (FastCluster c : jspRemoveList)
 			fastClusters.remove(c);
-		}
 		
 		Map<String,String> parentClassMap = new HashMap<>();
 		for (FastCluster c : fastClusters) {
@@ -188,11 +160,9 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		logger.debug("Removing singleton clusters with no doc-topic and are non-inner classes...");
 		List<FastCluster> excessClusters = new ArrayList<>();
 		for (FastCluster c : fastClusters) {
-			if (c.docTopicItem == null) {
-				if (!c.getName().contains("$")) {
-					logger.error("Could not find doc-topic for non-inner class: " + c.getName());
-					excessClusters.add(c);
-				}
+			if (c.docTopicItem == null && !c.getName().contains("$")) {
+				logger.error("Could not find doc-topic for non-inner class: " + c.getName());
+				excessClusters.add(c);
 			}
 		}
 		
@@ -225,8 +195,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 					}
 				}
 			}
+		}
 
-		}		
 		fastClusters = updatedFastClusters;
 		
 		List<FastCluster> clustersWithMissingDocTopics = new ArrayList<>();
