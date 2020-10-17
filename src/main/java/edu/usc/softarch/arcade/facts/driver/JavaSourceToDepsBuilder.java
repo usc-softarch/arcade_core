@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.PropertyConfigurator;
 
 import classycle.Analyser;
 import classycle.ClassAttributes;
@@ -24,8 +23,6 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 	// #region FIELDS ------------------------------------------------------------
 	private FastFeatureVectors ffVecs = null;
 	private int numSourceEntities = 0;
-	private static String loggingConfigFilename = "cfg" + File.separator + 
-		"extractor_logging.cfg"; //TODO Make this come from outside
 	// #endregion FIELDS ---------------------------------------------------------
 	
 	// #region ACCESSORS ---------------------------------------------------------
@@ -47,10 +44,9 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 
 	public void build(String classesDirPath, String depsRsfFilename)
 			throws IOException {
-		PropertyConfigurator.configure(loggingConfigFilename);
-		
 		String[] inputClasses = { FileUtil.tildeExpandPath(classesDirPath) };
 		String depsRsfFilepath = FileUtil.tildeExpandPath(depsRsfFilename);
+		(new File(depsRsfFilepath)).getParentFile().mkdirs();
 		
 		// Classycle gets a list of directories and/or files and runs an analysis
 		// on everything it received.
