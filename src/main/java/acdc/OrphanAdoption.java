@@ -1,24 +1,17 @@
 package acdc;
+
 import java.util.Collections;
 import java.util.ArrayList;
 
-import java.util.Comparator;
-
-//import java.util.Enumeration;
-//import java.util.HashSet;
-//import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-
-
-import soot.JastAddJ.List;
 
 /**
  * This pattern finds and moves children of the root node which are not
@@ -32,568 +25,345 @@ import soot.JastAddJ.List;
  * which has the largest number of children being targets of the
  * orphan, wins it.
  *
+ * The clustring method has been modified in order to make the
+ * algorithm deterministic
  */
-// The clustring method has been modified in order to make the algorithm deterministic
-
-public class OrphanAdoption extends Pattern
-{
-	public OrphanAdoption(DefaultMutableTreeNode _root)
-	{
+public class OrphanAdoption extends Pattern {
+	public OrphanAdoption(DefaultMutableTreeNode _root)	{
 		super(_root);
 		name = "Orphan Adoption";
 	}
 
-	public void execute()
-	{
-		Vector vModified = new Vector();
-		Vector vAdopted;
+	public void execute()	{
+		List<Node> vModified = new ArrayList<>();
+		List<Node> vAdopted;
 		// Run oneRoundForward as many times as the #orphans is decreasing
-		vAdopted = manyRoundsForward();
+		manyRoundsForward();
 
-		int on, prevon;
-		on = orphanNumber();
-		prevon = on + 1;
-		while(on < prevon)
-		{
+		int on = orphanNumber();
+		int prevon = on + 1;
+		while(on < prevon) {
 			IO.put("Orphan Number: " + on,2);
 			prevon = on;
 			vAdopted = oneRoundReverse();
 			vModified.addAll(vAdopted);
-			if (orphanNumber() > 0)
-			{
+			if (orphanNumber() > 0)	{
 				vAdopted = manyRoundsForward();
 				vModified.addAll(vAdopted);
 			}
 			on = orphanNumber();
 		}
-		induceEdges(vModified,root);
+		induceEdges(vModified);
 	}
 
-	public Vector oneRoundReverse()
-	{
-		Vector vReturn = new Vector();
-		Vector vRootChildren = nodeChildren(root);
+	public List<Node> oneRoundReverse()	{
+		List<Node> vReturn = new ArrayList<>();
+		List<Node> vRootChildren = nodeChildren(root);
+
 		// Keeps the cluster-nodes which are competing for this orphan
+		Map<Node, Double> ht;
 
-		//Hashtable ht = new Hashtable(10000);
-		//  Hashtable is Replaced with LinkedHashMap
-		LinkedHashMap ht = new LinkedHashMap (10000);
+		for (int j = 0; j < vRootChildren.size(); j++) {
+			Node ncurr = vRootChildren.get(j);
+			DefaultMutableTreeNode curr = ncurr.getTreeNode();
 
-	for(int j=0; j<vRootChildren.size();j++)
-	{
-	   Node ncurr = (Node)vRootChildren.elementAt(j);
-	   DefaultMutableTreeNode curr = (DefaultMutableTreeNode)ncurr.getTreeNode();
+			if(!ncurr.isCluster()) {
+				ht = new LinkedHashMap<>(10000);
+				IO.put("ROA:\torphan =: "+ ncurr.getName(),2);
 
-		if(!ncurr.isCluster())
-		{
+				// a set of the nodes to which the current orphan points to
+				SortedSet<Node> targets = new TreeSet<>();
+				targets.addAll(ncurr.getTargets());
 
-		//ht = new Hashtable(10000);
-		// Hashttable is replaced with LinkedHashMap
-		ht= new LinkedHashMap (10000) ;
+				Iterator<Node> itargets = targets.iterator();
+				while (itargets.hasNext()) {
+					Node ncurr_target = itargets.next();
+					DefaultMutableTreeNode curr_target = (ncurr_target.getTreeNode());
+					double counter = 0;
 
-		IO.put("ROA:\torphan =: "+ ncurr.getName(),2);
+					/**********************************************************************
+						NOTE: retain only targets of the orphan which are clusters <-- only 
+						the cluster	which is lowest in the tree should adopt the orphan
+					***********************************************************************/
 
-		//a set of the nodes to which the current orphan points to
-		//HashSet targets = ncurr.getTargets();
-		// HashSet is replaced with SortedSet
-		SortedSet targets = new TreeSet () ;
-		targets.addAll(ncurr.getTargets());
-		//if(targets.isEmpty())
-			//IO.put("orphan =:"+ncurr.getName()+" has NO TARGETS!");
+					// ignore root and its children as targets of the orphan
+					// also ignore targets of the orphan which are clusters
+					if(curr_target.getLevel()>1 && !ncurr_target.isCluster())	{
+						// the parent of this target is competing for the orphan
+						DefaultMutableTreeNode parent = (DefaultMutableTreeNode) curr_target.getParent();
+						Node nparent = (Node) parent.getUserObject();
+						// if parent is orphan or root, do nothing
+						if (!(nparent.getName().equalsIgnoreCase(ncurr.getName())
+								|| nparent.getName().equalsIgnoreCase("ROOT"))) {
+							boolean stop = false;
+							while(!stop && !nparent.isCluster()) {
+								parent = (DefaultMutableTreeNode) parent.getParent();
+								nparent = (Node) parent.getUserObject();
 
-		Iterator itargets = targets.iterator();
-		while (itargets.hasNext())
-		{
-			Node ncurr_target = (Node)(itargets.next());
-			DefaultMutableTreeNode curr_target =
-				(DefaultMutableTreeNode)(ncurr_target.getTreeNode());
+								// parent of the source is root or is the orphan
+								if(nparent.getName().equalsIgnoreCase(ncurr.getName())
+										|| nparent.getName().equalsIgnoreCase("ROOT")) {
+									stop = true;
+								}
+							}
+						}
 
-			double counter = 0;
+						if(nparent.isCluster()) {
+							// Case1: parent already in the hashtable
+							if(ht.containsKey(nparent)) {
+								// counter value get incremented by one unit
+								Double i = ht.get(nparent);
+								counter = i.doubleValue();
+								counter++;
+								// remove source with old counter value from the hashtable
+								ht.remove(nparent);
+								// add the source to the hashtable with the updated counter value
+								ht.put(nparent, Double.valueOf(counter));
+							} else { // Case2: parent was not in the hashtable
+								counter = 0;
+								SortedSet<Node> c_targets = new TreeSet<>();
 
-			 /**********************************************************************************
+								//Enumeration is replaced with an iterator on a sorted list
+								List<TreeNode> tempALBase =
+									Collections.list(parent.breadthFirstEnumeration());
+								List<DefaultMutableTreeNode> tempAL = new ArrayList<>();
+								for(TreeNode node : tempALBase)
+									tempAL.add((DefaultMutableTreeNode)node);
+								Collections.sort(tempAL,
+									(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) -> {
+										Node n1 = (Node)o1.getUserObject();
+										Node n2 = (Node)o2.getUserObject();
+										return n1.getName().compareTo(n2.getName());
+									}
+								);
+								Iterator<DefaultMutableTreeNode> ps = tempAL.iterator();
 
-			  NOTE: retain only targets of the orphan which are clusters <-- only the cluster
-					which is lowest in the tree should adopt the orphan,
-			 *********************************************************************************/
+								while (ps.hasNext()) {
+									DefaultMutableTreeNode ps_curr = ps.next();
+									Node nps_curr = (Node) ps_curr.getUserObject();
+									c_targets.clear();
+									c_targets.addAll(nps_curr.getTargets());
+									if (c_targets.contains(ncurr)) counter = counter + 0.000001;
+								}
 
-			//ignore root and its children  as targets of the orphan;
-			//also ignore targets of the orphan which are clusters
-			if(curr_target.getLevel()>1 && !ncurr_target.isCluster())
-			{
-
-
-			//IO.put("Rorphan := "+ ncurr.getName() +":::::::::::::: target =: "
-															   //+ncurr_target.getName());
-
-			//the parent of this target is competing for the orphan
-			DefaultMutableTreeNode parent =(DefaultMutableTreeNode)curr_target.getParent();
-			Node nparent = (Node)parent.getUserObject();
-			//IO.put("::::::: whose parent is :=  ");
-			//if parent is orphan or root, do nothing
-			if(nparent.getName().equalsIgnoreCase(ncurr.getName()) || nparent.getName().equalsIgnoreCase("ROOT"))
-					;
-					//IO.put("\nParent of target of orphan " + ncurr.getName() +
-						//" is Root or the orphan itself.\n");
-			else
-			{
-				boolean stop = false;
-				while(!stop && !nparent.isCluster())
-				{
-					parent = (DefaultMutableTreeNode)parent.getParent();
-					nparent = (Node)parent.getUserObject();
-
-					//parent of the source is root or is the orphan
-					if(nparent.getName().equalsIgnoreCase(ncurr.getName()) ||
-										   nparent.getName().equalsIgnoreCase("ROOT"))
-					{
-
-						stop = true;
+								//add parent to the hashtable with a counter value incremented
+								// by one more unit
+								ht.put(nparent, Double.valueOf(++counter));
+							}
+						}
 					}
 				}
-			}
 
-			if(nparent.isCluster())
-			{
-				//dvalues, ivalues, ivalue --> needed for printing only
-				//Collection dvalues;
-				//Vector ivalues;
-				//Double ivalue;
+				if(ht.isEmpty()) IO.put("\tNOT\t adopted", 2);
+				//the hashtable now contains all the candidate nodes for adopting the orphan
+				//the node in the hashtable with the highest counter value will get the orphan
+				if(!ht.isEmpty()) {
+					double max_value = 0;
+					Node max_key = new Node("faraz","oana");
 
-				//IO.put(nparent.getName());
+					Iterator<Node> keys = ht.keySet().iterator();
+					while (keys.hasNext()) {
+						Node curr_key = keys.next();
 
-				//Case1: parent already in the hashtable
-				if(ht.containsKey(nparent))
-				{
-				   //counter value get incremented by one unit
-					Double i = (Double)ht.get(nparent);
+						Double curr_value = ht.get(curr_key);
 
-					//IO.put(", iCounter:= " + i);
-
-					counter = i.doubleValue();
-					counter++;
-					//remove source with old counter value from the hashtable
-					ht.remove(nparent);
-					//add the source back to the hashtable with the updated counter value
-					ht.put(nparent, new Double(counter));
-
-					//IO.put(", fCounter not new:= "+ counter);
-
-					/*
-					IO.put("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-					dvalues = ht.values();
-					ivalues = new Vector(dvalues);
-					for(int j=0; j<ivalues.size(); j++)
-					{
-						ivalue = (Double)ivalues.elementAt(j);
-						IO.put("Value of Hashtable **** " + ivalue.doubleValue());
+						if(curr_value.doubleValue() >= max_value)	{
+							max_value = curr_value.doubleValue() ;
+							max_key = curr_key;
+						}
 					}
-					IO.put("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-					*/
-				}
-				//Case2: parent was not in the hashtable
-				else
-				{
-						counter = 0;
 
-					//HashSet c_targets = new HashSet();
-					// HashSet is replaced with SortedSet
-					SortedSet c_targets = new TreeSet () ;
+					DefaultMutableTreeNode max = max_key.getTreeNode();
+					max.add(curr);
 
-					//Enumeration ps = parent.breadthFirstEnumeration();
-					//Enumberation is replaced with an iterator on a sorted list
-					ArrayList<TreeNode> tempALBase = Collections.list(parent.breadthFirstEnumeration());
-					ArrayList<DefaultMutableTreeNode> tempAL = new ArrayList<DefaultMutableTreeNode>();
-					for(TreeNode node : tempALBase)
-					{
+					List<TreeNode> tempALBase =
+						Collections.list(curr.breadthFirstEnumeration());
+					List<DefaultMutableTreeNode> tempAL = new ArrayList<>();
+					for (TreeNode node : tempALBase)
 						tempAL.add((DefaultMutableTreeNode)node);
-					}
-					Collections.sort(tempAL, new Comparator<DefaultMutableTreeNode>() {
-						@Override
-					    public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) {
-					        Node n1 = (Node)o1.getUserObject();
-					        Node n2 = (Node)o2.getUserObject();
+					Collections.sort(tempAL,
+						(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) -> {
+							Node n1 = (Node) o1.getUserObject();
+							Node n2 = (Node) o2.getUserObject();
 							return n1.getName().compareTo(n2.getName());
-					    }
-					});
-					Iterator ps = tempAL.iterator();
-
-					//while(ps.hasMoreElements()){
-					while (ps.hasNext()){
-						//DefaultMutableTreeNode ps_curr = (DefaultMutableTreeNode)ps.nextElement();
-						DefaultMutableTreeNode ps_curr = (DefaultMutableTreeNode)ps.next();
-						Node nps_curr = (Node)ps_curr.getUserObject();
-						//c_targets= nps_curr.getTargets();
-						c_targets.clear();
-						c_targets.addAll(nps_curr.getTargets()) ;
-						if(c_targets.contains(ncurr))
-						{	counter = counter + 0.000001;
-							//IO.put(", Counter:= "+ counter);
 						}
+					);
+
+					Iterator<DefaultMutableTreeNode> emax = tempAL.iterator();
+
+					while (emax.hasNext()){
+						DefaultMutableTreeNode ec = emax.next();
+						if(!vReturn.contains(ec.getUserObject()))
+							vReturn.add((Node)ec.getUserObject());
 					}
-
-					//add parent to the hashtable with a counter value incremented by one more unit
-					ht.put(nparent, new Double(++counter));
-					//IO.put(", Counter:= "+ counter);
-
-					/*
-					IO.put("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-					dvalues = ht.values();
-					ivalues = new Vector(dvalues);
-						for(int i=0; i<ivalues.size(); i++)
-						{
-							ivalue = (Double)ivalues.elementAt(i);
-							IO.put("Value of Hashtable **** " + ivalue.doubleValue());
-						}
-						IO.put("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-					*/
+					IO.put("\twas adopted by ***\t" + max_key.getName(),2);
 				}
 			}
-
-				}
-
-		}// end while
-
-		if(ht.isEmpty())
-			IO.put("\tNOT\t adopted",2);
-		//the hashtable now contains all the candidate nodes for adopting the orphan
-		//the node in the hashtable with the highest counter value will get the orphan
-		if(!ht.isEmpty())
-		{
-			double max_value = 0;
-			Node max_key = new Node("faraz","oana");
-
-			/*
-			Collection cvalues = ht.values();
-			Vector values = new Vector(cvalues);
-			for(int i=0; i<values.size(); i++)
-			{
-				Double value = (Double)values.elementAt(i);
-				IO.put("Value of Hashtable **** " + value.doubleValue());
-			}
-			*/
-
-			//Enumeration keys = ht.keys();
-			Iterator keys = ht.keySet().iterator();
-			//while (keys.hasMoreElements()){
-			while (keys.hasNext()) {
-			//Node curr_key =  (Node)keys.nextElement();
-			Node curr_key =  (Node)keys.next();
-			//System.out.println("Enum Pooy: " + curr_key.getName());
-			//IO.put("Hashtable contains: ");
-			//curr_key.print();
-
-			Double curr_value = (Double)ht.get(curr_key);
-			//IO.put(", Value := " + curr_value.doubleValue());
-
-
-			if(curr_value.doubleValue() >= max_value)
-			{
-				max_value = curr_value.doubleValue() ;
-				max_key = curr_key;
-			}
-
-			}
-
-			DefaultMutableTreeNode max = (DefaultMutableTreeNode)(max_key.getTreeNode());
-			max.add(curr);
-
-			//Enumeration emax = curr.breadthFirstEnumeration();
-			ArrayList<TreeNode> tempALBase = Collections.list(curr.breadthFirstEnumeration());
-			ArrayList<DefaultMutableTreeNode> tempAL = new ArrayList<DefaultMutableTreeNode>();
-			for(TreeNode node : tempALBase)
-			{
-				tempAL.add((DefaultMutableTreeNode)node);
-			}
-			Collections.sort(tempAL, new Comparator<DefaultMutableTreeNode>() {
-				@Override
-			    public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) {
-			        Node n1 = (Node)o1.getUserObject();
-			        Node n2 = (Node)o2.getUserObject();
-					return n1.getName().compareTo(n2.getName());
-			    }
-			});
-
-			Iterator emax = tempAL.iterator();
-
-			//while(emax.hasMoreElements()){
-			while (emax.hasNext()){
-				//DefaultMutableTreeNode ec = (DefaultMutableTreeNode)emax.nextElement();
-				DefaultMutableTreeNode ec = (DefaultMutableTreeNode)emax.next();
-			if(!vReturn.contains((Node)ec.getUserObject()))
-				vReturn.add((Node)ec.getUserObject());
-			}
-
-			IO.put("\twas adopted by ***\t" + max_key.getName(),2);
-
 		}
-		}// end if
-	}// end while
-
-	return vReturn;
+		return vReturn;
 	}
 
-	public Vector manyRoundsForward()
-	{
-		Vector result = new Vector();
-		Vector vAdopted;
+	public List<Node> manyRoundsForward() {
+		List<Node> result = new ArrayList<>();
+		List<Node> vAdopted;
 		// Run oneRoundForward as many times as the #orphans is decreasing
-		do
-		{
+		do {
 			vAdopted = oneRoundForward();
-			IO.put("Before "+vAdopted.size(),2);
+			IO.put("Before " + vAdopted.size(),2);
 			result.addAll(vAdopted);
-			IO.put("After "+vAdopted.size()+"",2);
-		}
-		while(vAdopted.size() > 0);
+			IO.put("After " + vAdopted.size()+"",2);
+		}	while(!vAdopted.isEmpty());
 		return result;
 	}
 
-	public Vector oneRoundForward ()
-	{
-		Vector vReturn = new Vector();
+	public List<Node> oneRoundForward() {
+		List<Node> vReturn = new ArrayList<>();
 		//vector will contain the orphans adopted
-		Vector vRootChildren = nodeChildren(root);
+		List<Node> vRootChildren = nodeChildren(root);
 
-		// Hashtable keeps track of the nodes competing for the current orphan
-		//Hashtable ht = new Hashtable(10000);
-		LinkedHashMap ht = new LinkedHashMap(10000) ;
-		for (int j = 0; j < vRootChildren.size(); j++)
-		{
-			Node ncurr = (Node) vRootChildren.elementAt(j);
-			DefaultMutableTreeNode curr = (DefaultMutableTreeNode) ncurr.getTreeNode();
+		// Map keeps track of the nodes competing for the current orphan
+		Map<Node, Double> ht;
+		for (int j = 0; j < vRootChildren.size(); j++) {
+			Node ncurr = vRootChildren.get(j);
+			DefaultMutableTreeNode curr = ncurr.getTreeNode();
 
-			if (!ncurr.isCluster())
-			{
+			if (!ncurr.isCluster())	{
 				//begin with an empty hashtable for each orphan
-				ht = new LinkedHashMap(10000);
+				ht = new LinkedHashMap<>(10000);
 				IO.put("OA:\torphan  =: " + ncurr.getName(), 2);
 
 				//sources = set of nodes which point to the current orphan
-				//HashSet sources = ncurr.getSources();
-				SortedSet sources = new TreeSet() ;
-				sources.addAll(ncurr.getSources()) ;
-				//ncurr.printSources();
-				//if(sources.isEmpty())
-				//IO.put("orphan =:"+ncurr.getName()+" has NO SOURCES!");
-				Iterator isources = sources.iterator();
+				SortedSet<Node> sources = new TreeSet<>();
+				sources.addAll(ncurr.getSources());
+				Iterator<Node> isources = sources.iterator();
+
 				//iterate through the sources
-
-				while (isources.hasNext())
-				{
-					Node ncurr_source = (Node) (isources.next());
-					//IO.put("\tSource =: " +ncurr_source.getName());
-					DefaultMutableTreeNode curr_source =
-						(DefaultMutableTreeNode) (ncurr_source.getTreeNode());
-
+				while (isources.hasNext()) {
+					Node ncurr_source = isources.next();
+					DefaultMutableTreeNode curr_source = (ncurr_source.getTreeNode());
 					double counter = 0;
 
-					/**********************************************************************************
-
-					  NOTE: retain only sources of the orphan which are clusters <-- only the cluster
-					        which is lowest in the tree should adopt the orphan,
-					 *********************************************************************************/
-
-					//ignore root and its children  as sources of the orphan;
-
-					//      --> we ignore sources of the orphan which are clusters
-					if (curr_source.getLevel() > 1 && !ncurr_source.isCluster())
-					{
-						//IO.put("orphan := "+ ncurr.getName() +":::::::::::::: source =: " +ncurr_source.getName());
-
+					/********************************************************************
+						NOTE: retain only sources of the orphan which are clusters <-- only
+						 the cluster which is lowest in the tree should adopt the orphan,
+					 ********************************************************************/
+					// ignore root and its children  as sources of the orphan
+					// --> we ignore sources of the orphan which are clusters
+					if (curr_source.getLevel() > 1 && !ncurr_source.isCluster()) {
 						//the parent of this source is competing for the orphan
 						DefaultMutableTreeNode parent =
 							(DefaultMutableTreeNode) curr_source.getParent();
 						Node nparent = (Node) parent.getUserObject();
-						//IO.put("::::::: whose parent is :=  ");
 
 						//if parent is orphan or root, do nothing
-						if (nparent.getName().equalsIgnoreCase(ncurr.getName())
-							|| nparent.getName().equalsIgnoreCase("ROOT"));
-						else {
+						if (!(nparent.getName().equalsIgnoreCase(ncurr.getName())
+								|| nparent.getName().equalsIgnoreCase("ROOT"))) {
 							boolean stop = false;
 							while (!stop && !nparent.isCluster()) {
-								parent =
-									(DefaultMutableTreeNode) parent.getParent();
+								parent = (DefaultMutableTreeNode) parent.getParent();
 								nparent = (Node) parent.getUserObject();
-								//System.out.println("nparents pooy: "+nparent.getName());
 								//parent of the source is root or is the orphan
 								if (nparent.getName().equalsIgnoreCase(ncurr.getName())
-									|| nparent.getName().equalsIgnoreCase("ROOT")) {
-
+										|| nparent.getName().equalsIgnoreCase("ROOT")) {
 									stop = true;
 								}
 							}
 						}
 
 						if (nparent.isCluster()) {
-							//dvalues, ivalues, ivalue --> needed for printing only
-							//Collection dvalues;
-							//Vector ivalues;
-							//Double ivalue;
-
-							//IO.put(nparent.getName());
 							//Case1: parent already in the hashtable
 							if (ht.containsKey(nparent)) {
 								//counter value get incremented by one unit
-								Double i = (Double) ht.get(nparent);
-								//IO.put(", iCounter:= " + i);
+								Double i = ht.get(nparent);
 								counter = i.doubleValue();
 								counter++;
-								//remove source with old counter value from the hashtable
+								//remove source with old counter value from the map
 								ht.remove(nparent);
-								//add the source back to the hashtable with the updated counter value
-								ht.put(nparent, new Double(counter));
-								//IO.put(", fCounter not new:= "+ counter);
-
-								/*
-								IO.put("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-								dvalues = ht.values();
-								ivalues = new Vector(dvalues);
-								for(int j=0; j<ivalues.size(); j++)
-								{
-									ivalue = (Double)ivalues.elementAt(j);
-									IO.put("Value of Hashtable **** " + ivalue.doubleValue());
-								}
-								IO.put("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-								*/
+								//add the source to the map with the updated counter value
+								ht.put(nparent, Double.valueOf(counter));
 							}
 							//Case2: parent not in the hashtable
 							else {
 								counter = 0;
-								//HashSet c_sources = new HashSet();
-								SortedSet c_sources = new TreeSet() ;
-								//Enumeration ps =parent.breadthFirstEnumeration();
+								SortedSet<Node> c_sources = new TreeSet<>() ;
 
-								ArrayList<TreeNode> tempALBase = Collections.list(parent.breadthFirstEnumeration());
-								ArrayList<DefaultMutableTreeNode> tempAL = new ArrayList<DefaultMutableTreeNode>();
+								List<TreeNode> tempALBase = Collections.list(parent.breadthFirstEnumeration());
+								List<DefaultMutableTreeNode> tempAL = new ArrayList<>();
 								for(TreeNode node : tempALBase)
-								{
 									tempAL.add((DefaultMutableTreeNode)node);
-								}
-								Collections.sort(tempAL, new Comparator<DefaultMutableTreeNode>() {
-									@Override
-								    public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) {
-								        Node n1 = (Node)o1.getUserObject();
-								        Node n2 = (Node)o2.getUserObject();
+								Collections.sort(tempAL,
+									(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) -> {
+										Node n1 = (Node)o1.getUserObject();
+										Node n2 = (Node)o2.getUserObject();
 										return n1.getName().compareTo(n2.getName());
-								    }
-								});
-								Iterator ps = tempAL.iterator();
+									}
+								);
+								Iterator<DefaultMutableTreeNode> ps = tempAL.iterator();
 
-								//ps.nextElement();
 								ps.next();
-								//don't count the parent itself which surely points to curr due to edge induction
-								//while (ps.hasMoreElements()) {
-								while (ps.hasNext()){
-									//DefaultMutableTreeNode ps_curr = (DefaultMutableTreeNode) ps.nextElement();
-									DefaultMutableTreeNode ps_curr = (DefaultMutableTreeNode) ps.next();
-									Node nps_curr =
-										(Node) ps_curr.getUserObject();
-									//System.out.println("nps_curr pooy: "+ nps_curr.getName());
-									//c_sources = nps_curr.getSources();
+								// don't count the parent itself which surely points to
+								// curr due to edge induction
+								while (ps.hasNext()) {
+									DefaultMutableTreeNode ps_curr = ps.next();
+									Node nps_curr =	(Node) ps_curr.getUserObject();
 									c_sources.clear();
 									c_sources.addAll(nps_curr.getSources());
-									if (c_sources.contains(ncurr)) {
-										counter = counter + 0.000001;
-										//IO.put(", Counter:= "+ counter);
-									}
+									if (c_sources.contains(ncurr)) counter = counter + 0.000001;
 								}
 
-								//add parent to the hashtable with a counter value incremented by one more unit
-								ht.put(nparent, new Double(++counter));
-								//IO.put(", Counter:= "+ counter);
-
-								/*
-								IO.put("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-								dvalues = ht.values();
-								ivalues = new Vector(dvalues);
-								    for(int i=0; i<ivalues.size(); i++)
-								    {
-										ivalue = (Double)ivalues.elementAt(i);
-										IO.put("Value of Hashtable **** " + ivalue.doubleValue());
-								    }
-								    IO.put("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-								*/
+								// add parent to the hashtable with a counter value
+								// incremented by one more unit
+								ht.put(nparent, Double.valueOf(++counter));
 							}
 						}
-						//else
-						//IO.put("");
 					}
+				}
 
-				} // end while
+				if (ht.isEmpty()) IO.put("\tNOT\t adopted", 2);
 
-				if (ht.isEmpty())
-					IO.put("\tNOT\t adopted", 2);
-				//the hashtable now contains all the candidate nodes for adopting the orphan
-				//the node in the hashtable with the highest value will get the orphan
+				// the map now contains all the candidate nodes for adopting the orphan
+				// the node in the hashtable with the highest value will get the orphan
 				if (!ht.isEmpty()) {
 					double max_value = 0;
 					Node max_key = new Node("faraz", "oana");
 
-					/*
-					Collection cvalues = ht.values();
-					Vector values = new Vector(cvalues);
-					for(int i=0; i<values.size(); i++)
-					{
-						Double value = (Double)values.elementAt(i);
-						IO.put("Value of Hashtable **** " + value.doubleValue());
-					}
-					*/
-
-					//Enumeration keys = ht.keys();
-					Iterator keys = ht.keySet().iterator();
-					//while (keys.hasMoreElements()) {
+					Iterator<Node> keys = ht.keySet().iterator();
 					while (keys.hasNext()) {
-						//Node curr_key = (Node) keys.nextElement();
-						Node curr_key = (Node) keys.next();
-						//IO.put("Hashtable contains: ");
-						//curr_key.print();
-
-						Double curr_value = (Double) ht.get(curr_key);
-						//IO.put(", Value := " + curr_value.doubleValue());
+						Node curr_key = keys.next();
+						Double curr_value = ht.get(curr_key);
 
 						if (curr_value.doubleValue() >= max_value) {
 							max_value = curr_value.doubleValue();
 							max_key = curr_key;
 						}
-
 					}
 
-					DefaultMutableTreeNode max =
-						(DefaultMutableTreeNode) (max_key.getTreeNode());
+					DefaultMutableTreeNode max = (max_key.getTreeNode());
 					max.add(curr);
 
-					//Enumeration emax = curr.breadthFirstEnumeration();
 					ArrayList<TreeNode> tempALBase = Collections.list(curr.breadthFirstEnumeration());
-					ArrayList<DefaultMutableTreeNode> tempAL = new ArrayList<DefaultMutableTreeNode>();
+					ArrayList<DefaultMutableTreeNode> tempAL = new ArrayList<>();
 					for(TreeNode node : tempALBase)
-					{
 						tempAL.add((DefaultMutableTreeNode)node);
-					}
-					Collections.sort(tempAL, new Comparator<DefaultMutableTreeNode>() {
-						@Override
-					    public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) {
-					        Node n1 = (Node)o1.getUserObject();
-					        Node n2 = (Node)o2.getUserObject();
+					Collections.sort(tempAL,
+						(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) -> {
+							Node n1 = (Node)o1.getUserObject();
+							Node n2 = (Node)o2.getUserObject();
 							return n1.getName().compareTo(n2.getName());
-					    }
-					});
-					Iterator emax = tempAL.iterator();
+						}
+					);
+					Iterator<DefaultMutableTreeNode> emax = tempAL.iterator();
 
-					//while (emax.hasMoreElements()) {
-					while (emax.hasNext()){
-						//DefaultMutableTreeNode ec =(DefaultMutableTreeNode) emax.nextElement();
-						DefaultMutableTreeNode ec =(DefaultMutableTreeNode) emax.next();
-						if (!vReturn.contains((Node) ec.getUserObject()))
+					while (emax.hasNext()) {
+						DefaultMutableTreeNode ec = emax.next();
+						if (!vReturn.contains(ec.getUserObject()))
 							vReturn.add((Node) ec.getUserObject());
 					}
 
 					IO.put("\twas adopted by ***\t" + max_key.getName(), 2);
-
 				}
-			} // end if
-		} // end while
-
+			}
+		}
 		return vReturn;
-	} //end execute
-} //end class
+	}
+}

@@ -1,44 +1,31 @@
 package acdc;
-public class Sortable implements Comparable 
-{
-private  Comparable key = "";
-private  Object o = null;
 
-/************************************************/
-public Sortable(Comparable key , Object o )
-  {
-  this.key = key;
-  this.o = o;
+public class Sortable implements Comparable<Sortable> {
+  private Integer key;
+  private Node o;
+
+  public Sortable(Integer key, Node o) {
+    this.key = key;
+    this.o = o;
   }
 
-/************************************************/
-public void setKey ( Comparable key )
-  {
-  this.key = key;
+  public void setKey(Integer key) {
+    this.key = key;
   }
 
-/************************************************/
-public Comparable getKey()
-  {
-  return ( key );
+  public Integer getKey() {
+    return key ;
   }
 
-/************************************************/
-public void setObject ( Object o )
-  {
-  this.o = o;
+  public void setObject(Node o) {
+    this.o = o;
   }
 
-/************************************************/
-public Object getObject()
-  {
-  return ( o );
+  public Node getObject() {
+    return o;
   }
 
-/************************************************/
-public int compareTo ( Object o )
-  {
-  return ( key.compareTo ( ((Sortable) o).getKey() ) );
+  public int compareTo(Sortable o) {
+    return key.compareTo(o.getKey());
   }  
 }
-
