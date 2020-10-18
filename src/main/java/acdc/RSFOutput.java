@@ -1,5 +1,7 @@
 package acdc;
+
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,6 +21,8 @@ public class RSFOutput implements OutputHandler
 {
 	public void writeOutput(String outputName, DefaultMutableTreeNode root) 
 	{
+		(new File(outputName)).getParentFile().mkdirs();
+
 		PrintWriter out = null;
 		try 
 		{

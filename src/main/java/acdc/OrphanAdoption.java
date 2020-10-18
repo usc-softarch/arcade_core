@@ -201,7 +201,7 @@ public class OrphanAdoption extends Pattern
 
 					//Enumeration ps = parent.breadthFirstEnumeration();
 					//Enumberation is replaced with an iterator on a sorted list
-					ArrayList<TreeNode> tempALBase = Collections.list(curr.breadthFirstEnumeration());
+					ArrayList<TreeNode> tempALBase = Collections.list(parent.breadthFirstEnumeration());
 					ArrayList<DefaultMutableTreeNode> tempAL = new ArrayList<DefaultMutableTreeNode>();
 					for(TreeNode node : tempALBase)
 					{
@@ -464,7 +464,7 @@ public class OrphanAdoption extends Pattern
 								SortedSet c_sources = new TreeSet() ;
 								//Enumeration ps =parent.breadthFirstEnumeration();
 
-								ArrayList<TreeNode> tempALBase = Collections.list(curr.breadthFirstEnumeration());
+								ArrayList<TreeNode> tempALBase = Collections.list(parent.breadthFirstEnumeration());
 								ArrayList<DefaultMutableTreeNode> tempAL = new ArrayList<DefaultMutableTreeNode>();
 								for(TreeNode node : tempALBase)
 								{
