@@ -1,8 +1,5 @@
 package acdc;
 
-import java.util.Iterator;
-import java.util.List;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -10,8 +7,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 * "orphanContainer", which in turn is inserted under the root of the tree.
 */
 public class ClusterLast extends Pattern {
-	public ClusterLast(DefaultMutableTreeNode _root) {
-		super(_root);
+	public ClusterLast(DefaultMutableTreeNode root) {
+		super(root);
 		name = "Cluster Last";
 	}
 
@@ -24,11 +21,7 @@ public class ClusterLast extends Pattern {
 			nOrphanContainer.setTreeNode(orphanContainer);
 			root.add(orphanContainer);
 
-			List<Node> allOrphans = orphans();
-			Iterator<Node> iaO = allOrphans.iterator();
-
-			while (iaO.hasNext()) {
-				Node ncurr = iaO.next();
+			for (Node ncurr : orphans()) {
 				DefaultMutableTreeNode curr = ncurr.getTreeNode();
 
 				if (!ncurr.isCluster()) {

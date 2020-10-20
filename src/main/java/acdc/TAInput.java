@@ -17,10 +17,8 @@ import javax.swing.tree.TreeNode;
 * This class creates a tree from the info passed 
 * by the input file.
 */
-public class TAInput implements InputHandler
-{
-	public void readInput(String inputStr, DefaultMutableTreeNode treeModel)
-	{
+public class TAInput implements InputHandler {
+	public void readInput(String inputStr, DefaultMutableTreeNode treeModel) {
 		String str;
 		String firstTok;
 		String secondTok;
@@ -94,8 +92,8 @@ public class TAInput implements InputHandler
 						root.depthFirstEnumeration();
 					while (allNodes.hasMoreElements()) {
 						Object i = allNodes.nextElement();
-						DefaultMutableTreeNode j = (DefaultMutableTreeNode)i;
-						Node n = (Node)j.getUserObject();
+						DefaultMutableTreeNode j = (DefaultMutableTreeNode) i;
+						Node n = (Node) j.getUserObject();
 						if (n.getName().equals(secondTok)) {
 							IO.put("Syntax error in input file!",0);
 							IO.put("Two instances of " + secondTok,0);

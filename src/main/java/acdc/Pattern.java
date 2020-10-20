@@ -1,134 +1,133 @@
 package acdc;
 
-import java.util.*;
-import javax.swing.tree.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class Pattern {
-	public Pattern(DefaultMutableTreeNode _root) {
-		root = _root;
-		name = "";
-	}
-	
+	// #region ATTRIBUTES --------------------------------------------------------
+	private static final Logger logger = LogManager.getLogger(Pattern.class);
+
 	protected DefaultMutableTreeNode root;
 	protected String name;
+	// #endregion ATTRIBUTES -----------------------------------------------------
+
+	// #region CONSTRUCTORS ------------------------------------------------------
+	public Pattern(DefaultMutableTreeNode root) {
+		this.root = root;
+		name = "";
+	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
 	
+	// #region ACCESSORS ---------------------------------------------------------
 	public String getName() { return name; }
+	// #endregion ACCESSORS ------------------------------------------------------
 
 	protected abstract void execute();
 
+	/**
+	 * Returns a list of child nodes to the given parameter.
+	 */
 	protected List<Node> nodeChildren(DefaultMutableTreeNode node) {
 		List<Node> result = new ArrayList<>();
-		Enumeration<TreeNode> children = node.children();
-		while (children.hasMoreElements()) {
-			DefaultMutableTreeNode curr2 =
-				(DefaultMutableTreeNode) children.nextElement();
+		List<TreeNode> children = Collections.list(node.children());
+
+		for (TreeNode child : children) {
+			DefaultMutableTreeNode curr2 = (DefaultMutableTreeNode) child;
 			Node ncurr2 = (Node) curr2.getUserObject();
 			result.add(ncurr2);
 		}
+
 		return result;
 	}
 	
-	protected List<Node> orphans()
-	{
+	/**
+	 * Returns a list of orphans in the tree. Orphans are those child nodes of
+	 * the root that are not of type cluster.
+	 */
+	protected List<Node> orphans() {
 		List<Node> result = new ArrayList<>();
-		List<Node> rootChildren = nodeChildren(root);
-		Iterator<Node> iv = rootChildren.iterator();
-
-		while (iv.hasNext()) {
-			Node curr = iv.next();
+		for (Node curr : nodeChildren(root))
 			if (!curr.isCluster()) result.add(curr);
-		}
 		return result;
 	}
 
+	/**
+	 * Returns a count of orphans in the tree. Orphans are those child nodes of
+	 * the root that are not of type cluster.
+	 */
 	protected int orphanNumber() {
-		List<Node> rootChildren = nodeChildren(root);
-		Iterator<Node> iv = rootChildren.iterator();
 		int count = 0;
-
-		while (iv.hasNext()) {
-			Node curr = iv.next();
+		for (Node curr : nodeChildren(root))
 			if (!curr.isCluster()) count++;
-		}
 		return count;
 	}
 
+	/**
+	 * Returns all nodes in the tree rooted at the parameter, except for the root.
+	 */
 	public static List<Node> allNodes(DefaultMutableTreeNode root) {
-		List<Node> result = new ArrayList<>(); // will contain all nodes in the tree
-		Enumeration<TreeNode> treeNodes = root.breadthFirstEnumeration();
+		List<Node> result = new ArrayList<>();
+		List<TreeNode> treeNodes = Collections.list(root.breadthFirstEnumeration());
 
-		// The first node in the enumeration is the root. We skip it over.
-		treeNodes.nextElement();
-		DefaultMutableTreeNode curr;
-
-		while(treeNodes.hasMoreElements()) {
-			curr = (DefaultMutableTreeNode) treeNodes.nextElement();
+		for (TreeNode node : treeNodes.subList(1, treeNodes.size())) {
+			DefaultMutableTreeNode curr = (DefaultMutableTreeNode) node;
 			Node ncurr = (Node) curr.getUserObject();
 			result.add(ncurr);
 		}
+
 		return result;
 	}
 	
 	public static void induceEdges(List<Node> v) {
-		IO.put("The following " + v.size()
-			+ " nodes were selected for edge induction", 2);
-		for (int m = 0; m < v.size(); m++) {
-			Node ncurr = v.get(m);
-			IO.put(ncurr.getName(), 2);
-			Set<Node> outNodes = new HashSet<>(ncurr.getTargets());
+		logger.info("The following " + v.size()
+			+ " nodes were selected for edge induction");
+		
+		for (Node current : v) {
+			logger.info(current.getName());
 
-			//traverse the set of target nodes of the current node
-			Iterator<Node> ioN = outNodes.iterator();
-			while (ioN.hasNext()) {
-				//target node creating edges 
-				Node across = ioN.next();
-				DefaultMutableTreeNode tacross = across.getTreeNode();
-				TreeNode[] path = tacross.getPath();
-				for (int i = 0; i < path.length; i++) {
-					TreeNode k = path[i];
-					DefaultMutableTreeNode j = (DefaultMutableTreeNode) k;
-					Node nj = (Node) j.getUserObject();
+			inductionStep(current, false);
+			inductionStep(current, true);
+		}
+	}
 
-					//don't create induced edges for the root or circular edges 
-					if (!j.isRoot()) {
-						Edge e = new Edge(ncurr, nj, "induced");
-						IO.put("\tInduced edge from "	+ ncurr.getName() + " to " + nj.getName(), 2);
-						nj.addInEdge(e);
-						ncurr.addOutEdge(e);
-					}
+	/**
+	 * @param current The node for which this inductionStep is being executed
+	 * @param invert true if step should be done over sources, false over targets
+	 */
+	private static void inductionStep(Node current, boolean invert) {
+		Set<Node> set = invert 
+									? new HashSet<>(current.getSources())
+									: new HashSet<>(current.getTargets());
+		// For each node in set of sources/targets
+		for (Node across : set) {
+			// For each note from the root to across
+			for (TreeNode k : across.getTreeNode().getPath()) {
+				DefaultMutableTreeNode j = (DefaultMutableTreeNode) k;
+				Node nj = (Node) j.getUserObject();
+
+				if (!j.isRoot()) {
+					if (invert)
+						createEdge(nj, current);
+					else
+						createEdge(current, nj);
 				}
 			}
 		}
+	}
 
-		for (int j = 0; j < v.size(); j++) {
-			Node ncurr2 = v.get(j);
-			IO.put(ncurr2.getName(), 2);
-
-			//keep a set of the sources nodes of the current node
-			Set<Node> outNodes2 = new HashSet<>(ncurr2.getSources());
-
-			//traverse the set of target nodes of the current node
-			Iterator<Node> ioN2 = outNodes2.iterator();
-			while (ioN2.hasNext()) {
-				//traverse the nodes from the root to
-				//the current target node creating edges
-				Node across2 = ioN2.next();
-				DefaultMutableTreeNode tacross2 = across2.getTreeNode();
-				TreeNode[] path2 = tacross2.getPath();
-				for (int i = 0; i < path2.length; i++) {
-					TreeNode k2 = path2[i];
-					DefaultMutableTreeNode j2 = (DefaultMutableTreeNode) k2;
-					Node nj2 = (Node) j2.getUserObject();
-
-					//don't create induced edges for the root
-					if (!j2.isRoot()) {
-						Edge e2 = new Edge(nj2, ncurr2, "induced");
-						IO.put("\tInduced edge from " + nj2.getName() + " to " + ncurr2.getName(), 2);
-						nj2.addOutEdge(e2);
-						ncurr2.addInEdge(e2);
-					}
-				}
-			}
-		}
+	private static void createEdge(Node n1, Node n2) {
+		Edge e = new Edge(n1, n2, "induced");
+		logger.info("\tInduced edge from " + n1.getName() + " to " + n2.getName());
+		n1.addOutEdge(e);
+		n2.addInEdge(e);
 	}
 }

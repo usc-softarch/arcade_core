@@ -2,30 +2,23 @@ package acdc;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class DownInducer extends Pattern {
-	public DownInducer(DefaultMutableTreeNode _root) {
-		super(_root);
+	public DownInducer(DefaultMutableTreeNode root) {
+		super(root);
 	}
 	
 	public void execute() {
 		// Remove all but fine-grain clusters from the tree	
-		List<Node> allNodes = allNodes(root);
-		Iterator<Node> iv = allNodes.iterator();
-		
-		while (iv.hasNext()) {
-			Node parent = iv.next();
+		for (Node parent : allNodes(root)) {
 			DefaultMutableTreeNode tparent = parent.getTreeNode();
 			if (parent.isCluster()) {
 				List<Node> subTree = nodeChildren(tparent);
 				tparent.removeAllChildren();
 				tparent.removeFromParent();
-				Iterator<Node> is = subTree.iterator();
 				boolean hasChildrenFiles = false;
-				while (is.hasNext()) {
-					Node child = is.next();
+				for (Node child : subTree) {
 					if (child.isFile()) {
 						DefaultMutableTreeNode tchild = child.getTreeNode();
 						tchild.removeAllChildren();

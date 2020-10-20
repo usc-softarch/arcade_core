@@ -45,4 +45,36 @@ public class ACDCTest {
     // Check oracle
     assertEquals(resultSet, oracleSet);
   }
+
+  @Test
+  public void mainTest2() {
+    // Cluster httpd version 2.3.8
+    char fs = File.separatorChar;
+    String depsRsfFilename = "." + fs + "src" + fs + "test" + fs + "resources"
+      + fs + "ACDCTest_resources"
+      + fs + "httpd-2.3.8_deps.rsf";
+    String clusterRsfFilename = "." + fs + "target" + fs + "test_results"
+      + fs + "ACDCTest" + fs + "mainTest2Result.rsf";
+    String[] args = { depsRsfFilename, clusterRsfFilename };
+
+    // Run ACDC
+    ACDC.main(args);
+    String result = assertDoesNotThrow(() ->
+      { return FileUtil.readFile(clusterRsfFilename, StandardCharsets.UTF_8);});
+
+    // Load oracle
+    String oraclePath = "." + fs + "src" + fs + "test" + fs + "resources"
+      + fs + "ACDCTest_resources" + fs + "httpd-2.3.8_cluster_oracle.rsf";
+    String oracle = assertDoesNotThrow(() ->
+      { return FileUtil.readFile(oraclePath, StandardCharsets.UTF_8); });
+
+    // Sort results
+    Set<String> resultSet =
+      new HashSet<>(Arrays.asList(result.split(System.lineSeparator())));
+    Set<String> oracleSet =
+      new HashSet<>(Arrays.asList(oracle.split(System.lineSeparator())));
+
+    // Check oracle
+    assertEquals(resultSet, oracleSet);
+  }
 }

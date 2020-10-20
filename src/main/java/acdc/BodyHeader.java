@@ -3,6 +3,7 @@ package acdc;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
@@ -14,8 +15,8 @@ import javax.swing.tree.TreeNode;
  * Commented out lines that modify vTree on the fly
  */
  public class BodyHeader extends Pattern {
-	public BodyHeader(DefaultMutableTreeNode _root) {
-		super(_root);
+	public BodyHeader(DefaultMutableTreeNode root) {
+		super(root);
 		name = "Body Header";
 	}
 
@@ -25,8 +26,7 @@ import javax.swing.tree.TreeNode;
 		
 		//traverse the files with extension .c or .h in the tree looking for
 		//their counterpart file with extension .h and respectively .c 		
-		for (int i=0; i<vTree.size(); i++) {
-			Node ncurr = vTree.get(i);
+		for (Node ncurr : vTree) {
 			DefaultMutableTreeNode curr = ncurr.getTreeNode();
                               			
       if (ncurr.isFile())	{
@@ -39,12 +39,11 @@ import javax.swing.tree.TreeNode;
 
 					if (alreadyClustered(curr_parent))
 						IO.put("\tAlready in a body-header cluster",2);
-					else {	
+					else {
 						String toFind = "";
 						// Loop through the vector of remaining .h and .c 
 						// files to find counterpart file
-						for(int j = 0; j < vTree.size(); j++) {	
-							Node vnode = vTree.get(j);
+						for(Node vnode : vTree) {	
 							IO.put("\tConsidering other file: " + vnode.getName(),2);
 							DefaultMutableTreeNode vtnode = vnode.getTreeNode();							
 							if((ncurr.getName().endsWith(".c")))

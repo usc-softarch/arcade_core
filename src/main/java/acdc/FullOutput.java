@@ -6,12 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 
 public class FullOutput extends Pattern {
-	public FullOutput (DefaultMutableTreeNode _root, String _systemName) {
-		super(_root);
-		systemName = _systemName;
-	}
-	
 	private String systemName;
+	
+	public FullOutput (DefaultMutableTreeNode root, String systemName) {
+		super(root);
+		this.systemName = systemName;
+	}
 	
 	public void execute() {
 		// Create an extra root here since OutputHandler ignores the root of the tree

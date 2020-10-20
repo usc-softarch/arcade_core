@@ -20,8 +20,8 @@ import javax.swing.tree.TreeNode;
 public class SubGraph extends Pattern {
 	private int clusterSize;
 
-	public SubGraph(DefaultMutableTreeNode _root, int size) {
-		super(_root);
+	public SubGraph(DefaultMutableTreeNode root, int size) {
+		super(root);
 		clusterSize = size;
 		name = "Subgraph Dominator";
 	}
@@ -39,13 +39,11 @@ public class SubGraph extends Pattern {
 
 		// put nodes to be clustered together with their corresponding number of
 		// targets in a Map
-		Map<Node,Integer> ht = new HashMap<>(10000);
+		Map<Node,Integer> ht = new HashMap<>();
 
 		int counter = 0; // keeps track of #targets per node
 
-		Iterator<Node> ivRC = vRootChildren.iterator();
-		while (ivRC.hasNext()) {
-			Node ncurr = ivRC.next();
+		for (Node ncurr : vRootChildren) {
 			setOfTargets = new HashSet<>(); //reset
 
 			setOfTargets.add(ncurr.getTreeNode());
@@ -53,10 +51,8 @@ public class SubGraph extends Pattern {
 
 			counter = 0; //reset
 
-			Iterator<DefaultMutableTreeNode> ihs = setOfTargets.iterator();
 			//count only targets which are children of root
-			while (ihs.hasNext()) {
-				DefaultMutableTreeNode c = ihs.next();
+			for (DefaultMutableTreeNode c : setOfTargets) {
 				Node n = (Node) c.getUserObject();
 
 				if (vRootChildren.contains(n)) counter++;
@@ -66,10 +62,7 @@ public class SubGraph extends Pattern {
 
 		//sort ht in increasing order
 		List<Sortable> my_array = new ArrayList<>();
-		Set<Node> e = ht.keySet();
-		Iterator<Node> itHt = e.iterator();
-		while (itHt.hasNext()) {
-			Node curr_key = itHt.next();
+		for (Node curr_key : ht.keySet()) {
 			Integer curr_value = ht.get(curr_key);
 
 			// build a sortable object with the two pieces of information
@@ -118,13 +111,10 @@ public class SubGraph extends Pattern {
 			if (cS.size() == 1)	ht.remove(tentativeDominator);
 			else { //coveredSet returned tentativeRoot and its set of dominated nodes
 				// max cluster size allowed is clusterSize!!
-				DefaultMutableTreeNode curr_cS;
 				Node ncurr_cS;
 
 				if (cS.size() < clusterSize) {
-					Iterator<DefaultMutableTreeNode> ic = cS.iterator();
-					while (ic.hasNext()) {
-						curr_cS = ic.next();
+					for (DefaultMutableTreeNode curr_cS : cS) {
 						ncurr_cS = (Node) curr_cS.getUserObject();
 						ht.remove(ncurr_cS);
 					}
@@ -190,9 +180,7 @@ public class SubGraph extends Pattern {
 				}
 
 				//new node contains all the nodes in covered set and others too
-				Iterator<DefaultMutableTreeNode> intm = nodesToMove.iterator();
-				while (intm.hasNext()) {
-					DefaultMutableTreeNode nextToMove = intm.next();
+				for (DefaultMutableTreeNode nextToMove : nodesToMove) {
 					if (!nextToMove.equals(ssTreeNode))
 						ssTreeNode.add(nextToMove);
 
@@ -228,9 +216,7 @@ public class SubGraph extends Pattern {
 			"**************************************************************",
 			2);
 		Set<DefaultMutableTreeNode> cS = coveredSet(domin, vTree);
-		Iterator<DefaultMutableTreeNode> icS = cS.iterator();
-		while (icS.hasNext()) {
-			DefaultMutableTreeNode curr = icS.next();
+		for (DefaultMutableTreeNode curr : cS) {
 			Node ncurr = (Node) curr.getUserObject();
 			IO.put(
 				"\tCovered Set Node: **** "
@@ -240,10 +226,7 @@ public class SubGraph extends Pattern {
 				2);
 		}
 
-		Set<DefaultMutableTreeNode> tS = findTargets(cS, vTree);
-		Iterator<DefaultMutableTreeNode> itS = tS.iterator();
-		while (itS.hasNext()) {
-			DefaultMutableTreeNode curr1 = itS.next();
+		for (DefaultMutableTreeNode curr1 : findTargets(cS, vTree)) {
 			Node ncurr1 = (Node) curr1.getUserObject();
 			IO.put(
 				"\t** Target of covered set:= "
@@ -252,10 +235,7 @@ public class SubGraph extends Pattern {
 					+ ncurr1.getType(),
 				2);
 
-			Set<DefaultMutableTreeNode> sS = findSources(curr1, vTree);
-			Iterator<DefaultMutableTreeNode> isS = sS.iterator();
-			while (isS.hasNext()) {
-				DefaultMutableTreeNode curr2 = isS.next();
+			for (DefaultMutableTreeNode curr2 : findSources(curr1, vTree)) {
 				Node ncurr2 = (Node) curr2.getUserObject();
 				IO.put(
 					"\t\tIts source := "
@@ -294,9 +274,7 @@ public class SubGraph extends Pattern {
 			do {
 				both = new HashSet<>(covered);
 				both.addAll(result);
-				Iterator<DefaultMutableTreeNode> ic = covered.iterator();
-				while (ic.hasNext()) {
-					DefaultMutableTreeNode curr = ic.next();
+				for (DefaultMutableTreeNode curr : covered) {
 					fathers = findSources(curr, vTree);
 					if (!both.containsAll(fathers)) falseOnes.add(curr);
 				}
@@ -314,20 +292,12 @@ public class SubGraph extends Pattern {
 			Set<DefaultMutableTreeNode> source, List<Node> vRootChildren) {
 		Set<DefaultMutableTreeNode> allTargets = new HashSet<>();
 
-		//iterate thorough the passed HashSet    
-		Iterator<DefaultMutableTreeNode> iS = source.iterator();
-		while (iS.hasNext()) {
-			DefaultMutableTreeNode curr = iS.next();
+		//iterate thorough the passed HashSet
+		for (DefaultMutableTreeNode curr : source) {
 			Node ncurr = (Node) curr.getUserObject();
 
-			//get the targets of the current node in the iteration      
-			Set<Node> targets = ncurr.getTargets();
-
 			//iterate through these targets adding each to the HashSet 'targets'
-			Iterator<Node> iT = targets.iterator();
-			while (iT.hasNext()) {
-				Node n = iT.next();
-
+			for (Node n : ncurr.getTargets()) {
 				if (vRootChildren.contains(n)) {
 					DefaultMutableTreeNode t = n.getTreeNode();
 					allTargets.add(t);
@@ -347,13 +317,10 @@ public class SubGraph extends Pattern {
 
 		// get sources of the passed node
 		Node ntarget = (Node) target.getUserObject();
-		Set<Node> sources = ntarget.getSources();
 
 		// iterate through the sources of the passed node
 		// and add them to the HashSet called 'sources'
-		Iterator<Node> iS = sources.iterator();
-		while (iS.hasNext()) {
-			Node n = iS.next();
+		for (Node n : ntarget.getSources()) {
 			if (vRootChildren.contains(n)) {
 				DefaultMutableTreeNode t = n.getTreeNode();
 				allSources.add(t);

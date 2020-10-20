@@ -164,7 +164,23 @@ public class Node implements Comparable<Node> {
     return type.equals("cFile")
         || type.equals("Unknown")
         || type.equals("File");
-	}
+  }
+  
+  public boolean isNamed(String name) {
+    return getName().equals(name);
+  }
+
+  public boolean isNamed(Node name) {
+    return getName().equals(name.getName());
+  }
+
+  public boolean isNamedIgnoreCase(String name) {
+    return getName().equalsIgnoreCase(name);
+  }
+
+  public boolean isNamedIgnoreCase(Node name) {
+    return getName().equalsIgnoreCase(name.getName());
+  }
 
   /**
    * Adds an incoming edge to <code>this</code> node. If edge was already an 
