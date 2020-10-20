@@ -1,4 +1,4 @@
-package acdc;
+package edu.usc.softarch.arcade.clustering.acdc;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

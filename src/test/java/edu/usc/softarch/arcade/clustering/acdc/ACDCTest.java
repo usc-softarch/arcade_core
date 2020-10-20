@@ -1,4 +1,4 @@
-package acdc;
+package edu.usc.softarch.arcade.clustering.acdc;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,10 +23,9 @@ public class ACDCTest {
       + fs + "arcade_old_deps_oracle.rsf";
     String clusterRsfFilename = "." + fs + "target" + fs + "test_results"
       + fs + "ACDCTest" + fs + "mainTest1Result.rsf";
-    String[] args = { depsRsfFilename, clusterRsfFilename };
 
     // Run ACDC
-    ACDC.main(args);
+    ACDC.run(depsRsfFilename, clusterRsfFilename);
     String result = assertDoesNotThrow(() ->
       { return FileUtil.readFile(clusterRsfFilename, StandardCharsets.UTF_8);});
 
@@ -55,10 +54,9 @@ public class ACDCTest {
       + fs + "httpd-2.3.8_deps.rsf";
     String clusterRsfFilename = "." + fs + "target" + fs + "test_results"
       + fs + "ACDCTest" + fs + "mainTest2Result.rsf";
-    String[] args = { depsRsfFilename, clusterRsfFilename };
 
     // Run ACDC
-    ACDC.main(args);
+    ACDC.run(depsRsfFilename, clusterRsfFilename);
     String result = assertDoesNotThrow(() ->
       { return FileUtil.readFile(clusterRsfFilename, StandardCharsets.UTF_8);});
 

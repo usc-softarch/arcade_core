@@ -9,7 +9,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import acdc.ACDC;
+import edu.usc.softarch.arcade.clustering.acdc.ACDC;
 
 import com.google.common.base.Joiner;
 

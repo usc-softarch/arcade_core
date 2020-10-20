@@ -1,4 +1,4 @@
-package acdc;
+package edu.usc.softarch.arcade.clustering.acdc;
 
 import java.util.ArrayList;
 import java.util.Enumeration;

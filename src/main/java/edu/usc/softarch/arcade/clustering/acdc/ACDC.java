@@ -1,9 +1,12 @@
-package acdc;
+package edu.usc.softarch.arcade.clustering.acdc;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This application facilitates the task of recovering the structure
@@ -18,22 +21,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * (but it might get further clustered within its cluster)
  */
 public class ACDC {
+	private static final Logger logger = LogManager.getLogger(ACDC.class);
+
   public static void main(String [] args) {
+		run(args[0], args[1]);
+	}
+	
+	public static void run(String inputName, String outputName) {
 		IO.set_debug_level(0);
-    
-		String inputName;
-		String outputName;
-    
     int maxClusterSize = 20; //used by SubGraph pattern
-    
-		inputName = args[0]; 
-    outputName = args[1];
- 
 		InputHandler input = new TAInput();
 		OutputHandler output = new RSFOutput();
-			
-		// If it got to this line, we are dealing with at least two args
-		// Code executes for 2 or more arguments 
 
 		String selectedPatterns = "bso";
 	
@@ -43,14 +41,14 @@ public class ACDC {
 		dummy.setTreeNode(root);
 		Pattern inducer = new DownInducer(root);
 			   	
-    IO.put("Input File: " + inputName,1);
-    IO.put("Output File: " + outputName,1);
-    IO.put("Patterns: " + selectedPatterns,1);
-    IO.put("Cluster Size: " + maxClusterSize,1);
+    logger.info("Input File: " + inputName);
+    logger.info("Output File: " + outputName);
+    logger.info("Patterns: " + selectedPatterns);
+    logger.info("Cluster Size: " + maxClusterSize);
 
 		// Populate the tree from the input file   
-    input.readInput(inputName, root);
-
+		input.readInput(inputName, root);
+		
 		List<Pattern> vpatterns = new ArrayList<>();
 		vpatterns.add(new BodyHeader(root));
 		vpatterns.add(new SubGraph(root,maxClusterSize));
@@ -62,7 +60,7 @@ public class ACDC {
 
 		// Execute the patterns
 		for (Pattern p : vpatterns) {
-			IO.put("Executing " + p.getName() + " pattern...",1);
+			logger.info("Executing " + p.getName() + " pattern...");
 			p.execute();
     }
 
@@ -71,9 +69,7 @@ public class ACDC {
 		c.execute();
 	
     // Create output file
-		IO.put("Creating output...",1);
 		inducer.execute();
 		output.writeOutput(outputName, root);
-		IO.put("Finished!",1);
-  }
+	}
 }
