@@ -118,15 +118,13 @@ public class AcdcWithSmellDetection {
 		logger.debug("Running acdc for revision " + versionFolderName);
 		ACDC.main(acdcArgs);
 		
-		// the last element of the smellArgs array is the location of the file
-		// containing the detected smells (one is created per subdirectory of dir)
-		String[] smellArgs = { 
-			depsRsfFile.getAbsolutePath(),
-			acdcClusteredFile,
-			outputDir.getAbsolutePath() + fs 
-				+ versionFolderName + "_acdc_smells.ser" };
 		logger.debug("Running smell detecion for revision " + versionFolderName);
-		ArchSmellDetector.setupAndRunStructuralDetectionAlgs(smellArgs);
+
+		ArchSmellDetector asd = new ArchSmellDetector(depsRsfFile.getAbsolutePath(),
+			acdcClusteredFile, outputDir.getAbsolutePath() + fs + versionFolderName
+			+ "_acdc_smells.ser");
+
+		asd.runStructuralDetectionAlgs();
 	}
 
 	// #region AUXILIARY METHODS -------------------------------------------------

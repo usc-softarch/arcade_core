@@ -11,6 +11,8 @@ import mojo.MoJoCalculator;
 import org.apache.log4j.PropertyConfigurator;
 
 import edu.usc.softarch.arcade.config.Config;
+import edu.usc.softarch.arcade.topics.DocTopics;
+import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchSmellDetectionRunner {
@@ -51,7 +53,11 @@ public class BatchSmellDetectionRunner {
 				String detectedSmellsFilename = techniquesDir + prefix
 						+ "_smells.ser";
 
-				ArchSmellDetector.runAllDetectionAlgs(detectedSmellsFilename);
+				ArchSmellDetector asd = new ArchSmellDetector(depsRsfFilename, 
+					gtRsfFile.getAbsolutePath(), detectedSmellsFilename, selectedLang,
+					TopicModelExtractionMethod.VAR_MALLET_FILE,
+					new DocTopics(docTopicsFile));
+				asd.runAllDetectionAlgs();
 
 				MoJoCalculator mojoCalc = new MoJoCalculator(gtRsfFile.getAbsolutePath(),
 						groundTruthFilename, null);
@@ -63,9 +69,7 @@ public class BatchSmellDetectionRunner {
 			}
 			writer.close();
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 	}

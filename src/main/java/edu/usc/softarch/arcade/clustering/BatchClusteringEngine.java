@@ -118,11 +118,12 @@ public class BatchClusteringEngine {
 					+ revisionNumber + "_arc_smells.ser";
 
 			// Need to provide docTopics first
-			ArchSmellDetector.docTopics = TopicUtil.docTopics;
-			ArchSmellDetector.tmeMethod = TopicModelExtractionMethod.MALLET_API;
-			logger.debug("Running smell detecion for revision "
-					+ revisionNumber);
-			ArchSmellDetector.runAllDetectionAlgs(detectedSmellsFilename);
+			logger.debug("Running smell detecion for revision "	+ revisionNumber);
+			ArchSmellDetector asd = new ArchSmellDetector(
+				depsRsfFile.getAbsolutePath(), arcClustersFilename,
+				detectedSmellsFilename, Config.selectedLanguage.toString(),
+				TopicModelExtractionMethod.MALLET_API, TopicUtil.docTopics);
+			asd.runAllDetectionAlgs();
 		}
 	}
 }

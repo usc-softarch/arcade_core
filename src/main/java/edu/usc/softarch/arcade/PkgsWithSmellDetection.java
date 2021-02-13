@@ -67,17 +67,15 @@ public class PkgsWithSmellDetection {
 					System.exit(2);
 				}
 
-				// the last element of the smellArgs array is the location of
-				// the file containing the detected smells (one is created per
-				// subdirectory of dir)
-				String[] smellArgs = {
-						identifiedDepsFile.getAbsolutePath(),
-						clustersPkgFile.getAbsolutePath(),
-						smellsDir.getAbsolutePath() + File.separatorChar
-								+ pkgFilePrefix + "_pkg_smells.ser" };
 				logger.debug("Running smell detecion for release "
 						+ pkgFilePrefix);
-				ArchSmellDetector.setupAndRunStructuralDetectionAlgs(smellArgs);
+
+				ArchSmellDetector asd = new ArchSmellDetector(
+					identifiedDepsFile.getAbsolutePath(),
+					clustersPkgFile.getAbsolutePath(), smellsDir.getAbsolutePath()
+					+ File.separatorChar + pkgFilePrefix + "_pkg_smells.ser");
+
+				asd.runStructuralDetectionAlgs();
 			}
 		}
 	}
