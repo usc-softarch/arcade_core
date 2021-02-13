@@ -413,15 +413,6 @@ public class TopicUtil {
 
 	/**
 	 * Sets the DocTopicItem of a FastCluster.
-	 * 
-	 * @deprecated
-	 */
-	public static void setDocTopicForFastClusterForMalletApi(FastCluster c) {
-		setDocTopicForFastClusterForMalletApi(c, Config.getSelectedLanguage().name());
-	}
-
-	/**
-	 * Sets the DocTopicItem of a FastCluster.
 	 */
 	public static void setDocTopicForFastClusterForMalletApi(
 			FastCluster c, String language) {

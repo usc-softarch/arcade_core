@@ -19,24 +19,12 @@ public class FastCluster {
 		return featuresLength;
 	}
 
-	public void setFeaturesLength(int featuresLength) {
-		this.featuresLength = featuresLength;
-	}
-
 	public Map<Integer, Double> getNonZeroFeatureMap() {
 		return nonZeroFeatureMap;
 	}
 
-	public void setNonZeroFeatureMap(Map<Integer, Double> nonZeroFeatureMap) {
-		this.nonZeroFeatureMap = nonZeroFeatureMap;
-	}
-
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 	
 	public FastCluster(String name, BitSet featureSet, List<String> namesInFeatureSet) {
@@ -44,15 +32,10 @@ public class FastCluster {
 		featuresLength = namesInFeatureSet.size();
 		
 		nonZeroFeatureMap = new HashMap<>();
-		for (int i=0;i<featuresLength;i++) {
-			if (featureSet.get(i)) {
-				double one = 1;
-				nonZeroFeatureMap.put(i,one);
-			}
-			else {
-				/*Don't put anything*/
-			}
-		}
+		for (int i=0; i < featuresLength; i++)
+			if (featureSet.get(i)) // put if not 0
+				nonZeroFeatureMap.put(i,1.0);
+
 		this.numEntities = 1;
 	}
 	
@@ -144,10 +127,6 @@ public class FastCluster {
 
 	public int getNumEntities() {
 		return numEntities;
-	}
-
-	public void setNumEntities(int numEntities) {
-		this.numEntities = numEntities;
 	}
 	
 	public String toString() {

@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.google.common.base.Joiner;
 
@@ -20,7 +21,8 @@ import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.arcade.util.StopWatch;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
-	private static Logger logger = Logger.getLogger(ConcernClusteringRunner.class);
+	private static Logger logger =
+		LogManager.getLogger(ConcernClusteringRunner.class);
 	
 	/**
 	 * @param vecs feature vectors (dependencies) of entities
@@ -29,54 +31,36 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	 * @param numTopics number of topics to extract
 	 */
 	ConcernClusteringRunner(FastFeatureVectors vecs,
-			TopicModelExtractionMethod tmeMethod, String srcDir, String artifactsDir,
-			int numTopics) {
+			TopicModelExtractionMethod tmeMethod, String srcDir, String artifactsDir){
 		setFastFeatureVectors(vecs);
-		initializeClusters(srcDir);	
+		initializeClusters(srcDir);
 		initializeDocTopicsForEachFastCluster(tmeMethod, srcDir, artifactsDir);
 	}
 	
 	public void computeClustersWithConcernsAndFastClusters(
 			StoppingCriterion stoppingCriterion) {
 		StopWatch loopSummaryStopwatch = new StopWatch();
-
 		loopSummaryStopwatch.start();
-		
-		StopWatch matrixCreateTimer = new StopWatch();
-		matrixCreateTimer.start();
+
 		List<List<Double>> simMatrix = createSimilarityMatrix(fastClusters);
-		matrixCreateTimer.stop();
-		logger.debug("time to create similarity matrix: "
-				+ matrixCreateTimer.getElapsedTime());
 
 		while (stoppingCriterion.notReadyToStop()) {
-
 			if (Config.stoppingCriterion
 					.equals(Config.StoppingCriterionConfig.clustergain)) {
 				double clusterGain = ClusterUtil.computeClusterGainUsingTopics(fastClusters);
 				checkAndUpdateClusterGain(clusterGain);
 			}
 
-			StopWatch timer = new StopWatch();
-			timer.start();
 			MaxSimData data  = identifyMostSimClusters(simMatrix);
-			timer.stop();
-			logger.debug("time to identify two most similar clusters: "
-					+ timer.getElapsedTime());
-			
 			printDataForTwoMostSimilarClustersWithTopicsForConcerns(data);
-
 			FastCluster newCluster = mergeFastClustersUsingTopics(data);
-
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix);
-			
 			performPostProcessingConditionally();
 
 			logger.debug("after merge, clusters size: " + fastClusters.size());
 		}
 
 		loopSummaryStopwatch.stop();
-
 		logger.debug("Time in milliseconds to compute clusters: "
 				+ loopSummaryStopwatch.getElapsedTime());
 		logger.debug("max cluster gain: " + maxClusterGain);
@@ -85,34 +69,34 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 	
 	private static MaxSimData identifyMostSimClusters(List<List<Double>> simMatrix) {
-		if ( simMatrix.size() != fastClusters.size() ) {
-			throw new IllegalArgumentException("expected simMatrix.size():" + simMatrix.size() + " to be fastClusters.size(): " + fastClusters.size());
-		}
-		for (List<Double> col : simMatrix) {
-			if (col.size() != fastClusters.size()) {
-				throw new IllegalArgumentException("expected col.size():" + col.size() + " to be fastClusters.size(): " + fastClusters.size());
-			}
-		}
+		if (simMatrix.size() != fastClusters.size())
+			throw new IllegalArgumentException("expected simMatrix.size():"
+				+ simMatrix.size() + " to be fastClusters.size(): "
+				+ fastClusters.size());
+		for (List<Double> col : simMatrix)
+			if (col.size() != fastClusters.size())
+				throw new IllegalArgumentException("expected col.size():" + col.size()
+					+ " to be fastClusters.size(): " + fastClusters.size());
 		
 		int length = simMatrix.size();
 		MaxSimData msData = new MaxSimData();
 		msData.rowIndex = 0;
 		msData.colIndex = 0;
 		double smallestJsDiv = Double.MAX_VALUE;
-		for (int i=0;i<length;i++) {
-			for (int j=0;j<length;j++) {
+
+		for (int i=0; i < length; i++) {
+			for (int j=0; j < length; j++) {
 				double currJsDiv = simMatrix.get(i).get(j);
-				if (currJsDiv < smallestJsDiv &&
-					i != j) {
+				if (currJsDiv < smallestJsDiv && i != j) {
 					smallestJsDiv = currJsDiv;
 					msData.rowIndex = i;
 					msData.colIndex = j;
 				}
 			}
 		}
+
 		msData.currentMaxSim = smallestJsDiv;
 		return msData;
-		
 	}
 
 	private void initializeDocTopicsForEachFastCluster(
@@ -125,14 +109,14 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			for (FastCluster c : fastClusters)
 				TopicUtil.setDocTopicForFastClusterForMalletFile(TopicUtil.docTopics, c);
 		}
-		else if (tmeMethod == TopicModelExtractionMethod.MALLET_API) {
+		if (tmeMethod == TopicModelExtractionMethod.MALLET_API) {
 			try {
-				TopicUtil.docTopics = new DocTopics(srcDir,artifactsDir);
+				TopicUtil.docTopics = new DocTopics(srcDir,artifactsDir, Config.getSelectedLanguage().toString());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			for (FastCluster c : fastClusters)
-				TopicUtil.setDocTopicForFastClusterForMalletApi(c);
+				TopicUtil.setDocTopicForFastClusterForMalletApi(c, Config.getSelectedLanguage().toString());
 		}
 		
 		List<FastCluster> jspRemoveList = new ArrayList<>();
@@ -171,9 +155,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			for (FastCluster cluster : fastClusters) {
 				if (parentClassMap.containsKey(cluster)) {
 					String parentClass = parentClassMap.get(cluster);
-					if (parentClass.equals(excessCluster.getName())) {
+					if (parentClass.equals(excessCluster.getName()))
 						excessInners.add(cluster);
-					}
 				}
 			}
 		}
@@ -249,7 +232,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 	private static FastCluster mergeFastClustersUsingTopics(
 			FastCluster cluster, FastCluster otherCluster) {
-		FastCluster newCluster = new FastCluster(ClusteringAlgorithmType.LIMBO,cluster, otherCluster);
+		FastCluster newCluster =
+			new FastCluster(ClusteringAlgorithmType.LIMBO, cluster, otherCluster);
 		
 		try {
 			newCluster.docTopicItem = TopicUtil.mergeDocTopicItems(
@@ -257,68 +241,65 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		} catch (UnmatchingDocTopicItemsException e) {
 			e.printStackTrace(); //TODO handle it
 		}
+
 		return newCluster;
 	}
 	
-	private static void updateFastClustersAndSimMatrixToReflectMergedCluster(MaxSimData data,
-			FastCluster newCluster, List<List<Double>> simMatrix) {
-		
+	private static void updateFastClustersAndSimMatrixToReflectMergedCluster(
+			MaxSimData data, FastCluster newCluster, List<List<Double>> simMatrix) {
 		FastCluster cluster = fastClusters.get(data.rowIndex);
 		FastCluster otherCluster = fastClusters.get(data.colIndex);
 		
 		int greaterIndex = -1;
 		int lesserIndex = -1;
-		if (data.rowIndex == data.colIndex) {
-			throw new IllegalArgumentException("data.rowIndex: " + data.rowIndex + " should not be the same as data.colIndex: " + data.colIndex);
-		}
+		if (data.rowIndex == data.colIndex)
+			throw new IllegalArgumentException("data.rowIndex: " + data.rowIndex
+				+ " should not be the same as data.colIndex: " + data.colIndex);
+		
 		if (data.rowIndex > data.colIndex) {
 			greaterIndex = data.rowIndex;
 			lesserIndex = data.colIndex;
 		}
-		else if (data.rowIndex < data.colIndex) {
+		if (data.rowIndex < data.colIndex) {
 			greaterIndex = data.colIndex;
 			lesserIndex = data.rowIndex;
 		}
 		
 		simMatrix.remove(greaterIndex);
-		for (List<Double> col : simMatrix) {
+		for (List<Double> col : simMatrix)
 			col.remove(greaterIndex);
-		}
 		
 		simMatrix.remove(lesserIndex);
-		for (List<Double> col : simMatrix) {
+		for (List<Double> col : simMatrix)
 			col.remove(lesserIndex);
-		}
 		
 		fastClusters.remove(cluster);
 		fastClusters.remove(otherCluster);
-		
 		fastClusters.add(newCluster);
 		
 		List<Double> newRow = new ArrayList<>(fastClusters.size());
-		
-		for (int i=0;i<fastClusters.size();i++) {
+		for (int i=0; i < fastClusters.size(); i++)
 			newRow.add(Double.MAX_VALUE);
-		}
 		
 		simMatrix.add(newRow);
 		
-		for (int i=0;i<fastClusters.size()-1;i++) { // adding a new value to create new column for all but the last row, which already has the column for the new cluster
+		// adding a new value to create new column for all but the last row, which
+		// already has the column for the new cluster
+		for (int i=0; i < fastClusters.size()-1; i++)
 			simMatrix.get(i).add(Double.MAX_VALUE);
-		}
 		
-		if (simMatrix.size()!=fastClusters.size()) {
-			throw new RuntimeException("simMatrix.size(): " + simMatrix.size() + " is not equal to fastClusters.size(): " + fastClusters.size());
-		}
+		if (simMatrix.size() != fastClusters.size())
+			throw new RuntimeException("simMatrix.size(): " + simMatrix.size()
+				+ " is not equal to fastClusters.size(): " + fastClusters.size());
 		
-		for (int i=0;i<fastClusters.size();i++) {
-			if ( simMatrix.get(i).size() != fastClusters.size() ) {
-				throw new RuntimeException("simMatrix.get(" + i + ").size(): " + simMatrix.get(i).size() + " is not equal to fastClusters.size(): " + fastClusters.size());
-			}
-		}
+		for (int i=0; i < fastClusters.size(); i++)
+			if ( simMatrix.get(i).size() != fastClusters.size() )
+				throw new RuntimeException("simMatrix.get(" + i + ").size(): "
+					+ simMatrix.get(i).size() + " is not equal to fastClusters.size(): "
+					+ fastClusters.size());
 	
 		
-		for (int i=0;i<fastClusters.size();i++) {
+		for (int i=0; i < fastClusters.size(); i++) {
 			FastCluster currCluster = fastClusters.get(i);
 			double currJSDivergence = 0;
 			if (Config.getCurrSimMeasure().equals(SimMeasure.js)) {
@@ -339,8 +320,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		}
 	}
 	
-	public static List<List<Double>> createSimilarityMatrix(List<FastCluster> clusters) {
-		
+	public static List<List<Double>> createSimilarityMatrix(
+			List<FastCluster> clusters) {
 		List<List<Double>> simMatrixObj = new ArrayList<>(clusters.size());
 		
 		for (int i=0;i<clusters.size();i++) {

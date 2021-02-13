@@ -3,7 +3,6 @@ package edu.usc.softarch.arcade.config;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import soot.SootClass;
 import soot.SootMethod;
 import edu.usc.softarch.arcade.classgraphs.ClassGraphTransformer;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
-import edu.usc.softarch.arcade.util.FileUtil;
 
 //TODO This class is an abomination and must be destroyed.
 /**
@@ -80,28 +78,18 @@ public class Config {
 	private static List<Integer> numTopicsList = new ArrayList<>();
 
 	public static List<Integer> getNumTopicsList() { return numTopicsList; }
-	public static void setNumTopicsList(List<Integer> numTopicsList) {
-		Config.numTopicsList = numTopicsList;	}
 
 	public static int getNumTopics() { return numTopics; }
 	public static void setNumTopics(int numTopics) {
 		Config.numTopics = numTopics;	}
-	
-	public static String srcDir = ".";
 
 	/* DriverEngine options */
-	public static boolean useFastFeatureVectorsFile = false;
 	private static String depsRsfFilename;
 	private static String groundTruthFile;
-	private static String smellClustersFile;
-	public static void setSmellClustersFile(String smellClustersFile) {
-		Config.smellClustersFile = smellClustersFile;	}
 
 	private static int startNumClustersRange;
 	private static int endNumClustersRange;
 	private static int rangeNumClustersStep;
-	private static boolean usingPreselectedRange = false;
-	private static boolean usingNumTopicsRange = false;
 
 	private static int startNumTopicsRange;
 	public static int getStartNumTopicsRange() { return startNumTopicsRange; }
@@ -115,16 +103,11 @@ public class Config {
 	private static Granule clusteringGranule = Granule.file;
 	private static List<String> excludedEntities;
 	private static String clusterStartsWith;
-	public static String getClusterStartsWith() {	return clusterStartsWith;	}
 	public static Granule getClusteringGranule() { return clusteringGranule; }
-	public static boolean isUsingPreselectedRange() {
-		return usingPreselectedRange; }
-	public static boolean isUsingNumTopicsRange() { return usingNumTopicsRange; }
 	public static int getStartNumClustersRange() { return startNumClustersRange; }
 	public static int getEndNumClustersRange() { return endNumClustersRange; }
 	public static int getRangeNumClustersStep() { return rangeNumClustersStep; }
 	public static String getGroundTruthFile() { return groundTruthFile;	}
-	public static String getSmellClustersFile() {	return smellClustersFile;	}
 	public static String getOdemFile() { return odemFile;	}
 	public static String getCurrProjStr() {	return currProjName; }
 	public static int getNumClusters() { return numClusters; }
@@ -219,7 +202,6 @@ public class Config {
 			
 			odemFile = prop.getProperty("odem_file");
 			groundTruthFile = prop.getProperty("ground_truth_file");
-			smellClustersFile = prop.getProperty("smell_clusters_file");
 			String preselectedRange = prop.getProperty("preselected_range");
 			if (preselectedRange != null) {
 				String[] tokens = preselectedRange.split(",");
@@ -230,7 +212,6 @@ public class Config {
 					System.err.println(errMsg);
 					System.exit(1);
 				}
-				usingPreselectedRange = true;
 				startNumClustersRange = Integer.parseInt(tokens[0]);
 				endNumClustersRange = Integer.parseInt(tokens[1]);
 				rangeNumClustersStep = Integer.parseInt(tokens[2]);
@@ -251,7 +232,6 @@ public class Config {
 					System.err.println(errMsg);
 					System.exit(1);
 				}
-				usingNumTopicsRange = true;
 				startNumTopicsRange = Integer.parseInt(tokens[0]);
 				endNumTopicsRange = Integer.parseInt(tokens[1]);
 				rangeNumTopicsStep = Integer.parseInt(tokens[2]);
@@ -320,22 +300,7 @@ public class Config {
 					ignoreDependencyFilters = false;
 				}
 			}
-			
-			if (prop.getProperty("src_dir") !=null) {
-				srcDir = FileUtil.tildeExpandPath(prop.getProperty("src_dir"));
-			}
-			
-			if (prop.getProperty("use_fast_feature_vectors_file") != null) {
-				if (prop.getProperty("use_fast_feature_vectors_file").equals("true")) {
-					useFastFeatureVectorsFile = true;
-				}
-				else if (prop.getProperty("use_fast_feature_vectors_file").equals("false")) {
-					useFastFeatureVectorsFile = false;
-				}
-			}
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -402,18 +367,6 @@ public class Config {
 	public static String getXMLFeatureVectorMapFilename() {
 		return DATADIR + File.separator + getCurrProjStr() + "_fvMap.xml"; }
 
-	public static String getXLSDepsFilename() {
-		return DATADIR + File.separator + getCurrProjStr() + "_deps.xls"; }
-	
-	public static String getXLSSimMeasureFilename() {
-		return DATADIR + File.separator + getCurrProjStr() + "_sim.xls"; }
-	
-	public static String getXMLClassGraphFilename() {
-		return DATADIR + File.separator + getCurrProjStr() + "_clg.xml"; }
-	
-	public static String getSerializedClustersFilename() {
-		return DATADIR + File.separator + getCurrProjStr() +"_clusters.data"; }
-
 	public static String getClusterGraphDotFilename() {
 		return DATADIR + File.separator + getCurrProjStr() + "_cluster_graph.dot"; }
 
@@ -435,24 +388,9 @@ public class Config {
 			+ "_unusedMethods.data";
 	}
 
-	public static String getXMLSmellArchGraphFilename() {
-		return DATADIR + File.separator + Config.getCurrProjStr()
-			+ "_smellArchGraph.xml";
-	}
-
-	public static String getXMLSmellArchFilename() {
-		return DATADIR + File.separator + Config.getCurrProjStr()
-			+ "_smellArch.xml";
-	}
-
 	public static String getSpecifiedSmallArchFromXML() {
 		return DATADIR + File.separator + getCurrProjStr()
 			+ "_smellArch_specified.xml";
-	}
-
-	public static String getMethodInfoFilename() {
-		return DATADIR + File.separator + getCurrProjStr()
-			+ "_methodInfo.xml";
 	}
 	
 	public static String getNumbereNodeMappingTextFilename() {
@@ -493,10 +431,6 @@ public class Config {
 	public static String getProjConfigFilename() {
 		return projConfigFilename; }
 
-	public static String getXMLFunctionDepGraphFilename() {
-		return DATADIR + File.separator + getCurrProjStr() + "_func_dep_graph.xml";
-	}
-
 	public static Language getSelectedLanguage() { return selectedLanguage; }
 
 	public static void setSelectedLanguage(Language inLang) {
@@ -520,16 +454,6 @@ public class Config {
 
 	public static String getMalletDocTopicsFilename() {
 		return malletDocTopicsFilename;	}
-
-	public static String getNameToFeatureSetMapFilename() {
-		return DATADIR + File.separator + getCurrProjStr()
-			+ "_name_to_feature_set_map.data";
-	}
-
-	public static String getNamesInFeatureSetFilename() {
-		return DATADIR + File.separator + getCurrProjStr()
-			+ "_names_in_feature_set.data";
-	}
 
 	public static String getFastFeatureVectorsFilename() {
 		return DATADIR + File.separator + getCurrProjStr()
@@ -566,24 +490,8 @@ public class Config {
 		return Config.getCurrProjFilenamePrefix() + numClustersList.get(0) + "-" + numClustersList.get(numClustersList.size()-1) + "_" + selectedAlg  + "_" + simMeasure + "_clusters_mojo.csv";
 	}
 
-	public static void setClustersToWriteList(List<Integer> inClustersToWriteList) {
-		clustersToWriteList  = inClustersToWriteList;
-	}
-
 	public static List<Integer> getClustersToWriteList() {
 		return clustersToWriteList;
-	}
-
-	public static String getFilteredRoutineFactsFilename() {
-		return Config.getCurrProjFilenamePrefix() + "_filteredRoutineFacts.rsf";
-	}
-
-	public static String getFilteredFactsFilename() {
-		return Config.getCurrProjFilenamePrefix() + "_filteredFacts.rsf";
-	}
-	
-	public static String getClassGraphRsfFilename() {
-		return Config.getCurrProjFilenamePrefix() + "_class_graph_facts.rsf";
 	}
 
 	public static List<String> getExcludedEntities() {

@@ -24,7 +24,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,22 +48,30 @@ import soot.SootClass;
  */
 public class FeatureVectorMap {
 	// #region FIELDS ------------------------------------------------------------
-	public Map<SootClass, FeatureVector> sc_fv_map = new HashMap<>();
-	public Map<String, FeatureVector> featureVectorNameToFeatureVectorMap =
-		new HashMap<>(1500);
-	public Map<String, BitSet> nameToFeatureSetMap = new HashMap<>(1500);
-	
-	private Logger logger = Logger.getLogger(FeatureVectorMap.class);
+	private static Logger logger =
+		LogManager.getLogger(FeatureVectorMap.class);
+
+	private Map<SootClass, FeatureVector> sc_fv_map = new HashMap<>();
+	private Map<String, BitSet> nameToFeatureSetMap = new HashMap<>(1500);
 	private List<String> endNodesListWithNoDupes;
-	private Set<String> startNodesSet;
 	private Set<String> allNodesSet;
 	// #endregion FIELDS ---------------------------------------------------------
 
+	// #region CONSTRUCTORS ------------------------------------------------------
+	public FeatureVectorMap(Map<SootClass, FeatureVector> vecMap) {
+		this.sc_fv_map = vecMap; }
+	
+	public FeatureVectorMap(ClassGraph clg) {
+		constructFeatureVectorMapFromClassGraph(clg); }
+
+	public FeatureVectorMap(TypedEdgeGraph typedEdgeGraph) {
+		constructFeatureVectorMapFromTypedEdgeGraph(typedEdgeGraph); }
+	// #endregion CONSTRUCTORS ---------------------------------------------------
+
+	// #region IO ----------------------------------------------------------------
 	public void serializeAsFastFeatureVectors() {
 		FastFeatureVectors ffv = convertToFastFeatureVectors();
 		
-		//TODO Remove Config - This is only used in RsfReader, which initializes
-		//Config. So by refactoring RsfReader, I should be able to clean this up.
 		try(ObjectOutput out = new ObjectOutputStream(
 				new FileOutputStream(Config.getFastFeatureVectorsFilename()))) {
 			out.writeObject(ffv);
@@ -70,6 +79,7 @@ public class FeatureVectorMap {
 			e.printStackTrace();
 		}
 	}
+	// #endregion IO -------------------------------------------------------------
 
 	public FastFeatureVectors convertToFastFeatureVectors() {
 		return new FastFeatureVectors(
@@ -78,40 +88,22 @@ public class FeatureVectorMap {
 			endNodesListWithNoDupes);
 	}
 
-	public FeatureVectorMap(Map<SootClass, FeatureVector> vecMap) {
-		this.sc_fv_map = vecMap;
-	}
-	
-	public FeatureVectorMap() {
-		initializeMaps();
-	}
-	
-	public FeatureVectorMap(ClassGraph clg) {
-		constructFeatureVectorMapFromClassGraph(clg);
-	}
-
-	public FeatureVectorMap(TypedEdgeGraph typedEdgeGraph) {
-		constructFeatureVectorMapFromTypedEdgeGraph(typedEdgeGraph);
-	}
-
 	private void constructFeatureVectorMapFromTypedEdgeGraph(
 			TypedEdgeGraph functionGraph) {
-		
+		// Get edges of the graph
 		Set<StringTypedEdge> edges = functionGraph.getEdges();
 		
+		// Get a set of the types of edges
 		List<String> arcTypesList = Lists.transform(
-				new ArrayList<StringTypedEdge>(edges),
-				(StringTypedEdge edge) -> edge.arcTypeStr
-				);
-		
-		HashSet<String> arcTypesSet = Sets.newHashSet(arcTypesList);
+			new ArrayList<StringTypedEdge>(edges),
+			(StringTypedEdge edge) -> edge.arcTypeStr);
+		Set<String> arcTypesSet = Sets.newHashSet(arcTypesList);
 
 		List<String> startNodesList = Lists.transform(
 				new ArrayList<StringTypedEdge>(edges),
-				(StringTypedEdge edge) -> edge.getSrcStr()
-				);
+				(StringTypedEdge edge) -> edge.getSrcStr());
 
-		startNodesSet = Sets.newHashSet(startNodesList);
+		Set<String> startNodesSet = Sets.newHashSet(startNodesList);
 
 		List<String> endNodesList = Lists.transform(
 				new ArrayList<StringTypedEdge>(edges),
@@ -175,11 +167,6 @@ public class FeatureVectorMap {
 			logger.debug("difference set size: " + differenceSet.size());
 			logger.debug(Joiner.on("\n").join(differenceSet));
 		}
-	}
-
-	private void initializeMaps() {
-		sc_fv_map = new HashMap<>();
-		featureVectorNameToFeatureVectorMap = new HashMap<>();
 	}
 
 	public void writeXMLFeatureVectorMapUsingSootClassEdges() throws TransformerException,

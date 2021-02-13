@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.facts.driver;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -36,12 +37,7 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 	public FastFeatureVectors getFfVecs() {	return this.ffVecs; }
 	// #endregion ACCESSORS ------------------------------------------------------
 
-	public static void main(String[] args) throws IOException {
-		String classesDirPath = args[0];
-		String depsRsfFilename = args[1];
-		(new JavaSourceToDepsBuilder()).build(classesDirPath, depsRsfFilename);
-	}
-
+	// #region PROCESSING --------------------------------------------------------
 	public void build(String classesDirPath, String depsRsfFilename)
 			throws IOException {
 		String[] inputClasses = { FileUtil.tildeExpandPath(classesDirPath) };
@@ -51,50 +47,75 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 		// Classycle gets a list of directories and/or files and runs an analysis
 		// on everything it received.
 		Analyser analyzer = new Analyser(inputClasses);
-		// "false" means it will do a full analysis rather than a package-only
-		// analysis.
+		// "false" means it will do a full analysis rather than package-only.
 		analyzer.readAndAnalyse(false);
 
-		AtomicVertex[] graph = analyzer.getClassGraph();
-		
 		// Building the dependency graph as a set of edges between classes
-		edges = new LinkedHashSet<>();
-		for (int i = 0; i < graph.length; i++) {
-			AtomicVertex vertex = graph[i];
-			ClassAttributes sourceAttributes = 
+		AtomicVertex[] graph = analyzer.getClassGraph();
+		this.edges = buildEdges(graph);
+		
+		// Prints the dependencies to a file
+		serializeEdges(this.edges, depsRsfFilepath);
+		
+		// Calculating the number of source entities in dependency graph
+		Set<String> sources = new HashSet<>();
+		for (Pair<String,String> edge : edges)
+			sources.add(edge.getLeft());
+		this.numSourceEntities = sources.size();
+		
+		// Creates a proper graph object to hold the edges set.
+		TypedEdgeGraph typedEdgeGraph = new TypedEdgeGraph();
+		for (Pair<String,String> edge : edges)
+			typedEdgeGraph.addEdge("depends", edge.getLeft(), edge.getRight());
+		FeatureVectorMap fvMap = new FeatureVectorMap(typedEdgeGraph);
+		ffVecs = fvMap.convertToFastFeatureVectors();
+	}
+
+	/**
+	 * Converts the format of a graph from Classycle's to ARCADE's.
+	 * 
+	 * @param graph A graph drawn from Classycle.
+	 */
+	private Set<Pair<String, String>> buildEdges(AtomicVertex[] graph) {
+		Set<Pair<String, String>> edges = new LinkedHashSet<>();
+
+		// For each Vertex in the graph
+		for (AtomicVertex vertex : graph) {
+			// Get the attributes of the vertex
+			ClassAttributes sourceAttributes =
 				(ClassAttributes)vertex.getAttributes();
-			for (int j = 0, n = vertex.getNumberOfOutgoingArcs(); j < n; j++) {
-				ClassAttributes targetAttributes = 
+			// And then for each edge of that vertex
+			for (int j = 0; j < vertex.getNumberOfOutgoingArcs(); j++) {
+				// Get the attributes of the related vertex
+				ClassAttributes targetAttributes =
 					(ClassAttributes)vertex.getHeadVertex(j).getAttributes();
-				Pair<String,String> edge =
-					new ImmutablePair<>(
-						sourceAttributes.getName(), targetAttributes.getName());
+				// Create a Pair to represent the edge
+				Pair<String,String> edge = new ImmutablePair<>(
+					sourceAttributes.getName(), targetAttributes.getName());
+				// And add it to the set of edges
 				edges.add(edge);
 			}
 		}
-		
-		// Prints the dependencies to a file
+
+		return edges;
+	}
+	// #endregion PROCESSING -----------------------------------------------------
+
+	// #region IO ----------------------------------------------------------------
+	public static void main(String[] args) throws IOException {
+		String classesDirPath = args[0];
+		String depsRsfFilename = args[1];
+		(new JavaSourceToDepsBuilder()).build(classesDirPath, depsRsfFilename);
+	}
+
+	private void serializeEdges(Set<Pair<String, String>> edges,
+			String depsRsfFilepath) throws FileNotFoundException{
 		PrintStream out = new PrintStream(depsRsfFilepath);
 		PrintWriter writer = new PrintWriter(out);
 		for (Pair<String,String> edge : edges) {
 			writer.println("depends " + edge.getLeft() + " " + edge.getRight());
 		}
 		writer.close();
-		
-		// Calculating the number of source entities in dependency graph
-		Set<String> sources = new HashSet<>();
-		for (Pair<String,String> edge : edges) {
-			sources.add(edge.getLeft());
-		}
-		numSourceEntities = sources.size();
-		
-		// Creates a proper graph object to hold the edges set.
-		TypedEdgeGraph typedEdgeGraph = new TypedEdgeGraph();
-		for (Pair<String,String> edge : edges) {
-			typedEdgeGraph.addEdge("depends",edge.getLeft(),edge.getRight());
-		}
-		
-		FeatureVectorMap fvMap = new FeatureVectorMap(typedEdgeGraph);
-		ffVecs = fvMap.convertToFastFeatureVectors();
 	}
+	// #endregion IO -------------------------------------------------------------
 }

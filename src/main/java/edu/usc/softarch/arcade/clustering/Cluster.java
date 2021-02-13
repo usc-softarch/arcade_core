@@ -26,7 +26,7 @@ public class Cluster extends FeatureVector {
 	private Double simLeftRight;
 	private String type;
 	
-	private static SimMeasureComparator _ORDER;
+	private SimMeasureComparator _ORDER;
 	// #endregion FIELDS ---------------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------

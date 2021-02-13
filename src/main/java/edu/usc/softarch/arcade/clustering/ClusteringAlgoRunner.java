@@ -7,7 +7,8 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
@@ -16,24 +17,32 @@ import edu.usc.softarch.arcade.config.Config.Language;
 import edu.usc.softarch.arcade.util.FileListing;
 
 public class ClusteringAlgoRunner {
-	private static Logger logger = Logger.getLogger(ClusteringAlgoRunner.class);
+	// #region ATTRIBUTES --------------------------------------------------------
+	private static Logger logger =
+		LogManager.getLogger(ClusteringAlgoRunner.class);
+	
 	protected static List<FastCluster> fastClusters;
-	public static List<FastCluster> getFastClusters() {
-		return fastClusters;
-	}
-
 	protected static ArrayList<Cluster> clusters;
 	protected static FastFeatureVectors fastFeatureVectors;
 	protected static double maxClusterGain = 0;
 	protected static int numClustersAtMaxClusterGain = 0;
 	protected static int numberOfEntitiesToBeClustered = 0;
+	// #endregion ATTRIBUTES -----------------------------------------------------
+
+	// #region ACCESSORS ---------------------------------------------------------
+	public static List<FastCluster> getFastClusters() { return fastClusters; }
+
+	public static void setFastFeatureVectors(
+			FastFeatureVectors inFastFeatureVectors) {
+		fastFeatureVectors = inFastFeatureVectors;
+	}
+	// #endregion ACCESSORS ------------------------------------------------------
 	
 	protected static void initializeClusters(String srcDir) {
 		fastClusters = new ArrayList<>();
 
 		for (String name : fastFeatureVectors.getFeatureVectorNames()) {
-			BitSet featureSet = fastFeatureVectors
-					.getNameToFeatureSetMap().get(name);
+			BitSet featureSet = fastFeatureVectors.getNameToFeatureSetMap().get(name);
 			FastCluster fastCluster = new FastCluster(name, featureSet,
 					fastFeatureVectors.getNamesInFeatureSet());
 			
@@ -42,8 +51,8 @@ public class ClusteringAlgoRunner {
 		
 		try {
 			if (fastClusters.isEmpty()) {
-				List<File> javaFiles = FileListing.getFileListing(new File(srcDir),
-						".java");
+				List<File> javaFiles =
+					FileListing.getFileListing(new File(srcDir), ".java");
 				
 				for (File javaFile : javaFiles) {
 					FastCluster cluster = new FastCluster(javaFile.getPath());
@@ -54,17 +63,15 @@ public class ClusteringAlgoRunner {
 			e.printStackTrace();
 		}
 
+		// Logging
 		logger.debug("Listing initial cluster names using for-each...");
-		for (FastCluster cluster : fastClusters) {
+		for (FastCluster cluster : fastClusters)
 			logger.debug(cluster.getName());
-		}
-
 		logger.debug("Listing initial cluster names using indexed loop...");
 		for (int i = 0; i < fastClusters.size(); i++) {
 			FastCluster cluster = fastClusters.get(i);
 			logger.debug(cluster.getName());
 		}
-
 		numberOfEntitiesToBeClustered = fastClusters.size();
 		logger.debug("number of initial clusters: " + numberOfEntitiesToBeClustered);
 
@@ -78,32 +85,24 @@ public class ClusteringAlgoRunner {
 		
 		if (Config.getSelectedLanguage().equals(Language.c)) {
 			Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
-			if (	
-					Config.getClusteringGranule().equals(Granule.file) && 
+			if (Config.getClusteringGranule().equals(Granule.file) && 
 					isSingletonClusterNonexcluded(fastCluster) &&
 					!fastCluster.getName().startsWith("/") &&
-				
-					(	
-							p.matcher(fastCluster.getName()).find()
-					)
-				)  
-				{
-						fastClusters.add(fastCluster);
-				}
-				else {
-					logger.debug("Excluding file: " + fastCluster.getName());
-				}
+					p.matcher(fastCluster.getName()).find())
+				fastClusters.add(fastCluster);
+			else
+				logger.debug("Excluding file: " + fastCluster.getName());
 		}
+
 		if (Config.getClusteringGranule().equals(Granule.func)) {
-			if (fastCluster.getName().equals("\"##\"")) {
+			if (fastCluster.getName().equals("\"##\""))
 				return;
-			}
 			fastClusters.add(fastCluster);
 		}
+
 		if (Config.getSelectedLanguage().equals(Language.java) && 
-			Config.isClassInSelectedPackages(fastCluster.getName())) {
-				fastClusters.add(fastCluster);
-		}
+				Config.isClassInSelectedPackages(fastCluster.getName()))
+			fastClusters.add(fastCluster);
 	}
 
 	public static boolean isSingletonClusterNonexcluded(FastCluster fastCluster) {
@@ -126,30 +125,6 @@ public class ClusteringAlgoRunner {
 			maxClusterGain = clusterGain;
 			numClustersAtMaxClusterGain = fastClusters.size();
 		}
-	}
-	
-	protected static void printTwoMostSimilarClustersUsingStructuralData(
-			MaxSimData maxSimData) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("In, "
-					+ Thread.currentThread().getStackTrace()[1].getMethodName()
-					+ ", \nMax Similar Clusters: ");
-
-			ClusterUtil.printSimilarFeatures(maxSimData.c1, maxSimData.c2,
-					fastFeatureVectors);
-
-			logger.debug(maxSimData.currentMaxSim);
-			logger.debug("\n");
-
-			logger.debug("before merge, clusters size: " + fastClusters.size());
-			
-		}
-	}
-	
-	public static void setFastFeatureVectors(
-			FastFeatureVectors inFastFeatureVectors) {
-		fastFeatureVectors = inFastFeatureVectors;
-		
 	}
 	
 	protected static void performPostProcessingConditionally() {
