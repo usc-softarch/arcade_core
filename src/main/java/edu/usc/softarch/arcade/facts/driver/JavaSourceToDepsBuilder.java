@@ -68,7 +68,7 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 		for (Pair<String,String> edge : edges)
 			typedEdgeGraph.addEdge("depends", edge.getLeft(), edge.getRight());
 		FeatureVectorMap fvMap = new FeatureVectorMap(typedEdgeGraph);
-		ffVecs = fvMap.convertToFastFeatureVectors();
+		this.ffVecs = fvMap.convertToFastFeatureVectors();
 	}
 
 	/**

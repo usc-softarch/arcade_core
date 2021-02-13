@@ -15,7 +15,6 @@ import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.SimMeasure;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopics;
-import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.arcade.util.StopWatch;
@@ -23,18 +22,19 @@ import edu.usc.softarch.arcade.util.StopWatch;
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	private static Logger logger =
 		LogManager.getLogger(ConcernClusteringRunner.class);
+	private String language;
 	
 	/**
 	 * @param vecs feature vectors (dependencies) of entities
-	 * @param tmeMethod method of topic model extraction
 	 * @param srcDir directories with java or c files
 	 * @param numTopics number of topics to extract
 	 */
 	ConcernClusteringRunner(FastFeatureVectors vecs,
-			TopicModelExtractionMethod tmeMethod, String srcDir, String artifactsDir){
+			String srcDir, String artifactsDir, String language) {
 		setFastFeatureVectors(vecs);
-		initializeClusters(srcDir);
-		initializeDocTopicsForEachFastCluster(tmeMethod, srcDir, artifactsDir);
+		initializeClusters(srcDir); // Initially, every node gets a cluster
+		initializeDocTopicsForEachFastCluster(srcDir, artifactsDir);
+		this.language = language;
 	}
 	
 	public void computeClustersWithConcernsAndFastClusters(
@@ -99,25 +99,17 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		return msData;
 	}
 
-	private void initializeDocTopicsForEachFastCluster(
-			TopicModelExtractionMethod tmeMethod, String srcDir,
+	private void initializeDocTopicsForEachFastCluster(String srcDir,
 			String artifactsDir) {
 		logger.debug("Initializing doc-topics for each cluster...");
 
-		if (tmeMethod == TopicModelExtractionMethod.VAR_MALLET_FILE) {
-			TopicUtil.docTopics = TopicUtil.getDocTopicsFromVariableMalletDocTopicsFile();
-			for (FastCluster c : fastClusters)
-				TopicUtil.setDocTopicForFastClusterForMalletFile(TopicUtil.docTopics, c);
+		try {
+			TopicUtil.docTopics = new DocTopics(srcDir, artifactsDir, this.language);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		if (tmeMethod == TopicModelExtractionMethod.MALLET_API) {
-			try {
-				TopicUtil.docTopics = new DocTopics(srcDir,artifactsDir, Config.getSelectedLanguage().toString());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			for (FastCluster c : fastClusters)
-				TopicUtil.setDocTopicForFastClusterForMalletApi(c, Config.getSelectedLanguage().toString());
-		}
+		for (FastCluster c : fastClusters)
+			TopicUtil.setDocTopicForFastClusterForMalletApi(c, this.language);
 		
 		List<FastCluster> jspRemoveList = new ArrayList<>();
 		for (FastCluster c : fastClusters) {

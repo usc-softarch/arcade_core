@@ -41,14 +41,19 @@ public class ClusteringAlgoRunner {
 	protected static void initializeClusters(String srcDir) {
 		fastClusters = new ArrayList<>();
 
+		// For each node in the adjacency matrix
 		for (String name : fastFeatureVectors.getFeatureVectorNames()) {
+			// Get the vector relative to that node
 			BitSet featureSet = fastFeatureVectors.getNameToFeatureSetMap().get(name);
+			// Create a cluster containing only that node
 			FastCluster fastCluster = new FastCluster(name, featureSet,
-					fastFeatureVectors.getNamesInFeatureSet());
+				fastFeatureVectors.getNamesInFeatureSet());
 			
+			// Add the cluster except extraordinary circumstances (assume always)
 			addClusterConditionally(fastCluster);
 		}
 		
+		// Unknown whether this block ever executes
 		try {
 			if (fastClusters.isEmpty()) {
 				List<File> javaFiles =
@@ -74,17 +79,24 @@ public class ClusteringAlgoRunner {
 		}
 		numberOfEntitiesToBeClustered = fastClusters.size();
 		logger.debug("number of initial clusters: " + numberOfEntitiesToBeClustered);
-
 	}
 
+	/**
+	 * For almost all situations, adds the cluster to the list.
+	 */
 	private static void addClusterConditionally(FastCluster fastCluster) {
+		// This block is used only for certain older modules, disregard
 		if (Config.ignoreDependencyFilters) {
 			fastClusters.add(fastCluster);
 			return;
 		}
 		
+		// If the source language is C or C++, add the only C-based entities
 		if (Config.getSelectedLanguage().equals(Language.c)) {
 			Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
+			// First condition to be assumed true
+			// Second condition to be assumed true
+			// Third condition checks whether the cluster is based on a valid C entity
 			if (Config.getClusteringGranule().equals(Granule.file) && 
 					isSingletonClusterNonexcluded(fastCluster) &&
 					!fastCluster.getName().startsWith("/") &&
@@ -94,21 +106,22 @@ public class ClusteringAlgoRunner {
 				logger.debug("Excluding file: " + fastCluster.getName());
 		}
 
+		// This block is used only for certain older modules, disregard
 		if (Config.getClusteringGranule().equals(Granule.func)) {
 			if (fastCluster.getName().equals("\"##\""))
 				return;
 			fastClusters.add(fastCluster);
 		}
 
+		// If the source language is Java, add all clusters
+		// Second condition to be assumed true
 		if (Config.getSelectedLanguage().equals(Language.java) && 
 				Config.isClassInSelectedPackages(fastCluster.getName()))
 			fastClusters.add(fastCluster);
 	}
 
 	public static boolean isSingletonClusterNonexcluded(FastCluster fastCluster) {
-		if (Config.getExcludedEntities() == null) {
-			return true;
-		}
+		if (Config.getExcludedEntities() == null) return true;
 		return !Config.getExcludedEntities().contains(fastCluster.getName());
 	}
 	

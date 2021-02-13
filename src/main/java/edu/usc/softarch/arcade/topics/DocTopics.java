@@ -54,7 +54,6 @@ public class DocTopics {
 			throws Exception {
 		// Begin by importing documents from text to feature sequences
 		List<Pipe> pipeList = new ArrayList<>();
-		int numTopics = 100;
 
 		/* Pipes: alphanumeric only, camel case separation, lowercase, tokenize,
 		 * remove stopwords english, remove stopwords java, stem, map to
@@ -92,12 +91,15 @@ public class DocTopics {
 		/*TODO Is anything above this point even doing anything? The instances
 		 * variable goes nowhere and the object attributes are only affected past
 		 * this point. */
+
+		int numTopics = 100;
+		String fs = File.separator;
 		
 		InstanceList previousInstances = InstanceList.load(
-			new File(artifactsDir + File.separator + "output.pipe"));
+			new File(artifactsDir + fs + "output.pipe"));
 		
 		TopicInferencer inferencer = TopicInferencer.read(
-			new File(artifactsDir + File.separator + "infer.mallet"));
+			new File(artifactsDir + fs + "infer.mallet"));
 		
 		for (int instIndex = 0; instIndex < previousInstances.size(); instIndex++) {
 			DocTopicItem dtItem = new DocTopicItem();

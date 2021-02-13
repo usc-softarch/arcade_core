@@ -47,7 +47,6 @@ public class BatchSmellDetectionRunner {
 			PrintWriter writer = new PrintWriter(techniquesDir
 					+ File.separatorChar + mojoFmMappingFilename, "UTF-8");
 			for (File gtRsfFile : newGtFiles) {
-				Config.setSmellClustersFile(gtRsfFile.getAbsolutePath()); 
 				String prefix = FileUtil.extractFilenamePrefix(gtRsfFile
 						.getName());
 				String detectedSmellsFilename = techniquesDir + prefix

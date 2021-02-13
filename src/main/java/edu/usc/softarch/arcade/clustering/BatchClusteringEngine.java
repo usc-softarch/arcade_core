@@ -81,6 +81,8 @@ public class BatchClusteringEngine {
 		logger.debug("Processing directory: " + folder.getName());
 		String revisionNumber = folder.getName();
 		String fullClassesDir =	folder.getAbsolutePath() + fs + inClassesDir;
+		String fullSrcDir = folder.getAbsolutePath() + fs;
+		if (language.equals("c")) Config.selectedLanguage = Config.Language.c;
 		
 		// Ensure binaries directory exists
 		File classesDirFile = new File(fullClassesDir);
@@ -99,26 +101,21 @@ public class BatchClusteringEngine {
 		builder.build(fullClassesDir, depsRsfFilename);
 		if (builder.getEdges().isEmpty()) return;
 
+		// Set the number of topics to be used in clustering
 		int numTopics = (int) ((double) builder.getNumSourceEntities() * 0.18);
-		String fullSrcDir = folder.getAbsolutePath() + File.separatorChar;
-		
-		if (language.equals("c"))
-			Config.selectedLanguage = Config.Language.c;
 		
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
-				builder.getFfVecs(), TopicModelExtractionMethod.MALLET_API,
-				fullSrcDir, outputDirName+"/base");
+				builder.getFfVecs(), fullSrcDir, outputDirName + "/base", language);
 
 		// have to set some Config settings before executing the runner
-		int numClusters = (int) ((double) runner.getFastClusters()
-				.size() * .20); // number of clusters to obtain is based
-								// on the number of entities
+		// number of clusters to obtain is based on the number of entities
+		int numClusters = (int) ((double) runner.getFastClusters().size() * .20);
 		Config.setNumClusters(numClusters);
 		Config.stoppingCriterion = StoppingCriterionConfig.preselected;
 		Config.setCurrSimMeasure(SimMeasure.js);
 		runner.computeClustersWithConcernsAndFastClusters(new PreSelectedStoppingCriterion());
 
-		String arcClustersFilename = outputDirName + File.separatorChar
+		String arcClustersFilename = outputDirName + fs
 				+ revisionNumber + "_" + numTopics + "_topics_"
 				+ runner.getFastClusters().size() + "_arc_clusters.rsf";
 		// need to build the map before writing the file
@@ -129,7 +126,7 @@ public class BatchClusteringEngine {
 				arcClustersFilename);
 
 		Config.setDepsRsfFilename(depsRsfFile.getAbsolutePath());
-		String detectedSmellsFilename = outputDirName + File.separatorChar
+		String detectedSmellsFilename = outputDirName + fs
 				+ revisionNumber + "_arc_smells.ser";
 
 		// Need to provide docTopics first

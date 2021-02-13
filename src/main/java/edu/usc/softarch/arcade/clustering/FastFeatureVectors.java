@@ -21,7 +21,7 @@ public class FastFeatureVectors implements Serializable {
 	// #region CONSTRUCTORS ------------------------------------------------------
 	FastFeatureVectors(List<String> featureNames, 
 			Map<String, BitSet> nameToFeatureSetMap, 
-			List<String> namesInFeatureSet ) {
+			List<String> namesInFeatureSet) {
 		this.setFeatureVectorNames(featureNames);
 		this.nameToFeatureSetMap = nameToFeatureSetMap;
 		this.namesInFeatureSet = namesInFeatureSet;

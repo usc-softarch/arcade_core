@@ -9,33 +9,29 @@ import java.util.Set;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 
 public class FastCluster {
+	// #region ATTRIBUTES --------------------------------------------------------
 	private String name;
 	private int numEntities;
 	private Map<Integer,Double> nonZeroFeatureMap = new HashMap<>();
 	private int featuresLength = 0;
 	public DocTopicItem docTopicItem;
-	
-	public int getFeaturesLength() {
-		return featuresLength;
-	}
+	// #endregion ATTRIBUTES -----------------------------------------------------
 
-	public Map<Integer, Double> getNonZeroFeatureMap() {
-		return nonZeroFeatureMap;
-	}
-
-	public String getName() {
-		return name;
-	}
-	
-	public FastCluster(String name, BitSet featureSet, List<String> namesInFeatureSet) {
+	// #region CONSTRUCTORS ------------------------------------------------------
+	public FastCluster(String name, BitSet featureSet,
+			List<String> namesInFeatureSet) {
+		// Name of a node
 		this.name = name;
-		featuresLength = namesInFeatureSet.size();
+		// Number of target nodes in the graph
+		this.featuresLength = namesInFeatureSet.size();
 		
-		nonZeroFeatureMap = new HashMap<>();
+		// Map of target nodes to which this node has an edge
+		this.nonZeroFeatureMap = new HashMap<>();
 		for (int i=0; i < featuresLength; i++)
 			if (featureSet.get(i)) // put if not 0
 				nonZeroFeatureMap.put(i,1.0);
 
+		// Cluster currently only has one entity, the node itself
 		this.numEntities = 1;
 	}
 	
@@ -57,7 +53,6 @@ public class FastCluster {
 
 		this.numEntities = c1.getNumEntities() + c2.getNumEntities();
 		this.featuresLength = c1.getFeaturesLength();
-		
 	}
 
 	public FastCluster(ClusteringAlgorithmType cat, FastCluster c1,
@@ -70,12 +65,23 @@ public class FastCluster {
 			setNonZeroFeatureMapForLibmoUsingIndices(c1, c2, c2Indices);
 			
 			this.name = c1.getName() + ',' + c2.getName();
-			
 
 			this.numEntities = c1.getNumEntities() + c2.getNumEntities();
 			this.featuresLength = c1.getFeaturesLength();
 		}
 	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
+
+	// #region ACCESSORS ---------------------------------------------------------
+	public int getFeaturesLength() { return featuresLength; }
+
+	public Map<Integer, Double> getNonZeroFeatureMap() {
+		return nonZeroFeatureMap; }
+
+	public String getName() {	return name; }
+
+	public int getNumEntities() { return numEntities; }
+	// #endregion ACCESSORS ------------------------------------------------------
 	
 	private void setNonZeroFeatureMapForLibmoUsingIndices(FastCluster c1,
 			FastCluster c2, Set<Integer> c1Indices) {
@@ -97,7 +103,6 @@ public class FastCluster {
 			
 			if (newFeatureValue != null)
 				nonZeroFeatureMap.put(index, newFeatureValue);
-			
 		}
 	}
 
@@ -123,10 +128,6 @@ public class FastCluster {
 				nonZeroFeatureMap.put(index, newFeatureValue);
 			
 		}
-	}
-
-	public int getNumEntities() {
-		return numEntities;
 	}
 	
 	public String toString() {
