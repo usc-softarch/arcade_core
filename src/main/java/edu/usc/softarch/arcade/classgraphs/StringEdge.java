@@ -30,6 +30,10 @@ public class StringEdge implements Serializable {
 		initialize(null, null, srcStr, tgtStr, "");
 	}
 
+	public StringEdge(String srcStr, String tgtStr, String type) {
+		initialize(null, null, srcStr, tgtStr, type);
+	}
+
 	/**
 	 * Clone constructor.
 	 */
@@ -79,19 +83,24 @@ public class StringEdge implements Serializable {
 		logger.info("e.tgtStr: " + e.tgtStr);
 		logger.info("this.tgtStr: " + this.tgtStr);
 
-		return (e.srcStr.equals(this.srcStr) && e.tgtStr.equals(this.tgtStr));
+		return (e.srcStr.equals(this.srcStr) &&
+			e.tgtStr.equals(this.tgtStr) &&
+			e.type.equals(this.type));
 	}
 
 	@Override
 	public int hashCode() {
 		int result = srcStr.hashCode();
 		result = 37 * result + tgtStr.hashCode();
+		result = 37 * result + type.hashCode();
 		return result;
 	}
 	
 	@Override
 	public String toString() {
-		return "(" + srcStr + "," + tgtStr + ")";
+		if(this.type.isEmpty())
+			return "(" + srcStr + "," + tgtStr + ")";
+		return "(" + type + "," + srcStr + "," + tgtStr + ")";
 	}
 	
 	public String toDotString() {

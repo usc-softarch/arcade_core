@@ -36,14 +36,18 @@ import com.google.common.collect.Sets;
 
 import edu.usc.softarch.arcade.classgraphs.ClassGraph;
 import edu.usc.softarch.arcade.classgraphs.SootClassEdge;
+import edu.usc.softarch.arcade.classgraphs.StringEdge;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
-import edu.usc.softarch.arcade.functiongraph.StringTypedEdge;
 
 import soot.SootClass;
 
 /**
+ * Representation of a graph as an adjacency matrix. Each bit vector in the
+ * matrix represents all possible edges from a given source and each valid
+ * target.
+ * 
  * @author joshua
  */
 public class FeatureVectorMap {
@@ -55,6 +59,8 @@ public class FeatureVectorMap {
 	private Map<String, BitSet> nameToFeatureSetMap = new HashMap<>(1500);
 	private List<String> endNodesListWithNoDupes;
 	private Set<String> allNodesSet;
+	private Set<String> arcTypesSet;
+	private Set<String> startNodesSet;
 	// #endregion FIELDS ---------------------------------------------------------
 
 	// #region CONSTRUCTORS ------------------------------------------------------
@@ -81,6 +87,7 @@ public class FeatureVectorMap {
 	}
 	// #endregion IO -------------------------------------------------------------
 
+	// #region VERIFIED METHODS --------------------------------------------------
 	public FastFeatureVectors convertToFastFeatureVectors() {
 		return new FastFeatureVectors(
 			new ArrayList<>(allNodesSet),
@@ -90,64 +97,27 @@ public class FeatureVectorMap {
 
 	private void constructFeatureVectorMapFromTypedEdgeGraph(
 			TypedEdgeGraph functionGraph) {
-		// Get edges of the graph
-		Set<StringTypedEdge> edges = functionGraph.getEdges();
+		initializeNodeSets(functionGraph);
+		buildAdjacencyMatrix(functionGraph);
 		
-		// Get a set of the types of edges
-		List<String> arcTypesList = Lists.transform(
-			new ArrayList<StringTypedEdge>(edges),
-			(StringTypedEdge edge) -> edge.arcTypeStr);
-		Set<String> arcTypesSet = Sets.newHashSet(arcTypesList);
+		// -------------------------------------------------------------------------
 
-		List<String> startNodesList = Lists.transform(
-				new ArrayList<StringTypedEdge>(edges),
-				(StringTypedEdge edge) -> edge.getSrcStr());
+		//TODO This entire block of code below seems to be used only by C fact
+		// fact extraction. I need to review this when I get to that. Either way,
+		// it doesn't seem to serve any purpose other than debugging.
 
-		Set<String> startNodesSet = Sets.newHashSet(startNodesList);
-
-		List<String> endNodesList = Lists.transform(
-				new ArrayList<StringTypedEdge>(edges),
-				(StringTypedEdge edge) -> edge.getTgtStr()
-				);
-		TreeSet<String> endNodesSet = Sets.newTreeSet(endNodesList);
-		endNodesListWithNoDupes = Lists.newArrayList(endNodesSet);
-		
-		List<String> allNodesList = new ArrayList<>(startNodesList);
-		allNodesList.addAll(endNodesListWithNoDupes);
-		
-		allNodesSet = new HashSet<>(allNodesList);
-		
-		Set<String> nonStartNodes = new HashSet<>(allNodesSet);
-		nonStartNodes.removeAll(startNodesSet);
-		
-		int totalTrueBits = 0;
-		for (String source : allNodesSet) {
-			BitSet featureSet = new BitSet(endNodesListWithNoDupes.size());
-			for (String arcType : arcTypesSet) {
-				int bitIndex =0;
-				for (String target : endNodesListWithNoDupes) {
-					if (functionGraph.containsEdge(arcType, source, target)) {
-						featureSet.set(bitIndex, true);
-					}
-					bitIndex++;
-				}
-			}
-			
-			logger.debug(featureSet);
-			totalTrueBits += featureSet.cardinality();
-
-			nameToFeatureSetMap.put(source, featureSet);
-		}
-		
-		logger.debug("total true bits among feature sets: " + totalTrueBits);
-		
 		HashSet<List<String>> featureSetEdges = new HashSet<>();
 		logger.debug("Printing edges represented by feature sets...");
+		// For each source in the graph
 		for (String source : startNodesSet) {
+			// Get the vector representing that node's edges
 			BitSet featureSet = nameToFeatureSetMap.get(source);
-			for (int i=0;i<featureSet.size();i++) {
+			// And then for each potential edge in the vector
+			for (int i=0; i < featureSet.size(); i++) {
+				// If that edge exists in the graph
 				if (featureSet.get(i)) {
-					String target = endNodesListWithNoDupes.get(i);
+					// Add it to the featureSetEdges and print it
+					String target = this.endNodesListWithNoDupes.get(i);
 					logger.debug(source + " " + target);
 					featureSetEdges.add(Lists.newArrayList(source,target));
 				}
@@ -156,18 +126,79 @@ public class FeatureVectorMap {
 		
 		if (RsfReader.untypedEdgesSet != null) {
 			Set<List<String>> intersectionSet = Sets.intersection(
-					featureSetEdges, RsfReader.untypedEdgesSet);
+				featureSetEdges, RsfReader.untypedEdgesSet);
 			logger.debug("Printing intersection of rsf reader untyped edges set and feature set edges...");
 			logger.debug("intersection set size: " + intersectionSet.size());
 			logger.debug(Joiner.on("\n").join(intersectionSet));
 
 			Set<List<String>> differenceSet = Sets.difference(featureSetEdges,
-					RsfReader.untypedEdgesSet);
+				RsfReader.untypedEdgesSet);
 			logger.debug("Printing difference of rsf reader untyped edges set and feature set edges...");
 			logger.debug("difference set size: " + differenceSet.size());
 			logger.debug(Joiner.on("\n").join(differenceSet));
 		}
 	}
+
+	private void initializeNodeSets(TypedEdgeGraph functionGraph) {
+		// Get edges of the graph
+		Set<StringEdge> edges = functionGraph.getEdges();
+		
+		// Get a set of the types of edges
+		List<String> arcTypesList = Lists.transform(
+			new ArrayList<StringEdge>(edges),	StringEdge::getType);
+		this.arcTypesSet = Sets.newHashSet(arcTypesList);
+
+		// Get a set of the start nodes
+		List<String> startNodesList = Lists.transform(
+				new ArrayList<StringEdge>(edges),	StringEdge::getSrcStr);
+		this.startNodesSet = Sets.newHashSet(startNodesList);
+
+		// Get a set of the target nodes
+		List<String> endNodesList = Lists.transform(
+				new ArrayList<StringEdge>(edges), StringEdge::getTgtStr);
+		TreeSet<String> endNodesSet = Sets.newTreeSet(endNodesList);
+		this.endNodesListWithNoDupes = Lists.newArrayList(endNodesSet);
+		
+		// Get the set of all nodes in the graph
+		List<String> allNodesList = new ArrayList<>(startNodesList);
+		allNodesList.addAll(endNodesListWithNoDupes);
+		this.allNodesSet = new HashSet<>(allNodesList);
+	}
+
+	private void buildAdjacencyMatrix(TypedEdgeGraph functionGraph) {
+		// Represents the number of edges in the graph
+		int totalTrueBits = 0;
+
+		// For each node in the graph
+		for (String source : this.allNodesSet) {
+			// Create a vector representing all possible edges from this node to
+			// each potential target node
+			BitSet featureSet = new BitSet(endNodesListWithNoDupes.size());
+			// And then for each node type
+			for (String arcType : arcTypesSet) {
+				int bitIndex = 0;
+				// and for each potential target node
+				for (String target : endNodesListWithNoDupes) {
+					// check if an edge exists between source and target
+					if (functionGraph.containsEdge(arcType, source, target))
+						// If so, set the equivalent target node's bit to 1
+						featureSet.set(bitIndex, true);
+					// Finally, increment the featureSet's index
+					bitIndex++;
+				}
+			}
+			
+			logger.debug(featureSet);
+			// Increment totalTrueBits by the number of outgoing edges from source
+			totalTrueBits += featureSet.cardinality();
+
+			// Add the edges vector to the edge matrix of this graph
+			this.nameToFeatureSetMap.put(source, featureSet);
+		}
+		
+		logger.debug("total true bits among feature sets: " + totalTrueBits);
+	}
+	// #endregion VERIFIED METHODS -----------------------------------------------
 
 	public void writeXMLFeatureVectorMapUsingSootClassEdges() throws TransformerException,
 			ParserConfigurationException {
@@ -231,7 +262,6 @@ public class FeatureVectorMap {
 				else if (f.getValue() == 0)
 					valueElem.appendChild(doc.createTextNode("0"));
 			}
-
 		}
 
 		// write the content into xml file
