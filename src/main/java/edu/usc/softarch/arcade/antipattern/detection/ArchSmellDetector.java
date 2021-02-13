@@ -97,6 +97,85 @@ public class ArchSmellDetector {
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 	
 	// #region PUBLIC INTERFACE --------------------------------------------------
+	public Set<Smell> run(boolean runStructural, boolean runConcern, 
+			boolean runSerialize) {
+		// Make sure at least one type of smell detection algorithms was selected
+		if(!runConcern && !runStructural)
+			throw new IllegalArgumentException(); //TODO sort this out properly
+
+		// Initialize variables
+		Set<Smell> detectedSmells = new LinkedHashSet<>();
+		Set<ConcernCluster> clusters = loadClusters();
+		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
+
+		// Execute detection algorithms
+		if(runConcern)
+			runConcernDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
+		if(runStructural)
+			runStructuralDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
+
+		// Invert map: instead of smells per cluster, clusters per smell
+		Map<String, Set<String>> smellClustersMap = 
+			buildSmellToClustersMap(clusterSmellMap);
+
+		// Log the results
+		for (String clusterName : clusterSmellMap.keySet()) {
+			Set<String> smellList = clusterSmellMap.get(clusterName);
+			logger.debug(clusterName + " has smells "
+				+ Joiner.on(",").join(smellList));
+		}
+		for (Entry<String,Set<String>> entry : smellClustersMap.entrySet())
+			logger.debug(entry.getKey() + " : " + entry.getValue());
+		for (Smell smell : detectedSmells)
+			logger.debug(SmellUtil.getSmellAbbreviation(smell) + " " + smell);
+
+		// Serialize results
+		if(runSerialize)
+			serializeDetectedSmells(detectedSmellsFilename, detectedSmells);
+
+		// Return results
+		return detectedSmells;
+	}
+
+	public void runConcernDetectionAlgs(Set<ConcernCluster> clusters,
+			Set<Smell> detectedSmells, Map<String,Set<String>> clusterSmellMap) {
+		if (this.tmeMethod == TopicModelExtractionMethod.MALLET_API)
+			buildConcernClustersFromMalletAPI(clusters);
+		if (this.tmeMethod == TopicModelExtractionMethod.VAR_MALLET_FILE)
+			buildConcernClustersFromConfigTopicsFile(clusters);
+		
+		for (ConcernCluster cluster : clusters) {
+			if (cluster.getDocTopicItem() != null) {
+				logger.debug(cluster.getName() + " has topics: ");
+				DocTopicItem docTopicItem = cluster.getDocTopicItem();
+				Collections.sort(docTopicItem.getTopics(), TOPIC_PROPORTION_ORDER);
+				for (TopicItem topicItem : docTopicItem.getTopics()) {
+					logger.debug("\t" + topicItem);
+				}
+			}
+		}
+
+		detectBco(detectedSmells, clusters, clusterSmellMap);
+		detectSpfNew(clusters, clusterSmellMap, detectedSmells);
+	}
+
+	public void runStructuralDetectionAlgs(Set<ConcernCluster> clusters,
+			Set<Smell> detectedSmells, Map<String,Set<String>> clusterSmellMap) {
+		Map<String, Set<String>> depMap = 
+		ClusterUtil.buildDependenciesMap(this.depsRsfFilename);
+	
+		StringGraph clusterGraph = 
+			ClusterUtil.buildClusterGraphUsingDepMap(depMap,clusters);
+		System.out.print("");
+		
+		SimpleDirectedGraph<String, DefaultEdge> directedGraph = 
+			ClusterUtil.buildConcernClustersDiGraph(clusters, clusterGraph);
+		
+		detectBdc(detectedSmells, clusters, clusterSmellMap, directedGraph);
+		detectBuo(detectedSmells, clusters, clusterSmellMap, directedGraph);
+	}
+
+	@Deprecated
 	public void runAllDetectionAlgs() {
 		Set<Smell> detectedSmells = new LinkedHashSet<>();
 		Set<ConcernCluster> clusters = loadClusters();
@@ -153,6 +232,7 @@ public class ArchSmellDetector {
 		serializeDetectedSmells(detectedSmellsFilename, detectedSmells);
 	}
 	
+	@Deprecated
 	public void runStructuralDetectionAlgs() {
 		Set<Smell> detectedSmells = new LinkedHashSet<>();
 		Set<ConcernCluster> clusters = loadClusters();
@@ -190,6 +270,7 @@ public class ArchSmellDetector {
 	}
 	// #endregion PUBLIC INTERFACE -----------------------------------------------
 
+	// #region IO ----------------------------------------------------------------
 	/**
 	 * Loads clusters from the RSF file pointed to by this.clustersRsfFilename.
 	 */
@@ -204,9 +285,16 @@ public class ArchSmellDetector {
 		return clusters;
 	}
 
+	/**
+	 * Serializes the results of a smell analysis.
+	 * 
+	 * @param detectedSmellsFilename Path to an output file to serialize into.
+	 * @param detectedSmells Set of smells detected in the analysis.
+	 */
 	private void serializeDetectedSmells(String detectedSmellsFilename,
 			Set<Smell> detectedSmells) {
-		try (PrintWriter writer = new PrintWriter(detectedSmellsFilename, StandardCharsets.UTF_8)) {
+		try (PrintWriter writer =
+				new PrintWriter(detectedSmellsFilename, StandardCharsets.UTF_8)) {
 			XStream xstream = new XStream();
 			String xml = xstream.toXML(detectedSmells);
 	    writer.println(xml);
@@ -215,25 +303,109 @@ public class ArchSmellDetector {
 		}
 	}
 
+	private void buildConcernClustersFromConfigTopicsFile(
+			Set<ConcernCluster> clusters) {
+		for (ConcernCluster cluster : clusters) {
+			logger.debug("Building doctopics for " + cluster.getName());
+			for (String entity : cluster.getEntities()) {
+				DocTopicItem entityDocTopicItem = null;
+				switch(this.language.toLowerCase()) {
+					case "c":
+						entityDocTopicItem = this.docTopics.getDocTopicItemForC(entity);
+						break;
+					case "java":
+					default:
+						entityDocTopicItem = setDocTopicItemForJavaFromMalletFile(entity);
+						break;
+				}
+
+				if (cluster.getDocTopicItem() == null)
+					cluster.setDocTopicItem(entityDocTopicItem);
+				else {
+					DocTopicItem mergedDocTopicItem = null;
+
+					try {
+						mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
+							cluster.getDocTopicItem(), entityDocTopicItem);
+					} catch (UnmatchingDocTopicItemsException e) {
+						e.printStackTrace(); //TODO handle it
+					}
+
+					cluster.setDocTopicItem(mergedDocTopicItem);
+				}
+			}
+		}
+	}
+
+	private DocTopicItem setDocTopicItemForJavaFromMalletFile(String entity) {
+		DocTopicItem newDocTopicItem;
+		String docTopicName = 
+			TopicUtil.convertJavaClassWithPackageNameToDocTopicName(entity);
+		newDocTopicItem = docTopics.getDocTopicItemForJava(docTopicName);
+		return newDocTopicItem;
+	}
+
+	private void buildConcernClustersFromMalletAPI(
+			Set<ConcernCluster> clusters) {
+		for (ConcernCluster cluster : clusters) {
+			logger.debug("Building doctopics for " + cluster.getName());
+			for (String entity : cluster.getEntities()) {
+				DocTopicItem entityDocTopicItem = null;
+				if (this.language.equalsIgnoreCase("java"))
+					entityDocTopicItem = setDocTopicItemForJavaFromMalletApi(entity);
+
+				if (cluster.getDocTopicItem() == null)
+					cluster.setDocTopicItem(entityDocTopicItem);
+				else {
+					DocTopicItem mergedDocTopicItem = null;
+
+					try {
+						mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
+							cluster.getDocTopicItem(), entityDocTopicItem);
+					} catch (UnmatchingDocTopicItemsException e) {
+						e.printStackTrace(); //TODO handle it
+					}
+
+					cluster.setDocTopicItem(mergedDocTopicItem);
+				}
+			}
+		}
+	}
+	
+	private DocTopicItem setDocTopicItemForJavaFromMalletApi(String entity) {
+		DocTopicItem newDocTopicItem;
+		newDocTopicItem = docTopics.getDocTopicItemForJava(entity);
+		return newDocTopicItem;
+	}
+	// #endregion IO -------------------------------------------------------------
+
+	/**
+	 * Creates a map of clusters per smell from a map of smells per cluster.
+	 * 
+	 * @param clusterSmellMap Map of smells per cluster.
+	 * @return Map of clusters per smell.
+	 */
 	private Map<String, Set<String>> buildSmellToClustersMap(
 			Map<String, Set<String>> clusterSmellMap) {
 		Map<String,Set<String>> smellClustersMap = new HashMap<>();
+
 		for (String clusterName : clusterSmellMap.keySet()) {
 			Set<String> smellList = clusterSmellMap.get(clusterName);
 			for (String smell : smellList) {
-				if (smellClustersMap.containsKey(smell)) {
-					Set<String> mClusters = smellClustersMap.get(smell);
-					mClusters.add(clusterName);
-				} else {
+				if (smellClustersMap.containsKey(smell))
+					smellClustersMap.get(smell).add(clusterName);
+				else {
 					Set<String> mClusters = new HashSet<>();
 					mClusters.add(clusterName);
 					smellClustersMap.put(smell, mClusters);
 				}
 			}
 		}
+
 		return smellClustersMap;
 	}
 
+	// #region DETECTION ALGORITHMS ----------------------------------------------
 	protected void detectBuo(Set<Smell> detectedSmells,
 			Set<ConcernCluster> clusters,	Map<String, Set<String>> clusterSmellMap,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
@@ -300,7 +472,7 @@ public class ArchSmellDetector {
 				addDetectedBuoSmell(detectedSmells, clusters, vertex);
 			}
 			int inPlusOutDegree = inDegree + outDegree;
-			if ( inPlusOutDegree > meanInAndOutDegrees + stdDevFactor * stdDevInAndOutDegrees ) {
+			if (inPlusOutDegree > meanInAndOutDegrees + stdDevFactor * stdDevInAndOutDegrees) {
 				logger.debug("\t\t" + vertex + " has brick use overload for in plus out degrees");
 				logger.debug("\t\t in plus out degrees: " + inPlusOutDegree);
 				updateSmellMap(clusterSmellMap, vertex, "buo");
@@ -404,67 +576,6 @@ public class ArchSmellDetector {
 		return stdDev;
 	}
 
-	private void buildConcernClustersFromConfigTopicsFile(
-			Set<ConcernCluster> clusters) {
-		for (ConcernCluster cluster : clusters) {
-			logger.debug("Building doctopics for " + cluster.getName());
-			for (String entity : cluster.getEntities()) {
-				DocTopicItem entityDocTopicItem = null;
-				switch(this.language.toLowerCase()) {
-					case "c":
-						entityDocTopicItem = this.docTopics.getDocTopicItemForC(entity);
-						break;
-					case "java":
-					default:
-						entityDocTopicItem = setDocTopicItemForJavaFromMalletFile(entity);
-						break;
-				}
-
-				if (cluster.getDocTopicItem() == null)
-					cluster.setDocTopicItem(entityDocTopicItem);
-				else {
-					DocTopicItem mergedDocTopicItem = null;
-
-					try {
-						mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
-							cluster.getDocTopicItem(), entityDocTopicItem);
-					} catch (UnmatchingDocTopicItemsException e) {
-						e.printStackTrace(); //TODO handle it
-					}
-
-					cluster.setDocTopicItem(mergedDocTopicItem);
-				}
-			}
-		}
-	}
-
-	private void buildConcernClustersFromMalletAPI(
-			Set<ConcernCluster> clusters) {
-		for (ConcernCluster cluster : clusters) {
-			logger.debug("Building doctopics for " + cluster.getName());
-			for (String entity : cluster.getEntities()) {
-				DocTopicItem entityDocTopicItem = null;
-				if (this.language.equalsIgnoreCase("java"))
-					entityDocTopicItem = setDocTopicItemForJavaFromMalletApi(entity);
-
-				if (cluster.getDocTopicItem() == null)
-					cluster.setDocTopicItem(entityDocTopicItem);
-				else {
-					DocTopicItem mergedDocTopicItem = null;
-
-					try {
-						mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
-							cluster.getDocTopicItem(), entityDocTopicItem);
-					} catch (UnmatchingDocTopicItemsException e) {
-						e.printStackTrace(); //TODO handle it
-					}
-
-					cluster.setDocTopicItem(mergedDocTopicItem);
-				}
-			}
-		}
-	}
-
 	private void addDetectedBuoSmell(Set<Smell> detectedSmells,
 			Set<ConcernCluster> clusters, String vertex) {
 		Smell buo = new BuoSmell();
@@ -481,18 +592,20 @@ public class ArchSmellDetector {
 		return null;
 	}
 
-	private DocTopicItem setDocTopicItemForJavaFromMalletFile(String entity) {
-		DocTopicItem newDocTopicItem;
-		String docTopicName = 
-			TopicUtil.convertJavaClassWithPackageNameToDocTopicName(entity);
-		newDocTopicItem = docTopics.getDocTopicItemForJava(docTopicName);
-		return newDocTopicItem;
-	}
-	
-	private DocTopicItem setDocTopicItemForJavaFromMalletApi(String entity) {
-		DocTopicItem newDocTopicItem;
-		newDocTopicItem = docTopics.getDocTopicItemForJava(entity);
-		return newDocTopicItem;
+	/**
+	 * Adds a smell to the given cluster in clusterSmellMap.
+	 * 
+	 * @param clusterSmellMap Map of all clusters and their sets of smells.
+	 * @param clusterName Name of the cluster to add a smell to.
+	 * @param smellAbrv Abbreviation mell to add to the cluster.
+	 */
+	protected void updateSmellMap(Map<String, Set<String>> clusterSmellMap,
+			String clusterName, String smellAbrv) {
+		Set<String> smellList = clusterSmellMap.get(clusterName);
+		if(smellList == null)
+			smellList = new HashSet<>();
+		smellList.add(smellAbrv);
+		clusterSmellMap.putIfAbsent(clusterName, smellList);
 	}
 
 	// #region SCATTERED PARASITIC FUNCTIONALITY ---------------------------------
@@ -636,20 +749,5 @@ public class ArchSmellDetector {
 		return topicCountMean + topicCountStdDev;
 	}
 	// #endregion SCATTERED PARASITIC FUNCTIONALITY ------------------------------
-
-	/**
-	 * Adds a smell to the given cluster in clusterSmellMap.
-	 * 
-	 * @param clusterSmellMap Map of all clusters and their sets of smells.
-	 * @param clusterName Name of the cluster to add a smell to.
-	 * @param smellAbrv Abbreviation mell to add to the cluster.
-	 */
-	protected void updateSmellMap(Map<String, Set<String>> clusterSmellMap,
-			String clusterName, String smellAbrv) {
-		Set<String> smellList = clusterSmellMap.get(clusterName);
-		if(smellList == null)
-			smellList = new HashSet<>();
-		smellList.add(smellAbrv);
-		clusterSmellMap.putIfAbsent(clusterName, smellList);
-	}
+	// #endregion DETECTION ALGORITHMS -------------------------------------------
 }
