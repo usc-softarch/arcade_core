@@ -189,7 +189,7 @@ public class ArchSmellDetector {
 		serializeDetectedSmells(detectedSmellsFilename, detectedSmells);
 	}
 	
-	private static void runStructuralDetectionAlgs(String detectedSmellsFilename) {
+	public static void runStructuralDetectionAlgs(String detectedSmellsFilename) {
 		Set<Smell> detectedSmells = new LinkedHashSet<>();
 		System.out.println("Reading in clusters file: " + Config.getSmellClustersFile());
 		Set<ConcernCluster> clusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(Config.getSmellClustersFile());
@@ -270,7 +270,7 @@ public class ArchSmellDetector {
 		return smellClustersMap;
 	}
 
-	private static void detectBuo(Set<Smell> detectedSmells,
+	protected static void detectBuo(Set<Smell> detectedSmells,
 			Set<ConcernCluster> clusters,
 			Map<String, Set<String>> clusterSmellMap,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
@@ -367,7 +367,7 @@ public class ArchSmellDetector {
         }
 	}
 
-	private static void detectBdc(Set<Smell> detectedSmells,
+	protected static void detectBdc(Set<Smell> detectedSmells,
 			Set<ConcernCluster> clusters,
 			Map<String, Set<String>> clusterSmellMap,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
@@ -414,7 +414,7 @@ public class ArchSmellDetector {
 		logger.debug("Number of strongly connected components: " + relevantConnectedSetCount);
 	}
 
-	private static StandardDeviation detectBco(Set<Smell> detectedSmells,
+	protected static StandardDeviation detectBco(Set<Smell> detectedSmells,
 			Set<ConcernCluster> clusters,
 			Map<String, Set<String>> clusterSmellMap) {
 		System.out.println("Finding brick concern overload instances...");
@@ -577,7 +577,7 @@ public class ArchSmellDetector {
 	 * @param clusterSmellsMap Mapping of smells per cluster. Altered.
 	 * @param detectedSmells Set of detected smells. Altered.
 	 */
-	private static void detectSpfNew(
+	protected static void detectSpfNew(
 			Set<ConcernCluster> clusters,
 			Map<String, Set<String>> clusterSmellsMap,
 			Set<Smell> detectedSmells) {
@@ -721,7 +721,7 @@ public class ArchSmellDetector {
 	 * @param clusterName Name of the cluster to add a smell to.
 	 * @param smellAbrv Abbreviation mell to add to the cluster.
 	 */
-	private static void updateSmellMap(
+	protected static void updateSmellMap(
 			Map<String, Set<String>> clusterSmellMap,
 			String clusterName, String smellAbrv) {
 		Set<String> smellList = clusterSmellMap.get(clusterName);
