@@ -12,9 +12,6 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import soot.SootClass;
-import soot.SootMethod;
-import edu.usc.softarch.arcade.classgraphs.ClassGraphTransformer;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 
 //TODO This class is an abomination and must be destroyed.
@@ -102,7 +99,6 @@ public class Config {
 	private static List<Integer> clustersToWriteList = null;
 	private static Granule clusteringGranule = Granule.file;
 	private static List<String> excludedEntities;
-	private static String clusterStartsWith;
 	public static Granule getClusteringGranule() { return clusteringGranule; }
 	public static int getStartNumClustersRange() { return startNumClustersRange; }
 	public static int getEndNumClustersRange() { return endNumClustersRange; }
@@ -119,15 +115,12 @@ public class Config {
 		malletWordTopicCountsFilename = prop.getProperty("word_topic_counts_file");
 		malletDocTopicsFilename = prop.getProperty("doc_topics_file");
 		
-		if (malletTopicKeysFilename == null) {
+		if (malletTopicKeysFilename == null)
 			logger.error("topic_keys_file not set");
-		}
-		if (malletWordTopicCountsFilename == null) {
+		if (malletWordTopicCountsFilename == null)
 			logger.error("word_topics_file not set");
-		}
-		if (malletDocTopicsFilename == null) {
+		if (malletDocTopicsFilename == null)
 			logger.error("doc_topics_file");
-		}
 	}
 	
 	//TODO My eyes are bleeding.
@@ -284,13 +277,6 @@ public class Config {
 			}
 			
 			malletDocTopicsFilename = prop.getProperty("doc_topics_file");
-			clusterStartsWith = prop.getProperty("cluster_starts_with");
-			if (clusterStartsWith == null) {
-				clusterStartsWith = null;
-			}
-			else {
-				clusterStartsWith = clusterStartsWith.trim();
-			}
 			
 			if (prop.getProperty("ignore_dependency_filters") != null)  {
 				if (prop.getProperty("ignore_dependency_filters").equals("true")) {
@@ -318,49 +304,11 @@ public class Config {
 		}
 		return new String(buffer);
 	}
-
-	public static boolean isMethodInSelectedPackages(SootMethod src) {
-		char leading = '<';
-		
-		for (String pkg : selectedPkgsArray) {
-			if (src.toString().startsWith(leading + pkg)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public static boolean isMethodInDeselectedPackages(SootMethod src) {
-		return false;
-	}
-
-	//TODO I have a sneaking suspicion that this method is never actually used.
-	public static void initProjectData(
-			ClassGraphTransformer t) {
-		t.LlamaChatTMD.setDocTopicsFilename("/home/joshua/Documents/Software Engineering Research/Subjects/LlamaChat/LlamaChat-doc-topics.txt");
-		t.LlamaChatTMD.setTopicKeysFilename("/home/joshua/Documents/Software Engineering Research/Subjects/LlamaChat/LlamaChat-topic-keys.txt");
-
-		t.freecsTMD.setDocTopicsFilename("/home/joshua/Documents/Software Engineering Research/Subjects/freecs/freecs-doc-topics.txt");
-		t.freecsTMD.setTopicKeysFilename("/home/joshua/Documents/Software Engineering Research/Subjects/freecs/freecs-topic-keys.txt");
-
-		String threeProjDocTopicsFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/threeChatServerSystems/threeChatServerSystems-doc-topics.txt";
-		String threeProjTopicKeysFilename = "/home/joshua/Documents/Software Engineering Research/Subjects/threeChatServerSystems/threeChatServerSystems-topic-keys.txt";
-
-		t.currDocTopicsFilename = threeProjDocTopicsFilename;
-		t.currTopicKeysFilename = threeProjTopicKeysFilename;
-		t.datasetName = "oodt-filemgr";
-	}
 	
 	public static boolean isClassInSelectedPackages(String clazz) {	
 		if (selectedPkgsArray == null) return true;
 		for (String pkg : selectedPkgsArray)
 			if (clazz.trim().startsWith(pkg)) return true;
-		return false;
-	}
-
-	public static boolean isClassInSelectedPackages(SootClass src) {		
-		for (String pkg : selectedPkgsArray)
-			if (src.toString().startsWith(pkg)) return true;
 		return false;
 	}
 	
@@ -369,24 +317,6 @@ public class Config {
 
 	public static String getClusterGraphDotFilename() {
 		return DATADIR + File.separator + getCurrProjStr() + "_cluster_graph.dot"; }
-
-	public static String getMyCallGraphFilename() {
-		return DATADIR + File.separator + getCurrProjStr() + "_mycallgraph.data"; }
-
-	public static String getClassesWithUsedMethodsFilename() {
-		return DATADIR + File.separator + Config.getCurrProjStr()
-			+ "_classesWithUsedMethods.data";
-	}
-
-	public static String getClassesWithAllMethodsFilename() {
-		return DATADIR + File.separator + Config.getCurrProjStr()
-			+ "_classesWithAllMethods.data";
-	}
-	
-	public static String getUnusedMethodsFilename() {
-		return DATADIR + File.separator + Config.getCurrProjStr()
-			+ "_unusedMethods.data";
-	}
 
 	public static String getSpecifiedSmallArchFromXML() {
 		return DATADIR + File.separator + getCurrProjStr()
@@ -421,9 +351,6 @@ public class Config {
 	
 	public static String getCurrProjFilenamePrefix() {
 		return DATADIR + File.separator + getCurrProjStr(); }
-
-	public static String getClassGraphDotFilename() {
-		return DATADIR + File.separator + getCurrProjStr() + "_class_graph.dot"; }
 
 	public static void setProjConfigFilename(String projConfigFilename) {
 		Config.projConfigFilename = projConfigFilename;	}
@@ -491,10 +418,8 @@ public class Config {
 	}
 
 	public static List<Integer> getClustersToWriteList() {
-		return clustersToWriteList;
-	}
+		return clustersToWriteList; }
 
 	public static List<String> getExcludedEntities() {
-		return excludedEntities;
-	}
+		return excludedEntities; }
 }
