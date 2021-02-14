@@ -3,8 +3,6 @@ package edu.usc.softarch.arcade.clustering;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import edu.usc.softarch.arcade.util.ExtractionContext;
-
 /**
  * @author joshua
  */
@@ -15,7 +13,8 @@ class UnbiasedEllenbergComparator extends SimMeasureComparator implements
 	
 	public int compare(Cluster c1, Cluster c2) {
 		System.out.println("\tIn "
-				+ ExtractionContext.getCurrentClassAndMethodName());
+				+ Thread.currentThread().getStackTrace()[2].getClassName() + "." 
+				+ Thread.currentThread().getStackTrace()[2].getMethodName());
 		System.out.println("\tc1: " + c1);
 		System.out.println("\tc2: " + c2);
 		System.out.println("\trefCluster: " + getRefCluster());

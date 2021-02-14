@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.util.DebugUtil;
 import edu.usc.softarch.arcade.util.StopWatch;
 
 public class LimboRunner extends ClusteringAlgoRunner {
@@ -29,7 +28,6 @@ public class LimboRunner extends ClusteringAlgoRunner {
 
 		int clusterStepCount = 0;
 		int stepCountToStop = 5;
-		boolean stopAtClusterStep = false; // for debugging purposes
 		while (stopCriterion.notReadyToStop()) {
 			if (Config.stoppingCriterion
 					.equals(Config.StoppingCriterionConfig.clustergain)) {
@@ -53,20 +51,7 @@ public class LimboRunner extends ClusteringAlgoRunner {
 			FastCluster newCluster = new FastCluster(ClusteringAlgorithmType.LIMBO, cluster, otherCluster);
 			
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data,newCluster,simMatrix);
-			
-			if (stopAtClusterStep)
-				clusterStepCount++;
 
-			if (stopAtClusterStep) {
-				if (clusterStepCount == stepCountToStop) {
-					loopSummaryStopwatch.stop();
-
-					logger.debug("Time in milliseconds to compute clusters after priority queue initialization: "
-							+ loopSummaryStopwatch.getElapsedTime());
-
-					DebugUtil.earlyExit();
-				}
-			}
 			performPostProcessingConditionally();
 		}
 

@@ -14,8 +14,6 @@ public class StringEdge implements Serializable {
 	private static final long serialVersionUID = -4787247799445316839L;
 	private static Logger logger = LogManager.getLogger(StringEdge.class);
 
-	private ArchElemType srcType = null;
-	private ArchElemType tgtType = null;
 	private String srcStr = "";
 	private String tgtStr = "";
 	private String type = "";
@@ -23,29 +21,25 @@ public class StringEdge implements Serializable {
 
 	// #region CONSTRUCTORS ------------------------------------------------------
 	public StringEdge() {
-		initialize(null, null, "", "", "");
+		initialize("", "", "");
 	}
 
 	public StringEdge(String srcStr, String tgtStr) {
-		initialize(null, null, srcStr, tgtStr, "");
+		initialize(srcStr, tgtStr, "");
 	}
 
 	public StringEdge(String srcStr, String tgtStr, String type) {
-		initialize(null, null, srcStr, tgtStr, type);
+		initialize(srcStr, tgtStr, type);
 	}
 
 	/**
 	 * Clone constructor.
 	 */
 	public StringEdge(StringEdge e) {
-		initialize(e.getSrcType(), e.getTgtType(),
-			e.getSrcStr(), e.getTgtStr(), e.getType());
+		initialize(e.getSrcStr(), e.getTgtStr(), e.getType());
 	}
 
-	private void initialize(ArchElemType srcType, ArchElemType tgtType,
-			String srcStr, String tgtStr, String type) {
-		setSrcType(srcType);
-		setTgtType(tgtType);
+	private void initialize(String srcStr, String tgtStr, String type) {
 		setSrcStr(srcStr);
 		setTgtStr(tgtStr);
 		setType(type);
@@ -53,18 +47,10 @@ public class StringEdge implements Serializable {
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public ArchElemType getSrcType() { return this.srcType; }
-	public ArchElemType getTgtType() { return this.tgtType; }
 	public String getSrcStr() { return this.srcStr; }
 	public String getTgtStr() { return this.tgtStr; }
 	public String getType() { return this.type; }
 
-	public void setSrcType(ArchElemType srcType) { this.srcType = srcType; }
-	public void setSrcType(String srcType) {
-		this.srcType = ArchElemType.stringToType(srcType); }
-	public void setTgtType(ArchElemType tgtType) { this.tgtType = tgtType; }
-	public void setTgtType(String tgtType) {
-		this.tgtType = ArchElemType.stringToType(tgtType); }
 	public void setSrcStr(String srcStr) { this.srcStr = srcStr; }
 	public void setTgtStr(String tgtStr) { this.tgtStr = tgtStr; }
 	public void setType(String type) { this.type = type; }

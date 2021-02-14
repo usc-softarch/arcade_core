@@ -37,7 +37,6 @@ import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
-import edu.usc.softarch.arcade.util.DebugUtil;
 import edu.usc.softarch.extractors.cda.odem.Dependencies;
 import edu.usc.softarch.extractors.cda.odem.DependsOn;
 import edu.usc.softarch.extractors.cda.odem.Type;
@@ -242,11 +241,8 @@ public class ClusterUtil {
 			FastFeatureVectors fastFeatureVectors) {
 		List<String> names = fastFeatureVectors.getNamesInFeatureSet();
 
-		int characterLimit = 1000;
-		String c1LimitedName = DebugUtil.getLimitedString(c1.getName(),
-				characterLimit);
-		String c2LimitedName = DebugUtil.getLimitedString(c2.getName(),
-				characterLimit);
+		String c1LimitedName = c1.getName();
+		String c2LimitedName = c2.getName();
 
 		logger.debug("Features shared between " + c1LimitedName + " and "
 				+ c2LimitedName);

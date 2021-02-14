@@ -25,7 +25,6 @@ import org.apache.commons.lang3.tuple.MutablePair;
 
 import cc.mallet.util.Maths;
 import edu.usc.softarch.arcade.MetricsDriver;
-import edu.usc.softarch.arcade.clustering.SimCalcUtil;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.clustering.Entity;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;

@@ -27,7 +27,6 @@ import edu.usc.softarch.arcade.clustering.FastCluster;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.ConfigUtil;
 import edu.usc.softarch.arcade.config.Config.Language;
-import edu.usc.softarch.arcade.util.DebugUtil;
 
 /**
  * @author joshua
@@ -431,11 +430,13 @@ public class TopicUtil {
 			DocTopicItem docTopicItem2) {
 		// If either argument is null, do nothing.
 		if (docTopicItem == null) {
-			logger.debug(DebugUtil.addMethodInfo(" first arg is null...returning"));
+			logger.debug("In, "	+ Thread.currentThread().getStackTrace()[1]
+				.getMethodName() + ", " + " first arg is null...returning");
 			return; //TODO throw exception
 		}
 		if (docTopicItem2 == null) {
-			logger.debug(DebugUtil.addMethodInfo(" second arg is null...returning"));
+			logger.debug("In, "	+ Thread.currentThread().getStackTrace()[1]
+				.getMethodName() + ", " + " second arg is null...returning");
 			return; //TODO throw exception
 		}
 		

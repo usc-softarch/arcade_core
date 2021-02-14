@@ -127,8 +127,6 @@ public class ClassGraph implements Serializable {
 			String tgtStr = e.getTgtStr();
 			String srcType = map.get(srcStr);
 			String tgtType = map.get(tgtStr);
-			e.setSrcType(srcType);
-			e.setTgtType(tgtType);
 			
 			//TODO do this with logger instead
 			System.out.print("(" + srcStr + ":" + srcType +  ",");
@@ -145,16 +143,6 @@ public class ClassGraph implements Serializable {
 		
 		for (SootClassEdge e : edges)
 			str += e.toString() + ",";
-		
-		// Remove the last comma before returning
-		return str.substring(0, str.length() - 1);
-	}
-	
-	public String toStringWithArchElemType() {
-		String str = "";
-		
-		for (SootClassEdge e : edges)
-			str += e.toStringWithArchElemType() + ",";
 		
 		// Remove the last comma before returning
 		return str.substring(0, str.length() - 1);
@@ -193,24 +181,6 @@ public class ClassGraph implements Serializable {
 			
 			for(SootClassEdge e : edges)
 				out.println(e.toDotString());
-			
-			out.println("}");
-		}
-	}
-	
-	public void writeDotFileWithArchElementType(String filename) throws FileNotFoundException {
-		File f = new File(filename);
-		if (!f.getParentFile().exists())
-			f.getParentFile().mkdirs();
-
-		FileOutputStream fos = new FileOutputStream(f);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8); 
-
-		try(PrintWriter out = new PrintWriter(osw)) {
-			out.println("digraph G {");
-			
-			for(SootClassEdge e : edges)
-				out.println(e.toDotStringWithArchElemType());
 			
 			out.println("}");
 		}

@@ -88,23 +88,6 @@ public class SootClassEdge extends StringEdge {
 		return "\t\"" + src + "\" -> \"" + tgt + "\";";
 	}
 	
-	public String toStringWithArchElemType() {
-		return "(" + src + ":" + getSrcType().typeToString() + "," + tgt
-				+ ":" + getSrcType().typeToString() + ")";
-	}
-
-	public String toDotStringWithArchElemType() {
-		String srcDef = "\"" + src + "\" ";
-		String tgtDef = "\"" + tgt + "\" ";
-		
-		srcDef += getSrcType().typeToStyleString() + ";";
-		tgtDef += getTgtType().typeToStyleString() + ";";
-		
-		String edgeStr = "\t\"" + src + "\" -> \"" + tgt + "\";";
-	
-		return srcDef + "\n" + tgtDef + "\n" + edgeStr;
-	}
-	
 	public String toRsf() {
 		return type + " " + src + " " + " " + tgt;
 	}
