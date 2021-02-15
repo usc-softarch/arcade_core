@@ -15,8 +15,6 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import com.google.common.collect.Iterables;
-
 import edu.uci.ics.jung.algorithms.shortestpath.MinimumSpanningForest;
 import edu.uci.ics.jung.graph.DelegateForest;
 import edu.uci.ics.jung.graph.DirectedGraph;
@@ -32,17 +30,13 @@ public class DominatorGroundTruthAnalyzer {
 	static Factory<Integer> edgeFactory = new Factory<Integer>() {
 		int i = 0;
 
-		public Integer create() {
-			return i++;
-		}
+		public Integer create() { return i++; }
 	};
 
 	static Factory<String> vertexFactory = new Factory<String>() {
 		int i = 0;
 
-		public String create() {
-			return "V" + i++;
-		}
+		public String create() { return "V" + i++; }
 	};
 	
 	public static void main(String[] args) {
@@ -64,10 +58,8 @@ public class DominatorGroundTruthAnalyzer {
 				clusterMap, internalEdgeMap);
 		
 		try (FileWriter out = new FileWriter(outFilename)) {
-			for (Entry entry : ratioMap.entrySet()) {
+			for (Entry<String, Double> entry : ratioMap.entrySet())
 				out.write(entry.getKey() + "," + entry.getValue() + "\n");
-			}
-			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -106,9 +98,8 @@ public class DominatorGroundTruthAnalyzer {
 				}
 			}			
 			
-			for (String target : verticesWithNoPreds) {
+			for (String target : verticesWithNoPreds)
 				graph.addEdge(edgeFactory.create(), start, target);
-			}
 			
 			logger.debug("Graph with new start:");
 			logger.debug(graph);
@@ -120,8 +111,7 @@ public class DominatorGroundTruthAnalyzer {
 			numForestMap.put(clusterName, forest.getTrees().size());
 			forestMap.put(clusterName, forest);
 
-			Map<String, Integer> domCountMap = computeDominatorInfo(graph,
-					start);
+			Map<String, Integer> domCountMap = computeDominatorInfo(graph, start);
 			
 			String topDom = null;
 			int topCount = 0;
@@ -149,62 +139,54 @@ public class DominatorGroundTruthAnalyzer {
 			if (topDomMap.get(clusterName) != null && !topDomMap.get(clusterName).equals("ST")) {
 				int currTopCount = topDomCountMap.get(clusterName);
 				int clusterSize = clusterMap.get(clusterName).size();
-				if ((double)currTopCount > (double)(clusterSize/2)) {
+				if ((double)currTopCount > (double)clusterSize / 2)
 					properDomMap.put(clusterName, currTopCount);
-				}
 			}
 		}
 		
 		logger.debug("Cluster with proper dominators: ");
-		for (String clusterName : properDomMap.keySet()) {
+		for (String clusterName : properDomMap.keySet())
 			logger.debug(clusterName + ", " + topDomCountMap.get(clusterName) + ", " + clusterMap.get(clusterName).size() + ", " + topDomMap.get(clusterName)); 
-		}
 		
 		Set<String> clustersNoPropDoms = new HashSet<>(clusterMap.keySet());
 		clustersNoPropDoms.removeAll(properDomMap.keySet());
 		
 		logger.debug("");
 		logger.debug("Clusters withOUT proper dominators: ");
-		for (String clusterName : clustersNoPropDoms) {
+		for (String clusterName : clustersNoPropDoms)
 			logger.debug(clusterName);
-		}
 		
 		logger.debug("No. of clusters with proper dominators: " + properDomMap.keySet().size());
 		logger.debug("No. of total clusters: " + clusterMap.keySet().size());
 		logger.debug("Percentage of proper dominators: " + (double)(properDomMap.keySet().size())/(double)(clusterMap.keySet().size()));
 		
 		logger.debug("Number of trees in minimum spanning tree forest for each cluster:");
-		for (Entry entry : numForestMap.entrySet()) {
+		for (Entry<String, Integer> entry : numForestMap.entrySet())
 			logger.debug(entry);
-		}
 		
 		logger.debug("Number of trees in minimum spanning tree forest for each cluster:");
-		for (Entry entry : numForestMap.entrySet()) {
+		for (Entry<String, Integer> entry : numForestMap.entrySet()) {
 			logger.debug(entry);
 		}
 		
 		Map<String,Double> ratioMap = new TreeMap<>();
 		logger.debug("Comparing largest tree of cluster to entities of cluster:");
-		for (Entry entry : forestMap.entrySet()) {
-			String clusterName = (String) entry.getKey();
+		for (Entry<String, Forest<String, Integer>> entry : forestMap.entrySet()) {
+			String clusterName = entry.getKey();
 			Set<String> entities = clusterMap.get(clusterName);
-			Forest<String,Integer> forest = (Forest<String, Integer>) entry.getValue();
-			if (forest.getTrees().size() == 0) {
+			Forest<String,Integer> forest = entry.getValue();
+			if (forest.getTrees().isEmpty()) {
 				logger.debug(clusterName + " has an empty forest");
 				ratioMap.put(clusterName, (double) 0);
 				continue;
 			}
-			Tree<String,Integer> largestTree = Iterables.get(forest.getTrees(), 0);
-			for (Tree<String,Integer> tree : forest.getTrees()) { // identify the largest tree
-				if (tree.getVertexCount() > largestTree.getVertexCount()) {
+			Tree<String,Integer> largestTree = forest.getTrees().iterator().next();
+			for (Tree<String,Integer> tree : forest.getTrees()) // identify the largest tree
+				if (tree.getVertexCount() > largestTree.getVertexCount())
 					largestTree = tree;
-				}
-			}
 			int largestTreeTrueSize = largestTree.containsVertex(start) ? largestTree.getVertexCount() - 1 : largestTree.getVertexCount();
 			double ratio = (double) largestTreeTrueSize/(double) entities.size();
-			if (ratio > 1) {
-				ratio = 1;
-			}
+			if (ratio > 1) ratio = 1;
 			logger.debug(clusterName + ", numEntites: " + entities.size()
 					+ ", size of largest tree: " + largestTreeTrueSize
 					+ ", ratio: " + ratio);
@@ -212,10 +194,9 @@ public class DominatorGroundTruthAnalyzer {
 		}
 
 		int numClustersWithOneTreeInForest = 0;
-		for (Entry entry : numForestMap.entrySet()) {
+		for (Entry<String, Integer> entry : numForestMap.entrySet())
 			if (entry.getValue().equals(1))
 				numClustersWithOneTreeInForest++;
-		}
 		
 		logger.debug("Number of clusters with a forest with only one tree: " + numClustersWithOneTreeInForest);
 		return ratioMap;
@@ -231,18 +212,16 @@ public class DominatorGroundTruthAnalyzer {
 		Set<String> verticesMinusStart = new HashSet<>(graph.getVertices());
 		verticesMinusStart.remove(start);
 		
-		for (String vertex : verticesMinusStart) {
+		for (String vertex : verticesMinusStart)
 			domMap.put(vertex, new HashSet<>(graph.getVertices()));
-		}
 		
 		boolean changedDom = true;
 		while (changedDom) {
 			changedDom = false;
 			for (String vertex : verticesMinusStart) {
 				Set<String> predDomIntersection = new HashSet<>();
-				if (graph.getPredecessorCount(vertex) > 0) {
+				if (graph.getPredecessorCount(vertex) > 0)
 					predDomIntersection.addAll(graph.getVertices());
-				}
 				for (String pred : graph.getPredecessors(vertex)) {
 					Set<String> domOfPred = domMap.get(pred);
 					predDomIntersection.retainAll(domOfPred);
@@ -250,9 +229,8 @@ public class DominatorGroundTruthAnalyzer {
 				Set<String> oldDomOfVertex = domMap.get(vertex); 
 				Set<String> newDomOfVertex = new HashSet<>(predDomIntersection);
 				newDomOfVertex.add(vertex);
-				if (!newDomOfVertex.equals(oldDomOfVertex)) {
+				if (!newDomOfVertex.equals(oldDomOfVertex))
 					changedDom = true;
-				}
 				domMap.put(vertex, newDomOfVertex);
 			}
 		}
@@ -266,9 +244,8 @@ public class DominatorGroundTruthAnalyzer {
 		for (String vertex : graph.getVertices()) {
 			Set<String> dominators = domMap.get(vertex);
 			for (String dom : dominators) {
-				if (domCountMap.get(dom) == null) {
+				if (domCountMap.get(dom) == null)
 					domCountMap.put(dom, 1);
-				}
 				else {
 					int count = domCountMap.get(dom);
 					count++;
@@ -277,9 +254,8 @@ public class DominatorGroundTruthAnalyzer {
 			}
 		}
 		
-		for (Entry<String,Integer> entry : domCountMap.entrySet()) {
+		for (Entry<String,Integer> entry : domCountMap.entrySet())
 			logger.debug(entry.getKey() + " : " + entry.getValue());
-		}
 		return domCountMap;
 	}
 }

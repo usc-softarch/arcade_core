@@ -3,14 +3,14 @@ package edu.usc.softarch.arcade.clustering;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-
-import com.google.common.base.Joiner;
 
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
@@ -39,10 +39,12 @@ public class BatchClusteringEngine {
 		
 		File[] files = inputDir.listFiles();
 		Set<File> fileSet = new TreeSet<>(Arrays.asList(files));
+		List<String> fileSetNames =
+			fileSet.stream().map(File::toString).collect(Collectors.toList());
 
 		// Logging
 		logger.debug("All files in " + inputDir + ":");
-		logger.debug(Joiner.on("\n").join(fileSet));
+		logger.debug(String.join("\n", fileSetNames));
 		for (File file : fileSet) {
 			if (file.isDirectory()) {
 				logger.debug("Identified directory: " + file.getName());

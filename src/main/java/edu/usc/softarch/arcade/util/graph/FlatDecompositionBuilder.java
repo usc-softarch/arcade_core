@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.util.graph;
 
 import java.awt.Container;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
 
@@ -25,8 +25,6 @@ import org.apache.commons.collections4.Factory;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import com.google.common.base.Joiner;
-
 import edu.uci.ics.jung.graph.DelegateTree;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -34,10 +32,7 @@ import edu.uci.ics.jung.graph.Tree;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class FlatDecompositionBuilder {
-	
-	public enum FlatDecompType {
-		compact, detailed
-	}
+	public enum FlatDecompType { compact, detailed }
 	
 	static Logger logger = LogManager.getLogger(FlatDecompositionBuilder.class);
 	
@@ -87,26 +82,20 @@ public class FlatDecompositionBuilder {
 			// parse the command line arguments
 			CommandLine line = parser.parse(options, args);
 
-			if (line.hasOption("help")) {
+			if (line.hasOption("help"))
 				generateHelpStatement(options);
-			}
-			if (line.hasOption("visualize")) {
+			if (line.hasOption("visualize"))
 				isVisualizingTree = true;
-			}
-			if (line.hasOption("nestedFile")) {
+			if (line.hasOption("nestedFile"))
 				nestedFilename = line.getOptionValue("nestedFile");
-			}
-			if (line.hasOption("flatFile")) {
+			if (line.hasOption("flatFile"))
 				flatFilename = line.getOptionValue("flatFile");
-			}
 			if (line.hasOption("type")) {
 				String typeStr = line.getOptionValue("type");
-				if (typeStr.equals("c")) {
+				if (typeStr.equals("c"))
 					fdt = FlatDecompType.compact;
-				}
-				else if (typeStr.equals("d")) {
+				else if (typeStr.equals("d"))
 					fdt = FlatDecompType.detailed;
-				}
 			}
 		} catch (ParseException exp) {
 			// oops, something went wrong
@@ -118,25 +107,22 @@ public class FlatDecompositionBuilder {
 		
 		RsfReader.loadRsfDataFromFile(nestedFilename);
 		logger.debug("Printing filtered routine facts...");
-		logger.debug(Joiner.on("\n").join(RsfReader.filteredRoutineFacts));
+		logger.debug(String.join("\n", RsfReader.filteredRoutineFacts.stream()
+			.map(List::toString).collect(Collectors.toList())));
 		
-		DirectedGraph<String,Integer> dGraph = new DirectedSparseGraph<String,Integer>();
-		for (List<String> fact : RsfReader.filteredRoutineFacts) {
+		DirectedGraph<String,Integer> dGraph = new DirectedSparseGraph<>();
+		for (List<String> fact : RsfReader.filteredRoutineFacts)
 			dGraph.addEdge(edgeFactory.create(), fact.get(1), fact.get(2));
-		}
 		
 		logger.debug("Printing graph...");
 		logger.debug(dGraph);
 		
-		DelegateTree<String,Integer> tree = new DelegateTree<String,Integer>(dGraph);
-		for (String vertex : tree.getVertices()) {
-			if (tree.getParent(vertex) == null) {
+		DelegateTree<String,Integer> tree = new DelegateTree<>(dGraph);
+		for (String vertex : tree.getVertices())
+			if (tree.getParent(vertex) == null)
 				tree.setRoot(vertex);
-			}
-		}
-		if (tree.getRoot() == null) {
+		if (tree.getRoot() == null)
 			throw new RuntimeException("tree has no root...");
-		}
 		logger.debug("Printing tree...");
 		logger.debug(tree);
 		if (isVisualizingTree)
@@ -154,7 +140,7 @@ public class FlatDecompositionBuilder {
 		for (String parent : clustersMap.keySet()) {
 			List<String> members = clustersMap.get(parent);
 			logger.debug("parent: " + parent);
-			logger.debug("members: " + Joiner.on(",").join(members));
+			logger.debug("members: " + String.join(",", members));
 		}
 		
 		FileWriter fw;
@@ -174,8 +160,6 @@ public class FlatDecompositionBuilder {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-
 	}
 
 	private static void generateHelpStatement(Options options) {
@@ -187,11 +171,10 @@ public class FlatDecompositionBuilder {
 
 	private static Map<String, List<String>> buildDetailedFlatClusters(
 			DelegateTree<String, Integer> tree) {
-		Map<String,List<String>> clustersMap = new HashMap<String,List<String>>();
+		Map<String,List<String>> clustersMap = new HashMap<>();
 		for (String vertex : tree.getVertices()) {
-			if (tree.getRoot().equals(vertex)) {
+			if (tree.getRoot().equals(vertex))
 				continue;
-			}
 			if (tree.isLeaf(vertex)) {
 				List<String> clusterMembers = null;
 				String parent = tree.getParent(vertex);
@@ -200,7 +183,7 @@ public class FlatDecompositionBuilder {
 					clusterMembers.add(vertex);
 				}
 				else {
-					clusterMembers = new ArrayList<String>();
+					clusterMembers = new ArrayList<>();
 					clusterMembers.add(vertex);
 					clustersMap.put(parent, clusterMembers);
 				}
@@ -211,10 +194,10 @@ public class FlatDecompositionBuilder {
 	
 	private static Map<String, List<String>> buildCompactFlatClusters(
 			DelegateTree<String, Integer> tree) {
-		Map<String,List<String>> clustersMap = new HashMap<String,List<String>>();
+		Map<String,List<String>> clustersMap = new HashMap<>();
 		Collection<String> topLevelClusters = tree.getChildren(tree.getRoot());
 		for (String vertex : topLevelClusters) {
-			List<String> leaves = new ArrayList<String>();
+			List<String> leaves = new ArrayList<>();
 			getLeavesOfBranch(vertex,leaves,tree);
 			clustersMap.put(vertex, leaves);
 		}
@@ -223,12 +206,10 @@ public class FlatDecompositionBuilder {
 	
 	private static void getLeavesOfBranch(String vertex, Collection<String> leaves, DelegateTree<String,Integer> tree) {
 		for (String child : tree.getChildren(vertex)) {
-			if (tree.isLeaf(child)) {
+			if (tree.isLeaf(child))
 				leaves.add(child);
-			}
-			else {
+			else
 				getLeavesOfBranch(child, leaves, tree);
-			}
 		}
 	}
 }

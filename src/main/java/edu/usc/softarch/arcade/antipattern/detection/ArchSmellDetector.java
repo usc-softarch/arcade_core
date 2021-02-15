@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -24,8 +25,6 @@ import org.jgrapht.alg.StrongConnectivityInspector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import com.google.common.base.Joiner;
-import com.google.common.primitives.Doubles;
 import com.thoughtworks.xstream.XStream;
 
 import edu.usc.softarch.arcade.antipattern.BcoSmell;
@@ -127,7 +126,7 @@ public class ArchSmellDetector {
 		for (String clusterName : clusterSmellMap.keySet()) {
 			Set<String> smellList = clusterSmellMap.get(clusterName);
 			logger.debug(clusterName + " has smells "
-				+ Joiner.on(",").join(smellList));
+				+ String.join(",", smellList));
 		}
 		for (Entry<String,Set<String>> entry : smellClustersMap.entrySet())
 			logger.debug(entry.getKey() + " : " + entry.getValue());
@@ -222,7 +221,7 @@ public class ArchSmellDetector {
 		for (String clusterName : clusterSmellMap.keySet()) {
 			Set<String> smellList = clusterSmellMap.get(clusterName);
 			logger.debug(clusterName + " has smells "
-				+ Joiner.on(",").join(smellList));
+				+ String.join(",", smellList));
 		}
 		
 		Map<String, Set<String>> smellClustersMap = 
@@ -259,7 +258,7 @@ public class ArchSmellDetector {
 		for (String clusterName : clusterSmellMap.keySet()) {
 			Set<String> smellList = clusterSmellMap.get(clusterName);
 			logger.debug(clusterName + " has smells "
-				+ Joiner.on(",").join(smellList));
+				+ String.join(",", smellList));
 		}
 		
 		Map<String, Set<String>> smellClustersMap =
@@ -435,8 +434,10 @@ public class ArchSmellDetector {
 			inAndOutDegreesArray[i] = inPlusOutAtI;
 		}
     
-		double[] inDegreesArray = Doubles.toArray(inDegrees);
-		double[] outDegreesArray = Doubles.toArray(outDegrees);
+		double[] inDegreesArray = inDegrees.stream()
+			.mapToDouble(Double::doubleValue).toArray();
+		double[] outDegreesArray = outDegrees.stream()
+			.mapToDouble(Double::doubleValue).toArray();
 		double meanInDegrees = StatUtils.mean(inDegreesArray);
 		double meanOutDegrees = StatUtils.mean(outDegreesArray);
 		double meanInAndOutDegrees = StatUtils.mean(inAndOutDegreesArray);
@@ -500,8 +501,10 @@ public class ArchSmellDetector {
 		StrongConnectivityInspector<String, DefaultEdge> inspector =
 			new StrongConnectivityInspector<>(directedGraph);
 		List<Set<String>> connectedSets = inspector.stronglyConnectedSets();
+		List<String> connectedSetsString =
+			connectedSets.stream().map(Set::toString).collect(Collectors.toList());
 		logger.debug("Printing the strongly connected sets of the graph....");
-		logger.debug(Joiner.on("\n").join(connectedSets));
+		logger.debug(String.join("\n", connectedSetsString));
 		
 		int relevantConnectedSetCount = 0;
 		Set<Set<String>> bdcConnectedSets = new HashSet<>();

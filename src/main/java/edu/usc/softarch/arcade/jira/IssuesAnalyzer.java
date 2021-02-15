@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import net.rcarz.jiraclient.Issue;
 import net.rcarz.jiraclient.Version;
@@ -14,7 +15,6 @@ import net.rcarz.jiraclient.Version;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import com.google.common.base.Joiner;
 import com.thoughtworks.xstream.XStream;
 
 import edu.usc.softarch.arcade.util.FileListing;
@@ -80,8 +80,13 @@ public class IssuesAnalyzer {
 		
 		// You may need to change the line below so that sortbyKeyVersion works for your project
 		versionToIssueCountMap = MapUtil.sortByKeyVersion(versionToIssueCountMap);
+		Map<String, Integer> versionToIssueCountMapPrintable =
+			new HashMap<>(versionToIssueCountMap);
 		
-		System.out.println(Joiner.on("\n").withKeyValueSeparator("=").join(versionToIssueCountMap));
+		System.out.println(String.join("\n", versionToIssueCountMapPrintable
+			.keySet().stream()
+			.map(key -> key + "=" + versionToIssueCountMapPrintable.get(key))
+			.collect(Collectors.toList())));
 		
 		System.out.println("Running time: " + stopWatch.getElapsedTimeSecs());
 		

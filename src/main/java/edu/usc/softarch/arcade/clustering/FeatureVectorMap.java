@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,10 +31,6 @@ import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import edu.usc.softarch.arcade.classgraphs.ClassGraph;
 import edu.usc.softarch.arcade.classgraphs.SootClassEdge;
@@ -119,23 +117,25 @@ public class FeatureVectorMap {
 					// Add it to the featureSetEdges and print it
 					String target = this.endNodesListWithNoDupes.get(i);
 					logger.debug(source + " " + target);
-					featureSetEdges.add(Lists.newArrayList(source,target));
+					featureSetEdges.add(Arrays.asList(source,target));
 				}
 			}
 		}
 		
 		if (RsfReader.untypedEdgesSet != null) {
-			Set<List<String>> intersectionSet = Sets.intersection(
-				featureSetEdges, RsfReader.untypedEdgesSet);
+			Set<List<String>> intersectionSet = new HashSet<>(featureSetEdges);
+			intersectionSet.retainAll(RsfReader.untypedEdgesSet);
 			logger.debug("Printing intersection of rsf reader untyped edges set and feature set edges...");
 			logger.debug("intersection set size: " + intersectionSet.size());
-			logger.debug(Joiner.on("\n").join(intersectionSet));
+			logger.debug(String.join("\n", intersectionSet.stream()
+				.map(List::toString).collect(Collectors.toList())));
 
-			Set<List<String>> differenceSet = Sets.difference(featureSetEdges,
-				RsfReader.untypedEdgesSet);
+			Set<List<String>> differenceSet = new HashSet<>(featureSetEdges);
+			differenceSet.removeAll(RsfReader.untypedEdgesSet);
 			logger.debug("Printing difference of rsf reader untyped edges set and feature set edges...");
 			logger.debug("difference set size: " + differenceSet.size());
-			logger.debug(Joiner.on("\n").join(differenceSet));
+			logger.debug(String.join("\n", differenceSet.stream()
+				.map(List::toString).collect(Collectors.toList())));
 		}
 	}
 
@@ -144,20 +144,20 @@ public class FeatureVectorMap {
 		Set<StringEdge> edges = functionGraph.getEdges();
 		
 		// Get a set of the types of edges
-		List<String> arcTypesList = Lists.transform(
-			new ArrayList<StringEdge>(edges),	StringEdge::getType);
-		this.arcTypesSet = Sets.newHashSet(arcTypesList);
+		List<String> arcTypesList = edges.stream()
+			.map(StringEdge::getType).collect(Collectors.toList());
+		this.arcTypesSet = new HashSet<>(arcTypesList);
 
 		// Get a set of the start nodes
-		List<String> startNodesList = Lists.transform(
-				new ArrayList<StringEdge>(edges),	StringEdge::getSrcStr);
-		this.startNodesSet = Sets.newHashSet(startNodesList);
+		List<String> startNodesList = edges.stream()
+			.map(StringEdge::getSrcStr).collect(Collectors.toList());
+		this.startNodesSet = new HashSet<>(startNodesList);
 
 		// Get a set of the target nodes
-		List<String> endNodesList = Lists.transform(
-				new ArrayList<StringEdge>(edges), StringEdge::getTgtStr);
-		TreeSet<String> endNodesSet = Sets.newTreeSet(endNodesList);
-		this.endNodesListWithNoDupes = Lists.newArrayList(endNodesSet);
+		List<String> endNodesList = edges.stream()
+			.map(StringEdge::getTgtStr).collect(Collectors.toList());
+		TreeSet<String> endNodesSet = new TreeSet<>(endNodesList);
+		this.endNodesListWithNoDupes = new ArrayList<>(endNodesSet);
 		
 		// Get the set of all nodes in the graph
 		List<String> allNodesList = new ArrayList<>(startNodesList);

@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,8 +34,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import com.google.common.collect.Lists;
 
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -259,7 +258,7 @@ public class DependencyFinderProcessing {
 	public Map<String, List<String>> readClusterFile(String filePath){
 		Map<String, List<String>> clusterList = new HashMap<>();
 		// Read rsf file and generate the mapping of clusters and classes
-		final List<List<String>> facts = Lists.newArrayList();
+		final List<List<String>> facts = new ArrayList<>();
 
 		try (BufferedReader in = new BufferedReader(new FileReader(filePath))) {
 			String line;
@@ -276,7 +275,9 @@ public class DependencyFinderProcessing {
 				final String arcType = s.findInLine(expr);
 				final String startNode = s.findInLine(expr);
 				final String endNode = s.findInLine(expr);
-				final List<String> fact = Lists.newArrayList(arcType, startNode, endNode);
+				final List<String> fact =
+					new ArrayList<>(Arrays.asList(arcType, startNode, endNode));
+
 				logger.debug(fact);
 				facts.add(fact);
 				// add to cluster

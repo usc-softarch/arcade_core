@@ -23,7 +23,7 @@ public class RsfReader {
 	private static Logger logger = LogManager.getLogger(RsfReader.class);
 	public static Set<List<String>> untypedEdgesSet;
 	public static Set<String> startNodesSet;
-	public static Iterable<List<String>> filteredRoutineFacts;
+	public static List<List<String>> filteredRoutineFacts;
 	public static List<String> filteredRoutines;
 	public static Set<String> endNodesSet;
 	public static Set<String> allNodesSet;

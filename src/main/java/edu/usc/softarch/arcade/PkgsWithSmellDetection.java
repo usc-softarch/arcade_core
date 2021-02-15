@@ -2,15 +2,16 @@ package edu.usc.softarch.arcade;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import com.google.common.base.Joiner;
 
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -38,8 +39,10 @@ public class PkgsWithSmellDetection {
 		
 		File[] files = clustersDir.listFiles();
 		Set<File> fileSet = new TreeSet<>(Arrays.asList(files));
+		List<String> fileSetNames =
+			fileSet.stream().map(File::toString).collect(Collectors.toList());
 		logger.debug("All files in " + clustersDir + ":");
-		logger.debug(Joiner.on("\n").join(fileSet));
+		logger.debug(String.join("\n", fileSetNames));
 		for (File file : fileSet) {
 			if (file.isDirectory()) {
 				logger.debug("Identified directory: " + file.getName());

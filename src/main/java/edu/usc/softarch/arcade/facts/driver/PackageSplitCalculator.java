@@ -6,8 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.base.Joiner;
+import java.util.stream.Collectors;
 
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
@@ -25,7 +24,7 @@ public class PackageSplitCalculator {
 			exprToGrabPackageName = "(.+)\\/.+$";
 			grabPkgPattern = Pattern.compile(exprToGrabPackageName);
 		}
-		else if (fileType == "java") {
+		else if (fileType.equals("java")) {
 			// use default
 		}
 		
@@ -112,17 +111,18 @@ public class PackageSplitCalculator {
 		System.out.println("total no. of clusters: " + clusters.size());
 		System.out.println("proportion of clusters not in the same package: " + proportionOfClustersNotInTheSamePkg );
 		System.out.println("clusters with entities that are NOT in the same package: ");
-		System.out.println(Joiner.on("\n").join(clustersWithEntitiesNotInSamePackage));
+		System.out.println(String.join("\n", clustersWithEntitiesNotInSamePackage));
 		System.out.println("clusters with entities that ARE in the same package: ");
-		System.out.println(Joiner.on("\n").join(clustersWithEntitiesInSamePackage));
+		System.out.println(String.join("\n", clustersWithEntitiesInSamePackage));
 		System.out.println("no. of split clusters: " + numOfSplitClusters);
 		System.out.println("split packages: ");
-		System.out.println(Joiner.on("\n").withKeyValueSeparator(":").join(splitPkgs));
+		System.out.println(String.join("\n", splitPkgs.keySet().stream()
+			.map(key -> key + ":" + splitPkgs.get(key)).collect(Collectors.toList())));
 		System.out.println("proportion of split clusters: " + proportionOfSplitClusters);
 		System.out.println("no. of clusters where package structure is not enough: " + clustersWherePkgsIsNotEnough.size());
 		System.out.println("proportion of clusters where package structure is not enough: " + proportionWherePkgIsNotEnough);
 		System.out.println("components where packages and directories are not enough:");
-		System.out.println(Joiner.on("\n").join(clustersWherePkgsIsNotEnough));
+		System.out.println(String.join("\n", clustersWherePkgsIsNotEnough));
 	}
 
 	private static String getPackageNameOfFirstEntity(String clusterName, Set<ConcernCluster> clusters) {

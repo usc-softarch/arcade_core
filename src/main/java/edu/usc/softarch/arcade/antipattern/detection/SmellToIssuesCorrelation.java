@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.antipattern.detection;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,13 +11,13 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import com.google.common.base.Joiner;
 import com.thoughtworks.xstream.XStream;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
@@ -51,42 +52,60 @@ public class SmellToIssuesCorrelation {
 			logger.debug("\tcontains " + smells.size() + " smells");
 			
 			logger.debug("\tListing detected smells for file" + file.getName() + ": ");
-			for (Smell smell : smells) {
+			for (Smell smell : smells)
 				logger.debug("\t" + SmellUtil.getSmellAbbreviation(smell) + " " + smell);
-			}
 			
 			// You may need to change the regular expression below to match the versioning scheme of your project
 			Pattern p = Pattern.compile("[0-9]+\\.[0-9]+(\\.[0-9]+)*");
 			Matcher m = p.matcher(file.getName());
 			String currentVersion = "";
-			if (m.find()) {
-				currentVersion = m.group(0);
-			}
+			if (m.find()) currentVersion = m.group(0);
 			
 			versionToSmellCount.put(currentVersion, smells.size());
 		}
 		
 		versionToSmellCount = MapUtil.sortByKeyVersion(versionToSmellCount);
+		//TODO This is right derpy, but it's fine temporarily because these prints
+		// will all get removed anyway. It's because to use inside a lambda, the
+		// variable has to be "effectively final".
+		Map<String, Integer> versionToSmellCountPrintable1 =
+			new HashMap<>(versionToSmellCount);
 		System.out.println("Smell counts for versions:");
-		System.out.println(Joiner.on("\n").withKeyValueSeparator("=").join(versionToSmellCount));
+		System.out.println(versionToSmellCountPrintable1.keySet().stream()
+			.map(key -> key + " = " + versionToSmellCountPrintable1.get(key))
+			.collect(Collectors.joining("\n")));
 		
-		List<Integer> smellCounts = new ArrayList(versionToSmellCount.values());
+		List<Integer> smellCounts = new ArrayList<>(versionToSmellCount.values());
+		List<String> smellCountStrings =
+			smellCounts.stream().map(String::valueOf).collect(Collectors.toList());
 		System.out.println("Smell counts only:");
-		System.out.println(Joiner.on(",").join(smellCounts));
+		System.out.println(String.join(",", smellCountStrings));
 		double[] smellCountsArr = new double[smellCounts.size()];
 		for (int i=0;i<smellCounts.size();i++) {
 			smellCountsArr[i] = (double)smellCounts.get(i);
 		}
 		
 		XStream xstream = new XStream();
-		Map<String,Integer> issuesCountMap = (Map<String,Integer>)xstream.fromXML(new File(FileUtil.tildeExpandPath(issuesCountMapFilename)));
+		Map<String,Integer> issuesCountMap =
+			(Map<String,Integer>) xstream.fromXML(
+			new File(FileUtil.tildeExpandPath(issuesCountMapFilename)));
 		System.out.println("Number of issues for each version:");
-		System.out.println(Joiner.on("\n").withKeyValueSeparator("=").join(issuesCountMap));
+		System.out.println(issuesCountMap.keySet().stream()
+			.map(key -> key + " = " + issuesCountMap.get(key))
+			.collect(Collectors.joining("\n")));
+
+		//TODO This is right derpy, but it's fine temporarily because these prints
+		// will all get removed anyway. It's because to use inside a lambda, the
+		// variable has to be "effectively final".
+		Map<String, Integer> versionToSmellCountPrintable2 =
+			new HashMap<>(versionToSmellCount);
 		
 		System.out.println("Keys of smell count map: ");
-		System.out.println(Joiner.on("\n").join(versionToSmellCount.keySet()));
+		System.out.println(versionToSmellCountPrintable2.keySet().stream()
+			.map(key -> key + " " + versionToSmellCountPrintable2.get(key))
+			.collect(Collectors.joining("\n")));
 		
-		List<String> versions = new ArrayList<String>(versionToSmellCount.keySet());
+		List<String> versions = new ArrayList<>(versionToSmellCount.keySet());
 		double[] issueCountsArr = new double[smellCounts.size()];
 		for (int i=0;i<smellCounts.size();i++) {
 			issueCountsArr[i] = 0;

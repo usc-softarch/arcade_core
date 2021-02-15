@@ -3,8 +3,7 @@ package edu.usc.softarch.arcade.util.graph;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.base.Joiner;
+import java.util.stream.Collectors;
 
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
@@ -33,7 +32,9 @@ public class ClusterGraphDensityCalculator {
 		
 		double graphDensity = (double)numEdges / (double)(numVertices* (numVertices-1));
 		
-		System.out.println(Joiner.on("\n").join(edges));
+		System.out.println(String.join("\n", edges.stream()
+			.map(List::toString).collect(Collectors.toList())));
+			
 		System.out.println("no. of edges: " + numEdges);
 		System.out.println("no. of vertices: " + numVertices);
 		System.out.println("graph density: " + graphDensity);

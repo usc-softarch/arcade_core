@@ -3,16 +3,15 @@ package edu.usc.softarch.arcade;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.clustering.acdc.ACDC;
-
-import com.google.common.base.Joiner;
-
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder;
 import edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder;
@@ -49,20 +48,18 @@ public class AcdcWithSmellDetection {
 
 		// Console Output
 		logger.debug("All files in " + inputDir + ":");
-		logger.debug(Joiner.on("\n").join(fileSet));
+		List<String> fileSetNames =
+			fileSet.stream().map(File::toString).collect(Collectors.toList());
+		logger.debug(String.join("\n", fileSetNames));
 
-		for (File file : fileSet) {
-			if (file.isDirectory()) {
+		for (File file : fileSet)
+			if (file.isDirectory())
 				logger.debug("Identified directory: " + file.getName());
-			}
-		}
 
 		// Processing
-		for (File vFolder : fileSet) {
-			if (vFolder.isDirectory()) {
-				single (vFolder, args, outputDir);
-			}
-		}		
+		for (File vFolder : fileSet)
+			if (vFolder.isDirectory())
+				single (vFolder, args, outputDir);	
 	}
 
 	public static void single (File versionFolder, String[] args, File outputDir)

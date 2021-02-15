@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-
-import com.google.common.base.Joiner;
 
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
@@ -196,7 +195,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		}
 		
 		logger.debug("New initial fast clusters:");
-		logger.debug(Joiner.on("\n").join(fastClusters));
+		logger.debug(String.join("\n", fastClusters.stream()
+			.map(FastCluster::toString).collect(Collectors.toList())));
 	}
 	
 	private static void printDataForTwoMostSimilarClustersWithTopicsForConcerns(
