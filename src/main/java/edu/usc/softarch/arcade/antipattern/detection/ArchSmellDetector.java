@@ -20,8 +20,8 @@ import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.jgrapht.alg.CycleDetector;
-import org.jgrapht.alg.StrongConnectivityInspector;
+import org.jgrapht.alg.cycle.CycleDetector;
+import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
@@ -498,8 +498,8 @@ public class ArchSmellDetector {
 			"which participate in at least one cycle in this graph...");
 		logger.debug(cycleSet);
 		
-		StrongConnectivityInspector<String, DefaultEdge> inspector =
-			new StrongConnectivityInspector<>(directedGraph);
+		KosarajuStrongConnectivityInspector<String, DefaultEdge> inspector =
+			new KosarajuStrongConnectivityInspector<>(directedGraph);
 		List<Set<String>> connectedSets = inspector.stronglyConnectedSets();
 		List<String> connectedSetsString =
 			connectedSets.stream().map(Set::toString).collect(Collectors.toList());

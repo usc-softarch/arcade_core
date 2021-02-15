@@ -18,11 +18,6 @@
       <name>weka</name>
       <url>https://clojars.org/repo/</url>
     </repository>
-    <repository>
-      <id>jgrapht-old</id>
-      <name>jgrapht-jdk1.6</name>
-      <url>http://titania.fs.uni-saarland.de/nexus/content/repositories/stchair/</url>
-    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -99,11 +94,11 @@
       <artifactId>json</artifactId>
       <version>20141113</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-jdk1.6 -->
+    <!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
     <dependency>
       <groupId>org.jgrapht</groupId>
-      <artifactId>jgrapht-jdk1.6</artifactId>
-      <version>0.8.3</version>
+      <artifactId>jgrapht-core</artifactId>
+      <version>1.5.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.beust/jcommander -->
     <dependency>
