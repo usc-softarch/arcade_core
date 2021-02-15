@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.antipattern.detection;
+package edu.usc.softarch.arcade.antipattern;
 
 import java.util.HashSet;
 import java.util.List;
@@ -14,20 +14,29 @@ public class Smell {
 	}
 
 	@Deprecated
-	Set<ConcernCluster> clusters;
+	public Set<ConcernCluster> clusters;
 	private Set<ConcernCluster> newClusters;
 	private final SmellType smellType;
+	private final int topicNum;
 	// #endregion FIELDS ---------------------------------------------------------
 
 	// #region CONSTRUCTORS ------------------------------------------------------
 	@Deprecated
 	public Smell() {
 		this.smellType = SmellType.spf;
+		this.topicNum = -1;
 		this.clusters = new HashSet<>();
 	}
 
 	public Smell(SmellType smellType) {
 		this.smellType = smellType;
+		this.topicNum = -1;
+		this.newClusters = new HashSet<>();
+	}
+
+	public Smell(int topicNum) {
+		this.smellType = SmellType.spf;
+		this.topicNum = topicNum;
 		this.newClusters = new HashSet<>();
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
@@ -36,6 +45,7 @@ public class Smell {
 	public Set<ConcernCluster> getClusters() {
 		return new HashSet<>(this.newClusters); }
 	public SmellType getSmellType() { return this.smellType; }
+	public int getTopicNum() { return this.topicNum; }
 
 	public boolean addCluster(ConcernCluster cluster) {
 		return this.newClusters.add(cluster); }

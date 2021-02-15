@@ -57,19 +57,18 @@ public class DependencyFinderProcessing_ExportJSON {
 	private static String DUPLICATION	= "duplication";
 	private static String FILE = "file";
 	private static String PATH = "path";
-	public String PKGNAME;
 	
-	public static String summary ="SUMMARY:\n version, unused interface, unused block, sloppy, lego, function overload, duplicate functionality, logical deps\n";
-	public static String details ="DETAILS:\n"; 
-	public static JSONObject details_json = new JSONObject();
+	private static String summary ="SUMMARY:\n version, unused interface, unused block, sloppy, lego, function overload, duplicate functionality, logical deps\n";
+	private static String details ="DETAILS:\n"; 
+	private static JSONObject details_json = new JSONObject();
 	
-	static String mainFolder 	= "subject_systems\\Struts2\\";
-	static String testRSF 		= mainFolder + "acdc\\cluster";
-	static String testDefFinder = mainFolder + "depfinder";
-	static String testClone 	= mainFolder + "clone";
-	static String logicalDep 	= mainFolder + "struts2_cleaned.csv";
-	static String outputDest 	= mainFolder + "struts2_acdc_interface_smell.csv";
-	static String packageName 	=  "org.apache.struts2"; 
+	private static String mainFolder 	= "subject_systems\\Struts2\\";
+	private static String testRSF 		= mainFolder + "acdc\\cluster";
+	private static String testDefFinder = mainFolder + "depfinder";
+	private static String testClone 	= mainFolder + "clone";
+	private static String logicalDep 	= mainFolder + "struts2_cleaned.csv";
+	private static String outputDest 	= mainFolder + "struts2_acdc_interface_smell.csv";
+	private static String packageName 	=  "org.apache.struts2"; 
 	
 	private Map<String, List<String>> clusterList = new HashMap<>();		
 	private Map<String, String> class2component = new HashMap<>();
@@ -77,15 +76,15 @@ public class DependencyFinderProcessing_ExportJSON {
 	// Keep whole dependencies in Memory, using map
 	// Only keep inbound at the moment
 	// Mapping class name and Methond
-	public Map<String, List<String>> methodList = new HashMap<>();
+	private Map<String, List<String>> methodList = new HashMap<>();
 	// Mapping method name and inbound/outbound methods
-	public Map<String, List<String>> inboundDependencies = new HashMap<>();
-	public Map<String, List<String>> outboundDependencies = new HashMap<>();
+	private Map<String, List<String>> inboundDependencies = new HashMap<>();
+	private Map<String, List<String>> outboundDependencies = new HashMap<>();
 	
-	public Map<String, List<String>> inboundClasses = new HashMap<>();
-	public Map<String, List<String>> outboundClasses = new HashMap<>();
+	private Map<String, List<String>> inboundClasses = new HashMap<>();
+	private Map<String, List<String>> outboundClasses = new HashMap<>();
 
-	public Map<String, List<String>> classLogicalDependencies = new HashMap<>();
+	private Map<String, List<String>> classLogicalDependencies = new HashMap<>();
 	
 	public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
 		String mainFolder; 	
@@ -175,7 +174,7 @@ public class DependencyFinderProcessing_ExportJSON {
 			String smellFile = versionSmells.get(key);
 			String clusterFile =  clusterSmells.get(key);
 			String cloneFile   = cloneVersions.get(key);
-			if (smellFile == null | clusterFile ==null | cloneFile == null)
+			if (smellFile == null || clusterFile ==null || cloneFile == null)
 				continue;
 			single(versionSmells.get(key), clusterSmells.get(key), packageName, cloneVersions.get(key), key, logicalDep, outputDest);
 		}
@@ -186,7 +185,7 @@ public class DependencyFinderProcessing_ExportJSON {
 		
 		DependencyFinderProcessing_ExportJSON dp = new DependencyFinderProcessing_ExportJSON(testDoc, packageName);
 		dp.clusterList	= dp.readClusterFile(testRSF);
-		dp.codeClone	= dp.codeCloneUpdate(testClone, packageName);
+		dp.codeClone	= dp.codeCloneUpdate(testClone);
 		dp.classLogicalDependencies = dp.readLogicalDeps(logicalDep);
 		//detect smell
 		logger.info("Start detecting smells");
@@ -235,7 +234,7 @@ public class DependencyFinderProcessing_ExportJSON {
 		int total = 0;
 		for (String s : storage.keySet()) {
 			Set<String> componentList = storage.get(s);
-			if (componentList!= null && componentList.size() >0){
+			if (componentList!= null && !componentList.isEmpty()){
 				int numOfConnection = componentList.size();
 				// don't care if this is inner dependencies
 				if (componentList.contains(s)) {
@@ -448,7 +447,7 @@ public class DependencyFinderProcessing_ExportJSON {
 		logger.info("Finished processing XML input");
 	}
 
-	public Map<Integer, Set<String>> codeCloneUpdate(String xmlFilePath, String packageName) throws ParserConfigurationException, SAXException, IOException {
+	public Map<Integer, Set<String>> codeCloneUpdate(String xmlFilePath) throws ParserConfigurationException, SAXException, IOException {
 		//Handle by DOM Parser
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(true);
@@ -915,9 +914,8 @@ public class DependencyFinderProcessing_ExportJSON {
 		File file = new File(path);
 		File json_file = new File(path+".json");
 		// if file doesnt exists, then create it
-		if (!file.exists()) {
+		if (!file.exists())
 			file.createNewFile();
-		}
 		FileWriter fw = new FileWriter(file.getAbsoluteFile());
 		BufferedWriter bw = new BufferedWriter(fw);
 		bw.write(content);

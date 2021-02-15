@@ -28,6 +28,11 @@ import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
 import com.thoughtworks.xstream.XStream;
 
+import edu.usc.softarch.arcade.antipattern.BcoSmell;
+import edu.usc.softarch.arcade.antipattern.BdcSmell;
+import edu.usc.softarch.arcade.antipattern.BuoSmell;
+import edu.usc.softarch.arcade.antipattern.Smell;
+import edu.usc.softarch.arcade.antipattern.SpfSmell;
 import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.facts.ConcernCluster;

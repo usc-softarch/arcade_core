@@ -1,4 +1,4 @@
-package ArchSmellAnalyzer;
+package edu.usc.softarch.arcade.antipattern.detection;
 
 public class SmellCount {
 	int buo = 0;

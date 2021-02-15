@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -13,6 +13,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.util.FileListing;
@@ -23,7 +24,7 @@ import edu.usc.softarch.arcade.util.MapUtil;
 public class SmellDensityAnalyzer {
 	private static Logger logger = Logger.getLogger(SmellDensityAnalyzer.class);
 
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws IOException {
 		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		LogUtil.printLogFiles();
 		

@@ -30,15 +30,13 @@ public class ConcernCluster {
 	public boolean equals(Object obj) {
 		if (obj instanceof ConcernCluster) {
 			ConcernCluster cluster = (ConcernCluster) obj;
-			if (cluster.name.equals(this.name)) {
+			if (cluster.name.equals(this.name))
 				return true;
-			}
 		}
 		if (obj instanceof String) {
 			String clusterName = (String)obj;
-			if (clusterName.equals(this.name)) {
+			if (clusterName.equals(this.name))
 				return true;
-			}
 		}
 		return false;
 	}

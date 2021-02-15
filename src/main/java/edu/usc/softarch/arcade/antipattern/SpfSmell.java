@@ -1,9 +1,10 @@
-package edu.usc.softarch.arcade.antipattern.detection;
+package edu.usc.softarch.arcade.antipattern;
 
+@Deprecated
 public class SpfSmell extends Smell {
 	final int topicNum;
 	
-	SpfSmell(int topicNum) {
+	public SpfSmell(int topicNum) {
 		this.topicNum = topicNum;
 	}
 	

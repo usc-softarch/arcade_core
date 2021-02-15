@@ -1,8 +1,9 @@
-package ArchSmellAnalyzer;
+package edu.usc.softarch.arcade.antipattern.detection;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,15 +17,14 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-import edu.usc.softarch.arcade.antipattern.detection.Smell;
-import edu.usc.softarch.arcade.antipattern.detection.SmellUtil;
+import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
-public class SmellAnylazer {
+public class SmellAnalyzer {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		String inputDirectory = "E:\\android\\ser";
 		String outputDirectory = "E:\\android\\excel\\acdc_comp";
 		
@@ -38,7 +38,8 @@ public class SmellAnylazer {
 	 * @param inputFiles
 	 * @param outputPath: full path including file format
 	 */
-	static void analyzeVersionSmellnum(Set<File> inputFiles, String outputPath){
+	static void analyzeVersionSmellnum(Set<File> inputFiles, String outputPath)
+			throws IOException {
 		PrintWriter writer = null;
 		Integer total = 0;
 		try {
@@ -99,7 +100,8 @@ public class SmellAnylazer {
 	 * @param inputFiles
 	 * @param outputPath: full path without .xls
 	 */
-	static void analyzeClassSmellnum(Set<File> inputFiles, String outputPath){
+	static void analyzeClassSmellnum(Set<File> inputFiles, String outputPath)
+			throws IOException {
 		 HSSFWorkbook workbook = new HSSFWorkbook();  
 		 
 		for (File file : inputFiles) {
@@ -192,7 +194,8 @@ public class SmellAnylazer {
 	 * @param inputFiles
 	 * @param outputPath: full path WITHOUT .xls
 	 */
-	static void analyzeCompSmellnum(Set<File> inputFiles, String outputPath){
+	static void analyzeCompSmellnum(Set<File> inputFiles, String outputPath)
+			throws IOException {
 		 HSSFWorkbook workbook = new HSSFWorkbook();  
 		 
 		for (File file : inputFiles) {
