@@ -15,7 +15,6 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.Set;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.logging.log4j.Logger;
@@ -558,7 +557,8 @@ public class ArchSmellDetector {
 		
 		StandardDeviation stdDev = new StandardDeviation();
 		
-		int[] intConcernCountValues = ArrayUtils.toPrimitive(concernCountMap.values().toArray(new Integer[0]) );
+		int[] intConcernCountValues =
+			concernCountMap.values().stream().mapToInt(Integer::valueOf).toArray();
 		double[] doubleConcernCountValues = new double[intConcernCountValues.length];
 		for (int i=0; i<intConcernCountValues.length; i++)
 			doubleConcernCountValues[i] = intConcernCountValues[i];

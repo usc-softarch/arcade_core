@@ -3,11 +3,11 @@ package edu.usc.softarch.arcade.clustering;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import mojo.MoJoCalculator;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import edu.usc.softarch.arcade.util.FileListing;
@@ -43,7 +43,8 @@ public class MoJoEvolutionAnalyzer {
 			Double[] mojoFmArr = new Double[mojoFmValues.size()];
 			mojoFmValues.toArray(mojoFmArr);
 			
-			DescriptiveStatistics stats = new DescriptiveStatistics(ArrayUtils.toPrimitive(mojoFmArr));
+			DescriptiveStatistics stats = new DescriptiveStatistics(
+				Arrays.stream(mojoFmArr).mapToDouble(Double::valueOf).toArray());
 
 			System.out.println(stats);
 			System.out.println();
