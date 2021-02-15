@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -57,30 +58,29 @@ public class SmellAnalyzer {
 			int spfCount = 0;
 			int bcoCount = 0;
 			for (Smell smell : smells) {
-				if (SmellUtil.getSmellAbbreviation(smell).equals("buo")) {
+				if (SmellUtil.getSmellAbbreviation(smell).equals("buo"))
 					buoCount++;
-				} else if (SmellUtil.getSmellAbbreviation(smell).equals("bdc")) {
+				if (SmellUtil.getSmellAbbreviation(smell).equals("bdc"))
 					bdcCount++;
-				} else if (SmellUtil.getSmellAbbreviation(smell).equals("spf")) {
+				if (SmellUtil.getSmellAbbreviation(smell).equals("spf"))
 					spfCount++;
-				} else if (SmellUtil.getSmellAbbreviation(smell).equals("bco")) {
+				if (SmellUtil.getSmellAbbreviation(smell).equals("bco"))
 					bcoCount++;
-				}
 				System.out.println(SmellUtil.getSmellAbbreviation(smell) + " "
 						+ smell);
 			}
 			int sumCount = buoCount + bdcCount + spfCount + bcoCount;
 			total += sumCount;
 			writer.println(FileUtil.extractVersionPretty(file.getName()) + ","
-					+ bdcCount + "," + buoCount + "," + bcoCount + ","
-					+ spfCount + "," + sumCount);
+				+ bdcCount + "," + buoCount + "," + bcoCount + ","
+				+ spfCount + "," + sumCount);
 		}
 		writer.println("total:" + total);
 		writer.close();
 	}
 	
 	static Set<File> getOrderedFiles(String inputDirectory) {
-		Set<File> orderedSerFiles = new LinkedHashSet<File>();
+		Set<File> orderedSerFiles = new LinkedHashSet<>();
 		List<File> fileList = null;
 		try {
 			fileList = FileListing.getFileListing(new File(inputDirectory));
@@ -88,11 +88,9 @@ public class SmellAnalyzer {
 			e.printStackTrace();
 		}
 
-		for (File file : fileList) {
-			if (file.getName().endsWith(".ser")) {
+		for (File file : fileList)
+			if (file.getName().endsWith(".ser"))
 				orderedSerFiles.add(file);
-			}
-		}
 		return orderedSerFiles;
 	}
 	
@@ -102,12 +100,10 @@ public class SmellAnalyzer {
 	 */
 	static void analyzeClassSmellnum(Set<File> inputFiles, String outputPath)
 			throws IOException {
-		 HSSFWorkbook workbook = new HSSFWorkbook();  
+		HSSFWorkbook workbook = new HSSFWorkbook();  
 		 
 		for (File file : inputFiles) {
-			
-			Set<Smell> smells = SmellUtil.deserializeDetectedSmells(file
-					.getAbsolutePath());
+			Set<Smell> smells = SmellUtil.deserializeDetectedSmells(file.getAbsolutePath());
 			HSSFSheet sheet = workbook.createSheet(FileUtil.extractFilenamePrefix(file));  
 			sheet.setColumnWidth(0, 15000);
 			//set headers
@@ -125,34 +121,32 @@ public class SmellAnalyzer {
 			cell = row.createCell(5);
 			cell.setCellValue("all");
 			
-			Map<String, SmellCount> entityMap = new HashMap<String, SmellCount>();
+			Map<String, SmellCount> entityMap = new HashMap<>();
 
 			for (Smell smell : smells) {
-				Set<ConcernCluster> clusters = SmellUtil.getSmellClusters(smell);
-				for(ConcernCluster cluster: clusters){
+				Set<ConcernCluster > clusters = SmellUtil.getSmellClusters(smell);
+				for(ConcernCluster cluster : clusters) {
 					Set<String> entities = cluster.getEntities();
-					for(String entity: entities){
-						if(entityMap.containsKey(entity)){
-							if (SmellUtil.getSmellAbbreviation(smell).equals("buo")) {
+					for(String entity : entities) {
+						if(entityMap.containsKey(entity)) {
+							if (SmellUtil.getSmellAbbreviation(smell).equals("buo"))
 								entityMap.get(entity).buo++;
-							} else if (SmellUtil.getSmellAbbreviation(smell).equals("bdc")) {
+							if (SmellUtil.getSmellAbbreviation(smell).equals("bdc"))
 								entityMap.get(entity).bdc++;
-							} else if (SmellUtil.getSmellAbbreviation(smell).equals("spf")) {
+							if (SmellUtil.getSmellAbbreviation(smell).equals("spf"))
 								entityMap.get(entity).spf++;
-							} else if (SmellUtil.getSmellAbbreviation(smell).equals("bco")) {
+							if (SmellUtil.getSmellAbbreviation(smell).equals("bco"))
 								entityMap.get(entity).bco++;
-							}
-						}else{
+						} else {
 							SmellCount smellCount = new SmellCount();
-							if (SmellUtil.getSmellAbbreviation(smell).equals("buo")) {
+							if (SmellUtil.getSmellAbbreviation(smell).equals("buo"))
 								smellCount.buo++;
-							} else if (SmellUtil.getSmellAbbreviation(smell).equals("bdc")) {
+							if (SmellUtil.getSmellAbbreviation(smell).equals("bdc"))
 								smellCount.bdc++;
-							} else if (SmellUtil.getSmellAbbreviation(smell).equals("spf")) {
+							if (SmellUtil.getSmellAbbreviation(smell).equals("spf"))
 								smellCount.spf++;
-							} else if (SmellUtil.getSmellAbbreviation(smell).equals("bco")) {
+							if (SmellUtil.getSmellAbbreviation(smell).equals("bco"))
 								smellCount.bco++;
-							}
 							entityMap.put(entity, smellCount);
 						}
 						entityMap.get(entity).all++;
@@ -160,48 +154,47 @@ public class SmellAnalyzer {
 				}
 			}
 			
-			Iterator it = entityMap.entrySet().iterator();
+			Iterator<Entry<String, SmellCount>> it = entityMap.entrySet().iterator();
 			int rownum = 1;
-		    while (it.hasNext()) {
-		        Map.Entry pair = (Map.Entry)it.next();
-		        SmellCount smellCount = (SmellCount) pair.getValue();
-		        row = sheet.createRow(rownum++);
-		        cell = row.createCell(0);
-		        cell.setCellValue(pair.getKey().toString());
-		        cell = row.createCell(1);
-		        cell.setCellValue(smellCount.buo);
-		        cell = row.createCell(2);
-		        cell.setCellValue(smellCount.bdc);
-		        cell = row.createCell(3);
-		        cell.setCellValue(smellCount.spf);
-		        cell = row.createCell(4);
-		        cell.setCellValue(smellCount.bco);
-		        cell = row.createCell(5);
-		        cell.setCellValue(smellCount.all);
-		        it.remove(); // avoids a ConcurrentModificationException
-		    }
+			while (it.hasNext()) {
+				Entry<String, SmellCount> pair = it.next();
+				SmellCount smellCount = pair.getValue();
+				row = sheet.createRow(rownum++);
+				cell = row.createCell(0);
+				cell.setCellValue(pair.getKey());
+				cell = row.createCell(1);
+				cell.setCellValue(smellCount.buo);
+				cell = row.createCell(2);
+				cell.setCellValue(smellCount.bdc);
+				cell = row.createCell(3);
+				cell.setCellValue(smellCount.spf);
+				cell = row.createCell(4);
+				cell.setCellValue(smellCount.bco);
+				cell = row.createCell(5);
+				cell.setCellValue(smellCount.all);
+				it.remove(); // avoids a ConcurrentModificationException
+			}
 		}
-		 FileOutputStream os;
+		FileOutputStream os;
 		try {
 			os = new FileOutputStream(outputPath+".xls");
 			workbook.write(os);  
-		    os.close(); 
+		  os.close(); 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}    
 	}
+
 	/**
 	 * @param inputFiles
 	 * @param outputPath: full path WITHOUT .xls
 	 */
 	static void analyzeCompSmellnum(Set<File> inputFiles, String outputPath)
 			throws IOException {
-		 HSSFWorkbook workbook = new HSSFWorkbook();  
+		HSSFWorkbook workbook = new HSSFWorkbook();  
 		 
 		for (File file : inputFiles) {
-			
-			Set<Smell> smells = SmellUtil.deserializeDetectedSmells(file
-					.getAbsolutePath());
+			Set<Smell> smells = SmellUtil.deserializeDetectedSmells(file.getAbsolutePath());
 			HSSFSheet sheet = workbook.createSheet(FileUtil.extractFilenamePrefix(file));  
 			sheet.setColumnWidth(0, 15000);
 			//set headers
@@ -223,60 +216,58 @@ public class SmellAnalyzer {
 
 			for (Smell smell : smells) {
 				Set<ConcernCluster> clusters = SmellUtil.getSmellClusters(smell);
-				for(ConcernCluster cluster: clusters){
-					if(clusterMap.containsKey(cluster.getName())){
-						if (SmellUtil.getSmellAbbreviation(smell).equals("buo")) {
+				for (ConcernCluster cluster: clusters) {
+					if (clusterMap.containsKey(cluster.getName())) {
+						if (SmellUtil.getSmellAbbreviation(smell).equals("buo"))
 							clusterMap.get(cluster.getName()).buo++;
-						} else if (SmellUtil.getSmellAbbreviation(smell).equals("bdc")) {
+						if (SmellUtil.getSmellAbbreviation(smell).equals("bdc"))
 							clusterMap.get(cluster.getName()).bdc++;
-						} else if (SmellUtil.getSmellAbbreviation(smell).equals("spf")) {
+						if (SmellUtil.getSmellAbbreviation(smell).equals("spf"))
 							clusterMap.get(cluster.getName()).spf++;
-						} else if (SmellUtil.getSmellAbbreviation(smell).equals("bco")) {
+						if (SmellUtil.getSmellAbbreviation(smell).equals("bco"))
 							clusterMap.get(cluster.getName()).bco++;
-						}
-					}else{
+					} else {
 						SmellCount smellCount = new SmellCount();
-						if (SmellUtil.getSmellAbbreviation(smell).equals("buo")) {
+						if (SmellUtil.getSmellAbbreviation(smell).equals("buo"))
 							smellCount.buo++;
-						} else if (SmellUtil.getSmellAbbreviation(smell).equals("bdc")) {
+						if (SmellUtil.getSmellAbbreviation(smell).equals("bdc"))
 							smellCount.bdc++;
-						} else if (SmellUtil.getSmellAbbreviation(smell).equals("spf")) {
+						if (SmellUtil.getSmellAbbreviation(smell).equals("spf"))
 							smellCount.spf++;
-						} else if (SmellUtil.getSmellAbbreviation(smell).equals("bco")) {
+						if (SmellUtil.getSmellAbbreviation(smell).equals("bco"))
 							smellCount.bco++;
-						}
 						clusterMap.put(cluster.getName(), smellCount);
 					}
 					clusterMap.get(cluster.getName()).all++;
-					}
 				}
+			}
 
-			Iterator it = clusterMap.entrySet().iterator();
+			Iterator<Entry<String, SmellCount>> it = clusterMap.entrySet().iterator();
 			int rownum = 1;
-		    while (it.hasNext()) {
-		        Map.Entry pair = (Map.Entry)it.next();
-		        SmellCount smellCount = (SmellCount) pair.getValue();
-		        row = sheet.createRow(rownum++);
-		        cell = row.createCell(0);
-		        cell.setCellValue(pair.getKey().toString());
-		        cell = row.createCell(1);
-		        cell.setCellValue(smellCount.buo);
-		        cell = row.createCell(2);
-		        cell.setCellValue(smellCount.bdc);
-		        cell = row.createCell(3);
-		        cell.setCellValue(smellCount.spf);
-		        cell = row.createCell(4);
-		        cell.setCellValue(smellCount.bco);
-		        cell = row.createCell(5);
-		        cell.setCellValue(smellCount.all);
-		        it.remove(); // avoids a ConcurrentModificationException
-		    }
+			while (it.hasNext()) {
+				Entry<String, SmellCount> pair = it.next();
+				SmellCount smellCount = pair.getValue();
+				row = sheet.createRow(rownum++);
+				cell = row.createCell(0);
+				cell.setCellValue(pair.getKey());
+				cell = row.createCell(1);
+				cell.setCellValue(smellCount.buo);
+				cell = row.createCell(2);
+				cell.setCellValue(smellCount.bdc);
+				cell = row.createCell(3);
+				cell.setCellValue(smellCount.spf);
+				cell = row.createCell(4);
+				cell.setCellValue(smellCount.bco);
+				cell = row.createCell(5);
+				cell.setCellValue(smellCount.all);
+				it.remove(); // avoids a ConcurrentModificationException
+			}
 		}
-		 FileOutputStream os;
+		FileOutputStream os;
 		try {
 			os = new FileOutputStream(outputPath+".xls");
 			workbook.write(os);  
-		    os.close(); 
+		  os.close(); 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}    

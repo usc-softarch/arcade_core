@@ -60,7 +60,6 @@ public class BatchSmellDetectionRunner {
 				System.out.println(mojoFmValue);
 
 				writer.println(detectedSmellsFilename + "," + mojoFmValue);
-
 			}
 			writer.close();
 

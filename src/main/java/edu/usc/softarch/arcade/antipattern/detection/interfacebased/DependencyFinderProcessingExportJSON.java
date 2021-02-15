@@ -44,30 +44,12 @@ import edu.usc.softarch.arcade.util.FileUtil;
  * 
  * Find interface based architectural smell + co-change smell
  */
-public class DependencyFinderProcessing_ExportJSON {
+public class DependencyFinderProcessingExportJSON {
 	private static Logger logger =
-		LogManager.getLogger(DependencyFinderProcessing_ExportJSON.class);
-	// Define XML TAGs
-	private String FEATURE = "feature";
-	private String NAME = "name";
-	private String INBOUND = "inbound";
-	private String OUTBOUND = "outbound";
-	private String CLASS = "class";
-	private static String DUPLICATION	= "duplication";
-	private static String FILE = "file";
-	private static String PATH = "path";
-	
+		LogManager.getLogger(DependencyFinderProcessingExportJSON.class);
 	private static String summary ="SUMMARY:\n version, unused interface, unused block, sloppy, lego, function overload, duplicate functionality, logical deps\n";
 	private static String details ="DETAILS:\n"; 
 	private static JSONObject details_json = new JSONObject();
-	
-	private static String mainFolder 	= "subject_systems\\Struts2\\";
-	private static String testRSF 		= mainFolder + "acdc\\cluster";
-	private static String testDefFinder = mainFolder + "depfinder";
-	private static String testClone 	= mainFolder + "clone";
-	private static String logicalDep 	= mainFolder + "struts2_cleaned.csv";
-	private static String outputDest 	= mainFolder + "struts2_acdc_interface_smell.csv";
-	private static String packageName 	=  "org.apache.struts2"; 
 	
 	private Map<String, List<String>> clusterList = new HashMap<>();		
 	private Map<String, String> class2component = new HashMap<>();
@@ -79,14 +61,11 @@ public class DependencyFinderProcessing_ExportJSON {
 	// Mapping method name and inbound/outbound methods
 	private Map<String, List<String>> inboundDependencies = new HashMap<>();
 	private Map<String, List<String>> outboundDependencies = new HashMap<>();
-	
 	private Map<String, List<String>> inboundClasses = new HashMap<>();
 	private Map<String, List<String>> outboundClasses = new HashMap<>();
-
 	private Map<String, List<String>> classLogicalDependencies = new HashMap<>();
 	
 	public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
-		String mainFolder; 	
 		String testRSF;
 		String testDefFinder;
 		String testClone;
@@ -94,23 +73,20 @@ public class DependencyFinderProcessing_ExportJSON {
 		String outputDest;
 		String packageName;
 		
-		if (args.length == 7)
-		{
-			mainFolder = args[0];
-			testRSF = mainFolder + args[1];
-			testDefFinder = mainFolder + args[2];
-			testClone = mainFolder + args[3];
-			logicalDep = mainFolder + args[4];
+		if (args.length == 7)	{
+			testRSF = args[0] + args[1];
+			testDefFinder = args[0] + args[2];
+			testClone = args[0] + args[3];
+			logicalDep = args[0] + args[4];
 			packageName = args[5]; 
-			outputDest = mainFolder + args[6];		
+			outputDest = args[0] + args[6];		
 		} else {
-			mainFolder = DependencyFinderProcessing_ExportJSON.mainFolder;
-			testRSF = mainFolder + DependencyFinderProcessing_ExportJSON.testRSF;
-			testDefFinder = mainFolder + DependencyFinderProcessing_ExportJSON.testDefFinder;
-			testClone = mainFolder + DependencyFinderProcessing_ExportJSON.testClone;
-			logicalDep = mainFolder + DependencyFinderProcessing_ExportJSON.logicalDep;
-			outputDest = mainFolder + DependencyFinderProcessing_ExportJSON.outputDest;
-			packageName = DependencyFinderProcessing_ExportJSON.packageName;
+			testRSF = "subject_systems\\Struts2\\acdc\\cluster";
+			testDefFinder = "subject_systems\\Struts2\\depfinder";
+			testClone = "subject_systems\\Struts2\\clone";
+			logicalDep = "subject_systems\\Struts2\\struts2_cleaned.csv";
+			outputDest = "subject_systems\\Struts2\\struts2_acdc_interface_smell.csv";
+			packageName = "org.apache.struts2";
 		}
 		final File depFinderDir = FileUtil.checkDir(testDefFinder, false, false);
 		final File clustersDir = FileUtil.checkDir(testRSF, false, false);
@@ -119,29 +95,23 @@ public class DependencyFinderProcessing_ExportJSON {
 		List<File> fileList = FileListing.getFileListing(depFinderDir);
 		fileList = FileUtil.sortFileListByVersion(fileList);
 		final Set<File> orderedSerFiles = new LinkedHashSet<>();
-		for (final File file : fileList) {
-			if (file.getName().endsWith(".xml")) {
+		for (final File file : fileList)
+			if (file.getName().endsWith(".xml"))
 				orderedSerFiles.add(file);
-			}
-		}
 		
 		fileList = FileListing.getFileListing(clustersDir);
 		fileList = FileUtil.sortFileListByVersion(fileList);
 		final Set<File> clusterFiles = new LinkedHashSet<>();
-		for (final File file : fileList) {
-			if (file.getName().endsWith(".rsf")) {
+		for (final File file : fileList)
+			if (file.getName().endsWith(".rsf"))
 				clusterFiles.add(file);
-			}
-		}
 		
 		fileList = FileListing.getFileListing(cloneDir);
 		fileList = FileUtil.sortFileListByVersion(fileList);
 		final Set<File> cloneFiles = new LinkedHashSet<>();
-		for (final File file : fileList) {
-			if (file.getName().endsWith(".xml")) {
+		for (final File file : fileList)
+			if (file.getName().endsWith(".xml"))
 				cloneFiles.add(file);
-			}
-		}
 
 		Map<String, String> versionSmells = new LinkedHashMap<>();
 		final String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*+((-|\\.)(RC|ALPHA|BETA|M|Rc|Alpha|Beta|rc|alpha|beta)[0-9])*";
@@ -168,12 +138,12 @@ public class DependencyFinderProcessing_ExportJSON {
 			cloneVersions.put(version, file.getAbsolutePath());
 		}
 		
-		for (String key : versionSmells.keySet()){
+		for (String key : versionSmells.keySet()) {
 			logger.info("Start detecting smells for one version:" + versionSmells.get(key)+", "+clusterSmells.get(key));
 			String smellFile = versionSmells.get(key);
 			String clusterFile =  clusterSmells.get(key);
-			String cloneFile   = cloneVersions.get(key);
-			if (smellFile == null || clusterFile ==null || cloneFile == null)
+			String cloneFile = cloneVersions.get(key);
+			if (smellFile == null || clusterFile == null || cloneFile == null)
 				continue;
 			single(versionSmells.get(key), clusterSmells.get(key), packageName, cloneVersions.get(key), key, logicalDep, outputDest);
 		}
@@ -181,10 +151,9 @@ public class DependencyFinderProcessing_ExportJSON {
 
 	private static void single(String testDoc, String testRSF, String packageName, String testClone, String version, String logicalDep, String outputDest)
 			throws IOException, ParserConfigurationException, SAXException {
-		
-		DependencyFinderProcessing_ExportJSON dp = new DependencyFinderProcessing_ExportJSON(testDoc, packageName);
-		dp.clusterList	= dp.readClusterFile(testRSF);
-		dp.codeClone	= dp.codeCloneUpdate(testClone);
+		DependencyFinderProcessingExportJSON dp = new DependencyFinderProcessingExportJSON(testDoc, packageName);
+		dp.clusterList = dp.readClusterFile(testRSF);
+		dp.codeClone = dp.codeCloneUpdate(testClone);
 		dp.classLogicalDependencies = dp.readLogicalDeps(logicalDep);
 		//detect smell
 		logger.info("Start detecting smells");
@@ -202,7 +171,6 @@ public class DependencyFinderProcessing_ExportJSON {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 	
 	public void detectLogicalDepBetweenComponents(String version) {
@@ -217,14 +185,13 @@ public class DependencyFinderProcessing_ExportJSON {
 			if (fromComp != null) {
 				List<String> classList = classLogicalDependencies.get(fromClass);
 				Set<String> componentList = storage.get(fromComp);
-				if (componentList == null )
+				if (componentList == null)
 					componentList = new HashSet<>();
 				if (classList != null) {
-					for (String c : classList){
+					for (String c : classList) {
 						String com = class2component.get(c);
-						if (com != null) {
+						if (com != null)
 							componentList.add(com);
-						}
 					}
 					storage.put(fromComp, componentList);
 				}
@@ -236,9 +203,8 @@ public class DependencyFinderProcessing_ExportJSON {
 			if (componentList!= null && !componentList.isEmpty()){
 				int numOfConnection = componentList.size();
 				// don't care if this is inner dependencies
-				if (componentList.contains(s)) {
+				if (componentList.contains(s))
 					numOfConnection --;
-				}
 				if (numOfConnection > 0) {
 					total ++;
 					logger.info(s + "," +componentList.toString() + "," + numOfConnection);
@@ -273,16 +239,14 @@ public class DependencyFinderProcessing_ExportJSON {
 				String first = classes[0];
 				String second = classes[1];
 				List<String> tmp = storage.get(first);
-				if (tmp == null) {
+				if (tmp == null)
 					tmp = new ArrayList<>();
-				}
 				tmp.add(second);
 				storage.put(first, tmp);
 				
 				tmp = storage.get(second);
-				if (tmp == null) {
+				if (tmp == null)
 					tmp = new ArrayList<>();
-				}
 				tmp.add(first);
 				storage.put(second, tmp);
 			}
@@ -293,7 +257,7 @@ public class DependencyFinderProcessing_ExportJSON {
 	}
 	
 	
-	public Map<String, List<String>> readClusterFile(String filePath){
+	public Map<String, List<String>> readClusterFile(String filePath) {
 		Map<String, List<String>> clusterList = new HashMap<>();
 		// Read rsf file and generate the mapping of clusters and classes
 		final List<List<String>> facts = new ArrayList<>();
@@ -338,7 +302,7 @@ public class DependencyFinderProcessing_ExportJSON {
 	}
 	
 
-	public DependencyFinderProcessing_ExportJSON(String xmlFilePath, String packageName) throws IOException, ParserConfigurationException, SAXException{
+	public DependencyFinderProcessingExportJSON(String xmlFilePath, String packageName) throws IOException, ParserConfigurationException, SAXException{
 		// Run processing to input dependency into file
 		//Handle by DOM Parser
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -346,8 +310,7 @@ public class DependencyFinderProcessing_ExportJSON {
 		factory.setIgnoringElementContentWhitespace(true);
 		
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		builder.setEntityResolver( new EntityResolver() {
-			
+		builder.setEntityResolver(new EntityResolver() {
 			@Override
 			public InputSource resolveEntity(String arg0, String arg1)
 					throws SAXException, IOException {
@@ -359,47 +322,46 @@ public class DependencyFinderProcessing_ExportJSON {
 		
 		logger.info("Started processing XML input");
 		// Building class method mapping
-		NodeList nclist = doc.getElementsByTagName(CLASS);
+		NodeList nclist = doc.getElementsByTagName("class");
 		for (int k = 0; k < nclist.getLength(); k++){
 			Node node = nclist.item(k);
 			logger.debug("\nCurrent Element :" + node.getNodeName());
 			Element eElement = (Element) node;
-			String key = eElement.getElementsByTagName(NAME).item(0).getTextContent();	
+			String key = eElement.getElementsByTagName("name").item(0).getTextContent();	
 			logger.debug("Current key :" + key);
-			NodeList nflist = eElement.getElementsByTagName(FEATURE);
+			NodeList nflist = eElement.getElementsByTagName("feature");
 			List<String> methods	= new ArrayList<>();
 			for (int n = 0; n < nflist.getLength(); n++){
 				Element	e = (Element) nflist.item(n);
-				methods.add(e.getElementsByTagName(NAME).item(0).getTextContent());
-				logger.debug("Current methods :" + e.getElementsByTagName(NAME).item(0).getTextContent());
+				methods.add(e.getElementsByTagName("name").item(0).getTextContent());
+				logger.debug("Current methods :" + e.getElementsByTagName("name").item(0).getTextContent());
 			}
 			methodList.put(key, methods);
 		}
 		
 		// Building inbound dependencies
-		NodeList 		nlist 	= doc.getElementsByTagName(FEATURE);
+		NodeList nlist = doc.getElementsByTagName("feature");
 		for (int i = 0; i < nlist.getLength(); i++){
 			Node node = nlist.item(i);
 			logger.debug("\nCurrent Element :" + node.getNodeName());
 			 
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
-	 
 				Element eElement = (Element) node;
-				String key = eElement.getElementsByTagName(NAME).item(0).getTextContent();		
+				String key = eElement.getElementsByTagName("name").item(0).getTextContent();		
 				logger.debug("Current key :" + key);
 
 				//Get inbounds
-				NodeList inboundNode = eElement.getElementsByTagName(INBOUND);
+				NodeList inboundNode = eElement.getElementsByTagName("inbound");
 				List<String> inbounds = new ArrayList<>();
-	 			for (int j = 0; j < inboundNode.getLength(); j++){
+	 			for (int j = 0; j < inboundNode.getLength(); j++) {
 	 				inbounds.add(inboundNode.item(j).getTextContent());
 	 				logger.debug("Current inbound :" + inboundNode.item(j).getTextContent());
 	 			}
 	 			
 	 			//Get outbounds
-	 			NodeList outboundNode		= eElement.getElementsByTagName(OUTBOUND);
-				List<String> outbounds	= new ArrayList<>();
-	 			for (int j = 0; j < outboundNode.getLength(); j++){
+	 			NodeList outboundNode = eElement.getElementsByTagName("outbound");
+				List<String> outbounds = new ArrayList<>();
+	 			for (int j = 0; j < outboundNode.getLength(); j++) {
 	 				outbounds.add(outboundNode.item(j).getTextContent());
 	 				logger.debug("Current inbound :" + outboundNode.item(j).getTextContent());
 	 			}
@@ -411,33 +373,32 @@ public class DependencyFinderProcessing_ExportJSON {
 		}
 		
 		// Doing the samething with class type
-		nlist 	= doc.getElementsByTagName(CLASS);
-		for (int i = 0; i < nlist.getLength(); i++){
+		nlist = doc.getElementsByTagName("class");
+		for (int i = 0; i < nlist.getLength(); i++) {
 			Node node = nlist.item(i);
 			logger.debug("\nCurrent Element :" + node.getNodeName());
 			 
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
-	 
 				Element eElement = (Element) node;
-				String key = eElement.getElementsByTagName(NAME).item(0).getTextContent();		
+				String key = eElement.getElementsByTagName("name").item(0).getTextContent();		
 				logger.debug("Current key :" + key);
 
 				//Get inbounds
-				NodeList inboundNode = eElement.getElementsByTagName(INBOUND);
+				NodeList inboundNode = eElement.getElementsByTagName("inbound");
 				List<String> inbounds = new ArrayList<>();
-	 			for (int j = 0; j < inboundNode.getLength(); j++){
+	 			for (int j = 0; j < inboundNode.getLength(); j++) {
 	 				inbounds.add(inboundNode.item(j).getTextContent());
 	 				logger.debug("Current inbound :" + inboundNode.item(j).getTextContent());
 	 			}
 	 			
 	 			//Get outbounds
-	 			NodeList outboundNode = eElement.getElementsByTagName(OUTBOUND);
+	 			NodeList outboundNode = eElement.getElementsByTagName("outbound");
 				List<String> outbounds	= new ArrayList<>();
 	 			for (int j = 0; j < outboundNode.getLength(); j++){
 	 				outbounds.add(outboundNode.item(j).getTextContent());
 	 				logger.debug("Current inbound :" + outboundNode.item(j).getTextContent());
 	 			}
-	 			if (key.startsWith(packageName)){
+	 			if (key.startsWith(packageName)) {
 		 			inboundClasses.put(key, inbounds);
 		 			outboundClasses.put(key, outbounds);
 	 			}
@@ -455,33 +416,32 @@ public class DependencyFinderProcessing_ExportJSON {
 		factory.setIgnoringElementContentWhitespace(true);
 		
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		File			file	= new File(xmlFilePath);
-		Document		doc 	= builder.parse(file);
+		File file = new File(xmlFilePath);
+		Document doc = builder.parse(file);
 		Map<Integer, Set<String>> codeCloneFromFile = new HashMap<>();		
 		
 		logger.info("Started processing clone");
 		// Building class method mapping
-		NodeList nclist = doc.getElementsByTagName(DUPLICATION);
-		for (int k = 0; k < nclist.getLength(); k++){
+		NodeList nclist = doc.getElementsByTagName("duplication");
+		for (int k = 0; k < nclist.getLength(); k++) {
 			Node node = nclist.item(k);
 			logger.debug("\nCurrent Element :" + node.getNodeName());
 			Element eElement = (Element) node;
-			NodeList duplicatedFiles = eElement.getElementsByTagName(FILE);
+			NodeList duplicatedFiles = eElement.getElementsByTagName("file");
 			
 			//Keep tracks of duplicated class files
 			// Handle className
 			Set<String> tmp = new HashSet<>();
-			for (int i = 0; i < duplicatedFiles.getLength();  i++){
+			for (int i = 0; i < duplicatedFiles.getLength(); i++) {
 				Element e = (Element) duplicatedFiles.item(i);
-				if (! e.getAttribute(PATH).contains("src"))
+				if (!e.getAttribute("path").contains("src"))
 					continue;
-				String path =  e.getAttribute(PATH);
+				String path = e.getAttribute("path");
 				String className = "";
-				if (path.contains("//")) {
-				 className = e.getAttribute(PATH).replace("\\", ".").split("\\.src")[1].replace(".java", "").substring(1);
-				} else if (path.contains("/")){
-				  className = e.getAttribute(PATH).replace("/", ".").split("\\.src")[1].replace(".java", "").substring(1);
-				}
+				if (path.contains("//"))
+					className = e.getAttribute("path").replace("\\", ".").split("\\.src")[1].replace(".java", "").substring(1);
+				else if (path.contains("/"))
+				  className = e.getAttribute("path").replace("/", ".").split("\\.src")[1].replace(".java", "").substring(1);
 				if (className.startsWith("main."))
 					className = className.replace("main.", "");
 				if (className.startsWith("test."))
@@ -496,7 +456,7 @@ public class DependencyFinderProcessing_ExportJSON {
 		return codeCloneFromFile;
 	}
 	
-	public void DetectSmell(String version, String packageName){
+	public void DetectSmell(String version, String packageName) {
 		summary += version + ",";
 		DetectUnusedInterface(version, packageName);
 
@@ -518,7 +478,7 @@ public class DependencyFinderProcessing_ExportJSON {
 		detectLogicalDepBetweenComponents(version);
 	}
 	
-	public void DetectUnusedInterface(String version, String packageName){
+	public void DetectUnusedInterface(String version, String packageName) {
 		// Read all component
 		// If there all methods in one class without inbound
 		// Indicated that component has Unused Interface
@@ -532,26 +492,26 @@ public class DependencyFinderProcessing_ExportJSON {
 		content += "\nUnused interface: \n";
 		content += "componentName, className\n";
 		Iterator<String> it = allComponent.iterator();
-		while (it.hasNext()){
+		while (it.hasNext()) {
 			String componentName = it.next();
 			List<String> classList = clusterList.get(componentName);
-			for(String className: classList){
+			for(String className: classList) {
 				if (!className.startsWith(packageName))
 					break;
 				boolean classhasSmell = true;
-				List<String> methods	= methodList.get(className);
-				if (methods != null){
-					for(String methodName: methods){
-						List<String> inboundMethod	= inboundDependencies.get(methodName);
-						if (inboundMethod != null && inboundMethod.size() > 0){
+				List<String> methods = methodList.get(className);
+				if (methods != null) {
+					for(String methodName: methods) {
+						List<String> inboundMethod = inboundDependencies.get(methodName);
+						if (inboundMethod != null && !inboundMethod.isEmpty()){
 							classhasSmell = false;
 							break;
 						}
 					}
 					
-					if (classhasSmell == true){
+					if (classhasSmell) {
 						List<String> inboundClass	= inboundClasses.get(className);
-						if (inboundClass == null || inboundClass.size() == 0){
+						if (inboundClass == null || inboundClass.isEmpty()){
 							logger.info(componentName + "," + className + ",,");
 							content +=componentName + "," + className + ",,\n";
 
@@ -570,15 +530,14 @@ public class DependencyFinderProcessing_ExportJSON {
 		content += "component Name,\n";
 		for (String com :allComponent) {
 			List<String> classList = clusterList.get(com);
-			boolean unsedCom =  true;
+			boolean unsedCom = true;
 			boolean containPackageNameClass = false;
 			for (String className : classList) {
 				if (!className.startsWith(packageName))
 					continue;
 				containPackageNameClass = true;
-				if (!unusedInterface.contains(className)) {
+				if (!unusedInterface.contains(className))
 					unsedCom = false;
-				}
 			}
 			if (unsedCom && containPackageNameClass){
 				logger.info(com);	
@@ -591,7 +550,7 @@ public class DependencyFinderProcessing_ExportJSON {
 		details += content + "\n";
 		
 		//add all unused interface to json
-		for (String classname:unusedInterface){
+		for (String classname:unusedInterface) {
 			JSONObject temp = (JSONObject) file_list.get(classname);
 			if(temp == null)
 				temp = new JSONObject();
@@ -599,58 +558,57 @@ public class DependencyFinderProcessing_ExportJSON {
 			file_list.put(StringUtil.cutInnterClass(classname), temp);
 		}
 		// add all unused component to json
-		for (String unused : unsedCompSmell){
+		for (String unused : unsedCompSmell) {
 			List<String> classList = clusterList.get(unused);
-				for (String classname : classList){
-					JSONObject temp = (JSONObject) file_list.get(classname);
-					if(temp == null)
-						temp = new JSONObject();
-					temp.put("Unused_Comp", 1);
-					file_list.put(StringUtil.cutInnterClass(classname), temp);
-				}
+			for (String classname : classList) {
+				JSONObject temp = (JSONObject) file_list.get(classname);
+				if(temp == null)
+					temp = new JSONObject();
+				temp.put("Unused_Comp", 1);
+				file_list.put(StringUtil.cutInnterClass(classname), temp);
+			}
 		}
 	}
 	
-	public void DetectUnusedComponent(){
+	public void DetectUnusedComponent() {
 		// Read all component
 		// If there all methods in all class without inbound from outside of the components
 		// Indicated that component has block
 		Set<String> allComponent = clusterList.keySet();
 		logger.info("componentName, className , methodName");
 		Iterator<String> it = allComponent.iterator();
-		while (it.hasNext()){
+		while (it.hasNext()) {
 			boolean hasSmell = true;
 			String componentName = it.next();
 			List<String> classList = clusterList.get(componentName);
 			outterloop:
-			for(String className: classList){
-				List<String> methods	= methodList.get(className);
+			for(String className : classList) {
+				List<String> methods = methodList.get(className);
 				if (methods != null) {
-					for(String methodName: methods){
+					for(String methodName: methods) {
 						// extract class contains the method
 						String tmp = methodName.split(Pattern.quote("("))[0];
 						String[] tmpA = tmp.split(Pattern.quote("."));
 						String containClass = "";
-						for (int i = 0; i <= tmpA.length-3; i++){
+						for (int i = 0; i <= tmpA.length-3; i++)
 							containClass += tmpA[i] +".";
-						}
 						containClass += tmpA[tmpA.length-2];
 						// if this class doesn't belong to this component, then this is not unused component
-						if (!classList.contains(containClass)){
+						if (!classList.contains(containClass)) {
 							hasSmell = false;
 							break outterloop;
 						}
 					}
 				}
 			}
-			if (hasSmell){
+			if (hasSmell) {
 				//print them out
 				logger.info(componentName + ",,,");
 			}
 		}
 	}
 	
-	public void DetectAmbiguousInterface(){
+	public void DetectAmbiguousInterface() {
 		// Read all component
 		// If there is only one interface within a components are using by other component, indicated as Ambiguous Interface
 		// Indicated that component has block
@@ -658,39 +616,37 @@ public class DependencyFinderProcessing_ExportJSON {
 		Set<String> allComponent = clusterList.keySet();
 		logger.info("componentName, className , methodName");
 		Iterator<String> it = allComponent.iterator();
-		while (it.hasNext()){
+		while (it.hasNext()) {
 			String componentName = it.next();
 			List<String> classList = clusterList.get(componentName);
 			int outsideCaller = 0;
-			for(String className: classList){
+			for(String className : classList) {
 				List<String> methods = methodList.get(className);
 				if (methods != null) {
-					for(String methodName: methods){
+					for(String methodName: methods) {
 						// count number of method using by outside 
 						// extract class contains the method
 						String tmp = methodName.split(Pattern.quote("("))[0];
 						String[] tmpA = tmp.split(Pattern.quote("."));
 						String containClass = "";
-						for (int i = 0; i <= tmpA.length-3; i++){
+						for (int i = 0; i <= tmpA.length-3; i++)
 							containClass += tmpA[i] +".";
-						}
 						containClass += tmpA[tmpA.length-2];
 						
 						// if this class doesn't belong to this component, then this is not unused component
-						if (!classList.contains(containClass)){
+						if (!classList.contains(containClass))
 							outsideCaller++;
-						}
 					}
 				}
 			}
-			if (outsideCaller == 1){
+			if (outsideCaller == 1) {
 				//print them out
 				logger.info(componentName + ",,,");
 			}
 		}
 	}
 	
-	public void DetectSloppyDelegation(String version, String packageName){
+	public void DetectSloppyDelegation(String version, String packageName) {
 		// Read all the methods / features
 		// If it only have inbound from other components
 		// And have no outbound from itself
@@ -704,46 +660,43 @@ public class DependencyFinderProcessing_ExportJSON {
 		while (it.hasNext()) {
 			String featureName = it.next();
 			className = getClassName(featureName);
-			if (className.startsWith(packageName) ){
+			if (className.startsWith(packageName)) {
 				boolean hasSmell = true;
 				String currentComponent = class2component.get(className);
 				List<String> inbounds = inboundDependencies.get(featureName);
 				List<String> outbounds = outboundDependencies.get(featureName);
 				
-				if (outbounds.size() == 0){
-					for (String in : inbounds){
+				if (outbounds.isEmpty()) {
+					for (String in : inbounds) {
 						String compName = class2component.get(getClassName(in));
-						// TODO doubble check why it can be null ???
-						if (currentComponent!= null && currentComponent.equals(compName)){
+						// TODO double check why it can be null ???
+						if (currentComponent!= null && currentComponent.equals(compName)) {
 							hasSmell = false;
 							break;
 						}
 					}
-				} else {
-					hasSmell	= false;
-				}
+				} else
+					hasSmell = false;
 				
 				if (hasSmell) {
 					Set<String> classes = componentHasSmell.get(currentComponent);
-					if (classes == null) {
+					if (classes == null)
 						classes = new HashSet<>();
-					} 
 					classes.add(getClassName(featureName));
 					componentHasSmell.put(currentComponent, classes);
 				}
 			}
 		}
 		System.out.println(version);
-		for (String s : componentHasSmell.keySet()){
-			if (s == null)
-					continue;
+		for (String s : componentHasSmell.keySet()) {
+			if (s == null) continue;
 			details += s + ","+ componentHasSmell.get(s).size() + "," + clusterList.get(s).size() + "," + (float) componentHasSmell.get(s).size()*100/clusterList.get(s).size() + "\n";
 		}
 		
 		// add all sloopy delegation to json, only consider class, not whole component
 		JSONObject file_list = (JSONObject) details_json.get(version);
-		for (String s : componentHasSmell.keySet()){
-				for (String classname : componentHasSmell.get(s)){
+		for (String s : componentHasSmell.keySet()) {
+				for (String classname : componentHasSmell.get(s)) {
 					JSONObject temp = (JSONObject) file_list.get(classname);
 					if(temp == null)
 						temp = new JSONObject();
@@ -752,31 +705,29 @@ public class DependencyFinderProcessing_ExportJSON {
 				}
 		}
 		
-		summary += componentHasSmell.keySet().size() +",";
+		summary += componentHasSmell.keySet().size() + ",";
 	}
 	
-	public void DetectLegoSyndomeAndFunctionalityOverload(String version, String packageName){
+	public void DetectLegoSyndomeAndFunctionalityOverload(String version, String packageName) {
 		// Read all component
 		// Count number of public methods per components
 		// Compute average
 		int lego = 0;
 		int over = 0;
 		Set<String> allComponent = clusterList.keySet();
-		double[]    optStat		 = new double[allComponent.size()];
+		double[] optStat = new double[allComponent.size()];
 		int i = 0;
 		Map<String, Integer> counter = new HashMap<>();
 		logger.info("componentName, number of public methods , smells?");
 		Iterator<String> it = allComponent.iterator();
-		while (it.hasNext()){
-			
-			String componentName  	= it.next();
-			List<String> classList 	= clusterList.get(componentName);
-			int numOpt				= 0;
-			for(String className: classList){
-				List<String> methods	= methodList.get(className);
-				if (className.startsWith(packageName) && methods != null) {
-							numOpt++;
-				}
+		while (it.hasNext()) {
+			String componentName = it.next();
+			List<String> classList = clusterList.get(componentName);
+			int numOpt = 0;
+			for(String className : classList) {
+				List<String> methods = methodList.get(className);
+				if (className.startsWith(packageName) && methods != null)
+					numOpt++;
 			}
 			counter.put(componentName, numOpt);
 			optStat[i] = numOpt;
@@ -790,23 +741,23 @@ public class DependencyFinderProcessing_ExportJSON {
 		System.out.println(OperationStats);
 		for (String com : counter.keySet()) {
 			boolean hasSmell = false;
-			String  smellType = "";
-			if (counter.get(com) > OperationStats.getMean() + 1.5*OperationStats.getStandardDeviation()) {
+			String smellType = "";
+			if (counter.get(com) > OperationStats.getMean() + 1.5 * OperationStats.getStandardDeviation()) {
 				hasSmell = true;
 				smellType = "Overload";
 				over ++;
 			}
-			if (counter.get(com) < OperationStats.getMean() - 0.75*OperationStats.getStandardDeviation()) {
+			if (counter.get(com) < OperationStats.getMean() - 0.75 * OperationStats.getStandardDeviation()) {
 				hasSmell = true;
 				smellType = "Lego";
 				lego ++;
 			}
 			if (hasSmell) {
-				logger.info(com + ", "+ counter.get(com) +"," + smellType);
-				details += com + ", "+ counter.get(com) +"," + smellType + "\n";
+				logger.info(com + ", " + counter.get(com) + "," + smellType);
+				details += com + ", " + counter.get(com) + "," + smellType + "\n";
 				
 				// add all lego & overload to json, only consider class, not whole component
-				for (String classname : clusterList.get(com)){
+				for (String classname : clusterList.get(com)) {
 					JSONObject temp = (JSONObject) file_list.get(classname);
 					if(temp == null)
 						temp = new JSONObject();
@@ -816,10 +767,10 @@ public class DependencyFinderProcessing_ExportJSON {
 			}
 		}
 		
-		summary += lego +"," + over +",";
+		summary += lego + "," + over + ",";
 	}
 	
-	public void detectComponentClone(){
+	public void detectComponentClone() {
 		Set<Integer> allduplication = codeClone.keySet();
 		Iterator<Integer> it = allduplication.iterator();
 		logger.info("componentName, other components , smells?");
@@ -827,21 +778,18 @@ public class DependencyFinderProcessing_ExportJSON {
 			Set<String> classList = codeClone.get(it.next());
 			Set<String> componentList = new HashSet<>();
 			if (classList.size() >1) {
-				for (String c : classList){
+				for (String c : classList) {
 					String com = class2component.get(c);
-					if (com != null) {
+					if (com != null)
 						componentList.add(com);
-					}
 				}
-				if (componentList.size() >1){
+				if (componentList.size() >1)
 					logger.info(componentList.toString());
-				}
-					
 			}
 		}
 	}
 	
-	public void detectComponentClonebyClassLevel(String version){
+	public void detectComponentClonebyClassLevel(String version) {
 		Set<Integer> allduplication = codeClone.keySet();
 		Iterator<Integer> it = allduplication.iterator();
 		logger.info("componentName, other components , smells?");
@@ -850,8 +798,8 @@ public class DependencyFinderProcessing_ExportJSON {
 		while (it.hasNext()) {
 			Set<String> classList = codeClone.get(it.next());
 			Set<String> componentList = new HashSet<>();
-			if (classList.size() >1) {
-				for (String c : classList){
+			if (classList.size() > 1) {
+				for (String c : classList) {
 					String com = class2component.get(c);
 					if (com != null) {
 						componentList.add(com);
@@ -864,9 +812,8 @@ public class DependencyFinderProcessing_ExportJSON {
 						effectedClass.put(com, effected);
 					}
 				}
-				if (componentList.size() >1){
+				if (componentList.size() > 1)
 					logger.info(componentList.toString());
-				}
 			}
 		}
 		
@@ -875,11 +822,11 @@ public class DependencyFinderProcessing_ExportJSON {
 		for (String com : effectedClass.keySet()) {
 			List<String> effected = effectedClass.get(com);
 			List<String> allClass = clusterList.get(com);
-			float effect = (effected.size()*100.0f)/allClass.size();
-			logger.info(com + ", " + allClass.size() + ", "+ effected.size() + ", " + effect);
+			float effect = (effected.size() * 100.0f) / allClass.size();
+			logger.info(com + ", " + allClass.size() + ", " + effected.size() + ", " + effect);
 			// 10% of class has code clone
 			if (effect > 10) {
-				details += com +", "+ effected.size() + ", " + allClass.size()  + ", " + effect +"\n";
+				details += com + ", " + effected.size() + ", " + allClass.size()  + ", " + effect + "\n";
 				total ++;
 				
 				JSONObject file_list = (JSONObject) details_json.get(version);
@@ -897,17 +844,16 @@ public class DependencyFinderProcessing_ExportJSON {
 	}
 	
 	private String getClassName(String featureName) {
-		String className ="";
+		String className = "";
 		if(featureName.contains("(")) {
 			String tmp = featureName.split(Pattern.quote("("))[0];
 			String[] tmpA = tmp.split(Pattern.quote("."));
-			for (int i = 0; i <= tmpA.length-3; i++){
-				className += tmpA[i] +".";
-			}
+			for (int i = 0; i <= tmpA.length-3; i++)
+				className += tmpA[i] + ".";
 			className += tmpA[tmpA.length-2];
-		} else {
-			className	= featureName.substring(0, featureName.lastIndexOf("."));
 		}
+		else
+			className	= featureName.substring(0, featureName.lastIndexOf("."));
 		return className;
 	}
 	
@@ -923,9 +869,8 @@ public class DependencyFinderProcessing_ExportJSON {
 		bw.close();
 		
 		// if file doesnt exists, then create it
-		if (!json_file.exists()) {
+		if (!json_file.exists())
 			json_file.createNewFile();
-		}
 		fw = new FileWriter(json_file.getAbsolutePath());
 		bw = new BufferedWriter(fw);
 		bw.write(details_json.toJSONString());

@@ -38,11 +38,9 @@ public class SmellToIssuesCorrelation {
 		
 		List<File> fileList = FileListing.getFileListing(new File(FileUtil.tildeExpandPath(inputDirFilename)));
 		Set<File> orderedSerFiles = new TreeSet<>();
-		for (File file : fileList) {
-			if (file.getName().endsWith(".ser")) {
+		for (File file : fileList)
+			if (file.getName().endsWith(".ser"))
 				orderedSerFiles.add(file);
-			}
-		}
 		
 		// key: version, value: smells counts for the version
 		Map<String,Integer> versionToSmellCount = new LinkedHashMap<>();
@@ -81,9 +79,8 @@ public class SmellToIssuesCorrelation {
 		System.out.println("Smell counts only:");
 		System.out.println(String.join(",", smellCountStrings));
 		double[] smellCountsArr = new double[smellCounts.size()];
-		for (int i=0;i<smellCounts.size();i++) {
+		for (int i=0;i<smellCounts.size();i++)
 			smellCountsArr[i] = (double)smellCounts.get(i);
-		}
 		
 		XStream xstream = new XStream();
 		Map<String,Integer> issuesCountMap =
@@ -111,22 +108,17 @@ public class SmellToIssuesCorrelation {
 			issueCountsArr[i] = 0;
 			if (versions.get(i).endsWith(".0")) {
 				String currentVersion = versions.get(i);
-				currentVersion = currentVersion.substring(0,
-						currentVersion.lastIndexOf(".0"));
-				if (issuesCountMap.get(currentVersion) != null) {
-					issueCountsArr[i] += (double) issuesCountMap
-							.get(currentVersion);
-				}
+				currentVersion = currentVersion.substring(0, currentVersion.lastIndexOf(".0"));
+				if (issuesCountMap.get(currentVersion) != null)
+					issueCountsArr[i] += (double) issuesCountMap.get(currentVersion);
 			}
-			if (issuesCountMap.get(versions.get(i)) != null) {
+			if (issuesCountMap.get(versions.get(i)) != null)
 				issueCountsArr[i] += (double)issuesCountMap.get(versions.get(i));
-			}
 		}
 
 		System.out.println("version, smell count, issue count");
-		for (int i=0;i<smellCounts.size();i++) {
+		for (int i=0;i<smellCounts.size();i++)
 			System.out.println(versions.get(i) + ", " + smellCountsArr[i] + ", " + issueCountsArr[i]);
-		}
 		
 		PearsonsCorrelation pearsons = new PearsonsCorrelation();
 		System.out.println("Pearson's correlation: " + pearsons.correlation(smellCountsArr, issueCountsArr));

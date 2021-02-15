@@ -67,10 +67,8 @@ public class ClusterUtil {
 						}
 
 						if (c1FeatureName.equals(c2EntityName)) {
-							logger.trace("Adding edge (" + c1.getName() + ","
-									+ c2.getName() + ")");
-							clusterGraph.addEdge(new StringEdge(c1.getName(),
-									c2.getName()));
+							logger.trace("Adding edge (" + c1.getName() + "," + c2.getName() + ")");
+							clusterGraph.addEdge(new StringEdge(c1.getName(), c2.getName()));
 						}
 					}
 				}
@@ -80,14 +78,11 @@ public class ClusterUtil {
 	}
 
 	public static double computeCentroidUsingStructuralData(FastCluster cluster) {
-
 		double centroidSum = 0;
 		Set<Integer> clusterKeys = cluster.getNonZeroFeatureMap().keySet();
 
-		for (Integer key : clusterKeys) {
-			centroidSum += cluster.getNonZeroFeatureMap().get(key)
-					.doubleValue();
-		}
+		for (Integer key : clusterKeys)
+			centroidSum += cluster.getNonZeroFeatureMap().get(key).doubleValue();
 
 		double centroidAvg = centroidSum / cluster.getFeaturesLength();
 
@@ -97,12 +92,10 @@ public class ClusterUtil {
 
 	public static double computeGlobalCentroidForStructuralData(
 			List<Double> clusterCentroids) {
-
 		double centroidSum = 0;
 
-		for (Double centroid : clusterCentroids) {
+		for (Double centroid : clusterCentroids)
 			centroidSum += centroid.doubleValue();
-		}
 
 		return centroidSum / clusterCentroids.size();
 	}
@@ -119,12 +112,9 @@ public class ClusterUtil {
 		double globalCentroid = computeGlobalCentroidForStructuralData(clusterCentroids);
 
 		double clusterGain = 0;
-		for (int i = 0; i < clusterCentroids.size(); i++) {
+		for (int i = 0; i < clusterCentroids.size(); i++)
 			clusterGain += (fastClusters.get(i).getNumEntities() - 1)
-					* Math.pow(
-							Math.abs(globalCentroid
-									- clusterCentroids.get(i).doubleValue()), 2);
-		}
+				* Math.pow(Math.abs(globalCentroid - clusterCentroids.get(i).doubleValue()), 2);
 
 		return clusterGain;
 	}
@@ -136,7 +126,7 @@ public class ClusterUtil {
 				&& firstNonNullDocTopicItemIndex < docTopicItems.size(); firstNonNullDocTopicItemIndex++) {
 		}
 		DocTopicItem mergedDocTopicItem = new DocTopicItem(
-				docTopicItems.get(firstNonNullDocTopicItemIndex));
+			docTopicItems.get(firstNonNullDocTopicItemIndex));
 		for (int i = firstNonNullDocTopicItemIndex; i < docTopicItems.size(); i++) {
 			if (docTopicItems.get(i) == null)
 				continue;
@@ -154,12 +144,11 @@ public class ClusterUtil {
 	public static double computeClusterGainUsingTopics(
 			List<FastCluster> clusters) {
 		ArrayList<DocTopicItem> docTopicItems = new ArrayList<>();
-		for (FastCluster c : clusters) {
+		for (FastCluster c : clusters)
 			docTopicItems.add(c.docTopicItem);
-		}
 		DocTopicItem globalDocTopicItem = computeGlobalCentroidUsingTopics(docTopicItems);
 		logger.debug("Global Centroid Using Topics: "
-				+ globalDocTopicItem.toStringWithLeadingTabsAndLineBreaks(0));
+			+ globalDocTopicItem.toStringWithLeadingTabsAndLineBreaks(0));
 
 		double clusterGain = 0;
 
@@ -190,11 +179,9 @@ public class ClusterUtil {
 			Map<String, Integer> clusterNameToNodeNumberMap) {
 		Map<Integer, String> nodeNumberToClusterNameMap = new TreeMap<>();
 
-		for (FastCluster cluster : clusters) {
+		for (FastCluster cluster : clusters)
 			nodeNumberToClusterNameMap.put(
-					clusterNameToNodeNumberMap.get(cluster.getName()),
-					cluster.getName());
-		}
+				clusterNameToNodeNumberMap.get(cluster.getName()), cluster.getName());
 
 		return nodeNumberToClusterNameMap;
 	}
@@ -204,7 +191,7 @@ public class ClusterUtil {
 			List<FastCluster> clusters) throws FileNotFoundException {
 		String currentClustersDetailedRsfFilename = Config.getClustersRSFFilename(clusters.size());
 		writeFastClustersRsfFile(clusterNameToNodeNumberMap, clusters,
-				currentClustersDetailedRsfFilename);
+			currentClustersDetailedRsfFilename);
 	}
 
 	public static void writeFastClustersRsfFile(
@@ -220,8 +207,7 @@ public class ClusterUtil {
 
 		logger.trace("Printing each cluster and its leaves...");
 		for (FastCluster cluster : clusters) {
-			Integer currentNodeNumber = clusterNameToNodeNumberMap.get(cluster
-					.getName());
+			Integer currentNodeNumber = clusterNameToNodeNumberMap.get(cluster.getName());
 			logger.trace("Cluster name: " + currentNodeNumber);
 			logger.trace("Cluster node number: " + cluster);
 			String[] entities = cluster.getName().split(",");
@@ -244,8 +230,7 @@ public class ClusterUtil {
 		String c1LimitedName = c1.getName();
 		String c2LimitedName = c2.getName();
 
-		logger.debug("Features shared between " + c1LimitedName + " and "
-				+ c2LimitedName);
+		logger.debug("Features shared between " + c1LimitedName + " and " + c2LimitedName);
 
 		Set<Integer> c1Keys = c1.getNonZeroFeatureMap().keySet();
 

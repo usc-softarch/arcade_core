@@ -20,25 +20,20 @@ public class SmellUtil {
 			return smell.getSmellType().toString();
 
 		//TODO remove everything below this
-		if (smell instanceof BcoSmell) {
+		if (smell instanceof BcoSmell)
 			return "bco";
-		}
-		else if (smell instanceof SpfSmell) {
+		else if (smell instanceof SpfSmell)
 			return "spf";
-		}
-		else if (smell instanceof BdcSmell) {
+		else if (smell instanceof BdcSmell)
 			return "bdc";
-		}
-		else if (smell instanceof BuoSmell) {
+		else if (smell instanceof BuoSmell)
 			return "buo";
-		}
-		else {
+		else
 			return "invalid smell type";
-		}
 	}
 	
 	public static Class[] getSmellClasses() {
-		Class[] smellClasses = {BcoSmell.class,BdcSmell.class,BuoSmell.class,SpfSmell.class};
+		Class[] smellClasses = { BcoSmell.class, BdcSmell.class, BuoSmell.class, SpfSmell.class };
 		return smellClasses;
 	}
 	

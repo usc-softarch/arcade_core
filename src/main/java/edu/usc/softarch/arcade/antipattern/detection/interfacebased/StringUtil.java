@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
-	public static String extractOrgSuffix(String name){
+	public static String extractOrgSuffix(String name) {
 		Pattern p = Pattern.compile("org\\/(.*)");
 		Matcher m = p.matcher(name);
 		if (m.find())
@@ -19,13 +19,13 @@ public class StringUtil {
 	 * @param dir
 	 * @return
 	 */
-	public static String dir2pkg(String dir){
+	public static String dir2pkg(String dir) {
 		String orgSuffix = extractOrgSuffix(dir);
 		String tmp = orgSuffix.substring(0, orgSuffix.lastIndexOf(".java"));
 		return tmp.replace('/', '.');
 	}
 	
-	public static String cutInnterClass(String dir){
+	public static String cutInnterClass(String dir) {
 		if (dir.contains("$"))
 			return dir.split("$")[0];
 		else
