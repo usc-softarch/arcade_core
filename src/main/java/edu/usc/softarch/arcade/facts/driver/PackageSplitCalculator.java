@@ -1,14 +1,11 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.log4j.PropertyConfigurator;
 
 import com.google.common.base.Joiner;
 
@@ -20,13 +17,9 @@ public class PackageSplitCalculator {
 	private static Pattern grabPkgPattern = Pattern.compile(exprToGrabPackageName);
 
 	public static void main(String[] args) {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		
 		String clusterRsfFilename = args[0];
 		String fileType = "java";
-		if (args.length >= 2) {
-			fileType = args[1];
-		}
+		if (args.length >= 2)	fileType = args[1];
 		
 		if (fileType.equals("c")) {
 			exprToGrabPackageName = "(.+)\\/.+$";
@@ -39,15 +32,15 @@ public class PackageSplitCalculator {
 		GroundTruthFileParser.parseRsf(clusterRsfFilename);
 		
 		Set<ConcernCluster> clusters = GroundTruthFileParser.getClusters();
-		Set<String> clusterNames = new HashSet<String>();
+		Set<String> clusterNames = new HashSet<>();
 		
 		for (ConcernCluster cluster : clusters) {
 			clusterNames.add(cluster.getName());
 		}
 		
 		int clusterCountOfEntitiesNotInSamePackage = 0;
-		Set<String> clustersWithEntitiesNotInSamePackage = new HashSet<String>();
-		Set<String> clustersWithEntitiesInSamePackage = new HashSet<String>(clusterNames);
+		Set<String> clustersWithEntitiesNotInSamePackage = new HashSet<>();
+		Set<String> clustersWithEntitiesInSamePackage = new HashSet<>(clusterNames);
 		
 		// Count and record the clusters that have entities from different packages in them
 		for (ConcernCluster cluster : clusters) {
@@ -73,7 +66,7 @@ public class PackageSplitCalculator {
 	
 		clustersWithEntitiesInSamePackage.removeAll(clustersWithEntitiesNotInSamePackage);
 		
-		Map<String,Set<String>> splitPkgs = new HashMap<String,Set<String>>();
+		Map<String,Set<String>> splitPkgs = new HashMap<>();
 		for (String clusterName1 : clustersWithEntitiesInSamePackage) {
 			String pkgName1 = getPackageNameOfFirstEntity(clusterName1, clusters);
 			for (String clusterName2 : clustersWithEntitiesInSamePackage) {
@@ -85,7 +78,7 @@ public class PackageSplitCalculator {
 						Set<String> clustersOfSplitPkg = splitPkgs
 								.get(splitPkg);
 						if (clustersOfSplitPkg == null) {
-							clustersOfSplitPkg = new HashSet<String>();
+							clustersOfSplitPkg = new HashSet<>();
 						}
 						clustersOfSplitPkg.add(clusterName1);
 						clustersOfSplitPkg.add(clusterName2);
@@ -103,7 +96,7 @@ public class PackageSplitCalculator {
 			numOfSplitClusters += splitClustersOfSinglePkg.size();
 		}
 		
-		Set<String> splitClusters = new HashSet<String>();
+		Set<String> splitClusters = new HashSet<>();
 		for (Set<String> splitClustersOfSinglePkg : splitPkgs.values()) {
 			splitClusters.addAll(splitClustersOfSinglePkg);
 		}

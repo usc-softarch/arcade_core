@@ -9,14 +9,12 @@ import mojo.MoJoCalculator;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.PropertyConfigurator;
 
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class MoJoEvolutionAnalyzer {
 	public static void main(String[] args) throws FileNotFoundException {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		// File containing only containing recovered architectures stored as rsf files
 		String clusterFilesDir = args[0];
 

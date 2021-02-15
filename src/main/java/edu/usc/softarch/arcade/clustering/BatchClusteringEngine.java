@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.PropertyConfigurator;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -30,9 +29,6 @@ public class BatchClusteringEngine {
 		LogManager.getLogger(BatchClusteringEngine.class);
 
 	public static void main(String[] args) throws Exception {
-		PropertyConfigurator.configure(
-			"cfg" + File.separator + "extractor_logging.cfg");
-		
 		// directory where each subdirectory is a different version or revision of
 		// the system you want to analyze
 		String inputDirName = args[0];

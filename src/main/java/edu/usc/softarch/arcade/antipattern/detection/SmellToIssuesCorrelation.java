@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.google.common.base.Joiner;
 import com.thoughtworks.xstream.XStream;
@@ -22,16 +22,13 @@ import com.thoughtworks.xstream.XStream;
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
-import edu.usc.softarch.arcade.util.LogUtil;
 import edu.usc.softarch.arcade.util.MapUtil;
 
 public class SmellToIssuesCorrelation {
-	private static Logger logger = Logger.getLogger(SmellToIssuesCorrelation.class);
+	private static Logger logger =
+		LogManager.getLogger(SmellToIssuesCorrelation.class);
 
 	public static void main(String[] args) throws IOException {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		LogUtil.printLogFiles();
-		
 		// inputDirFilename is the directory containing the .ser files which contain detected smells
 		String inputDirFilename = args[0];
 		
@@ -39,7 +36,7 @@ public class SmellToIssuesCorrelation {
 		String issuesCountMapFilename = args[1];
 		
 		List<File> fileList = FileListing.getFileListing(new File(FileUtil.tildeExpandPath(inputDirFilename)));
-		Set<File> orderedSerFiles = new TreeSet<File>();
+		Set<File> orderedSerFiles = new TreeSet<>();
 		for (File file : fileList) {
 			if (file.getName().endsWith(".ser")) {
 				orderedSerFiles.add(file);
@@ -47,7 +44,7 @@ public class SmellToIssuesCorrelation {
 		}
 		
 		// key: version, value: smells counts for the version
-		Map<String,Integer> versionToSmellCount = new LinkedHashMap<String,Integer>();
+		Map<String,Integer> versionToSmellCount = new LinkedHashMap<>();
 		for (File file : orderedSerFiles) {
 			logger.debug(file.getName());
 			Set<Smell> smells = SmellUtil.deserializeDetectedSmells(file.getAbsolutePath());

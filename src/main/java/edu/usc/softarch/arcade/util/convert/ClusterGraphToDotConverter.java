@@ -1,21 +1,16 @@
 package edu.usc.softarch.arcade.util.convert;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.PropertyConfigurator;
-
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class ClusterGraphToDotConverter {
 	public static void main(String[] args) {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		
 		String depsFilename = args[0];
 		String clustersFilename = args[1];
 		String dotFilename = args[2];

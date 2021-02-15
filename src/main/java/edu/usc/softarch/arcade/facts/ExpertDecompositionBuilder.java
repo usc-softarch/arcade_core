@@ -11,12 +11,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.config.Config;
 
 public class ExpertDecompositionBuilder {
-	private static Logger logger = Logger.getLogger(ExpertDecompositionBuilder.class);
+	private static Logger logger =
+		LogManager.getLogger(ExpertDecompositionBuilder.class);
 	private static List<ExpertDecomposition> expertDecompositions = null;
 	
 	public static void readInExpertDecomposition(String filename) {

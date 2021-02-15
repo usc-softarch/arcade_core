@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -13,8 +12,8 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections4.Factory;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.google.common.collect.Iterables;
 
@@ -28,7 +27,7 @@ import edu.uci.ics.jung.graph.util.Pair;
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 
 public class DominatorGroundTruthAnalyzer {
-	private static Logger logger = Logger.getLogger(DominatorGroundTruthAnalyzer.class);
+	private static Logger logger = LogManager.getLogger(DominatorGroundTruthAnalyzer.class);
 	
 	static Factory<Integer> edgeFactory = new Factory<Integer>() {
 		int i = 0;
@@ -47,8 +46,6 @@ public class DominatorGroundTruthAnalyzer {
 	};
 	
 	public static void main(String[] args) {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		
 		String depsFilename = args[0];
 		String clustersFilename = args[1];
 		String outFilename = args[2];

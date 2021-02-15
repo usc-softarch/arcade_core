@@ -15,13 +15,15 @@ import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.HashSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class GroundTruthFileParser {
-	private static Logger logger = Logger.getLogger(GroundTruthFileParser.class);
+	private static Logger logger =
+		LogManager.getLogger(GroundTruthFileParser.class);
 	private static Set<ConcernCluster> clusters = new HashSet<>();
 	private static Map<String,ConcernCluster> clusterMap = new HashMap<>();
 

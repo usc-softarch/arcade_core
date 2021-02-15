@@ -8,8 +8,6 @@ import java.io.UnsupportedEncodingException;
 
 import mojo.MoJoCalculator;
 
-import org.apache.log4j.PropertyConfigurator;
-
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
@@ -31,8 +29,6 @@ public class BatchSmellDetectionRunner {
 				return file.getName().endsWith(".rsf");
 			}
 		});
-
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 
 		Config.setMalletDocTopicsFilename(docTopicsFile);
 		if (selectedLang.equals("c")) {

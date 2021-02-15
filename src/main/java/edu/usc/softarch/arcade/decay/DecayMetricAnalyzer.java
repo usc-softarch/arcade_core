@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.decay;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -9,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
@@ -20,18 +19,16 @@ import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 import edu.usc.softarch.arcade.util.FileUtil;
-import edu.usc.softarch.arcade.util.LogUtil;
 
 public class DecayMetricAnalyzer {
-	private static Logger logger = Logger.getLogger(DecayMetricAnalyzer.class);
+	private static Logger logger =
+		LogManager.getLogger(DecayMetricAnalyzer.class);
 	public static Double rciVal;
 	public static double twoWayPairRatio;
 	public static double avgStability;
 	public static double mqRatio;
 
 	public static void main(String[] args) {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		
 		rciVal = null;
 		twoWayPairRatio = -1;
 		avgStability = -1;
@@ -86,9 +83,8 @@ public class DecayMetricAnalyzer {
 		for (ConcernCluster cluster : clusters) {
 			Set<MutablePair<String,String>> internalEdges = internalEdgeMap.get(cluster.getName());
 			Set<MutablePair<String,String>> externalEdges = externalEdgeMap.get(cluster.getName());
-			if (internalEdges.size() == 0) {
+			if (internalEdges.size() == 0)
 				clusterFactors.put(cluster.getName(),Double.valueOf(0));
-			}
 			else {
 				double cf = (double)(2*internalEdges.size())/(2*internalEdges.size()+externalEdges.size()); 
 				clusterFactors.put(cluster.getName(), cf);
@@ -104,10 +100,6 @@ public class DecayMetricAnalyzer {
 		logger.info("MQ: " + mq);
 		logger.info("# of clusters: " + clusters.size());
 		logger.info("MQ ratio: " + mqRatio);
-		
-		System.out.println("Wrote decay metrics to: ");
-		LogUtil.printLogFiles();
-		logger.info("");
 	}
 	
 	private static double detectStability(

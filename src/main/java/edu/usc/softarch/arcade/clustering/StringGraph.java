@@ -22,7 +22,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -35,7 +36,7 @@ import edu.usc.softarch.arcade.config.Config;
 public class StringGraph implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -4879127696671797183L;
-	private transient Logger logger = Logger.getLogger(StringGraph.class);
+	private transient Logger logger = LogManager.getLogger(StringGraph.class);
 	public Set<StringEdge> edges = new HashSet<>();
 	private String name = "";
 	// #endregion FIELDS ---------------------------------------------------------

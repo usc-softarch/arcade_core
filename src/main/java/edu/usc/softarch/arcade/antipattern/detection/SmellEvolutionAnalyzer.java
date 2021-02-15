@@ -9,32 +9,27 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
-import edu.usc.softarch.arcade.util.LogUtil;
 
 public class SmellEvolutionAnalyzer {
-	private static Logger logger = Logger.getLogger(SmellEvolutionAnalyzer.class);
+	private static Logger logger =
+		LogManager.getLogger(SmellEvolutionAnalyzer.class);
 
 	public static void main(String[] args) throws IOException {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		LogUtil.printLogFiles();
-		
 		// inputDirFilename is the directory containing the .ser files which contain detected smells
 		String inputDirFilename = args[0];
 		
 		List<File> fileList = FileListing.getFileListing(new File(FileUtil.tildeExpandPath(inputDirFilename)));
 		fileList = FileUtil.sortFileListByVersion(fileList);
 		List<File> orderedSerFiles = new ArrayList<>();
-		for (File file : fileList) {
-			if (file.getName().endsWith(".ser")) {
+		for (File file : fileList)
+			if (file.getName().endsWith(".ser"))
 				orderedSerFiles.add(file);
-			}
-		}
 		 		
 		double[] smellCounts = new double[orderedSerFiles.size()];
 		int idx = 0;

@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -16,11 +16,10 @@ import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class PkgsWithSmellDetection {
-	private static Logger logger = Logger.getLogger(PkgsWithSmellDetection.class);
+	private static Logger logger =
+		LogManager.getLogger(PkgsWithSmellDetection.class);
 	
 	public static void main(String[] args) {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		
 		PkgsWithSmellDetectionOptions psdOptions = new PkgsWithSmellDetectionOptions();
 		JCommander jcmd = new JCommander(psdOptions);
 		

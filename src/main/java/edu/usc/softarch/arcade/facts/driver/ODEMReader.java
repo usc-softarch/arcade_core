@@ -4,7 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -17,7 +18,7 @@ import edu.usc.softarch.extractors.cda.odem.Type;
 
 public class ODEMReader {
 	private static List<Type> allTypes = new ArrayList<>();
-	private static Logger logger = Logger.getLogger(ODEMReader.class);
+	private static Logger logger = LogManager.getLogger(ODEMReader.class);
 	
 	public static void setTypesFromODEMFile(String odemFile) {
 		JAXBContext context;

@@ -22,8 +22,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections4.Factory;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.google.common.base.Joiner;
 
@@ -39,7 +39,7 @@ public class FlatDecompositionBuilder {
 		compact, detailed
 	}
 	
-	static Logger logger = Logger.getLogger(FlatDecompositionBuilder.class);
+	static Logger logger = LogManager.getLogger(FlatDecompositionBuilder.class);
 	
 	static Factory<Integer> edgeFactory = new Factory<Integer>() {
 		int i=0;
@@ -58,8 +58,6 @@ public class FlatDecompositionBuilder {
 	}
 
 	public static void main(String[] args) {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-
 		String nestedFilename = "";
 		String flatFilename = "";
 		FlatDecompType fdt = FlatDecompType.compact;

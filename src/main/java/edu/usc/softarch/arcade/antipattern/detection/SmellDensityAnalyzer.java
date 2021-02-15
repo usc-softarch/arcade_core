@@ -10,24 +10,21 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
-import edu.usc.softarch.arcade.util.LogUtil;
 import edu.usc.softarch.arcade.util.MapUtil;
 
 public class SmellDensityAnalyzer {
-	private static Logger logger = Logger.getLogger(SmellDensityAnalyzer.class);
+	private static Logger logger =
+		LogManager.getLogger(SmellDensityAnalyzer.class);
 
 	public static void main(String[] args) throws IOException {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		LogUtil.printLogFiles();
-		
 		// inputDirFilename is the directory containing the .ser files which contain detected smells
 		String inputDirFilename = FileUtil.tildeExpandPath(args[0]);
 		
@@ -37,11 +34,9 @@ public class SmellDensityAnalyzer {
 		List<File> fileList = FileListing.getFileListing(new File(inputDirFilename));
 		fileList = FileUtil.sortFileListByVersion(fileList);
 		Set<File> orderedSerFiles = new LinkedHashSet<>();
-		for (File file : fileList) {
-			if (file.getName().endsWith(".ser")) {
+		for (File file : fileList)
+			if (file.getName().endsWith(".ser"))
 				orderedSerFiles.add(file);
-			}
-		}
 		 	
 		Map<String,Set<Smell>> versionSmells = new LinkedHashMap<>();
 		String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*";

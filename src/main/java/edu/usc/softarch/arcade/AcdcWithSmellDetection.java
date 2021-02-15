@@ -6,8 +6,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.clustering.acdc.ACDC;
 
@@ -20,7 +20,9 @@ import edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class AcdcWithSmellDetection {
-	private static Logger logger = Logger.getLogger(AcdcWithSmellDetection.class);
+	private static Logger logger =
+		LogManager.getLogger(AcdcWithSmellDetection.class);
+
 	/**
 	 * inputDirName is a directory where each subdirectory contains a revision
 	 * or version of the system to be analyzed
@@ -38,13 +40,9 @@ public class AcdcWithSmellDetection {
 	private static String classesDir;
 	//TODO Replace with the SourceBuilder itself once those have been refactored
 	private static String srcLanguage;
-	//TODO Receive this as an argument
-	private static String loggingConfigFilename = "cfg" + File.separator + 
-		"extractor_logging.cfg";
 	
 	public static void main(String[] args) throws IOException  {
 		// Setup
-		PropertyConfigurator.configure(loggingConfigFilename);
 		loadArguments(args);
 		File[] files = inputDir.listFiles();
 		Set<File> fileSet = new TreeSet<>(Arrays.asList(files));

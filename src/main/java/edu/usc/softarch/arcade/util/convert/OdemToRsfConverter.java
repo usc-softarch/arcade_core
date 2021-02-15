@@ -15,8 +15,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.MetricsDriver;
 import edu.usc.softarch.arcade.facts.driver.ODEMReader;
@@ -25,13 +25,12 @@ import edu.usc.softarch.extractors.cda.odem.Type;
 
 public class OdemToRsfConverter {
 
-	static Logger logger = Logger.getLogger(OdemToRsfConverter.class);
+	static Logger logger = LogManager.getLogger(OdemToRsfConverter.class);
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		String odemFileStr = "/home/joshua/cda/hadoop-0.19.odem";
 		String rsfFileStr = "/home/joshua/workspace/MyExtractors/data/hadoop-0.19/hadoop-0.19-odem-facts.rsf";
 

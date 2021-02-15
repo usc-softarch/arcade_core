@@ -1,12 +1,11 @@
 package edu.usc.softarch.arcade.svn;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
@@ -19,18 +18,14 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
-import edu.usc.softarch.arcade.util.LogUtil;
-
 public class SvnLogAnalyzer {
-	private static Logger logger = Logger.getLogger(SvnLogAnalyzer.class);
+	private static Logger logger = LogManager.getLogger(SvnLogAnalyzer.class);
     /*
      * args parameter is used to obtain a repository location URL, a start
      * revision number, an end revision number, user's account name & password
      * to authenticate him to the server.
      */
     public static void main(String[] args) {
-    	PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-    	LogUtil.printLogFiles();
         /*
          * Default values:
          */

@@ -12,15 +12,15 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.StopWatch;
 
 public class RsfReader {
-
-	private static Logger logger = Logger.getLogger(RsfReader.class);
+	private static Logger logger = LogManager.getLogger(RsfReader.class);
 	public static Set<List<String>> untypedEdgesSet;
 	public static Set<String> startNodesSet;
 	public static Iterable<List<String>> filteredRoutineFacts;

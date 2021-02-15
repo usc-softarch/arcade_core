@@ -8,12 +8,13 @@ import java.util.List;
 
 import mojo.MoJoCalculator;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.config.Config;
 
 public class MetricsDriver {
-	static Logger logger = Logger.getLogger(MetricsDriver.class);
+	static Logger logger = LogManager.getLogger(MetricsDriver.class);
 
 	public static String constructTopicBasedComputedRsfFilename(
 			String computedFilePrex, String selectedAlg, String simMeasure,

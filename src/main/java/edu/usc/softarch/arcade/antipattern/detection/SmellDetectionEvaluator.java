@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
-import org.apache.log4j.PropertyConfigurator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -75,10 +74,6 @@ public class SmellDetectionEvaluator {
 	// #endregion ATTRIBUTES -----------------------------------------------------
 
 	public static void main(String[] args) throws IOException {
-		// Setting up variables
-		String fs = File.separator;
-		PropertyConfigurator.configure("cfg" + fs + "extractor_logging.cfg");
-
 		/**
 		 * Key: Ground-truth smell
 		 * Value: All matching smells and the technique from which the smell comes

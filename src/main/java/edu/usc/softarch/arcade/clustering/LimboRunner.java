@@ -3,14 +3,15 @@ package edu.usc.softarch.arcade.clustering;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.StopWatch;
 
 public class LimboRunner extends ClusteringAlgoRunner {
-	private static Logger logger = Logger.getLogger(LimboRunner.class);
+	private static Logger logger = LogManager.getLogger(LimboRunner.class);
 
 	public static void computeClusters(StoppingCriterion stopCriterion) {
 		StopWatch loopSummaryStopwatch = new StopWatch();
@@ -26,8 +27,6 @@ public class LimboRunner extends ClusteringAlgoRunner {
 		logger.debug("time to create similarity matrix: "
 				+ matrixCreateTimer.getElapsedTime());
 
-		int clusterStepCount = 0;
-		int stepCountToStop = 5;
 		while (stopCriterion.notReadyToStop()) {
 			if (Config.stoppingCriterion
 					.equals(Config.StoppingCriterionConfig.clustergain)) {

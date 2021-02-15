@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -10,7 +9,6 @@ import java.util.Set;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Skewness;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
-import org.apache.log4j.PropertyConfigurator;
 
 import com.google.common.base.Joiner;
 
@@ -19,7 +17,6 @@ import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
 
 public class ClusterSizeCalculator {
 	public static void main(String[] args) {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		String rsfFilename = args[0];
 		
 		GroundTruthFileParser.parseRsf(rsfFilename);
@@ -27,24 +24,20 @@ public class ClusterSizeCalculator {
 		
 		for (ConcernCluster cluster : clusters) {
 			System.out.println(cluster.getName());
-			for (String entity : cluster.getEntities()) {
+			for (String entity : cluster.getEntities())
 				System.out.println("\t" + entity);
-			}
 			System.out.println();
 		}
 		
 		int entityCount = 0;
-		for (ConcernCluster cluster : clusters) {
-			for (String entity : cluster.getEntities()) {
+		for (ConcernCluster cluster : clusters)
+			for (String entity : cluster.getEntities())
 				entityCount++;
-			}
-		}
 		
 		Map<String,Integer> clusterEntityCountMap = new HashMap<>();
 		
-		for (ConcernCluster cluster : clusters) {
+		for (ConcernCluster cluster : clusters)
 			clusterEntityCountMap.put(cluster.getName(), cluster.getEntities().size());
-		}
 		
 		double[] clusterEntityCounts = new double[clusterEntityCountMap.values().size()];
 		int i = 0;

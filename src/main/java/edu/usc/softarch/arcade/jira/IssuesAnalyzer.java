@@ -11,8 +11,8 @@ import java.util.Map;
 import net.rcarz.jiraclient.Issue;
 import net.rcarz.jiraclient.Version;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.google.common.base.Joiner;
 import com.thoughtworks.xstream.XStream;
@@ -23,10 +23,9 @@ import edu.usc.softarch.arcade.util.MapUtil;
 import edu.usc.softarch.arcade.util.StopWatch;
 
 public class IssuesAnalyzer {
-	static Logger logger = Logger.getLogger(IssuesAnalyzer.class);
+	static Logger logger = LogManager.getLogger(IssuesAnalyzer.class);
 
 	public static void main(String[] args) throws FileNotFoundException {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		// The directory where the serialized issue files are stored
@@ -34,7 +33,7 @@ public class IssuesAnalyzer {
 		
 		List<File> filesList = FileListing.getFileListing(new File(FileUtil.tildeExpandPath(issuesDir)));
 		
-		List<Issue> allIssues = new ArrayList<Issue>();
+		List<Issue> allIssues = new ArrayList<>();
 		for (File file : filesList) {
 			if (file.getName().endsWith(".ser")) {
 				List<Issue> issues = JiraUtil.deserializeIssues(file.getAbsolutePath());

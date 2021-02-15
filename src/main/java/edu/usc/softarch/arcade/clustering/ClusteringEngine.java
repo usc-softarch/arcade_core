@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.xml.sax.SAXException;
 
 import edu.usc.softarch.arcade.classgraphs.ClassGraph;
@@ -20,7 +21,7 @@ import edu.usc.softarch.arcade.util.StopWatch;
  * @author joshua
  */
 public class ClusteringEngine {
-	private static Logger logger = Logger.getLogger(ClusteringEngine.class);
+	private static Logger logger = LogManager.getLogger(ClusteringEngine.class);
 
 	public ClusteringEngine() { }
 

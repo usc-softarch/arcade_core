@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.io.File;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -21,8 +20,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
 import edu.usc.softarch.arcade.clustering.StringGraph;
@@ -33,7 +32,8 @@ import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
 import edu.usc.softarch.extractors.cda.odem.Type;
 
 public class GroundTruthRecoveryGraphBuilder {
-	private static Logger logger = Logger.getLogger(GroundTruthRecoveryGraphBuilder.class);
+	private static Logger logger =
+		LogManager.getLogger(GroundTruthRecoveryGraphBuilder.class);
 	
 	public static void main(String[] args) {
 		Options options = new Options();
@@ -53,9 +53,8 @@ public class GroundTruthRecoveryGraphBuilder {
 			// parse the command line arguments
 			CommandLine line = parser.parse(options, args);
 
-			if (line.hasOption("projfile")) {
+			if (line.hasOption("projfile"))
 				Config.setProjConfigFilename(line.getOptionValue("projfile"));
-			}
 			if (line.hasOption("help")) {
 				// automatically generate the help statement
 				HelpFormatter formatter = new HelpFormatter();
@@ -67,8 +66,6 @@ public class GroundTruthRecoveryGraphBuilder {
 			System.err.println("Parsing failed.  Reason: " + exp.getMessage());
 		}
 		
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		
 		Config.initConfigFromFile(Config.getProjConfigFilename());
 		
 		System.out.println("Reading in odem file " + Config.getOdemFile()  + "...");
@@ -76,20 +73,15 @@ public class GroundTruthRecoveryGraphBuilder {
 		ODEMReader.setTypesFromODEMFile(Config.getOdemFile());
 		List<Type> allTypes = ODEMReader.getAllTypes();
 		Map<String,Type> typeMap = new HashMap<>();
-		for (Type t : allTypes) {
+		for (Type t : allTypes)
 			typeMap.put(t.getName().trim(), t);
-		}
 		
 		System.out.println("Reading in ground truth file: " + Config.getGroundTruthFile());
 		
-		
-		
-		if (Config.getGroundTruthFile().endsWith(".rsf")) {
+		if (Config.getGroundTruthFile().endsWith(".rsf"))
 			GroundTruthFileParser.parseRsf(Config.getGroundTruthFile());
-		}
-		else {
+		else
 			GroundTruthFileParser.parseHadoopStyle(Config.getGroundTruthFile());
-		}
 		Set<ConcernCluster> nonPkgBasedClusters = GroundTruthFileParser.getClusters();
 		
 		

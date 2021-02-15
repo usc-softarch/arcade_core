@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -17,11 +17,10 @@ import net.rcarz.jiraclient.JiraException;
 import net.rcarz.jiraclient.RestClient;
 
 public class JiraClientPrototype {
-	private static Logger logger = Logger.getLogger(JiraClientPrototype.class);
+	private static Logger logger = LogManager.getLogger(JiraClientPrototype.class);
 	private static final String JIRA_URL = "https://issues.apache.org/jira";
 	
 	public static void main(String[] args) throws Exception {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 		// username and password to access Apache's JIRA repo

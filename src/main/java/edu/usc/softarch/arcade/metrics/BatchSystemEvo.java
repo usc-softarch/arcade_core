@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -17,11 +17,9 @@ import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchSystemEvo {
-	private static Logger logger = Logger.getLogger(BatchSystemEvo.class);
+	private static Logger logger = LogManager.getLogger(BatchSystemEvo.class);
 	
 	public static void main(String[] args) throws FileNotFoundException {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-
 		BatchSystemEvoOptions options = new BatchSystemEvoOptions();
 		JCommander jcmd = new JCommander(options);
 

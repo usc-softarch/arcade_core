@@ -3,7 +3,8 @@ package edu.usc.softarch.arcade.clustering;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
 import edu.usc.softarch.arcade.config.Config;
@@ -12,7 +13,7 @@ import edu.usc.softarch.arcade.util.StopWatch;
 
 public class WcaRunner extends ClusteringAlgoRunner {
 	
-	private static Logger logger = Logger.getLogger(WcaRunner.class);
+	private static Logger logger = LogManager.getLogger(WcaRunner.class);
 
 	public static void computeClustersWithPQAndWCA(
 			StoppingCriterion stopCriterion) {
