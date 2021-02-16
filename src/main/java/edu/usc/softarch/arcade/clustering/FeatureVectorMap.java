@@ -72,19 +72,6 @@ public class FeatureVectorMap {
 		constructFeatureVectorMapFromTypedEdgeGraph(typedEdgeGraph); }
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
-	// #region IO ----------------------------------------------------------------
-	public void serializeAsFastFeatureVectors() {
-		FastFeatureVectors ffv = convertToFastFeatureVectors();
-		
-		try(ObjectOutput out = new ObjectOutputStream(
-				new FileOutputStream(Config.getFastFeatureVectorsFilename()))) {
-			out.writeObject(ffv);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	// #endregion IO -------------------------------------------------------------
-
 	// #region VERIFIED METHODS --------------------------------------------------
 	public FastFeatureVectors convertToFastFeatureVectors() {
 		return new FastFeatureVectors(
@@ -199,89 +186,6 @@ public class FeatureVectorMap {
 		logger.debug("total true bits among feature sets: " + totalTrueBits);
 	}
 	// #endregion VERIFIED METHODS -----------------------------------------------
-
-	public void writeXMLFeatureVectorMapUsingSootClassEdges() throws TransformerException,
-			ParserConfigurationException {
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-		// classgraph elements
-		Document doc = docBuilder.newDocument();
-		Element rootElement = doc.createElement("FeatureVectorMap");
-		doc.appendChild(rootElement);
-
-		// classedge elements
-		logger.trace("Printing out feature vector map...");
-		for (FeatureVector fv : sc_fv_map.values()) {
-			logger.trace(fv);
-			Element fvElem = doc.createElement("FeatureVector");
-			rootElement.appendChild(fvElem);
-
-			// set attribute to staff element
-			Attr attr = doc.createAttribute("name");
-			attr.setValue(fv.getName());
-			fvElem.setAttributeNode(attr);
-
-			rootElement.appendChild(fvElem);
-			for (Feature f : fv) {
-				Element fElem = doc.createElement("Feature");
-				fvElem.appendChild(fElem);
-				Element ce = doc.createElement("ClassEdge");
-				fElem.appendChild(ce);
-				Element src = doc.createElement("src");
-				
-				SootClassEdge fSootEdge = null;
-				
-				if (f.getEdge() instanceof SootClassEdge) {
-					fSootEdge = (SootClassEdge) f.getEdge();
-				}
-				if (fSootEdge != null) 
-					src.appendChild(doc.createTextNode(fSootEdge.getSrc().toString()));
-				else
-					src.appendChild(doc.createTextNode(f.getEdge().getSrcStr()));
-				
-				
-				Element tgt = doc.createElement("tgt");
-				
-				if (fSootEdge !=null) 
-					tgt.appendChild(doc.createTextNode(fSootEdge.getTgt().toString()));
-				else 
-					tgt.appendChild(doc.createTextNode(f.getEdge().getTgtStr()));
-				
-				Element type = doc.createElement("type");
-				type.appendChild(doc.createTextNode(fSootEdge.getType()));
-				
-				ce.appendChild(src);
-				ce.appendChild(tgt);
-				ce.appendChild(type);
-
-				Element valueElem = doc.createElement("value");
-				fElem.appendChild(valueElem);
-				if (f.getValue() == 1)
-					valueElem.appendChild(doc.createTextNode("1"));
-				else if (f.getValue() == 0)
-					valueElem.appendChild(doc.createTextNode("0"));
-			}
-		}
-
-		// write the content into xml file
-		TransformerFactory transformerFactory = TransformerFactory
-				.newInstance();
-		Transformer transformer = transformerFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-		DOMSource source = new DOMSource(doc);
-		StreamResult result = new StreamResult(new File(
-				Config.getXMLFeatureVectorMapFilename()));
-		transformer.transform(source, result);
-
-		System.out.println("In "
-				+ Thread.currentThread().getStackTrace()[1].getClassName()
-				+ ". "
-				+ Thread.currentThread().getStackTrace()[1].getMethodName()
-				+ ", Wrote " + Config.getXMLFeatureVectorMapFilename());
-
-	}
 
 	public void constructFeatureVectorMapFromClassGraph(ClassGraph clg) {
 		for (SootClass caller : clg.getNodes()) {

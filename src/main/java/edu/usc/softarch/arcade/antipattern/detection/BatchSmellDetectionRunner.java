@@ -31,14 +31,12 @@ public class BatchSmellDetectionRunner {
 			}
 		});
 
-		Config.setMalletDocTopicsFilename(docTopicsFile);
 		if (selectedLang.equals("c")) {
 			Config.setSelectedLanguage(Config.Language.c);
 		}
 		else if (selectedLang.equals("java")) {
 			Config.setSelectedLanguage(Config.Language.java);
 		}
-		Config.setDepsRsfFilename(depsRsfFilename);
 		try {
 			String mojoFmMappingFilename = "mojofm_mapping.csv";
 			PrintWriter writer = new PrintWriter(techniquesDir

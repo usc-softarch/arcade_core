@@ -122,7 +122,6 @@ public class BatchClusteringEngine {
 		runner.getFastClusters().writeFastClustersRsfFile(
 				clusterNameToNodeNumberMap, arcClustersFilename);
 
-		Config.setDepsRsfFilename(depsRsfFile.getAbsolutePath());
 		String detectedSmellsFilename = outputDirName + fs
 				+ revisionNumber + "_arc_smells.ser";
 

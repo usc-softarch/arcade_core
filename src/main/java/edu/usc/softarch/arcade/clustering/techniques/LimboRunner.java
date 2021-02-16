@@ -55,8 +55,6 @@ public class LimboRunner extends ClusteringAlgoRunner {
 			FastCluster newCluster = new FastCluster(ClusteringAlgorithmType.LIMBO, cluster, otherCluster);
 			
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data,newCluster,simMatrix);
-
-			performPostProcessingConditionally();
 		}
 
 		loopSummaryStopwatch.stop();

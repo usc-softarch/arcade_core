@@ -88,20 +88,13 @@ public class ClusteringAlgoRunner {
 	 * For almost all situations, adds the cluster to the list.
 	 */
 	private static void addClusterConditionally(FastCluster fastCluster) {
-		// This block is used only for certain older modules, disregard
-		if (Config.ignoreDependencyFilters) {
-			fastClusters.add(fastCluster);
-			return;
-		}
-		
 		// If the source language is C or C++, add the only C-based entities
 		if (Config.getSelectedLanguage().equals(Language.c)) {
 			Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
 			// First condition to be assumed true
 			// Second condition to be assumed true
 			// Third condition checks whether the cluster is based on a valid C entity
-			if (Config.getClusteringGranule().equals(Granule.file) && 
-					isSingletonClusterNonexcluded(fastCluster) &&
+			if (Config.getClusteringGranule().equals(Granule.file) &&
 					!fastCluster.getName().startsWith("/") &&
 					p.matcher(fastCluster.getName()).find())
 				fastClusters.add(fastCluster);
@@ -118,14 +111,8 @@ public class ClusteringAlgoRunner {
 
 		// If the source language is Java, add all clusters
 		// Second condition to be assumed true
-		if (Config.getSelectedLanguage().equals(Language.java) && 
-				Config.isClassInSelectedPackages(fastCluster.getName()))
+		if (Config.getSelectedLanguage().equals(Language.java))
 			fastClusters.add(fastCluster);
-	}
-
-	public static boolean isSingletonClusterNonexcluded(FastCluster fastCluster) {
-		if (Config.getExcludedEntities() == null) return true;
-		return !Config.getExcludedEntities().contains(fastCluster.getName());
 	}
 	
 	protected static void checkAndUpdateClusterGain(double clusterGain) {
@@ -140,18 +127,6 @@ public class ClusteringAlgoRunner {
 			}
 			maxClusterGain = clusterGain;
 			numClustersAtMaxClusterGain = fastClusters.size();
-		}
-	}
-	
-	protected static void performPostProcessingConditionally() {
-		if (Config.getClustersToWriteList() == null) {
-			logger.debug("Config.getClustersToWriteList() == null so skipping post processing");
-			return;
-		}
-		if (Config.getClustersToWriteList().contains(fastClusters.size())) {
-			String postProcMsg = "Performing post processing at " + fastClusters.size() + " number of clusters";
-			logger.debug(postProcMsg);
-			fastClusters.fastClusterPostProcessing(fastFeatureVectors);
 		}
 	}
 }

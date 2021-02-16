@@ -66,12 +66,6 @@ public class RsfReader {
 		return facts;
 	}
 
-	public static void loadRsfDataForCurrProj() {
-		String rsfFilename = Config.getDepsRsfFilename();
-		
-		loadRsfDataFromFile(rsfFilename);
-	}
-
 	public static void loadRsfDataFromFile(String rsfFilename) {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();

@@ -58,8 +58,6 @@ public class WcaRunner extends ClusteringAlgoRunner {
 			FastCluster newCluster = new FastCluster(cluster, otherCluster);
 			
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data,newCluster,simMatrix);
-			
-			performPostProcessingConditionally();
 		}
 
 		loopSummaryStopwatch.stop();

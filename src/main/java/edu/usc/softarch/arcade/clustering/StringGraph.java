@@ -83,54 +83,6 @@ public class StringGraph implements Serializable {
 	// #endregion PROCESSING -----------------------------------------------------
 	
 	// #region IO ----------------------------------------------------------------
-	public void writeNumberedNodeDotFileWithTextMappingFile(
-			String clusterGraphDotFilename, 
-			Map<String, Integer> clusterNameToNodeNumberMap,
-			Map<Integer, String> nodeNumberToClusterNameMap
-			) throws FileNotFoundException {
-		File clusterGraphDotFile = new File(clusterGraphDotFilename);
-		if ((clusterGraphDotFile.getParentFile() != null)
-				&& (!clusterGraphDotFile.getParentFile().exists()))
-			clusterGraphDotFile.getParentFile().mkdirs();
-		
-		FileOutputStream fos = new FileOutputStream(clusterGraphDotFile);
-		OutputStreamWriter osw =
-			new OutputStreamWriter(fos, StandardCharsets.UTF_8); 
-		PrintWriter clusterGraphDotOut = new PrintWriter(osw);
-		
-		logger.debug("Writing mapping of clusters to integers to " + 
-			"CurrProj.getNumbereNodeMappingTextFilename()...");
-		
-		File clusterGraphNumberNodeMappingFile = 
-			new File(Config.getNumbereNodeMappingTextFilename());
-		FileOutputStream numberNodeMappingFileOutputStream = 
-			new FileOutputStream(clusterGraphNumberNodeMappingFile);
-		OutputStreamWriter numberedNodeMappingOutputStreamWriter = 
-			new OutputStreamWriter(numberNodeMappingFileOutputStream,
-			StandardCharsets.UTF_8);
-		PrintWriter clusterGraphNumberedNodeOut =
-			new PrintWriter(numberedNodeMappingOutputStreamWriter);
-		
-		for (Map.Entry<Integer, String> e : nodeNumberToClusterNameMap.entrySet()) {  
-			Integer key = e.getKey();  
-			String value = e.getValue();  
-			clusterGraphNumberedNodeOut.println(key + ": " + value);  
-		}
-	    
-	  clusterGraphNumberedNodeOut.close();
-		Iterator<StringEdge> iter = edges.iterator();
-		clusterGraphDotOut.println("digraph G {");
-		
-		while(iter.hasNext()) {
-			StringEdge e = iter.next();
-			clusterGraphDotOut.println(
-				e.toNumberedNodeDotString(clusterNameToNodeNumberMap));
-		}
-		
-		clusterGraphDotOut.println("}");
-		clusterGraphDotOut.close();
-	}
-	
 	public void writeDotFile(String filename) throws FileNotFoundException {
 		File f = new File(filename);
 		if ((f.getParentFile() != null) && !f.getParentFile().exists()) {
@@ -153,42 +105,6 @@ public class StringGraph implements Serializable {
 		out.println("}");
 		
 		out.close();
-	}
-	
-	public void writeXMLClusterGraph(String filename)
-			throws ParserConfigurationException, TransformerException {
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-	
-		//classgraph elements
-		Document doc = docBuilder.newDocument();
-		Element rootElement = doc.createElement("ClusterGraph");
-		doc.appendChild(rootElement);
-	
-		//classedge elements
-		for (StringEdge e : edges) {
-			Element ce = doc.createElement("StringEdge");
-			rootElement.appendChild(ce);
-			Element src = doc.createElement("src");
-			src.appendChild(doc.createTextNode(e.getSrcStr()));
-			Element tgt = doc.createElement("tgt");
-			tgt.appendChild(doc.createTextNode(e.getTgtStr()));
-			ce.appendChild(src);
-			ce.appendChild(tgt);
-		}
-	
-		//write the content into xml file
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		Transformer transformer = transformerFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		DOMSource source = new DOMSource(doc);
-		StreamResult result =  new StreamResult(new File(filename));
-		transformer.transform(source, result);
-	
-		logger.debug(
-			"In "	+ Thread.currentThread().getStackTrace()[1].getClassName() 
-			+ ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
-			+ ", Wrote " + filename);
 	}
 	// #endregion IO -------------------------------------------------------------
 }

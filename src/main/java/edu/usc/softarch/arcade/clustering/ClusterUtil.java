@@ -133,8 +133,7 @@ public class ClusterUtil {
 					Dependencies dependencies = type.getDependencies();
 					for (DependsOn dependency : dependencies.getDependsOn()) {
 						for (ConcernCluster otherCluster : clusters) {
-							for (String otherEntity : otherCluster
-									.getEntities()) {
+							for (String otherEntity : otherCluster.getEntities()) {
 								if (otherEntity.trim().equals(
 										dependency.getName().trim())) {
 									cg.addEdge(cluster.getName().trim(),

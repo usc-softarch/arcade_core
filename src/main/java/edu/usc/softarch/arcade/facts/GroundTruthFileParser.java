@@ -3,7 +3,6 @@ package edu.usc.softarch.arcade.facts;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -75,8 +74,6 @@ public class GroundTruthFileParser {
 				}
 			}
 			in.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -119,8 +116,6 @@ public class GroundTruthFileParser {
 				}
 			}
 			in.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -134,20 +129,18 @@ public class GroundTruthFileParser {
 
 			String clusterName = fact.get(1).trim();
 			String containedClass = fact.get(2).trim();
-			if (Config.isClassInSelectedPackages(containedClass)) {
-				logger.debug("Found class: " + containedClass);
+			logger.debug("Found class: " + containedClass);
 
-				ConcernCluster currCluster = null;
-				if (!clusterMap.containsKey(clusterName)) { // This is a new cluster
-					logger.debug("Creating new cluster: " + clusterName);
-					currCluster = new ConcernCluster();
-					currCluster.setName(clusterName);
-					currCluster.addEntity(containedClass);
-					clusterMap.put(clusterName, currCluster);
-				} else { // This is an already added cluster
-					currCluster = clusterMap.get(clusterName);
-					currCluster.addEntity(containedClass);
-				}
+			ConcernCluster currCluster = null;
+			if (!clusterMap.containsKey(clusterName)) { // This is a new cluster
+				logger.debug("Creating new cluster: " + clusterName);
+				currCluster = new ConcernCluster();
+				currCluster.setName(clusterName);
+				currCluster.addEntity(containedClass);
+				clusterMap.put(clusterName, currCluster);
+			} else { // This is an already added cluster
+				currCluster = clusterMap.get(clusterName);
+				currCluster.addEntity(containedClass);
 			}
 		}
 		

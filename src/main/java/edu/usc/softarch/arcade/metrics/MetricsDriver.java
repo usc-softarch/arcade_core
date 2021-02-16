@@ -32,7 +32,7 @@ public class MetricsDriver {
 	
 	public static void performMoJoForMultiClustersOnFile(
 			String computedFilePrex, String authClusteringFile, String selectedAlg,
-			String simMeasure, String stoppingCriterion) {
+			String simMeasure, String stoppingCriterion, String outputDirectory) {
 		List<Integer> numClustersList = new ArrayList<>();
 		List<Integer> numTopicsList = new ArrayList<>();
 		
@@ -119,18 +119,21 @@ public class MetricsDriver {
 		System.out.println("max mojo fm: " + maxMojoFM);
 		System.out.println("num clusters at max: " + numClustersAtMax);
 		System.out.println("num topics at max: " + numTopicsAtMax);
+
+		String outputFilePath = outputDirectory + numClustersList.get(0) + "-"
+			+ numClustersList.get(numClustersList.size()-1) + "_" + selectedAlg
+			+ "_" + simMeasure + "_clusters_mojo.csv";
 		
 		System.out.println("Writing MoJo and MoJoFM to csv file " +
-			Config.getMojoToAuthCSVFilename(numClustersList,selectedAlg,simMeasure)
-			+ " ...");
+			outputFilePath + " ...");
 
 		createMojoToAuthListsCSVFile(numClustersList, mojoToAuthList,
-			mojoFmToAuthList, selectedAlg, simMeasure, numTopicsList);
+			mojoFmToAuthList, numTopicsList, outputFilePath);
 		
 	}
 	
 	public static void performMoJoOperationsForMultipleClustersOnSingleAuthClusteringFile(String selectedAlg, String simMeasure,
-			String stoppingCriterion, String computedFilePrex, String authClusteringFile) {
+			String stoppingCriterion, String computedFilePrex, String authClusteringFile, String outputDirectory) {
 		List<Integer> numClustersList = new ArrayList<>();
 		List<Long> mojoList = new ArrayList<>();
 		List<Double> mojoFmList = new ArrayList<>();
@@ -179,10 +182,12 @@ public class MetricsDriver {
 		}
 		
 		double avgMojoFm = sumMojoFm/numClustersList.size();
+		String outputFilePath = outputDirectory + numClustersList.get(0) + "-"
+			+ numClustersList.get(numClustersList.size()-1) + "_" + selectedAlg
+			+ "_" + simMeasure + "_clusters_mojo.csv";
 		
 		String writingMojoToCsvMsg = "Writing MoJo and MoJoFM to csv file "
-			+ Config.getMojoToAuthCSVFilename(numClustersList,selectedAlg,simMeasure)
-			+ " ...";
+			+ outputFilePath + " ...";
 		String maxMojoFmMsg = "max mojo fm: " + maxMojoFm;
 		String numClusAtMaxMojoFmMsg = "no. clusters at max mojo fm: " + maxNumClusters;
 		String avgMojoFmMsg = "avg mojo fm: " + avgMojoFm;
@@ -199,7 +204,8 @@ public class MetricsDriver {
 		logger.debug(numClusAtMaxMojoFmMsg);
 		logger.debug(avgMojoFmMsg);
 
-		createMojoListsCSVFile(numClustersList,mojoList,mojoFmList,selectedAlg,simMeasure);
+		createMojoListsCSVFile(numClustersList, mojoList,
+			mojoFmList, outputFilePath);
 	}
 
 	public static void performMojoForSingleAuthClustering(String computedRsfFilename, String authClusteringFile) {
@@ -218,10 +224,9 @@ public class MetricsDriver {
 		System.out.println(mojoOutput);
 	}
 	
-	public static void createMojoListsCSVFile(List<Integer> numClustersList, List<Long> mojoList,
-			List<Double> mojoFmList,String selectedAlg, String simMeasure) {
-		try (FileWriter fstream = new FileWriter(
-			Config.getMojoToAuthCSVFilename(numClustersList,selectedAlg, simMeasure))) {
+	public static void createMojoListsCSVFile(List<Integer> numClustersList,
+			List<Long> mojoList, List<Double> mojoFmList, String outputFilePath) {
+		try (FileWriter fstream = new FileWriter(outputFilePath)) {
 			BufferedWriter out = new BufferedWriter(fstream);
 			
 			out.write("number of clusters,");
@@ -238,10 +243,10 @@ public class MetricsDriver {
 		}
 	}
 	
-	public static void createMojoToAuthListsCSVFile(List<Integer> numClustersList, List<Long> mojoList,
-			List<Double> mojoFmList,String selectedAlg, String simMeasure, List<Integer> numTopicsList) {
-		try (FileWriter fstream = new FileWriter(
-			Config.getMojoToAuthCSVFilename(numClustersList,selectedAlg,simMeasure))) {
+	public static void createMojoToAuthListsCSVFile(List<Integer> numClustersList,
+			List<Long> mojoList, List<Double> mojoFmList, List<Integer> numTopicsList,
+			String outputFilePath) {
+		try (FileWriter fstream = new FileWriter(outputFilePath)) {
 			BufferedWriter out = new BufferedWriter(fstream);
 			
 			out.write("number of topics,");

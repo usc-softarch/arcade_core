@@ -70,7 +70,6 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			printDataForTwoMostSimilarClustersWithTopicsForConcerns(data);
 			FastCluster newCluster = mergeFastClustersUsingTopics(data);
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix);
-			performPostProcessingConditionally();
 
 			logger.debug("after merge, clusters size: " + fastClusters.size());
 		}

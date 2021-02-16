@@ -16,7 +16,6 @@ import edu.usc.softarch.arcade.classgraphs.ClassGraph;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.clustering.Feature;
-import edu.usc.softarch.arcade.clustering.PreSelectedStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.StoppingCriterion;
 import edu.usc.softarch.arcade.config.Config;
 
@@ -45,11 +44,10 @@ public class ClusteringEngine {
 			ParserConfigurationException, SAXException, IOException {
 	}
 
-	public void run() throws Exception {
+	public void run(String fastFeatureVectorsFilePath) throws Exception {
 		FastFeatureVectors fastFeatureVectors = null;
 		
-		File fastFeatureVectorsFile = new File(
-				Config.getFastFeatureVectorsFilename());
+		File fastFeatureVectorsFile = new File(fastFeatureVectorsFilePath);
 
 		ObjectInputStream objInStream = new ObjectInputStream(
 				new FileInputStream(fastFeatureVectorsFile));
@@ -72,7 +70,7 @@ public class ClusteringEngine {
 			WcaRunner.setFastFeatureVectors(fastFeatureVectors);
 			if (Config.stoppingCriterion
 					.equals(Config.StoppingCriterionConfig.preselected)) {
-				StoppingCriterion stopCriterion = new PreSelectedStoppingCriterion();
+				StoppingCriterion stopCriterion = new ConcernClusteringRunner.PreSelectedStoppingCriterion();
 				WcaRunner.computeClustersWithPQAndWCA(stopCriterion);
 			}
 			if (Config.stoppingCriterion
@@ -94,7 +92,7 @@ public class ClusteringEngine {
 		
 		if (Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.LIMBO)) {
 			LimboRunner.setFastFeatureVectors(fastFeatureVectors);
-			LimboRunner.computeClusters(new PreSelectedStoppingCriterion());
+			LimboRunner.computeClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion());
 			if (Config.stoppingCriterion.equals(Config.StoppingCriterionConfig.clustergain)) {
 				LimboRunner.computeClusters(new ClusterGainStoppingCriterion());
 			}

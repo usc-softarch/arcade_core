@@ -15,14 +15,11 @@ import java.util.Set;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import edu.usc.softarch.arcade.config.Config;
-
 public class MakeDepReader {
 	private static Logger logger = LogManager.getLogger(MakeDepReader.class);
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		logger.debug("Running from " + MakeDepReader.class.getName());
-		Config.initConfigFromFile(Config.getProjConfigFilename());
 
 		String filename = args[0];
 		Scanner scanner = new Scanner(new FileInputStream(filename));

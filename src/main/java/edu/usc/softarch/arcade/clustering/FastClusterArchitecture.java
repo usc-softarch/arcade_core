@@ -13,15 +13,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.usc.softarch.arcade.classgraphs.StringEdge;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.SimMeasure;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
@@ -50,26 +45,6 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 		return clusterNameToNodeNumberMap;
 	}
 
-  public Map<Integer, String> createNodeNumberToFastClusterNameMap(
-			Map<String, Integer> clusterNameToNodeNumberMap) {
-		Map<Integer, String> nodeNumberToClusterNameMap = new TreeMap<>();
-
-		for (FastCluster cluster : this)
-			nodeNumberToClusterNameMap.put(
-				clusterNameToNodeNumberMap.get(cluster.getName()), cluster.getName());
-
-		return nodeNumberToClusterNameMap;
-	}
-
-  public void writeFastClusterRSFFileUsingConfigName(
-			Map<String, Integer> clusterNameToNodeNumberMap)
-      throws FileNotFoundException {
-		String currentClustersDetailedRsfFilename =
-      Config.getClustersRSFFilename(this.size());
-		writeFastClustersRsfFile(
-      clusterNameToNodeNumberMap, currentClustersDetailedRsfFilename);
-	}
-
   public void writeFastClustersRsfFile(
 			Map<String, Integer> clusterNameToNodeNumberMap,
 			String currentClustersDetailedRsfFilename)
@@ -95,51 +70,6 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
         }
       }
     }
-	}
-
-  public void fastClusterPostProcessing(
-      FastFeatureVectors fastFeatureVectors) {
-		StringGraph clusterGraph = generateFastClusterGraph(
-			fastFeatureVectors.getNamesInFeatureSet());
-
-		Map<String, Integer> clusterNameToNodeNumberMap =
-      createFastClusterNameToNodeNumberMap();
-		Map<Integer, String> nodeNumberToClusterNameMap =
-      createNodeNumberToFastClusterNameMap(clusterNameToNodeNumberMap);
-
-		try {
-			clusterGraph.writeNumberedNodeDotFileWithTextMappingFile(
-				Config.getClusterGraphDotFilename(),
-				clusterNameToNodeNumberMap, nodeNumberToClusterNameMap);
-			writeFastClusterRSFFileUsingConfigName(clusterNameToNodeNumberMap);
-			clusterGraph.writeXMLClusterGraph(Config.getClusterGraphXMLFilename());
-		} catch (FileNotFoundException
-				| ParserConfigurationException
-				| TransformerException e) {
-			e.printStackTrace();
-		}
-	}
-
-  private StringGraph generateFastClusterGraph(List<String> namesInFeatureSet) {
-		StringGraph clusterGraph = new StringGraph();
-		for (FastCluster c1 : this) {
-			for (FastCluster c2 : this) {
-				Set<Integer> c1Keys = c1.getNonZeroFeatureMap().keySet();
-				for (Integer key : c1Keys) {
-					String c1FeatureName = namesInFeatureSet.get(key);
-					String[] c2Entities = c2.getName().split(",");
-					for (String c2EntityName : c2Entities) {
-						if (c1FeatureName.equals(c2EntityName)) {
-							logger.trace(
-								"Adding edge (" + c1.getName() + "," + c2.getName() + ")");
-							clusterGraph.addEdge(new StringEdge(c1.getName(), c2.getName()));
-						}
-					}
-				}
-			}
-		}
-
-		return clusterGraph;
 	}
 
   public double computeClusterGainUsingStructuralData() {
