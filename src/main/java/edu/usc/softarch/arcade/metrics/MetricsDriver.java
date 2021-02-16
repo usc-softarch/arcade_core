@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade;
+package edu.usc.softarch.arcade.metrics;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

@@ -18,7 +18,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import edu.usc.softarch.arcade.MetricsDriver;
+import edu.usc.softarch.arcade.metrics.MetricsDriver;
 import edu.usc.softarch.arcade.facts.driver.ODEMReader;
 import edu.usc.softarch.extractors.cda.odem.DependsOn;
 import edu.usc.softarch.extractors.cda.odem.Type;

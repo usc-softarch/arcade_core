@@ -217,7 +217,7 @@ public class DependencyFinderProcessingExportJSON {
 						if(temp == null)
 							temp = new JSONObject();
 						temp.put("Logical_Dependency", 1);
-						file_list.put(StringUtil.cutInnterClass(classname), temp);
+						file_list.put(FileUtil.cutInnterClass(classname), temp);
 					}
 				}
 			}
@@ -555,7 +555,7 @@ public class DependencyFinderProcessingExportJSON {
 			if(temp == null)
 				temp = new JSONObject();
 			temp.put("Unused_Interface", 1);
-			file_list.put(StringUtil.cutInnterClass(classname), temp);
+			file_list.put(FileUtil.cutInnterClass(classname), temp);
 		}
 		// add all unused component to json
 		for (String unused : unsedCompSmell) {
@@ -565,7 +565,7 @@ public class DependencyFinderProcessingExportJSON {
 				if(temp == null)
 					temp = new JSONObject();
 				temp.put("Unused_Comp", 1);
-				file_list.put(StringUtil.cutInnterClass(classname), temp);
+				file_list.put(FileUtil.cutInnterClass(classname), temp);
 			}
 		}
 	}
@@ -701,7 +701,7 @@ public class DependencyFinderProcessingExportJSON {
 					if(temp == null)
 						temp = new JSONObject();
 					temp.put("Sloopy_Delegation", 1);
-					file_list.put(StringUtil.cutInnterClass(classname), temp);
+					file_list.put(FileUtil.cutInnterClass(classname), temp);
 				}
 		}
 		
@@ -762,7 +762,7 @@ public class DependencyFinderProcessingExportJSON {
 					if(temp == null)
 						temp = new JSONObject();
 					temp.put(smellType, 1);
-					file_list.put(StringUtil.cutInnterClass(classname), temp);
+					file_list.put(FileUtil.cutInnterClass(classname), temp);
 				}
 			}
 		}
@@ -836,7 +836,7 @@ public class DependencyFinderProcessingExportJSON {
 					if(temp == null)
 						temp = new JSONObject();
 					temp.put("Clone_Comp", 1);
-					file_list.put(StringUtil.cutInnterClass(classname), temp);
+					file_list.put(FileUtil.cutInnterClass(classname), temp);
 				}
 			}
 		}

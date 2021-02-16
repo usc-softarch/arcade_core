@@ -365,4 +365,34 @@ public class FileUtil {
 		iterable.forEach(toReturn::add);
 		return toReturn;
 	}
+
+	public static String extractOrgSuffix(String name) {
+		Pattern p = Pattern.compile("org\\/(.*)");
+		Matcher m = p.matcher(name);
+		if (m.find())
+			return m.group(0);
+
+		return null;
+	}
+	
+	/**
+	 * convert	src/java/org/apache/hadoop/dfs/FSDataset.java
+	 * to 			org.apache.hadoop.dfs.FSDataset
+	 * @param dir
+	 * @return
+	 */
+	public static String dir2pkg(String dir) {
+		String orgSuffix = extractOrgSuffix(dir);
+		if (orgSuffix == null) return null;
+
+		String tmp = orgSuffix.substring(0, orgSuffix.lastIndexOf(".java"));
+		return tmp.replace('/', '.');
+	}
+	
+	public static String cutInnterClass(String dir) {
+		if (dir.contains("$"))
+			return dir.split("$")[0];
+		else
+			return dir;
+	}
 }
