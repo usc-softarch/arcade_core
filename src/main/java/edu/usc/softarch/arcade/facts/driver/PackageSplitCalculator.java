@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
 
@@ -30,7 +31,7 @@ public class PackageSplitCalculator {
 		
 		GroundTruthFileParser.parseRsf(clusterRsfFilename);
 		
-		Set<ConcernCluster> clusters = GroundTruthFileParser.getClusters();
+		ConcernClusterArchitecture clusters = GroundTruthFileParser.getClusters();
 		Set<String> clusterNames = new HashSet<>();
 		
 		for (ConcernCluster cluster : clusters) {
@@ -125,7 +126,7 @@ public class PackageSplitCalculator {
 		System.out.println(String.join("\n", clustersWherePkgsIsNotEnough));
 	}
 
-	private static String getPackageNameOfFirstEntity(String clusterName, Set<ConcernCluster> clusters) {
+	private static String getPackageNameOfFirstEntity(String clusterName, ConcernClusterArchitecture clusters) {
 		for (ConcernCluster cluster : clusters) {
 			if (cluster.getName().equals(clusterName)) {
 				String firstEntity = (String) cluster.getEntities().toArray()[0];

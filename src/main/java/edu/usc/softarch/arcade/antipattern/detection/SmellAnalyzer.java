@@ -20,6 +20,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -199,7 +200,7 @@ public class SmellAnalyzer {
 				Map<String, SmellCount> clusterMap = new HashMap<>();
 
 				for (Smell smell : smells) {
-					Set<ConcernCluster> clusters = smell.getClusters();
+					ConcernClusterArchitecture clusters = smell.getClusters();
 					for (ConcernCluster cluster: clusters) {
 						if (clusterMap.containsKey(cluster.getName())) {
 							switch (smell.getSmellType()) {

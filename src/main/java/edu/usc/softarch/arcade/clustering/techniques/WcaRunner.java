@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.clustering.FastCluster;
 import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
 import edu.usc.softarch.arcade.clustering.MaxSimData;
@@ -150,8 +149,8 @@ public class WcaRunner extends ClusteringAlgoRunner {
 					+ Thread.currentThread().getStackTrace()[1].getMethodName()
 					+ ", \nMax Similar Clusters: ");
 
-			ClusterUtil.printSimilarFeatures(fastClusters.get(maxSimData.rowIndex), fastClusters.get(maxSimData.colIndex),
-					fastFeatureVectors);
+			fastClusters.get(maxSimData.rowIndex).printSimilarFeatures(
+				fastClusters.get(maxSimData.colIndex), fastFeatureVectors);
 
 			logger.debug(maxSimData.currentMaxSim);
 			logger.debug("\n");

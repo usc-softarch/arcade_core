@@ -10,6 +10,7 @@ import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Skewness;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
 
@@ -18,7 +19,7 @@ public class ClusterSizeCalculator {
 		String rsfFilename = args[0];
 		
 		GroundTruthFileParser.parseRsf(rsfFilename);
-		Set<ConcernCluster> clusters = GroundTruthFileParser.getClusters();
+		ConcernClusterArchitecture clusters = GroundTruthFileParser.getClusters();
 		
 		for (ConcernCluster cluster : clusters) {
 			System.out.println(cluster.getName());

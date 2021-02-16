@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.simple.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -46,8 +47,9 @@ import edu.usc.softarch.arcade.util.FileUtil;
 public class DependencyFinderProcessing {
 	private static Logger logger =
 		LogManager.getLogger(DependencyFinderProcessing.class);
-	private static String summary = "SUMMARY:\n version, unused interface, unused block, sloppy, lego, function overload, duplicate functionality, logical deps\n";
-	private static String details = "DETAILS:\n";
+	private static String summary ="SUMMARY:\n version, unused interface, unused block, sloppy, lego, function overload, duplicate functionality, logical deps\n";
+	private static String details ="DETAILS:\n";
+	private static JSONObject details_json = new JSONObject();
 	
 	private Map<String, List<String>> clusterList = new HashMap<>();		
 	private Map<String, String> class2component = new HashMap<>();
@@ -64,10 +66,32 @@ public class DependencyFinderProcessing {
 	private Map<String, List<String>> classLogicalDependencies = new HashMap<>();
 	
 	public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
-		final File depFinderDir = FileUtil.checkDir("F:\\Interface_based_detection\\log4j_Output_2\\depfinders", false, false);
-		final File clustersDir = FileUtil.checkDir("F:\\Recovered_files\\log4j\\Log4j_acdc\\clusters\\all", false, false);
-		final File cloneDir = FileUtil.checkDir("F:\\Interface_based_detection\\log4j_output_2\\clone", false, false);
+		String testRSF;
+		String testDefFinder;
+		String testClone;
+		String logicalDep;
+		String outputDest;
+		String packageName;
 		
+		if (args.length == 7)	{
+			testRSF = args[0] + args[1];
+			testDefFinder = args[0] + args[2];
+			testClone = args[0] + args[3];
+			logicalDep = args[0] + args[4];
+			packageName = args[5]; 
+			outputDest = args[0] + args[6];		
+		} else {
+			testRSF = "subject_systems\\Struts2\\acdc\\cluster";
+			testDefFinder = "subject_systems\\Struts2\\depfinder";
+			testClone = "subject_systems\\Struts2\\clone";
+			logicalDep = "subject_systems\\Struts2\\struts2_cleaned.csv";
+			outputDest = "subject_systems\\Struts2\\struts2_acdc_interface_smell.csv";
+			packageName = "org.apache.struts2";
+		}
+		final File depFinderDir = FileUtil.checkDir(testDefFinder, false, false);
+		final File clustersDir = FileUtil.checkDir(testRSF, false, false);
+		final File cloneDir = FileUtil.checkDir(testClone, false, false);
+
 		List<File> fileList = FileListing.getFileListing(depFinderDir);
 		fileList = FileUtil.sortFileListByVersion(fileList);
 		final Set<File> orderedSerFiles = new LinkedHashSet<>();
@@ -90,7 +114,7 @@ public class DependencyFinderProcessing {
 				cloneFiles.add(file);
 
 		Map<String, String> versionSmells = new LinkedHashMap<>();
-		final String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*+(-|\\.)*((RC|ALPHA|BETA|M|Rc|Alpha|Beta|rc|alpha|beta)[0-9])*";
+		final String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*+((-|\\.)(RC|ALPHA|BETA|M|Rc|Alpha|Beta|rc|alpha|beta)[0-9])*";
 		for (final File file : orderedSerFiles) {
 			logger.debug(file.getName());
 			final String version = FileUtil.extractVersionFromFilename(versionSchemeExpr, file.getName());
@@ -114,43 +138,42 @@ public class DependencyFinderProcessing {
 			cloneVersions.put(version, file.getAbsolutePath());
 		}
 		
-		for (String key : versionSmells.keySet()){
+		for (String key : versionSmells.keySet()) {
 			logger.info("Start detecting smells for one version:" + versionSmells.get(key)+", "+clusterSmells.get(key));
 			String smellFile = versionSmells.get(key);
 			String clusterFile =  clusterSmells.get(key);
-			String cloneFile   = cloneVersions.get(key);
+			String cloneFile = cloneVersions.get(key);
 			if (smellFile == null || clusterFile == null || cloneFile == null)
 				continue;
-			single(versionSmells.get(key), clusterSmells.get(key), "org.apache.logging.log4j", cloneVersions.get(key), key);
+			single(versionSmells.get(key), clusterSmells.get(key), packageName, cloneVersions.get(key), key, logicalDep, outputDest);
 		}
 	}
 
-	private static void single(String testDoc, String testRSF, String packageName, String testClone, String version)
+	private static void single(String testDoc, String testRSF, String packageName, String testClone, String version, String logicalDep, String outputDest)
 			throws IOException, ParserConfigurationException, SAXException {
 		DependencyFinderProcessing dp = new DependencyFinderProcessing(testDoc, packageName);
 		dp.clusterList = dp.readClusterFile(testRSF);
 		dp.codeClone = dp.codeCloneUpdate(testClone);
-		dp.classLogicalDependencies = dp.readLogicalDeps("F:\\logical_dependencies\\log4j_cleaned.csv");
+		dp.classLogicalDependencies = dp.readLogicalDeps(logicalDep);
 		//detect smell
 		logger.info("Start detecting smells");
 		
 		details += "\n" + version + ":\n";
-		dp.DetectSmell(version);
-		//detect cochange components
-		details += "\nCo change: \n";
-		details += "componentName, other components , smells?\n";
-		dp.detectLogicalDepBetweenComponents();
+		JSONObject list_files_per_versions = new JSONObject();
+		details_json.put(version, list_files_per_versions);
+		
+		dp.DetectSmell(version, packageName);
 		
 		// finish summary and move to new version
 		summary += "\n";
 		try {
-			writeToFile(summary + "\n" + details, "F:\\Output\\log4j_InterfaceSmell_acdc_2.csv");
+			writeToFile(summary + "\n" + details, outputDest);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void detectLogicalDepBetweenComponents() {
+	public void detectLogicalDepBetweenComponents(String version) {
 		Map<String, Set<String>> storage = new HashMap<>();
 		
 		Set<String> allLogicalDeps = classLogicalDependencies.keySet();
@@ -162,10 +185,10 @@ public class DependencyFinderProcessing {
 			if (fromComp != null) {
 				List<String> classList = classLogicalDependencies.get(fromClass);
 				Set<String> componentList = storage.get(fromComp);
-				if (componentList == null )
+				if (componentList == null)
 					componentList = new HashSet<>();
 				if (classList != null) {
-					for (String c : classList){
+					for (String c : classList) {
 						String com = class2component.get(c);
 						if (com != null)
 							componentList.add(com);
@@ -186,15 +209,24 @@ public class DependencyFinderProcessing {
 					total ++;
 					logger.info(s + "," +componentList.toString() + "," + numOfConnection);
 					details += s + "," +componentList.toString() + "," + numOfConnection + "\n";
+					
+					JSONObject file_list = (JSONObject) details_json.get(version);
+					// add all lego & overload to json, only consider class, not whole component
+					for (String classname : clusterList.get(s)){
+						JSONObject temp = (JSONObject) file_list.get(classname);
+						if(temp == null)
+							temp = new JSONObject();
+						temp.put("Logical_Dependency", 1);
+						file_list.put(FileUtil.cutInnterClass(classname), temp);
+					}
 				}
 			}
 		}
 		summary += total + ",";
 	}
 	
-	public Map<String, List<String>> readLogicalDeps(String logicalDep) {
+	public Map<String, List<String>> readLogicalDeps(String logicalDep){
 		Map<String, List<String>> storage = new HashMap<>();
-		
 		String line = "";
 		String cvsSplitBy = ",";
 	 
@@ -234,10 +266,12 @@ public class DependencyFinderProcessing {
 			String line;
 			while ((line = in.readLine()) != null) {
 				logger.debug(line);
+
 				if (line.trim().isEmpty()) continue;
 
 				final Scanner s = new Scanner(line);
 				final String expr = "([^\"\\s][^\\s]*[^\"\\s]*)|([\"][^\"]*[\"])";
+
 				final String arcType = s.findInLine(expr);
 				final String startNode = s.findInLine(expr);
 				final String endNode = s.findInLine(expr);
@@ -266,24 +300,23 @@ public class DependencyFinderProcessing {
 		}
 		return clusterList;
 	}
-	
 
-	public DependencyFinderProcessing(String xmlFilePath, String packageName) throws IOException, ParserConfigurationException, SAXException {
+	public DependencyFinderProcessing(String xmlFilePath, String packageName) throws IOException, ParserConfigurationException, SAXException{
 		// Run processing to input dependency into file
-		// Handle by DOM Parser
+		//Handle by DOM Parser
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(true);
 		factory.setIgnoringElementContentWhitespace(true);
 		
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		builder.setEntityResolver( new EntityResolver() {
+		builder.setEntityResolver(new EntityResolver() {
 			@Override
 			public InputSource resolveEntity(String arg0, String arg1)
 					throws SAXException, IOException {
 				return new InputSource(new StringReader("<?xml version='1.0' encoding='UTF-8'?>"));
 			}
 		});
-		File file = new File(xmlFilePath);
+		File file	= new File(xmlFilePath);
 		Document doc = builder.parse(file);
 		
 		logger.info("Started processing XML input");
@@ -296,8 +329,8 @@ public class DependencyFinderProcessing {
 			String key = eElement.getElementsByTagName("name").item(0).getTextContent();	
 			logger.debug("Current key :" + key);
 			NodeList nflist = eElement.getElementsByTagName("feature");
-			List<String> methods = new ArrayList<>();
-			for (int n = 0; n < nflist.getLength(); n++) {
+			List<String> methods	= new ArrayList<>();
+			for (int n = 0; n < nflist.getLength(); n++){
 				Element	e = (Element) nflist.item(n);
 				methods.add(e.getElementsByTagName("name").item(0).getTextContent());
 				logger.debug("Current methods :" + e.getElementsByTagName("name").item(0).getTextContent());
@@ -307,19 +340,18 @@ public class DependencyFinderProcessing {
 		
 		// Building inbound dependencies
 		NodeList nlist = doc.getElementsByTagName("feature");
-		for (int i = 0; i < nlist.getLength(); i++) {
+		for (int i = 0; i < nlist.getLength(); i++){
 			Node node = nlist.item(i);
 			logger.debug("\nCurrent Element :" + node.getNodeName());
 			 
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
-	 
 				Element eElement = (Element) node;
 				String key = eElement.getElementsByTagName("name").item(0).getTextContent();		
 				logger.debug("Current key :" + key);
 
 				//Get inbounds
 				NodeList inboundNode = eElement.getElementsByTagName("inbound");
-				ArrayList<String> inbounds = new ArrayList<>();
+				List<String> inbounds = new ArrayList<>();
 	 			for (int j = 0; j < inboundNode.getLength(); j++) {
 	 				inbounds.add(inboundNode.item(j).getTextContent());
 	 				logger.debug("Current inbound :" + inboundNode.item(j).getTextContent());
@@ -327,12 +359,12 @@ public class DependencyFinderProcessing {
 	 			
 	 			//Get outbounds
 	 			NodeList outboundNode = eElement.getElementsByTagName("outbound");
-				ArrayList<String> outbounds	= new ArrayList<>();
+				List<String> outbounds = new ArrayList<>();
 	 			for (int j = 0; j < outboundNode.getLength(); j++) {
 	 				outbounds.add(outboundNode.item(j).getTextContent());
 	 				logger.debug("Current inbound :" + outboundNode.item(j).getTextContent());
 	 			}
-	 			if (key.startsWith(packageName)) {
+	 			if (key.startsWith(packageName)){
 		 			inboundDependencies.put(key, inbounds);
 		 			outboundDependencies.put(key, outbounds);
 	 			}
@@ -352,7 +384,7 @@ public class DependencyFinderProcessing {
 
 				//Get inbounds
 				NodeList inboundNode = eElement.getElementsByTagName("inbound");
-				ArrayList<String> inbounds = new ArrayList<>();
+				List<String> inbounds = new ArrayList<>();
 	 			for (int j = 0; j < inboundNode.getLength(); j++) {
 	 				inbounds.add(inboundNode.item(j).getTextContent());
 	 				logger.debug("Current inbound :" + inboundNode.item(j).getTextContent());
@@ -360,8 +392,8 @@ public class DependencyFinderProcessing {
 	 			
 	 			//Get outbounds
 	 			NodeList outboundNode = eElement.getElementsByTagName("outbound");
-				ArrayList<String> outbounds	= new ArrayList<>();
-	 			for (int j = 0; j < outboundNode.getLength(); j++) {
+				List<String> outbounds	= new ArrayList<>();
+	 			for (int j = 0; j < outboundNode.getLength(); j++){
 	 				outbounds.add(outboundNode.item(j).getTextContent());
 	 				logger.debug("Current inbound :" + outboundNode.item(j).getTextContent());
 	 			}
@@ -401,9 +433,14 @@ public class DependencyFinderProcessing {
 			Set<String> tmp = new HashSet<>();
 			for (int i = 0; i < duplicatedFiles.getLength(); i++) {
 				Element e = (Element) duplicatedFiles.item(i);
-				if (! e.getAttribute("path").contains("src"))
+				if (!e.getAttribute("path").contains("src"))
 					continue;
-				String className = e.getAttribute("path").replace("\\", ".").split("src")[1].replace(".java", "").substring(1);
+				String path = e.getAttribute("path");
+				String className = "";
+				if (path.contains("//"))
+					className = e.getAttribute("path").replace("\\", ".").split("\\.src")[1].replace(".java", "").substring(1);
+				else if (path.contains("/"))
+				  className = e.getAttribute("path").replace("/", ".").split("\\.src")[1].replace(".java", "").substring(1);
 				if (className.startsWith("main."))
 					className = className.replace("main.", "");
 				if (className.startsWith("test."))
@@ -414,33 +451,39 @@ public class DependencyFinderProcessing {
 		}
 		
 		// Building inbound dependencies
-				
 		logger.info("Finished processing clone input");
 		return codeCloneFromFile;
 	}
 	
-	public void DetectSmell(String version) {
+	public void DetectSmell(String version, String packageName) {
 		summary += version + ",";
-		DetectUnusedInterface();
+		DetectUnusedInterface(version, packageName);
 
 		details += "Sloppy Delegation:\n";
 		details += "component, affected class, total class, percentages\n";
-		DetectSloppyDelegation(version);
+		DetectSloppyDelegation(version, packageName);
 		
 		details += "\nLego and Overload:\n";
 		details += "componentName, number of public methods , smells\n";
-		DetectLegoSyndomeAndFunctionalityOverload();
-
+		DetectLegoSyndomeAndFunctionalityOverload(version, packageName);
+		
 		details += "\nCode colone based:\n";
 		details += "componentName, affected classes, total classes, percentages\n";
-		detectComponentClonebyClassLevel();
+		detectComponentClonebyClassLevel(version);
+
+		//detect cochange components
+		details += "\nCo change: \n";
+		details += "componentName, other components , smells?\n";
+		detectLogicalDepBetweenComponents(version);
 	}
 	
-	public void DetectUnusedInterface() {
+	public void DetectUnusedInterface(String version, String packageName) {
 		// Read all component
 		// If there all methods in one class without inbound
 		// Indicated that component has Unused Interface
 		String content = "";
+		JSONObject file_list = (JSONObject) details_json.get(version);
+		
 		Set<String> allComponent = clusterList.keySet();
 		Set<String> unusedComponent = new HashSet<>(); 
 		Set<String> unusedInterface = new HashSet<>(); 
@@ -448,16 +491,16 @@ public class DependencyFinderProcessing {
 		content += "\nUnused interface: \n";
 		content += "componentName, className\n";
 		Iterator<String> it = allComponent.iterator();
-		while (it.hasNext()){
+		while (it.hasNext()) {
 			String componentName = it.next();
 			List<String> classList = clusterList.get(componentName);
 			for(String className: classList) {
-				if (!className.startsWith("org.apache.logging.log4j"))
+				if (!className.startsWith(packageName))
 					break;
 				boolean classhasSmell = true;
 				List<String> methods = methodList.get(className);
 				if (methods != null) {
-					for(String methodName : methods) {
+					for(String methodName: methods) {
 						List<String> inboundMethod = inboundDependencies.get(methodName);
 						if (inboundMethod != null && !inboundMethod.isEmpty()){
 							classhasSmell = false;
@@ -467,9 +510,10 @@ public class DependencyFinderProcessing {
 					
 					if (classhasSmell) {
 						List<String> inboundClass	= inboundClasses.get(className);
-						if (inboundClass == null || inboundClass.isEmpty()) {
+						if (inboundClass == null || inboundClass.isEmpty()){
 							logger.info(componentName + "," + className + ",,");
 							content +=componentName + "," + className + ",,\n";
+
 							unusedComponent.add(componentName);
 							unusedInterface.add(className);
 						}
@@ -488,13 +532,13 @@ public class DependencyFinderProcessing {
 			boolean unsedCom = true;
 			boolean containPackageNameClass = false;
 			for (String className : classList) {
-				if (!className.startsWith("org.apache.logging.log4j"))
+				if (!className.startsWith(packageName))
 					continue;
 				containPackageNameClass = true;
 				if (!unusedInterface.contains(className))
 					unsedCom = false;
 			}
-			if (unsedCom && containPackageNameClass) {
+			if (unsedCom && containPackageNameClass){
 				logger.info(com);	
 				content += com + "\n";
 				unsedCompSmell.add(com);
@@ -504,85 +548,28 @@ public class DependencyFinderProcessing {
 		summary += unusedInterface.size() +  "," + unsedCompSmell.size() + ",";
 		details += content + "\n";
 		
-	}
-	
-	public void DetectUnusedComponent() {
-		// Read all component
-		// If there all methods in all class without inbound from outside of the components
-		// Indicated that component has block
-		Set<String> allComponent = clusterList.keySet();
-		logger.info("componentName, className , methodName");
-		Iterator<String> it = allComponent.iterator();
-		while (it.hasNext()) {
-			boolean hasSmell = true;
-			String componentName = it.next();
-			List<String> classList = clusterList.get(componentName);
-			outterloop:
-			for(String className : classList){
-				List<String> methods = methodList.get(className);
-				if (methods != null) {
-					for (String methodName: methods) {
-						// extract class contains the method
-						String tmp = methodName.split(Pattern.quote("("))[0];
-						String[] tmpA = tmp.split(Pattern.quote("."));
-						String containClass = "";
-						for (int i = 0; i <= tmpA.length-3; i++)
-							containClass += tmpA[i] +".";
-						containClass += tmpA[tmpA.length-2];
-						// if this class doesn't belong to this component, then this is not unused component
-						if (!classList.contains(containClass)){
-							hasSmell 	= false;
-							break outterloop;
-						}
-					}
-				}
-			}
-			if (hasSmell) {
-				//print them out
-				logger.info(componentName + ",,,");
+		//add all unused interface to json
+		for (String classname:unusedInterface) {
+			JSONObject temp = (JSONObject) file_list.get(classname);
+			if(temp == null)
+				temp = new JSONObject();
+			temp.put("Unused_Interface", 1);
+			file_list.put(FileUtil.cutInnterClass(classname), temp);
+		}
+		// add all unused component to json
+		for (String unused : unsedCompSmell) {
+			List<String> classList = clusterList.get(unused);
+			for (String classname : classList) {
+				JSONObject temp = (JSONObject) file_list.get(classname);
+				if(temp == null)
+					temp = new JSONObject();
+				temp.put("Unused_Comp", 1);
+				file_list.put(FileUtil.cutInnterClass(classname), temp);
 			}
 		}
 	}
 	
-	public void DetectAmbiguousInterface() {
-		// Read all component
-		// If there is only one interface within a components are using by other component, indicated as Ambiguous Interface
-		// Indicated that component has block
-		Set<String> allComponent = clusterList.keySet();
-		logger.info("componentName, className , methodName");
-		Iterator<String> it = allComponent.iterator();
-		while (it.hasNext()) {
-			String componentName = it.next();
-			List<String> classList = clusterList.get(componentName);
-			int outsideCaller = 0;
-			for(String className : classList) {
-				List<String> methods = methodList.get(className);
-				if (methods != null) {
-					for(String methodName : methods) {
-						// count number of method using by outside 
-						// extract class contains the method
-						String tmp = methodName.split(Pattern.quote("("))[0];
-						String[] tmpA = tmp.split(Pattern.quote("."));
-						String containClass = "";
-						for (int i = 0; i <= tmpA.length-3; i++)
-							containClass += tmpA[i] +".";
-						containClass += tmpA[tmpA.length-2];
-						
-						// if this class doesn't belong to this component, then this is not unused component
-						if (!classList.contains(containClass))
-							outsideCaller++;
-					}
-				}
-			}
-			if (outsideCaller == 1) {
-				//print them out
-				logger.info(componentName + ",,,");
-			}
-		}
-		
-	}
-	
-	public void DetectSloppyDelegation(String version) {
+	public void DetectSloppyDelegation(String version, String packageName) {
 		// Read all the methods / features
 		// If it only have inbound from other components
 		// And have no outbound from itself
@@ -596,7 +583,7 @@ public class DependencyFinderProcessing {
 		while (it.hasNext()) {
 			String featureName = it.next();
 			className = getClassName(featureName);
-			if (className.startsWith("org.apache.logging.log4j") ){
+			if (className.startsWith(packageName)) {
 				boolean hasSmell = true;
 				String currentComponent = class2component.get(className);
 				List<String> inbounds = inboundDependencies.get(featureName);
@@ -605,15 +592,14 @@ public class DependencyFinderProcessing {
 				if (outbounds.isEmpty()) {
 					for (String in : inbounds) {
 						String compName = class2component.get(getClassName(in));
-						// TODO doubble check why it can be null ???
+						// TODO double check why it can be null ???
 						if (currentComponent!= null && currentComponent.equals(compName)) {
 							hasSmell = false;
 							break;
 						}
 					}
-				}
-				else
-					hasSmell	= false;
+				} else
+					hasSmell = false;
 				
 				if (hasSmell) {
 					Set<String> classes = componentHasSmell.get(currentComponent);
@@ -626,15 +612,26 @@ public class DependencyFinderProcessing {
 		}
 		System.out.println(version);
 		for (String s : componentHasSmell.keySet()) {
-			if (s == null)
-				continue;
-			details += s + ","+ componentHasSmell.get(s).size() + "," + clusterList.get(s).size() + "," + (float) componentHasSmell.get(s).size() * 100 / clusterList.get(s).size() + "\n";
+			if (s == null) continue;
+			details += s + ","+ componentHasSmell.get(s).size() + "," + clusterList.get(s).size() + "," + (float) componentHasSmell.get(s).size()*100/clusterList.get(s).size() + "\n";
 		}
 		
-		summary += componentHasSmell.keySet().size() +",";
+		// add all sloopy delegation to json, only consider class, not whole component
+		JSONObject file_list = (JSONObject) details_json.get(version);
+		for (String s : componentHasSmell.keySet()) {
+				for (String classname : componentHasSmell.get(s)) {
+					JSONObject temp = (JSONObject) file_list.get(classname);
+					if(temp == null)
+						temp = new JSONObject();
+					temp.put("Sloopy_Delegation", 1);
+					file_list.put(FileUtil.cutInnterClass(classname), temp);
+				}
+		}
+		
+		summary += componentHasSmell.keySet().size() + ",";
 	}
 	
-	public void DetectLegoSyndomeAndFunctionalityOverload() {
+	public void DetectLegoSyndomeAndFunctionalityOverload(String version, String packageName) {
 		// Read all component
 		// Count number of public methods per components
 		// Compute average
@@ -650,73 +647,62 @@ public class DependencyFinderProcessing {
 			String componentName = it.next();
 			List<String> classList = clusterList.get(componentName);
 			int numOpt = 0;
-			for(String className : classList){
+			for(String className : classList) {
 				List<String> methods = methodList.get(className);
-				if (className.startsWith("org.apache.logging.log4j") && methods != null)
+				if (className.startsWith(packageName) && methods != null)
 					numOpt++;
 			}
 			counter.put(componentName, numOpt);
 			optStat[i] = numOpt;
 			i++;
 		}
+		
+		JSONObject file_list = (JSONObject) details_json.get(version);
+		
 		System.out.println("Operations stats:");
 		DescriptiveStatistics OperationStats = new DescriptiveStatistics(optStat);
 		System.out.println(OperationStats);
 		for (String com : counter.keySet()) {
 			boolean hasSmell = false;
 			String smellType = "";
-			// Using mean
-			double iqr = OperationStats.getPercentile(75) - OperationStats.getPercentile(25);
-			double upperBound = OperationStats.getPercentile(75) + 1.5*iqr;
-			double lowerBound = OperationStats.getPercentile(25) - 1.5*iqr;
-			if (counter.get(com) > upperBound) {
+			if (counter.get(com) > OperationStats.getMean() + 1.5 * OperationStats.getStandardDeviation()) {
 				hasSmell = true;
 				smellType = "Overload";
 				over ++;
 			}
-			if (counter.get(com) < lowerBound) {
+			if (counter.get(com) < OperationStats.getMean() - 0.75 * OperationStats.getStandardDeviation()) {
 				hasSmell = true;
 				smellType = "Lego";
 				lego ++;
 			}
 			if (hasSmell) {
-				logger.info(com + ", "+ counter.get(com) +"," + smellType);
-				details += com + ", "+ counter.get(com) +"," + smellType + "\n";
+				logger.info(com + ", " + counter.get(com) + "," + smellType);
+				details += com + ", " + counter.get(com) + "," + smellType + "\n";
+				
+				// add all lego & overload to json, only consider class, not whole component
+				for (String classname : clusterList.get(com)) {
+					JSONObject temp = (JSONObject) file_list.get(classname);
+					if(temp == null)
+						temp = new JSONObject();
+					temp.put(smellType, 1);
+					file_list.put(FileUtil.cutInnterClass(classname), temp);
+				}
 			}
 		}
 		
-		summary += lego +"," + over +",";
-}
+		summary += lego + "," + over + ",";
+	}
 	
-	public void detectComponentClone() {
+	public void detectComponentClonebyClassLevel(String version) {
 		Set<Integer> allduplication = codeClone.keySet();
 		Iterator<Integer> it = allduplication.iterator();
 		logger.info("componentName, other components , smells?");
-		while (it.hasNext()) {
-			Set<String> classList = codeClone.get(it.next());
-			Set<String> componentList = new HashSet<>();
-			if (classList.size() > 1) {
-				for (String c : classList){
-					String com = class2component.get(c);
-					if (com != null)
-						componentList.add(com);
-				}
-				if (componentList.size() >1)
-					logger.info(componentList.toString());
-			}
-		}
-	}
-	
-	public void detectComponentClonebyClassLevel(){
-		Set<Integer> allduplication = codeClone.keySet();
-		Iterator<Integer> it = allduplication.iterator();
-		logger.info("componentName, other components, smells?");
 		int total = 0;
 		Map<String, List<String>> effectedClass = new HashMap<>();
 		while (it.hasNext()) {
 			Set<String> classList = codeClone.get(it.next());
 			Set<String> componentList = new HashSet<>();
-			if (classList.size() >1) {
+			if (classList.size() > 1) {
 				for (String c : classList) {
 					String com = class2component.get(c);
 					if (com != null) {
@@ -730,7 +716,7 @@ public class DependencyFinderProcessing {
 						effectedClass.put(com, effected);
 					}
 				}
-				if (componentList.size() >1)
+				if (componentList.size() > 1)
 					logger.info(componentList.toString());
 			}
 		}
@@ -740,24 +726,34 @@ public class DependencyFinderProcessing {
 		for (String com : effectedClass.keySet()) {
 			List<String> effected = effectedClass.get(com);
 			List<String> allClass = clusterList.get(com);
-			float effect = (effected.size()*100.0f)/allClass.size();
-			logger.info(com + ", " + allClass.size() + ", "+ effected.size() + ", " + effect);
+			float effect = (effected.size() * 100.0f) / allClass.size();
+			logger.info(com + ", " + allClass.size() + ", " + effected.size() + ", " + effect);
 			// 10% of class has code clone
 			if (effect > 10) {
-				details += com +", "+ effected.size() + ", " + allClass.size()  + ", " + effect +"\n";
+				details += com + ", " + effected.size() + ", " + allClass.size()  + ", " + effect + "\n";
 				total ++;
+				
+				JSONObject file_list = (JSONObject) details_json.get(version);
+				// add all lego & overload to json, only consider class, not whole component
+				for (String classname : clusterList.get(com)){
+					JSONObject temp = (JSONObject) file_list.get(classname);
+					if(temp == null)
+						temp = new JSONObject();
+					temp.put("Clone_Comp", 1);
+					file_list.put(FileUtil.cutInnterClass(classname), temp);
+				}
 			}
 		}
 		summary += total + ",";
 	}
 	
 	private String getClassName(String featureName) {
-		String className ="";
+		String className = "";
 		if(featureName.contains("(")) {
 			String tmp = featureName.split(Pattern.quote("("))[0];
 			String[] tmpA = tmp.split(Pattern.quote("."));
 			for (int i = 0; i <= tmpA.length-3; i++)
-				className += tmpA[i] +".";
+				className += tmpA[i] + ".";
 			className += tmpA[tmpA.length-2];
 		}
 		else
@@ -767,14 +763,21 @@ public class DependencyFinderProcessing {
 	
 	private static void writeToFile(String content,String path) throws IOException {
 		File file = new File(path);
-
+		File json_file = new File(path+".json");
 		// if file doesnt exists, then create it
 		if (!file.exists())
 			file.createNewFile();
-
 		FileWriter fw = new FileWriter(file.getAbsoluteFile());
 		BufferedWriter bw = new BufferedWriter(fw);
 		bw.write(content);
+		bw.close();
+		
+		// if file doesnt exists, then create it
+		if (!json_file.exists())
+			json_file.createNewFile();
+		fw = new FileWriter(json_file.getAbsolutePath());
+		bw = new BufferedWriter(fw);
+		bw.write(details_json.toJSONString());
 		bw.close();
 
 		System.out.println("Done");

@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.antipattern.detection;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -15,7 +14,7 @@ import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
-import edu.usc.softarch.arcade.facts.ConcernCluster;
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -59,10 +58,13 @@ public class SmellDensityAnalyzer {
 			versionSmells.put(version, smells);
 		}
 		
-		Map<String,Set<ConcernCluster>> versionClusters = new LinkedHashMap<>();
+		Map<String, ConcernClusterArchitecture> versionClusters =
+			new LinkedHashMap<>();
 		List<File> clustersFileList = FileListing.getFileListing(new File(clustersDirName));
 		for (File file : clustersFileList) {
-			Set<ConcernCluster> clusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(file.getAbsolutePath());
+			ConcernClusterArchitecture clusters =
+				ConcernClusterRsf.extractConcernClustersFromRsfFile(
+					file.getAbsolutePath());
 			
 			String version = FileUtil.extractVersionFromFilename(versionSchemeExpr,file.getName());
 			assert !version.equals("") : "Could not extract version";
@@ -78,15 +80,14 @@ public class SmellDensityAnalyzer {
 		for (String version : versionClusters.keySet()) {
 			SmellCollection smells = versionSmells.get(version);
 			
-			Set<ConcernCluster> allSmellyClusters = new HashSet<>();
-			for (Smell smell : smells) {
+			ConcernClusterArchitecture allSmellyClusters =
+				new ConcernClusterArchitecture();
+			for (Smell smell : smells)
 				allSmellyClusters.addAll(smell.getClusters());
-			}
 			
-			Set<ConcernCluster> clusters = versionClusters.get(version);
+			ConcernClusterArchitecture clusters = versionClusters.get(version);
 			double smellDensity = (double)smells.size()/(double)clusters.size();
 			smellDensityArr[idx] = smellDensity;
-			
 			
 			double affectedClustersRatio = (double)allSmellyClusters.size()/(double)clusters.size();
 			clustersRatioArr[idx] = affectedClustersRatio;

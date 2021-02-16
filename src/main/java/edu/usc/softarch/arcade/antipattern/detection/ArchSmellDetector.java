@@ -25,6 +25,7 @@ import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.clustering.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
@@ -100,7 +101,7 @@ public class ArchSmellDetector {
 
 		// Initialize variables
 		SmellCollection detectedSmells = new SmellCollection();
-		Set<ConcernCluster> clusters = loadClusters();
+		ConcernClusterArchitecture clusters = loadClusters();
 		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
 
 		// Execute detection algorithms
@@ -132,7 +133,7 @@ public class ArchSmellDetector {
 		return detectedSmells;
 	}
 
-	public void runConcernDetectionAlgs(Set<ConcernCluster> clusters,
+	public void runConcernDetectionAlgs(ConcernClusterArchitecture clusters,
 			SmellCollection detectedSmells, Map<String,Set<String>> clusterSmellMap) {
 		if (this.tmeMethod == TopicModelExtractionMethod.MALLET_API)
 			buildConcernClustersFromMalletAPI(clusters);
@@ -154,13 +155,12 @@ public class ArchSmellDetector {
 		detectSpfNew(clusters, clusterSmellMap, detectedSmells);
 	}
 
-	public void runStructuralDetectionAlgs(Set<ConcernCluster> clusters,
+	public void runStructuralDetectionAlgs(ConcernClusterArchitecture clusters,
 			SmellCollection detectedSmells, Map<String,Set<String>> clusterSmellMap) {
 		Map<String, Set<String>> depMap = 
 		ClusterUtil.buildDependenciesMap(this.depsRsfFilename);
 	
-		StringGraph clusterGraph = 
-			ClusterUtil.buildClusterGraphUsingDepMap(depMap,clusters);
+		StringGraph clusterGraph = clusters.buildClusterGraphUsingDepMap(depMap);
 		System.out.print("");
 		
 		SimpleDirectedGraph<String, DefaultEdge> directedGraph = 
@@ -173,7 +173,7 @@ public class ArchSmellDetector {
 	@Deprecated
 	public void runAllDetectionAlgs() throws IOException {
 		SmellCollection detectedSmells = new SmellCollection();
-		Set<ConcernCluster> clusters = loadClusters();
+		ConcernClusterArchitecture clusters = loadClusters();
 		
 		if (this.tmeMethod == TopicModelExtractionMethod.MALLET_API)
 			buildConcernClustersFromMalletAPI(clusters);
@@ -199,8 +199,7 @@ public class ArchSmellDetector {
 		Map<String, Set<String>> depMap = 
 			ClusterUtil.buildDependenciesMap(this.depsRsfFilename);
 		
-		StringGraph clusterGraph = 
-			ClusterUtil.buildClusterGraphUsingDepMap(depMap,clusters);
+		StringGraph clusterGraph = clusters.buildClusterGraphUsingDepMap(depMap);
 		System.out.print("");
 		
 		SimpleDirectedGraph<String, DefaultEdge> directedGraph = 
@@ -230,14 +229,13 @@ public class ArchSmellDetector {
 	@Deprecated
 	public void runStructuralDetectionAlgs() throws IOException {
 		SmellCollection detectedSmells = new SmellCollection();
-		Set<ConcernCluster> clusters = loadClusters();
+		ConcernClusterArchitecture clusters = loadClusters();
 		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
 		
 		Map<String, Set<String>> depMap =
 			ClusterUtil.buildDependenciesMap(this.depsRsfFilename);
 		
-		StringGraph clusterGraph =
-			ClusterUtil.buildClusterGraphUsingDepMap(depMap, clusters);
+		StringGraph clusterGraph = clusters.buildClusterGraphUsingDepMap(depMap);
 		System.out.print("");
 		
 		SimpleDirectedGraph<String, DefaultEdge> directedGraph =
@@ -269,9 +267,9 @@ public class ArchSmellDetector {
 	/**
 	 * Loads clusters from the RSF file pointed to by this.clustersRsfFilename.
 	 */
-	private Set<ConcernCluster> loadClusters() {
+	private ConcernClusterArchitecture loadClusters() {
 		System.out.println("Reading in clusters file: " + this.clustersRsfFilename);
-		Set<ConcernCluster> clusters = ConcernClusterRsf.
+		ConcernClusterArchitecture clusters = ConcernClusterRsf.
 			extractConcernClustersFromRsfFile(this.clustersRsfFilename);
 		logger.debug("Found and built clusters:");
 		for (ConcernCluster cluster : clusters)
@@ -281,7 +279,7 @@ public class ArchSmellDetector {
 	}
 
 	private void buildConcernClustersFromConfigTopicsFile(
-			Set<ConcernCluster> clusters) {
+			ConcernClusterArchitecture clusters) {
 		for (ConcernCluster cluster : clusters) {
 			logger.debug("Building doctopics for " + cluster.getName());
 			for (String entity : cluster.getEntities()) {
@@ -323,7 +321,7 @@ public class ArchSmellDetector {
 	}
 
 	private void buildConcernClustersFromMalletAPI(
-			Set<ConcernCluster> clusters) {
+			ConcernClusterArchitecture clusters) {
 		for (ConcernCluster cluster : clusters) {
 			logger.debug("Building doctopics for " + cluster.getName());
 			for (String entity : cluster.getEntities()) {
@@ -384,7 +382,8 @@ public class ArchSmellDetector {
 
 	// #region DETECTION ALGORITHMS ----------------------------------------------
 	protected void detectBuo(SmellCollection detectedSmells,
-			Set<ConcernCluster> clusters,	Map<String, Set<String>> clusterSmellMap,
+			ConcernClusterArchitecture clusters, 
+			Map<String, Set<String>> clusterSmellMap,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
 		Set<String> vertices = directedGraph.vertexSet();
         
@@ -461,7 +460,8 @@ public class ArchSmellDetector {
 	}
 
 	protected void detectBdc(SmellCollection detectedSmells,
-			Set<ConcernCluster> clusters,	Map<String, Set<String>> clusterSmellMap,
+			ConcernClusterArchitecture clusters,
+			Map<String, Set<String>> clusterSmellMap,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
 		System.out.println("Finding cycles...");
 		CycleDetector<String, DefaultEdge> cycleDetector =
@@ -507,7 +507,7 @@ public class ArchSmellDetector {
 	}
 
 	protected StandardDeviation detectBco(SmellCollection detectedSmells,
-			Set<ConcernCluster> clusters,
+			ConcernClusterArchitecture clusters,
 			Map<String, Set<String>> clusterSmellMap) {
 		System.out.println("Finding brick concern overload instances...");
 		double concernOverloadTopicThreshold = .10;
@@ -557,14 +557,14 @@ public class ArchSmellDetector {
 	}
 
 	private void addDetectedBuoSmell(SmellCollection detectedSmells,
-			Set<ConcernCluster> clusters, String vertex) {
+			ConcernClusterArchitecture clusters, String vertex) {
 		Smell buo = new Smell(Smell.SmellType.buo);
 		buo.addCluster(getMatchingCluster(vertex,clusters));
 		detectedSmells.add(buo);
 	}
 	
 	private ConcernCluster getMatchingCluster(String clusterName,
-			Set<ConcernCluster> clusters) {
+			ConcernClusterArchitecture clusters) {
 		for (ConcernCluster cluster : clusters)
 			if (cluster.getName().equals(clusterName))
 				return cluster;
@@ -597,14 +597,14 @@ public class ArchSmellDetector {
 	 * @param detectedSmells Set of detected smells. Altered.
 	 */
 	protected void detectSpfNew(
-			Set<ConcernCluster> clusters,
+			ConcernClusterArchitecture clusters,
 			Map<String, Set<String>> clusterSmellsMap,
 			SmellCollection detectedSmells) {
 		logger.info("Finding scattered parasitic functionality instances...");
 
 		// Setting thresholds for detection algorithm
 		Map<Integer, Integer> topicNumCountMap = new HashMap<>();
-		Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap 
+		Map<Integer, ConcernClusterArchitecture> scatteredTopicToClustersMap 
 			= new HashMap<>();
 		
 		mapTopicItemsToCluster(
@@ -621,13 +621,14 @@ public class ArchSmellDetector {
 			topicNumCountMap.get(topicNum) <= significanceThreshold);
 
 		for (int topicNum : significantTopicNums) {
-			Set<ConcernCluster> clustersWithScatteredTopics = 
+			ConcernClusterArchitecture clustersWithScatteredTopics = 
 				scatteredTopicToClustersMap.get(topicNum);
-			Set<ConcernCluster> affectedClusters = new HashSet<>();
+			ConcernClusterArchitecture affectedClusters =
+				new ConcernClusterArchitecture();
 
 			// Filter out all clusters that don't have topics
-			Set<ConcernCluster> validScatteredClusters = 
-				new HashSet<>(clustersWithScatteredTopics);
+			ConcernClusterArchitecture validScatteredClusters = 
+				new ConcernClusterArchitecture(clustersWithScatteredTopics);
 			validScatteredClusters.removeIf((ConcernCluster cluster) -> 
 				cluster.getDocTopicItem() == null);
 
@@ -663,11 +664,12 @@ public class ArchSmellDetector {
 	 * @param scatteredTopicToClustersMap Mapping of topics to clusters.
 	 */
 	private void mapTopicItemsToCluster(
-			Set<ConcernCluster> inputClusters,
+			ConcernClusterArchitecture inputClusters,
 			Map<Integer, Integer> topicNumCountMap,
-			Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap) {
+			Map<Integer, ConcernClusterArchitecture> scatteredTopicToClustersMap) {
 		// Filter out all clusters that don't have topics
-		Set<ConcernCluster> validClusters = new HashSet<>(inputClusters);
+		ConcernClusterArchitecture validClusters =
+			new ConcernClusterArchitecture(inputClusters);
 		validClusters.removeIf((ConcernCluster cluster) -> 
 			cluster.getDocTopicItem() == null);
 		
@@ -683,7 +685,8 @@ public class ArchSmellDetector {
 				topicNumCountMap.compute(ti.getTopicNum(), (k, v) ->	(v == null) ? 1 : v++);
 				
 				// map cluster to the related topicItem
-				scatteredTopicToClustersMap.putIfAbsent(ti.getTopicNum(), new HashSet<>());
+				scatteredTopicToClustersMap.putIfAbsent(
+					ti.getTopicNum(), new ConcernClusterArchitecture());
 				scatteredTopicToClustersMap.get(ti.getTopicNum()).add(cluster);
 			}
 		}
@@ -701,7 +704,7 @@ public class ArchSmellDetector {
 	 */
 	private double computeSPFSignificanceThreshold(
 			double[] topicCounts, Map<Integer, Integer> topicNumCountMap,
-			Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap){
+			Map<Integer, ConcernClusterArchitecture> scatteredTopicToClustersMap){
 		double topicCountMean = 0;
 		double topicCountStdDev = 0;
 		int topicNumCounter = 0;
@@ -723,7 +726,7 @@ public class ArchSmellDetector {
 			logger.debug(entry.getKey() + " : " + entry.getValue() );
 
 		logger.debug("topic num : clusters with topic");
-		for (Map.Entry<Integer, Set<ConcernCluster>> entry 
+		for (Map.Entry<Integer, ConcernClusterArchitecture> entry 
 				: scatteredTopicToClustersMap.entrySet())
 			logger.debug(entry.getKey() + " : " + entry.getValue() );
 

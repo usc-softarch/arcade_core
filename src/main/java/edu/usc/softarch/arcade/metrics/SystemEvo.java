@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 
@@ -41,8 +42,8 @@ public class SystemEvo {
 		String sourceRsf = options.parameters.get(0);
 		String targetRsf = options.parameters.get(1);
 		
-		Set<ConcernCluster> sourceClusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(sourceRsf);
-		Set<ConcernCluster> targetClusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(targetRsf);
+		ConcernClusterArchitecture sourceClusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(sourceRsf);
+		ConcernClusterArchitecture targetClusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(targetRsf);
 		
 		logger.debug("Source clusters: ");
 		logger.debug(clustersToString(sourceClusters));
@@ -155,7 +156,7 @@ public class SystemEvo {
 				return result;
 			}).collect(Collectors.toList())));
 		
-		Set<ConcernCluster> removedSourceClusters = new HashSet<> () ;
+		ConcernClusterArchitecture removedSourceClusters = new ConcernClusterArchitecture() ;
 		
 		//Pooyan! unmatched clusters must be removed
 		for (ConcernCluster source:sourceClusters){
@@ -180,7 +181,7 @@ public class SystemEvo {
 		}
 		
 		// The clusters that remain after removal of clusters 
-		Set<ConcernCluster> remainingSourceClusters = new HashSet<>(sourceClusters);
+		ConcernClusterArchitecture remainingSourceClusters = new ConcernClusterArchitecture(sourceClusters);
 		remainingSourceClusters.removeAll(removedSourceClusters);
 		
 		// for each cluster, the map gives the set of entities that may be moved (not including added or
@@ -263,7 +264,7 @@ public class SystemEvo {
 			
 	}
 
-	private static String clustersToString(Set<ConcernCluster> sourceClusters) {
+	private static String clustersToString(ConcernClusterArchitecture sourceClusters) {
 		String output = "";
 		for (ConcernCluster cluster : sourceClusters) {
 			output += cluster.getName() +  ": ";
@@ -276,7 +277,7 @@ public class SystemEvo {
 	}
 
 	private static Set<String> getAllEntitiesInClusters(
-			Set<ConcernCluster> clusters) {
+			ConcernClusterArchitecture clusters) {
 		Set<String> entities = new HashSet<>();
 		for (ConcernCluster cluster : clusters) {
 			entities.addAll( cluster.getEntities() );

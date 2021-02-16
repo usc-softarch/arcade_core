@@ -15,6 +15,7 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.clustering.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
@@ -40,7 +41,8 @@ public class DecayMetricAnalyzer {
 		System.out.println(readingClustersFile);
 		logger.info(readingClustersFile);
 		
-		Set<ConcernCluster> clusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(clustersFilename);
+		ConcernClusterArchitecture clusters = 
+			ConcernClusterRsf.extractConcernClustersFromRsfFile(clustersFilename);
 
 		logger.debug("Found and built clusters:");
 		for (ConcernCluster cluster : clusters) {
@@ -52,7 +54,7 @@ public class DecayMetricAnalyzer {
 		logger.info(readingDepsFile);
 		Map<String, Set<String>> depMap = ClusterUtil.buildDependenciesMap(depsRsfFilename);
 		
-		StringGraph clusterGraph = ClusterUtil.buildClusterGraphUsingDepMap(depMap,clusters);
+		StringGraph clusterGraph = clusters.buildClusterGraphUsingDepMap(depMap);
 		
 		SimpleDirectedGraph<String, DefaultEdge> directedGraph = ClusterUtil.buildConcernClustersDiGraph(
 				clusters, clusterGraph);
@@ -83,7 +85,7 @@ public class DecayMetricAnalyzer {
 		for (ConcernCluster cluster : clusters) {
 			Set<MutablePair<String,String>> internalEdges = internalEdgeMap.get(cluster.getName());
 			Set<MutablePair<String,String>> externalEdges = externalEdgeMap.get(cluster.getName());
-			if (internalEdges.size() == 0)
+			if (internalEdges.isEmpty())
 				clusterFactors.put(cluster.getName(),Double.valueOf(0));
 			else {
 				double cf = (double)(2*internalEdges.size())/(2*internalEdges.size()+externalEdges.size()); 

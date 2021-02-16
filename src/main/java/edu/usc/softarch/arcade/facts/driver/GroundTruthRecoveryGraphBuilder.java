@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
 import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.clustering.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
 import edu.usc.softarch.extractors.cda.odem.Type;
@@ -58,23 +59,23 @@ public class GroundTruthRecoveryGraphBuilder {
 			GroundTruthFileParser.parseRsf(groundTruthFilePath);
 		else
 			GroundTruthFileParser.parseHadoopStyle(groundTruthFilePath);
-		Set<ConcernCluster> nonPkgBasedClusters = GroundTruthFileParser.getClusters();
+		ConcernClusterArchitecture nonPkgBasedClusters = GroundTruthFileParser.getClusters();
 		
 		StringGraph nonPkgBasedClusterGraph =
-			ClusterUtil.buildClusterGraphUsingOdemClasses(typeMap, nonPkgBasedClusters);
+			nonPkgBasedClusters.buildClusterGraphUsingOdemClasses(typeMap);
 		logger.debug("Printing cluster graph of hdfs and mapred...");
 		logger.debug(nonPkgBasedClusterGraph);
 	
 		Set<String> allClasses = new HashSet<>();
 		for (Type type : allTypes)
 			allClasses.add(type.getName().trim());
-		Set<String> nodesInClusterGraph =
-			ClusterUtil.getNodesInClusterGraph(nonPkgBasedClusterGraph);
+		Set<String> nodesInClusterGraph = 
+			nonPkgBasedClusterGraph.getNodesInClusterGraph();
 		logger.debug("Number of nodes in cluster graph: "
 			+ nodesInClusterGraph.size());
 		
-		Set<String> classesInClusterGraph =
-			ClusterUtil.getClassesInClusters(nonPkgBasedClusters);
+		Set<String> classesInClusterGraph = 
+			nonPkgBasedClusters.getClassesInClusters();
 		logger.debug("Number of classes in all clusters: "
 			+ classesInClusterGraph.size());
 		
@@ -117,14 +118,15 @@ public class GroundTruthRecoveryGraphBuilder {
 			pkgCount++;
 		}
 		
-		Set<ConcernCluster> pkgBasedClusters = ClusterUtil.buildGroundTruthClustersFromPackages(topLevelPackagesOfUnclusteredClasses,unClusteredClasses);
-		StringGraph pkgBasedClusterGraph = ClusterUtil.buildClusterGraphUsingOdemClasses(typeMap, pkgBasedClusters);
+		ConcernClusterArchitecture pkgBasedClusters = ClusterUtil.buildGroundTruthClustersFromPackages(topLevelPackagesOfUnclusteredClasses,unClusteredClasses);
+		StringGraph pkgBasedClusterGraph = pkgBasedClusters.buildClusterGraphUsingOdemClasses(typeMap);
 		
-		Set<ConcernCluster> allClusters = new HashSet<>(nonPkgBasedClusters);
+		ConcernClusterArchitecture allClusters = 
+			new ConcernClusterArchitecture(nonPkgBasedClusters);
 		allClusters.addAll(pkgBasedClusters);
 		
 		StringGraph fullClusterGraph =
-			ClusterUtil.buildClusterGraphUsingOdemClasses(typeMap, allClusters);
+			allClusters.buildClusterGraphUsingOdemClasses(typeMap);
 		
 		Set<String> twoWayClusters = new HashSet<>();
 		logger.debug("Clusters that would be merged together...");
@@ -147,7 +149,7 @@ public class GroundTruthRecoveryGraphBuilder {
 			clusterCount++;
 		}
 		
-		Set<StringGraph> internalGraphs = ClusterUtil.buildInternalGraphs(typeMap, allClusters);
+		Set<StringGraph> internalGraphs = allClusters.buildInternalGraphs(typeMap);
 	
 		String dotFileWritingMsg = "Writing out dot files for cluster graphs...";
 		System.out.println(dotFileWritingMsg);

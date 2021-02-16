@@ -17,9 +17,6 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
-import edu.usc.softarch.extractors.cda.odem.Dependencies;
-import edu.usc.softarch.extractors.cda.odem.DependsOn;
-import edu.usc.softarch.extractors.cda.odem.Type;
 
 /**
  * @author joshua
@@ -27,134 +24,10 @@ import edu.usc.softarch.extractors.cda.odem.Type;
 public class ClusterUtil {
 	private static Logger logger = LogManager.getLogger(ClusterUtil.class);
 
-	public static void printSimilarFeatures(FastCluster c1, FastCluster c2,
-			FastFeatureVectors fastFeatureVectors) {
-		List<String> names = fastFeatureVectors.getNamesInFeatureSet();
-
-		String c1LimitedName = c1.getName();
-		String c2LimitedName = c2.getName();
-
-		logger.debug("Features shared between " + c1LimitedName + " and " + c2LimitedName);
-
-		Set<Integer> c1Keys = c1.getNonZeroFeatureMap().keySet();
-
-		for (Integer key : c1Keys) {
-			if (c1.getNonZeroFeatureMap().get(key) != null
-					&& c2.getNonZeroFeatureMap().get(key) != null) {
-				logger.debug(names.get(key));
-			}
-		}
-
-	}
-
-	public static Set<String> getNodesInClusterGraph(StringGraph cg) {
-		Set<String> nodes = new HashSet<>();
-		for (StringEdge edge : cg.edges) {
-			nodes.add(edge.getSrcStr().trim());
-			nodes.add(edge.getTgtStr().trim());
-		}
-		return nodes;
-	}
-
-	public static Set<String> getClassesInClusters(
-			Set<ConcernCluster> clusters) {
-		Set<String> classes = new HashSet<>();
-		for (ConcernCluster cluster : clusters) {
-			for (String entity : cluster.getEntities()) {
-				classes.add(entity.trim());
-			}
-		}
-		return classes;
-	}
-	
-	public static Set<StringGraph> buildInternalGraphs(Map<String, Type> typeMap,
-			Set<ConcernCluster> clusters) {
-		Set<StringGraph> graphs = new HashSet<>();
-		for (ConcernCluster cluster : clusters) {
-			StringGraph currGraph = new StringGraph(cluster.getName().trim());
-			for (String entity : cluster.getEntities()) {
-				Type type = typeMap.get(entity.trim());
-				if (type != null) {
-					Dependencies dependencies = type.getDependencies();
-					for (DependsOn dependency : dependencies.getDependsOn()) {
-						for (String otherEntity : cluster.getEntities()) {
-							if (!entity.equals(otherEntity)) {
-								if (otherEntity.trim().equals(
-										dependency.getName().trim())) {
-									StringEdge newEdge = new StringEdge(entity.trim(), otherEntity.trim());
-									newEdge.setType(dependency.getClassification());
-									currGraph.addEdge(newEdge);
-								}
-							}
-						}
-					}
-				}
-					
-				
-			}
-			graphs.add(currGraph);
-		}
-		return graphs;
-	}
-	
-	public static StringGraph buildClusterGraphUsingDepMap(Map<String,Set<String>> depMap,
-			Set<ConcernCluster> clusters) {
-		StringGraph cg = new StringGraph();
-		for (ConcernCluster cluster : clusters) {
-			for (String entity : cluster.getEntities()) {
-				if (depMap.containsKey(entity.trim())) {
-					Set<String> dependencies = depMap.get(entity);
-					for (String dependency : dependencies) {
-						for (ConcernCluster otherCluster : clusters) {
-							for (String otherEntity : otherCluster
-									.getEntities()) {
-								if (otherEntity.trim()
-										.equals(dependency.trim())) {
-									cg.addEdge(cluster.getName().trim(),
-											otherCluster.getName().trim());
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		return cg;
-	}
-	
-	public static StringGraph buildClusterGraphUsingOdemClasses(Map<String, Type> typeMap,
-			Set<ConcernCluster> clusters) {
-		StringGraph cg = new StringGraph();
-		for (ConcernCluster cluster : clusters) {
-			for (String entity : cluster.getEntities()) {
-				Type type = typeMap.get(entity.trim());
-				if (type != null) {
-					Dependencies dependencies = type.getDependencies();
-					for (DependsOn dependency : dependencies.getDependsOn()) {
-						for (ConcernCluster otherCluster : clusters) {
-							for (String otherEntity : otherCluster.getEntities()) {
-								if (otherEntity.trim().equals(
-										dependency.getName().trim())) {
-									cg.addEdge(cluster.getName().trim(),
-											otherCluster.getName().trim());
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		
-		
-		return cg;
-	}
-
-	public static Set<ConcernCluster> buildGroundTruthClustersFromPackages(
+	public static ConcernClusterArchitecture buildGroundTruthClustersFromPackages(
 			Set<String> topLevelPackagesOfUnclusteredClasses,
 			Set<String> unClusteredClasses) {
-		Set<ConcernCluster> clusters = new HashSet<>();
+		ConcernClusterArchitecture clusters = new ConcernClusterArchitecture();
 		for (String pkg : topLevelPackagesOfUnclusteredClasses) {
 			ConcernCluster cluster = new ConcernCluster();
 			cluster.setName(pkg.trim());
@@ -307,7 +180,7 @@ public class ClusterUtil {
 	}
 	
 	public static SimpleDirectedGraph<String, DefaultEdge> buildConcernClustersDiGraph(
-			Set<ConcernCluster> clusters, String depsRsfFilename) {
+			ConcernClusterArchitecture clusters, String depsRsfFilename) {
 		SimpleDirectedGraph<String, DefaultEdge>  directedGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
 		
 		for (ConcernCluster cluster : clusters) {
@@ -329,7 +202,7 @@ public class ClusterUtil {
 	}
 	
 	public static SimpleDirectedGraph<String, DefaultEdge> buildConcernClustersDiGraph(
-			Set<ConcernCluster> clusters, StringGraph clusterGraph) {
+			ConcernClusterArchitecture clusters, StringGraph clusterGraph) {
 		SimpleDirectedGraph<String, DefaultEdge>  directedGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
 		
 		for (ConcernCluster cluster : clusters) {
@@ -348,13 +221,13 @@ public class ClusterUtil {
 	}
 
 	public static SimpleDirectedGraph<String, DefaultEdge> buildSimpleDirectedGraph(
-			String depsFilename, Set<ConcernCluster> clusters) {
+			String depsFilename, ConcernClusterArchitecture clusters) {
 		String readingDepsFile = "Reading in deps file: " + depsFilename;
 		System.out.println(readingDepsFile);
 		logger.info(readingDepsFile);
 		Map<String, Set<String>> depMap = ClusterUtil.buildDependenciesMap(depsFilename);
 		
-		StringGraph clusterGraph = ClusterUtil.buildClusterGraphUsingDepMap(depMap,clusters);
+		StringGraph clusterGraph = clusters.buildClusterGraphUsingDepMap(depMap);
 		
 		return ClusterUtil.buildConcernClustersDiGraph(clusters, clusterGraph);
 	}

@@ -1,14 +1,13 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 
 public class ConcernClusterRsf {
 	private static boolean containsClusterWithName(
-			Set<ConcernCluster> clusters, String clusterName) {
+			ConcernClusterArchitecture clusters, String clusterName) {
 		for (ConcernCluster cluster : clusters) {
 			if (cluster.getName().equals(clusterName)) {
 				return true;
@@ -17,10 +16,10 @@ public class ConcernClusterRsf {
 		return false;
 	}
 	
-	public static Set<ConcernCluster> extractConcernClustersFromRsfFile(String rsfFilename) {
+	public static ConcernClusterArchitecture extractConcernClustersFromRsfFile(String rsfFilename) {
 		RsfReader.loadRsfDataFromFile(rsfFilename);
 		Iterable<List<String>> clusterFacts = RsfReader.filteredRoutineFacts;
-		Set<ConcernCluster> clusters = new HashSet<>();
+		ConcernClusterArchitecture clusters = new ConcernClusterArchitecture();
 		for (List<String> fact : clusterFacts) {
 			String clusterName = fact.get(1).trim();
 			String element = fact.get(2).trim();

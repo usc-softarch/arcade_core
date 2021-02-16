@@ -44,6 +44,16 @@ public class StringGraph implements Serializable {
 		edges.remove(new StringEdge(src,tgt)); }
 	public String getName() {	return name; }
 	public void setName(String name) { this.name = name; }
+	public Set<StringEdge> getEdges() { return new HashSet<>(edges); }
+
+	public Set<String> getNodesInClusterGraph() {
+		Set<String> nodes = new HashSet<>();
+		for (StringEdge edge : getEdges()) {
+			nodes.add(edge.getSrcStr().trim());
+			nodes.add(edge.getTgtStr().trim());
+		}
+		return nodes;
+	}
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region PROCESSING --------------------------------------------------------

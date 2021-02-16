@@ -112,17 +112,6 @@
       <artifactId>jung-visualization</artifactId>
       <version>2.1.1</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/net.sf.jung/jung-samples -->
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-samples</artifactId>
-      <version>2.1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-collections4</artifactId>
-      <version>4.4</version>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/weka/weka -->
     <dependency>
       <groupId>weka</groupId>
@@ -135,6 +124,12 @@
       <artifactId>json-simple</artifactId>
       <version>1.1.1</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+    <!-- <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.12.1</version>
+    </dependency> -->
     <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
     <dependency>
       <groupId>org.apache.poi</groupId>
@@ -176,18 +171,6 @@
       <groupId>org.bithill</groupId>
       <artifactId>classycle</artifactId>
       <version>1.4.4</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.eclipse.tycho/org.eclipse.jdt.core -->
-    <dependency>
-      <groupId>org.eclipse.tycho</groupId>
-      <artifactId>org.eclipse.jdt.core</artifactId>
-      <version>3.9.1.v20130905-0837</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/eclipse/eclipse-runtime -->
-    <dependency>
-      <groupId>eclipse</groupId>
-      <artifactId>eclipse-runtime</artifactId>
-      <version>2.1.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.tmatesoft.svnkit/svnkit -->
     <dependency>
@@ -272,31 +255,6 @@
           </execution>
         </executions>
       </plugin>
-      <!-- <plugin>
-        <groupId>org.apache.maven.plugin</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M4</version>
-        <configuration>
-          <enableAssertions>true</enableAssertions>
-          <excludes>
-            <exclude>**/CleanUpCodeMaatWrapperTest.java</exclude>
-            <exclude>**/AcdcWrapperTest.java</exclude>
-            <exclude>**/CSourceToDepsBuilderWrapperTest.java</exclude>
-            <exclude>**/JavaSourceToDepsBuilderWrapperTest.java</exclude>
-            <exclude>**/PipeExtractorWrapperTest.java</exclude>
-            <exclude>**/BatchCloneFinderWrapperTest.java</exclude>
-            <exclude>**/InferencerTest.java</exclude>
-            <exclude>**/TopicModelGeneratorTest.java</exclude>
-            <exclude>**/BatchDecayMetricsAnalyzerWrapperTest.java</exclude>
-            <exclude>**/C2CAverageAnalyzerWrapperTest.java</exclude>
-            <exclude>**/SmellDensityAnalyzerWrapperTest.java</exclude>
-            <exclude>**/SmellEvolutionAnalyzerWrapperTest.java</exclude>
-            <exclude>**/CodemaatWrapperTest.java</exclude>
-            <exclude>**/DepFindRunnerWrapperTest.java</exclude>
-            <exclude>**/BatchSystemEvoWrapperTest.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin> -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>

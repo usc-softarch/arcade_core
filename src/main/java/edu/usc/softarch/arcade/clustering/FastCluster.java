@@ -6,10 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 
 public class FastCluster {
 	// #region ATTRIBUTES --------------------------------------------------------
+	private static Logger logger = LogManager.getLogger(FastCluster.class);
+
 	private String name;
 	private int numEntities;
 	private Map<Integer,Double> nonZeroFeatureMap = new HashMap<>();
@@ -132,6 +137,21 @@ public class FastCluster {
 
 		// centroid
 		return centroidAvg / getNumEntities();
+	}
+
+	public void printSimilarFeatures(FastCluster toCompare,
+			FastFeatureVectors fastFeatureVectors) {
+		List<String> names = fastFeatureVectors.getNamesInFeatureSet();
+
+		logger.debug("Features shared between " + this.getName() + " and "
+			+ toCompare.getName());
+
+		Set<Integer> c1Keys = this.getNonZeroFeatureMap().keySet();
+
+		for (Integer key : c1Keys)
+			if (this.getNonZeroFeatureMap().get(key) != null
+					&& toCompare.getNonZeroFeatureMap().get(key) != null)
+				logger.debug(names.get(key));
 	}
 	
 	public String toString() {

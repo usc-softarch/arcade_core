@@ -11,30 +11,29 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.util.Set;
-import java.util.HashSet;
-
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class GroundTruthFileParser {
 	private static Logger logger =
 		LogManager.getLogger(GroundTruthFileParser.class);
-	private static Set<ConcernCluster> clusters = new HashSet<>();
-	private static Map<String,ConcernCluster> clusterMap = new HashMap<>();
+	private static ConcernClusterArchitecture clusters = 
+		new ConcernClusterArchitecture();
+	private static Map<String, ConcernCluster> clusterMap = new HashMap<>();
 
-	public static Map<String,ConcernCluster> getClusterMap() {
+	public static Map<String, ConcernCluster> getClusterMap() {
 		return clusterMap;
 	}
 	
-	public static Set<ConcernCluster> getClusters() {
+	public static ConcernClusterArchitecture getClusters() {
 		return clusters;
 	}
 	
 	public static void parseBashStyle(String groundTruthFile) {
-		clusters = new HashSet<>();
+		clusters = new ConcernClusterArchitecture();
 		clusterMap = new HashMap<>();
 		try (FileInputStream fstream = new FileInputStream(groundTruthFile)) {
 			DataInputStream in = new DataInputStream(fstream);
@@ -79,7 +78,7 @@ public class GroundTruthFileParser {
 	}
 
 	public static void parseHadoopStyle(String groundTruthFile) {
-		clusters = new HashSet<>();
+		clusters = new ConcernClusterArchitecture();
 		try (FileInputStream fstream = new FileInputStream(groundTruthFile)) {
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -143,7 +142,7 @@ public class GroundTruthFileParser {
 			}
 		}
 		
-		clusters = new HashSet<>(clusterMap.values());
+		clusters = new ConcernClusterArchitecture(clusterMap.values());
 		
 		logger.debug("Printing out read in ground truth clusters...");
 		
