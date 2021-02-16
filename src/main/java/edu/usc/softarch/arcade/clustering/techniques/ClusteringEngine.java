@@ -86,7 +86,7 @@ public class ClusteringEngine {
 			Config.setNumTopics(numTopics);
 			if (Config.getCurrentClusteringAlgorithm().equals(
 					ClusteringAlgorithmType.ARC)) {
-				throw new Exception("Pooyan-> there is a null instead of outputDir/base"); 
+				throw new Exception("there is a null instead of outputDir/base"); 
 			}
 		}
 		

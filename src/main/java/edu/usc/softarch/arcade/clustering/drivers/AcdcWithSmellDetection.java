@@ -119,7 +119,7 @@ public class AcdcWithSmellDetection {
 			acdcClusteredFile, outputDir.getAbsolutePath() + fs + versionFolderName
 			+ "_acdc_smells.ser");
 
-		asd.runStructuralDetectionAlgs();
+		asd.run(true, false, true);
 	}
 
 	// #region AUXILIARY METHODS -------------------------------------------------
@@ -134,8 +134,7 @@ public class AcdcWithSmellDetection {
 	private static void loadSingleArguments(String[] args) {
 		classesDir = args[2];
 
-		if (args.length == 4)
-		{
+		if (args.length == 4) {
 			switch(args[3].toLowerCase()) {
 				case "c":
 					srcLanguage = "c";

@@ -56,7 +56,7 @@ public class JiraClientExample {
                isn't required, but it helps with readability. */
             issue.update()
                 .field(Field.SUMMARY, "tubes are clogged")
-                .field(Field.LABELS, new ArrayList() {{
+                .field(Field.LABELS, new ArrayList<>() {{
                     addAll(issue.getLabels());
                     add("foo");
                     add("bar");
@@ -105,7 +105,7 @@ public class JiraClientExample {
 
             /* Set two new values for customfield_5678. */
             issue.update()
-                .field("customfield_5678", new ArrayList() {{
+                .field("customfield_5678", new ArrayList<>() {{
                     add("foo");
                     add("bar");
                     add(Field.valueById("1234")); /* you can also update using the value ID */
@@ -150,7 +150,5 @@ public class JiraClientExample {
             if (ex.getCause() != null)
                 System.err.println(ex.getCause().getMessage());
         }
-
 	}
-
 }

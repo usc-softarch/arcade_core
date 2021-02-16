@@ -9,26 +9,9 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
-import edu.usc.softarch.arcade.config.Config;
 
 /**
  * @author joshua
@@ -36,7 +19,6 @@ import edu.usc.softarch.arcade.config.Config;
 public class StringGraph implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -4879127696671797183L;
-	private transient Logger logger = LogManager.getLogger(StringGraph.class);
 	public Set<StringEdge> edges = new HashSet<>();
 	private String name = "";
 	// #endregion FIELDS ---------------------------------------------------------

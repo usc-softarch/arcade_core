@@ -1,7 +1,6 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,11 +24,8 @@ public class BatchSmellDetectionRunner {
 		String groundTruthFilename = args[6];
 		// obtain rsf files in output directory
 		File gtRsfsDirFile = new File(gtRsfsDir);
-		File[] newGtFiles = gtRsfsDirFile.listFiles(new FileFilter() {
-			public boolean accept(File file) {
-				return file.getName().endsWith(".rsf");
-			}
-		});
+		File[] newGtFiles =
+			gtRsfsDirFile.listFiles(file -> file.getName().endsWith(".rsf"));
 
 		if (selectedLang.equals("c")) {
 			Config.setSelectedLanguage(Config.Language.c);
@@ -37,10 +33,8 @@ public class BatchSmellDetectionRunner {
 		else if (selectedLang.equals("java")) {
 			Config.setSelectedLanguage(Config.Language.java);
 		}
-		try {
-			String mojoFmMappingFilename = "mojofm_mapping.csv";
-			PrintWriter writer = new PrintWriter(techniquesDir
-					+ File.separatorChar + mojoFmMappingFilename, "UTF-8");
+		try (PrintWriter writer = new PrintWriter(techniquesDir
+				+ File.separatorChar + "mojofm_mapping.csv", "UTF-8")) {
 			for (File gtRsfFile : newGtFiles) {
 				String prefix = FileUtil.extractFilenamePrefix(gtRsfFile
 						.getName());
@@ -51,7 +45,7 @@ public class BatchSmellDetectionRunner {
 					gtRsfFile.getAbsolutePath(), detectedSmellsFilename, selectedLang,
 					TopicModelExtractionMethod.VAR_MALLET_FILE,
 					new DocTopics(docTopicsFile));
-				asd.runAllDetectionAlgs();
+				asd.run(true, true, true);
 
 				MoJoCalculator mojoCalc = new MoJoCalculator(gtRsfFile.getAbsolutePath(),
 						groundTruthFilename, null);
@@ -60,8 +54,6 @@ public class BatchSmellDetectionRunner {
 
 				writer.println(detectedSmellsFilename + "," + mojoFmValue);
 			}
-			writer.close();
-
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}

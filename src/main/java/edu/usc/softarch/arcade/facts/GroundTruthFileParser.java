@@ -17,7 +17,6 @@ import java.util.HashSet;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class GroundTruthFileParser {

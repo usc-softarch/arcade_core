@@ -33,7 +33,7 @@ public class ClusteringAlgoRunner {
 	// #endregion ATTRIBUTES -----------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public static FastClusterArchitecture getFastClusters() { return fastClusters; }
+	public FastClusterArchitecture getFastClusters() { return fastClusters; }
 
 	public static void setFastFeatureVectors(
 			FastFeatureVectors inFastFeatureVectors) {

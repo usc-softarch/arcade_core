@@ -131,6 +131,6 @@ public class BatchClusteringEngine {
 			depsRsfFile.getAbsolutePath(), arcClustersFilename,
 			detectedSmellsFilename, Config.selectedLanguage.toString(),
 			TopicModelExtractionMethod.MALLET_API, TopicUtil.docTopics);
-		asd.runAllDetectionAlgs();
+		asd.run(true, true, true);
 	}
 }
