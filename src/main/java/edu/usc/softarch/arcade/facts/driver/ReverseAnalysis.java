@@ -115,8 +115,7 @@ public class ReverseAnalysis {
 	}
 
 	private double computePkgClusterSim(String clusterName,Map<String,Map<String,Entity>> clusterNameToEntities,Map<String,Integer> pkgSizeMap) {
-		Map<String, Entity> nameToEntity = clusterNameToEntities
-				.get(clusterName);
+		Map<String, Entity> nameToEntity = clusterNameToEntities.get(clusterName);
 		Object[] entities = nameToEntity.values().toArray();
 		
 		if (entities.length == 0) {
@@ -140,9 +139,8 @@ public class ReverseAnalysis {
 			delimiter = ".";
 			regexDelimiter = "\\.";
 		}
-		else {
+		else
 			throw new RuntimeException("Invalid language selected");
-		}
 
 		Map<String, Integer> pkgCountMap = new HashMap<>();
 		for (Object obj : entities) {
@@ -151,17 +149,15 @@ public class ReverseAnalysis {
 				String[] tokens = entity.name.split(regexDelimiter);
 				String directoryName = "";
 				List<String> directoryNameParts = new ArrayList<>();
-				for (int i=0;i<tokens.length-1;i++) {
+				for (int i = 0; i < tokens.length - 1; i++)
 					directoryNameParts.add(tokens[i]);
-				}
+
 				directoryName = StringUtils.join(directoryNameParts,delimiter);
 				
-				if (pkgCountMap.containsKey(directoryName)) {
-					pkgCountMap.put(directoryName,
-							pkgCountMap.get(directoryName) + 1);
-				} else {
+				if (pkgCountMap.containsKey(directoryName))
+					pkgCountMap.put(directoryName, pkgCountMap.get(directoryName) + 1);
+				else
 					pkgCountMap.put(directoryName, 1);
-				}
 		}
 
 		int maxCount = 0;
@@ -176,18 +172,16 @@ public class ReverseAnalysis {
 				maxUpdated = true;
 			}
 		}
+
 		assert maxUpdated;
-		if (maxPkgName.endsWith(delimiter)) {
+		if (maxPkgName.endsWith(delimiter))
 			maxPkgName = maxPkgName.substring(0, maxPkgName.length()-1);
-		}
 		
 		int pkgSize = 0;
-		if (maxPkgName.equals("")) {
+		if (maxPkgName.equals(""))
 			pkgSize = pkgSizeMap.get("default.ss");
-		}
-		else {
+		else
 			pkgSize = pkgSizeMap.get(maxPkgName);
-		}
 		assert pkgSize != 0;
 
 		//samePkgToClusterSizeRatio
@@ -201,7 +195,7 @@ public class ReverseAnalysis {
 			String clusterName, Map<String,Map<String,Entity>> clusterNameToEntities,
 			Map<String,Set<MutablePair<String,String>>> internalEdgeMap,
 			Map<String,Set<MutablePair<String,String>>> externalEdgeMap) {
-		if(sm == SimilarityMeasure.BUNCH) {
+		if (sm == SimilarityMeasure.BUNCH) {
 			Set<MutablePair<String,String>> intEdges = internalEdgeMap.get(clusterName);
 			Set<MutablePair<String,String>> extEdges = externalEdgeMap.get(clusterName);
 			double countInternalEdges = intEdges.size();
@@ -228,15 +222,15 @@ public class ReverseAnalysis {
 		}
 	}
 	/**method to compute similarity between a pair of entities */
-	private double computePairWiseSimilarity(SimilarityMeasure sm, Entity entity1, Entity entity2)
-	{
+	private double computePairWiseSimilarity(SimilarityMeasure sm,
+			Entity entity1, Entity entity2) {
 		if(sm == SimilarityMeasure.LIMBO) {
 			Set<Integer> c1Indices = entity1.nonZeroFeatureMap.keySet();
 			entity1.setNonZeroFeatureMapForLibmoUsingIndices(entity1, entity2, c1Indices);
 			
 			Set<Integer> c2Indices = entity2.nonZeroFeatureMap.keySet();
 			entity2.setNonZeroFeatureMapForLibmoUsingIndices(entity1, entity2, c2Indices);
-			return(this.getInfoLossMeasure(2, entity1, entity2));
+			return getInfoLossMeasure(2, entity1, entity2);
 		}
 		
 		BitSet fv1 = entity1.featureVector;
@@ -246,7 +240,7 @@ public class ReverseAnalysis {
 		int count00 = 0;
 		int count11 = 0;
 		int sum11 = 0;
-		for (int i=0;i<fv1.size();i++) {
+		for (int i = 0; i < fv1.size(); i++) {
 			if (fv1.get(i) && !fv2.get(i)) 
 				count10++;
 			else if (!fv1.get(i) && fv2.get(i))
@@ -325,8 +319,8 @@ public class ReverseAnalysis {
 			Entity entity1,	Entity entity2) {
 		double[] firstDist = new double[bitSetSize];
 		double[] secondDist = new double[bitSetSize];	
-		normalizeFeatureVectorOfCluster(entity1, bitSetSize, firstDist);
-		normalizeFeatureVectorOfCluster(entity2, bitSetSize, secondDist);
+		entity1.normalizeFeatureVectorOfCluster(bitSetSize, firstDist);
+		entity2.normalizeFeatureVectorOfCluster(bitSetSize, secondDist);
 		
 		double jsDivergence = Maths.jensenShannonDivergence(firstDist, secondDist);
 		System.out.println("JsDivergence is " + jsDivergence);
@@ -340,17 +334,6 @@ public class ReverseAnalysis {
 		if (Double.isNaN(infoLossMeasure))
 			throw new RuntimeException("infoLossMeasure is NaN");
 		return infoLossMeasure;
-	}
-	
-	private static void normalizeFeatureVectorOfCluster(Entity entity,
-			int featuresLength, double[] firstDist) { 
-		for (int i = 0; i < featuresLength; i++) {
-			if (entity.nonZeroFeatureMap.get(i) != null) {
-				double featureValue = entity.nonZeroFeatureMap.get(i);
-				firstDist[i] = featureValue/entity.nonZeroFeatureMap.size();
-			}	else // this feature is zero
-				firstDist[i] = 0;
-		}
 	}
 	
 	//----------------------DOCTOPICITEM STUFF----------------------------------------------------//

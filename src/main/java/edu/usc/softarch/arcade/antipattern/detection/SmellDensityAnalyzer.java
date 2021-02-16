@@ -15,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
-import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.MapUtil;
@@ -63,8 +62,7 @@ public class SmellDensityAnalyzer {
 		List<File> clustersFileList = FileListing.getFileListing(new File(clustersDirName));
 		for (File file : clustersFileList) {
 			ConcernClusterArchitecture clusters =
-				ConcernClusterRsf.extractConcernClustersFromRsfFile(
-					file.getAbsolutePath());
+				ConcernClusterArchitecture.loadFromRsf(file.getAbsolutePath());
 			
 			String version = FileUtil.extractVersionFromFilename(versionSchemeExpr,file.getName());
 			assert !version.equals("") : "Could not extract version";

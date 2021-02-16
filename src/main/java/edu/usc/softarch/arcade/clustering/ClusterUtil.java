@@ -11,11 +11,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleDirectedGraph;
 
-import edu.usc.softarch.arcade.classgraphs.StringEdge;
-import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 /**
@@ -23,23 +19,6 @@ import edu.usc.softarch.arcade.facts.driver.RsfReader;
  */
 public class ClusterUtil {
 	private static Logger logger = LogManager.getLogger(ClusterUtil.class);
-
-	public static ConcernClusterArchitecture buildGroundTruthClustersFromPackages(
-			Set<String> topLevelPackagesOfUnclusteredClasses,
-			Set<String> unClusteredClasses) {
-		ConcernClusterArchitecture clusters = new ConcernClusterArchitecture();
-		for (String pkg : topLevelPackagesOfUnclusteredClasses) {
-			ConcernCluster cluster = new ConcernCluster();
-			cluster.setName(pkg.trim());
-			for (String clazz : unClusteredClasses) {
-				if (clazz.trim().startsWith(pkg.trim())) {
-					cluster.addEntity(clazz);
-				}
-			}
-			clusters.add(cluster);
-		}
-		return clusters;
-	}
 	
 	/**
 	 * Creates a map of a cluster name to its entities
@@ -177,58 +156,5 @@ public class ClusterUtil {
 			depMap.put(source, dependencies);
 		}
 		return depMap;
-	}
-	
-	public static SimpleDirectedGraph<String, DefaultEdge> buildConcernClustersDiGraph(
-			ConcernClusterArchitecture clusters, String depsRsfFilename) {
-		SimpleDirectedGraph<String, DefaultEdge>  directedGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
-		
-		for (ConcernCluster cluster : clusters) {
-			directedGraph.addVertex(cluster.getName());
-		}
-		logger.debug("No. of vertices: " + directedGraph.vertexSet().size());
-		
-		RsfReader.loadRsfDataFromFile(depsRsfFilename);
-		Iterable<List<String>> depFacts = RsfReader.filteredRoutineFacts;
-		
-		for (List<String> fact : depFacts) {
-			String source = fact.get(1).trim();
-			String target = fact.get(2).trim();
-			directedGraph.addEdge(source, target);
-        }
-		logger.debug("No. of edges: " + directedGraph.edgeSet().size());
-		
-		return directedGraph;
-	}
-	
-	public static SimpleDirectedGraph<String, DefaultEdge> buildConcernClustersDiGraph(
-			ConcernClusterArchitecture clusters, StringGraph clusterGraph) {
-		SimpleDirectedGraph<String, DefaultEdge>  directedGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
-		
-		for (ConcernCluster cluster : clusters) {
-			directedGraph.addVertex(cluster.getName());
-		}
-		logger.debug("No. of vertices: " + directedGraph.vertexSet().size());
-		
-		
-		for (StringEdge stringEdge : clusterGraph.edges) {
-        	if (!stringEdge.getSrcStr().equals(stringEdge.getTgtStr()))
-        		directedGraph.addEdge(stringEdge.getSrcStr(), stringEdge.getTgtStr());
-        }
-		logger.debug("No. of edges: " + directedGraph.edgeSet().size());
-		
-		return directedGraph;
-	}
-
-	public static SimpleDirectedGraph<String, DefaultEdge> buildSimpleDirectedGraph(
-			String depsFilename, ConcernClusterArchitecture clusters) {
-		String readingDepsFile = "Reading in deps file: " + depsFilename;
-		System.out.println(readingDepsFile);
-		logger.info(readingDepsFile);
-		Map<String, Set<String>> depMap = ClusterUtil.buildDependenciesMap(depsFilename);
-		
-		StringGraph clusterGraph = clusters.buildClusterGraphUsingDepMap(depMap);
-		
-		return ClusterUtil.buildConcernClustersDiGraph(clusters, clusterGraph);
 	}
 }

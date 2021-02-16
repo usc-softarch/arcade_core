@@ -17,7 +17,6 @@ import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
-import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -42,7 +41,7 @@ public class DecayMetricAnalyzer {
 		logger.info(readingClustersFile);
 		
 		ConcernClusterArchitecture clusters = 
-			ConcernClusterRsf.extractConcernClustersFromRsfFile(clustersFilename);
+			ConcernClusterArchitecture.loadFromRsf(clustersFilename);
 
 		logger.debug("Found and built clusters:");
 		for (ConcernCluster cluster : clusters) {
@@ -56,8 +55,8 @@ public class DecayMetricAnalyzer {
 		
 		StringGraph clusterGraph = clusters.buildClusterGraphUsingDepMap(depMap);
 		
-		SimpleDirectedGraph<String, DefaultEdge> directedGraph = ClusterUtil.buildConcernClustersDiGraph(
-				clusters, clusterGraph);
+		SimpleDirectedGraph<String, DefaultEdge> directedGraph =
+			clusters.buildConcernClustersDiGraph(clusterGraph);
 		
 		rciVal = detectRci(directedGraph);
 		

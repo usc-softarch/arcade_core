@@ -42,74 +42,40 @@ public class ReverseAnalysisOverTopics {
 			Map<String, Set<String>> clusterMap, List<List<String>> depFacts) {
 		Map<String, Map<String, Entity>> map = new HashMap<>();
 
-		for (String clusterName : clusterMap.keySet()) { // for each cluster
-															// name
-			Map<String, Entity> entityToFeatures = new HashMap<>(); // using
-																					// a
-																					// map<String,Entity>
-																					// instead
-																					// of
-																					// a
-																					// list
-																					// of
-																					// entities
-																					// so
-																					// that
-																					// getting
-																					// the
-																					// feature
-			// vector for an Entity name will be faster. Mapping name of entity
-			// to Entity object.
+
+		for (String clusterName : clusterMap.keySet()) {
+			// Mapping name of entity to Entity object.
+			Map<String, Entity> entityToFeatures = new HashMap<>();
 			for (List<String> depFact : depFacts) {
 				Entity entity;
 				String source = depFact.get(1);
 				String target = depFact.get(2);
 
-				if (clusterMap.get(clusterName).contains(source)) // if cluster
-																	// contains
-																	// entity
-				{
-					Set<String> featureSet; // featureSet contains a list of all
-											// featureNames for that entity
-
-					if (map.get(clusterName) != null) // if cluster already
-														// exists in map that is
-														// being built
-					{
+				if (clusterMap.get(clusterName).contains(source)) {
+					// featureSet contains a list of all featureNames for that entity
+					Set<String> featureSet;
+					// If cluster already exists in map that is being built
+					if (map.get(clusterName) != null)
 						entityToFeatures = map.get(clusterName);
-					}
 					if (entityToFeatures.get(source) != null) {
 						featureSet = entityToFeatures.get(source).featureSet;
 						entity = entityToFeatures.get(source);
-					} else // otherwise create new ones
-					{
+					} else {
 						entity = new Entity(source);
 						featureSet = new HashSet<>();
 					}
-					featureSet.add(target); // adding target to set of features
-											// for that entity
+					// Adding target to set of features for that entity
+					featureSet.add(target);
 					entity.featureSet = featureSet;
-					if (featureNameToBitsetIndex.get(target) == null) // if this
-																		// target
-																		// has
-																		// never
-																		// been
-																		// encountered
-																		// yet
-					{
-						featureNameToBitsetIndex.put(target, Integer.valueOf(
-								bitSetSize));
-						entity.featureVector.set(bitSetSize); // setting the
-																// spot for this
-																// feature as 1
-																// in the
-																// entitie's
-																// feature
-																// vector
+					// If this target has never been encountered yet
+					if (featureNameToBitsetIndex.get(target) == null)	{
+						featureNameToBitsetIndex.put(target, Integer.valueOf(bitSetSize));
+						// Setting this feature as 1 in the entity's feature vector
+						entity.featureVector.set(bitSetSize);
 						bitSetSize++;
 					} else {
-						entity.featureVector.set(featureNameToBitsetIndex
-								.get(target)); // setting that feature to true
+						// Setting that feature to true
+						entity.featureVector.set(featureNameToBitsetIndex.get(target));
 					}
 					entity.initializeNonZeroFeatureMap(bitSetSize);
 					entityToFeatures.put(source, entity);

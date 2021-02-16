@@ -15,7 +15,6 @@ import com.beust.jcommander.ParameterException;
 
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
-import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 
 public class SystemEvo {
 	private static Logger logger = LogManager.getLogger(SystemEvo.class);
@@ -42,8 +41,10 @@ public class SystemEvo {
 		String sourceRsf = options.parameters.get(0);
 		String targetRsf = options.parameters.get(1);
 		
-		ConcernClusterArchitecture sourceClusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(sourceRsf);
-		ConcernClusterArchitecture targetClusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(targetRsf);
+		ConcernClusterArchitecture sourceClusters =
+			ConcernClusterArchitecture.loadFromRsf(sourceRsf);
+		ConcernClusterArchitecture targetClusters =
+			ConcernClusterArchitecture.loadFromRsf(targetRsf);
 		
 		logger.debug("Source clusters: ");
 		logger.debug(clustersToString(sourceClusters));

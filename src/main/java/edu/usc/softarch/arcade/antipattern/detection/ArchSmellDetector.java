@@ -27,7 +27,6 @@ import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
-import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicItem;
@@ -164,102 +163,10 @@ public class ArchSmellDetector {
 		System.out.print("");
 		
 		SimpleDirectedGraph<String, DefaultEdge> directedGraph = 
-			ClusterUtil.buildConcernClustersDiGraph(clusters, clusterGraph);
+			clusters.buildConcernClustersDiGraph(clusterGraph);
 		
 		detectBdc(detectedSmells, clusters, clusterSmellMap, directedGraph);
 		detectBuo(detectedSmells, clusters, clusterSmellMap, directedGraph);
-	}
-
-	@Deprecated
-	public void runAllDetectionAlgs() throws IOException {
-		SmellCollection detectedSmells = new SmellCollection();
-		ConcernClusterArchitecture clusters = loadClusters();
-		
-		if (this.tmeMethod == TopicModelExtractionMethod.MALLET_API)
-			buildConcernClustersFromMalletAPI(clusters);
-		if (this.tmeMethod == TopicModelExtractionMethod.VAR_MALLET_FILE)
-			buildConcernClustersFromConfigTopicsFile(clusters);
-		
-		for (ConcernCluster cluster : clusters) {
-			if (cluster.getDocTopicItem() != null) {
-				logger.debug(cluster.getName() + " has topics: ");
-				DocTopicItem docTopicItem = cluster.getDocTopicItem();
-				Collections.sort(docTopicItem.getTopics(), TOPIC_PROPORTION_ORDER);
-				for (TopicItem topicItem : docTopicItem.getTopics()) {
-					logger.debug("\t" + topicItem);
-				}
-			}
-		}
-		
-		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
-		
-		detectBco(detectedSmells, clusters, clusterSmellMap);
-		detectSpfNew(clusters, clusterSmellMap, detectedSmells);
-		
-		Map<String, Set<String>> depMap = 
-			ClusterUtil.buildDependenciesMap(this.depsRsfFilename);
-		
-		StringGraph clusterGraph = clusters.buildClusterGraphUsingDepMap(depMap);
-		System.out.print("");
-		
-		SimpleDirectedGraph<String, DefaultEdge> directedGraph = 
-			ClusterUtil.buildConcernClustersDiGraph(clusters, clusterGraph);
-		
-		detectBdc(detectedSmells, clusters, clusterSmellMap, directedGraph);
-		detectBuo(detectedSmells, clusters, clusterSmellMap, directedGraph);
-		
-		for (String clusterName : clusterSmellMap.keySet()) {
-			Set<String> smellList = clusterSmellMap.get(clusterName);
-			logger.debug(clusterName + " has smells "
-				+ String.join(",", smellList));
-		}
-		
-		Map<String, Set<String>> smellClustersMap = 
-			buildSmellToClustersMap(clusterSmellMap);
-		
-		for (Entry<String,Set<String>> entry : smellClustersMap.entrySet())
-			logger.debug(entry.getKey() + " : " + entry.getValue());
-		
-		for (Smell smell : detectedSmells)
-			logger.debug(smell.getSmellType() + " " + smell);
-
-		detectedSmells.serializeSmellCollection(detectedSmellsFilename);
-	}
-	
-	@Deprecated
-	public void runStructuralDetectionAlgs() throws IOException {
-		SmellCollection detectedSmells = new SmellCollection();
-		ConcernClusterArchitecture clusters = loadClusters();
-		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
-		
-		Map<String, Set<String>> depMap =
-			ClusterUtil.buildDependenciesMap(this.depsRsfFilename);
-		
-		StringGraph clusterGraph = clusters.buildClusterGraphUsingDepMap(depMap);
-		System.out.print("");
-		
-		SimpleDirectedGraph<String, DefaultEdge> directedGraph =
-			ClusterUtil.buildConcernClustersDiGraph(clusters, clusterGraph);
-		
-		detectBdc(detectedSmells, clusters, clusterSmellMap, directedGraph);
-		detectBuo(detectedSmells, clusters, clusterSmellMap, directedGraph);
-		
-		for (String clusterName : clusterSmellMap.keySet()) {
-			Set<String> smellList = clusterSmellMap.get(clusterName);
-			logger.debug(clusterName + " has smells "
-				+ String.join(",", smellList));
-		}
-		
-		Map<String, Set<String>> smellClustersMap =
-			buildSmellToClustersMap(clusterSmellMap);
-		
-		for (Entry<String,Set<String>> entry : smellClustersMap.entrySet())
-			logger.debug(entry.getKey() + " : " + entry.getValue());
-		
-		for (Smell smell : detectedSmells)
-			logger.debug(smell.getSmellType() + " " + smell);
-
-		detectedSmells.serializeSmellCollection(detectedSmellsFilename);
 	}
 	// #endregion PUBLIC INTERFACE -----------------------------------------------
 
@@ -269,8 +176,8 @@ public class ArchSmellDetector {
 	 */
 	private ConcernClusterArchitecture loadClusters() {
 		System.out.println("Reading in clusters file: " + this.clustersRsfFilename);
-		ConcernClusterArchitecture clusters = ConcernClusterRsf.
-			extractConcernClustersFromRsfFile(this.clustersRsfFilename);
+		ConcernClusterArchitecture clusters = ConcernClusterArchitecture.
+			loadFromRsf(this.clustersRsfFilename);
 		logger.debug("Found and built clusters:");
 		for (ConcernCluster cluster : clusters)
 			logger.debug(cluster.getName());

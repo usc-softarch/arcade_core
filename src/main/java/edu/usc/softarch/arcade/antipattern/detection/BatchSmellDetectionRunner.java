@@ -27,17 +27,15 @@ public class BatchSmellDetectionRunner {
 		File[] newGtFiles =
 			gtRsfsDirFile.listFiles(file -> file.getName().endsWith(".rsf"));
 
-		if (selectedLang.equals("c")) {
+		if (selectedLang.equals("c"))
 			Config.setSelectedLanguage(Config.Language.c);
-		}
-		else if (selectedLang.equals("java")) {
+		else if (selectedLang.equals("java"))
 			Config.setSelectedLanguage(Config.Language.java);
-		}
+
 		try (PrintWriter writer = new PrintWriter(techniquesDir
 				+ File.separatorChar + "mojofm_mapping.csv", "UTF-8")) {
 			for (File gtRsfFile : newGtFiles) {
-				String prefix = FileUtil.extractFilenamePrefix(gtRsfFile
-						.getName());
+				String prefix = FileUtil.extractFilenamePrefix(gtRsfFile.getName());
 				String detectedSmellsFilename = techniquesDir + prefix
 						+ "_smells.ser";
 
@@ -47,8 +45,8 @@ public class BatchSmellDetectionRunner {
 					new DocTopics(docTopicsFile));
 				asd.run(true, true, true);
 
-				MoJoCalculator mojoCalc = new MoJoCalculator(gtRsfFile.getAbsolutePath(),
-						groundTruthFilename, null);
+				MoJoCalculator mojoCalc = new MoJoCalculator(
+					gtRsfFile.getAbsolutePath(), groundTruthFilename, null);
 				double mojoFmValue = mojoCalc.mojofm();
 				System.out.println(mojoFmValue);
 

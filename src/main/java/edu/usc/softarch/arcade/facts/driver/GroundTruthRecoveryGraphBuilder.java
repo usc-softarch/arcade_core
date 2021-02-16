@@ -118,7 +118,9 @@ public class GroundTruthRecoveryGraphBuilder {
 			pkgCount++;
 		}
 		
-		ConcernClusterArchitecture pkgBasedClusters = ClusterUtil.buildGroundTruthClustersFromPackages(topLevelPackagesOfUnclusteredClasses,unClusteredClasses);
+		ConcernClusterArchitecture pkgBasedClusters =
+			ConcernClusterArchitecture.buildGroundTruthClustersFromPackages(
+			topLevelPackagesOfUnclusteredClasses,unClusteredClasses);
 		StringGraph pkgBasedClusterGraph = pkgBasedClusters.buildClusterGraphUsingOdemClasses(typeMap);
 		
 		ConcernClusterArchitecture allClusters = 

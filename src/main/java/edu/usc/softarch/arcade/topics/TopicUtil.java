@@ -36,28 +36,6 @@ public class TopicUtil {
 		return docTopics;
 	}
 	
-	public static void setDocTopicForCluster(DocTopics docTopics, Cluster leaf) {
-		String strippedLeafClassName = leaf.getName().substring(leaf.getName().lastIndexOf('.')+1,leaf.getName().length()-1);
-		String dollarSign = "$";
-		if (strippedLeafClassName.contains(dollarSign)) {
-			String anonInnerClassRegExpr = ".*\\$\\D.*";
-			if (Pattern.matches(anonInnerClassRegExpr, strippedLeafClassName)) {
-				logger.debug("\t\tfound inner class: " + strippedLeafClassName);
-				
-				strippedLeafClassName = strippedLeafClassName.substring(
-					strippedLeafClassName.lastIndexOf('$') + 1,
-					strippedLeafClassName.length());
-				
-				logger.debug("\t\tstripped to name to: " + strippedLeafClassName);
-			}
-		}
-		
-		logger.debug("\t" + strippedLeafClassName);
-		leaf.setDocTopicItem(docTopics
-			.getDocTopicItemForJava(strippedLeafClassName));
-		logger.debug("\t" + "doc-topic: " + leaf.getDocTopicItem());
-	}
-	
 	/** pretty much the same method as above, except uses Entities instead
 	 * of FastClusters.
 	 * Appends .java and ignores the entities whose names have $ sign in them 
@@ -143,72 +121,6 @@ public class TopicUtil {
 				+ mergedTopicItem.getProportion());
 		}
 		return mergedDocTopicItem;
-	}
-
-	/**
-	 * Gets a TopicItem from a list based on its Topic Number.
-	 * 
-	 * @param topics A list of TopicItems.
-	 * @param inTopicItem The desired TopicItem.
-	 * @return The desired TopicItem if it is in the list, null otherwise.
-	 * @deprecated
-	 */
-	public static TopicItem getMatchingTopicItem(List<TopicItem> topics,
-			TopicItem inTopicItem) {
-		for (TopicItem currTopicItem : topics)
-			if (currTopicItem.getTopicNum() == inTopicItem.getTopicNum())
-				return currTopicItem;
-
-		return null;
-	}
-
-	/**
-	 * Gets a TopicItem from a list based on its Topic Number.
-	 * 
-	 * @param topics A list of TopicItems.
-	 * @param inTopicItem The desired TopicItem's number.
-	 * @return The desired TopicItem if it is in the list, null otherwise.
-	 */
-	public static TopicItem getMatchingTopicItem(List<TopicItem> topics,
-			int inTopicItem) {
-		for (TopicItem currTopicItem : topics)
-			if (currTopicItem.getTopicNum() == inTopicItem)
-				return currTopicItem;
-
-		return null;
-	}
-
-	public static void setDocTopicForFastClusterForMalletFile(
-			DocTopics docTopics, FastCluster leaf) {
-		String strippedLeafClasName = leaf.getName();
-		String dollarSign = "$";
-
-		if (strippedLeafClasName.contains(dollarSign)) {
-			String anonInnerClassRegExpr = ".*\\$\\D.*";
-			if (Pattern.matches(anonInnerClassRegExpr,
-					strippedLeafClasName)) {
-				logger.debug("\t\tfound inner class: " + strippedLeafClasName);
-				
-				strippedLeafClasName = strippedLeafClasName.substring(
-						strippedLeafClasName.lastIndexOf('$') + 1,
-						strippedLeafClasName.length());
-				
-				logger.debug("\t\tstripped to name to: " + strippedLeafClasName);
-			}
-		}
-		
-		logger.debug("\t" + strippedLeafClasName);
-		if (Config.getSelectedLanguage().equals(Language.c)) {
-			leaf.docTopicItem = docTopics.getDocTopicItemForC(strippedLeafClasName);
-			logger.debug("set " + ((leaf.docTopicItem == null) ? "null" : leaf.docTopicItem.getSource())  + " as doc topic for " +  strippedLeafClasName);
-		}
-		else if (Config.getSelectedLanguage().equals(Language.java)) {
-			String docTopicName = convertJavaClassWithPackageNameToDocTopicName( leaf.getName() );
-			leaf.docTopicItem = docTopics.getDocTopicItemForJava(docTopicName);
-		}
-		else
-			leaf.docTopicItem = docTopics.getDocTopicItemForJava(strippedLeafClasName);
-		logger.debug("\t" + "doc-topic: " + leaf.docTopicItem);
 	}
 
 	/**
