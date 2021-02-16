@@ -30,6 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
+import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -101,12 +102,12 @@ public class SmellDetectionEvaluator {
 			throw new IOException(techniquesDir + " does not exist.");
 		
 		// Deserialize ground-truth smells
-		Set<Smell> detectedGtSmells =
-			SmellUtil.deserializeDetectedSmells(detectedSmellsGtFilename);
+		SmellCollection detectedGtSmells =
+			new SmellCollection(detectedSmellsGtFilename);
 		logger.debug("");
 		logger.debug("Listing detected gt smells: ");
 		for (Smell smell : detectedGtSmells)
-			logger.debug(SmellUtil.getSmellAbbreviation(smell) + " " + smell);
+			logger.debug(smell.getSmellType() + " " + smell);
 		
 		// Obtain .ser files from the results of analysis techniques
 		File[] detectedSmellsFiles = techDirFile.listFiles(
@@ -121,10 +122,9 @@ public class SmellDetectionEvaluator {
 		logger.debug(String.join(",", dsFilenames));
 		
 		// Deserialize smell files from analysis results
-		Map<String,Set<Smell>> fileToSmellInstancesMap = new LinkedHashMap<>();
+		Map<String, SmellCollection> fileToSmellInstancesMap = new LinkedHashMap<>();
 		for (String dsFilename : dsFilenames) {
-			Set<Smell> detectedSmells =
-				SmellUtil.deserializeDetectedSmells(dsFilename);
+			SmellCollection detectedSmells = new SmellCollection(dsFilename);
 			fileToSmellInstancesMap.put(dsFilename, detectedSmells);
 		}
 		
@@ -133,10 +133,10 @@ public class SmellDetectionEvaluator {
 		logger.debug(String.join("\n", fileToSmellInstancesMap.keySet()));
 
 		// For each .ser file from the technique analysis results
-		for (Entry<String, Set<Smell>> fsiEntry
+		for (Entry<String, SmellCollection> fsiEntry
 				: fileToSmellInstancesMap.entrySet()) {
 			String currFilename = fsiEntry.getKey();
-			Set<Smell> detectedTechSmells = fsiEntry.getValue();
+			SmellCollection detectedTechSmells = fsiEntry.getValue();
 			
 			Map<Smell, Entry<Smell, Double>> maxSmellMap = new LinkedHashMap<>();
 

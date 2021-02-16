@@ -19,20 +19,20 @@ public class MetricsDriver {
 	public static String constructTopicBasedComputedRsfFilename(
 			String computedFilePrex, String selectedAlg, String simMeasure,
 			String stoppingCriterion, int numClusters, int numTopics) {
-		return computedFilePrex + selectedAlg + "_"
-				+ stoppingCriterion + "_" + simMeasure + "_"  + numClusters + "_clusters_" + numTopics + "topics.rsf";
+		return computedFilePrex + selectedAlg + "_" + stoppingCriterion + "_"
+			+ simMeasure + "_"  + numClusters + "_clusters_" + numTopics + "topics.rsf";
 	}
 
 	public static String constructNonTopicComputedRsfFilename(
 			String computedFilePrex, String selectedAlg, String simMeasure,
 			String stoppingCriterion, int numClusters) {
-		return computedFilePrex + selectedAlg + "_"
-				+ stoppingCriterion + "_" + simMeasure + "_" + numClusters
-				+ "_clusters.rsf";
+		return computedFilePrex + selectedAlg + "_" + stoppingCriterion + "_"
+			+ simMeasure + "_" + numClusters + "_clusters.rsf";
 	}
 	
 	public static void performMoJoForMultiClustersOnFile(
-			String computedFilePrex, String authClusteringFile, String selectedAlg, String simMeasure, String stoppingCriterion) {
+			String computedFilePrex, String authClusteringFile, String selectedAlg,
+			String simMeasure, String stoppingCriterion) {
 		List<Integer> numClustersList = new ArrayList<>();
 		List<Integer> numTopicsList = new ArrayList<>();
 		
@@ -51,48 +51,47 @@ public class MetricsDriver {
 		int numClustersAtMax = 0;
 		int numTopicsAtMax = 0;
 		
-		for (int numClusters = Config.getStartNumClustersRange(); numClusters <= Config
-				.getEndNumClustersRange(); numClusters += Config
-				.getRangeNumClustersStep()) {
-			for (int numTopics = Config.getStartNumTopicsRange(); numTopics <= Config
-					.getEndNumTopicsRange(); numTopics += Config
-					.getRangeNumTopicsStep()) {
+		for (int numClusters = Config.getStartNumClustersRange();
+			numClusters <= Config.getEndNumClustersRange();
+			numClusters += Config.getRangeNumClustersStep()) {
+			for (int numTopics = Config.getStartNumTopicsRange();
+				numTopics <= Config.getEndNumTopicsRange();
+				numTopics += Config.getRangeNumTopicsStep()) {
 
 				numClustersList.add(numClusters);
 				numTopicsList.add(numTopics);
 
 				String computedRsfFilename = null;
-				if (!selectedAlg.equals("arc")) {
-					computedRsfFilename = constructNonTopicComputedRsfFilename(computedFilePrex,
-							selectedAlg, simMeasure, stoppingCriterion, numClusters);
-				} else {
-					computedRsfFilename = constructTopicBasedComputedRsfFilename(computedFilePrex,
-							selectedAlg, simMeasure, stoppingCriterion, numClusters,
-							numTopics);
-				}
+				if (!selectedAlg.equals("arc"))
+					computedRsfFilename = constructNonTopicComputedRsfFilename(
+						computedFilePrex, selectedAlg, simMeasure,
+						stoppingCriterion, numClusters);
+				else
+					computedRsfFilename = constructTopicBasedComputedRsfFilename(
+						computedFilePrex,	selectedAlg, simMeasure,
+						stoppingCriterion, numClusters,	numTopics);
 
 				String usingComputedFilename = "Using " + computedRsfFilename
-						+ " as computed clusters...";
+					+ " as computed clusters...";
 				logger.debug(usingComputedFilename);
 				System.out.println(usingComputedFilename);
 
 				MoJoCalculator mojoCalc = new MoJoCalculator(
-						computedRsfFilename, authClusteringFile, null);
+					computedRsfFilename, authClusteringFile, null);
 				long mojoValue = mojoCalc.mojo();
 				mojoToAuthList.add(mojoValue);
 				String mojoOutput = "MoJo of " + computedRsfFilename
-						+ " compared to authoritative clustering: " + mojoValue;
+					+ " compared to authoritative clustering: " + mojoValue;
 				logger.debug(mojoOutput);
 				System.out.println(mojoOutput);
 				mojoSum += mojoValue;
 
 				mojoCalc = new MoJoCalculator(computedRsfFilename,
-						authClusteringFile, null);
+					authClusteringFile, null);
 				double mojoFmValue = mojoCalc.mojofm();
 				mojoFmToAuthList.add(mojoFmValue);
 				mojoOutput = "MoJoFM of " + computedRsfFilename
-						+ " compared to authoritative clustering: "
-						+ mojoFmValue;
+					+ " compared to authoritative clustering: " + mojoFmValue;
 				logger.debug(mojoOutput);
 				System.out.println(mojoOutput);
 				mojoFmSum += mojoFmValue;
@@ -105,9 +104,9 @@ public class MetricsDriver {
 
 				computedClusterCount++;
 			}
-
 		}
-		double mojoAvg = mojoSum/computedClusterCount;
+
+		double mojoAvg = mojoSum / computedClusterCount;
 		String mojoAvgOutput = "MoJo averge: " + mojoAvg;
 		logger.debug(mojoAvgOutput);
 		System.out.println(mojoAvgOutput);
@@ -121,9 +120,12 @@ public class MetricsDriver {
 		System.out.println("num clusters at max: " + numClustersAtMax);
 		System.out.println("num topics at max: " + numTopicsAtMax);
 		
-		System.out.println("Writing MoJo and MoJoFM to csv file " + Config.getMojoToAuthCSVFilename(numClustersList,selectedAlg,simMeasure) + " ...");
+		System.out.println("Writing MoJo and MoJoFM to csv file " +
+			Config.getMojoToAuthCSVFilename(numClustersList,selectedAlg,simMeasure)
+			+ " ...");
 
-		createMojoToAuthListsCSVFile(numClustersList,mojoToAuthList,mojoFmToAuthList,selectedAlg,simMeasure,numTopicsList);
+		createMojoToAuthListsCSVFile(numClustersList, mojoToAuthList,
+			mojoFmToAuthList, selectedAlg, simMeasure, numTopicsList);
 		
 	}
 	
@@ -136,35 +138,35 @@ public class MetricsDriver {
 		double maxMojoFm = 0;
 		double maxNumClusters = 0;
 		double sumMojoFm = 0;
-		for (int numClusters = Config.getStartNumClustersRange(); numClusters <= Config
-				.getEndNumClustersRange(); numClusters += Config
-				.getRangeNumClustersStep()) {
+		for (int numClusters = Config.getStartNumClustersRange();
+			numClusters <= Config.getEndNumClustersRange();
+			numClusters += Config.getRangeNumClustersStep()) {
 			
 			numClustersList.add(numClusters);
 			
-			String computedRsfFilename = constructNonTopicComputedRsfFilename(computedFilePrex, selectedAlg, simMeasure,
-					stoppingCriterion, numClusters);
+			String computedRsfFilename =
+				constructNonTopicComputedRsfFilename(computedFilePrex, selectedAlg,
+				simMeasure,	stoppingCriterion, numClusters);
 			String usingComputedFilename = "Using " + computedRsfFilename
-					+ " as computed clusters...";
+				+ " as computed clusters...";
 			logger.debug(usingComputedFilename);
 			System.out.println(usingComputedFilename);
 			
 			MoJoCalculator mojoCalc = new MoJoCalculator(
-					computedRsfFilename, authClusteringFile, null);
+				computedRsfFilename, authClusteringFile, null);
 			long mojoValue = mojoCalc.mojo();
 			mojoList.add(mojoValue);
 			String mojoOutput = "MoJo of " + computedRsfFilename
-					+ " compared to authoritative clustering: " + mojoValue;
+				+ " compared to authoritative clustering: " + mojoValue;
 			logger.debug(mojoOutput);
 			System.out.println(mojoOutput);
 			
 			mojoCalc = new MoJoCalculator(computedRsfFilename,
-					authClusteringFile, null);
+				authClusteringFile, null);
 			double mojoFmValue = mojoCalc.mojofm();
 			mojoFmList.add(mojoFmValue);
 			mojoOutput = "MoJoFM of " + computedRsfFilename
-					+ " compared to authoritative clustering: "
-					+ mojoFmValue;
+				+ " compared to authoritative clustering: " + mojoFmValue;
 			logger.debug(mojoOutput);
 			System.out.println(mojoOutput);
 			
@@ -178,8 +180,9 @@ public class MetricsDriver {
 		
 		double avgMojoFm = sumMojoFm/numClustersList.size();
 		
-		
-		String writingMojoToCsvMsg = "Writing MoJo and MoJoFM to csv file " + Config.getMojoToAuthCSVFilename(numClustersList,selectedAlg,simMeasure) + " ...";
+		String writingMojoToCsvMsg = "Writing MoJo and MoJoFM to csv file "
+			+ Config.getMojoToAuthCSVFilename(numClustersList,selectedAlg,simMeasure)
+			+ " ...";
 		String maxMojoFmMsg = "max mojo fm: " + maxMojoFm;
 		String numClusAtMaxMojoFmMsg = "no. clusters at max mojo fm: " + maxNumClusters;
 		String avgMojoFmMsg = "avg mojo fm: " + avgMojoFm;
@@ -203,11 +206,9 @@ public class MetricsDriver {
 		MoJoCalculator mojoCalc = new MoJoCalculator(computedRsfFilename,authClusteringFile, null);
 		long mojoValue = mojoCalc.mojo();
 		String mojoOutput = "MoJo of " + computedRsfFilename
-				+ " compared to authoritative clustering: " + mojoValue;
+			+ " compared to authoritative clustering: " + mojoValue;
 		logger.debug(mojoOutput);
 		System.out.println(mojoOutput);
-
-		
 
 		mojoCalc = new MoJoCalculator(computedRsfFilename, authClusteringFile, null);
 		double mojoFmValue = mojoCalc.mojofm();

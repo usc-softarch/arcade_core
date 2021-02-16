@@ -25,7 +25,6 @@ import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.Entity;
 import edu.usc.softarch.arcade.clustering.FastCluster;
 import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.config.ConfigUtil;
 import edu.usc.softarch.arcade.config.Config.Language;
 
 /**
@@ -96,51 +95,6 @@ public class TopicUtil {
 		logger.debug("\n");
 
 		logger.debug("Symmetric Kullback Leibler Divergence: " + divergence);
-		
-		return divergence;
-	}
-	
-	public static double jsDivergence(
-			DocTopicItem pDocTopicItem,
-			DocTopicItem qDocTopicItem)
-			throws DistributionSizeMismatchException {
-		double divergence = 0;
-		
-		// Error due to size mismatch
-		if (pDocTopicItem.size() != qDocTopicItem.size()) {
-			logger.error("P size: " + pDocTopicItem.size());
-			logger.error("Q size: " + qDocTopicItem.size());
-			logger.error("P and Q for Jensen Shannon Divergence not the same size");
-			throw new DistributionSizeMismatchException(
-				"P and Q for Jensen Shannon Divergence not the same size");
-		}
-		
-		double[] sortedP = new double[pDocTopicItem.size()];
-		double[] sortedQ = new double[qDocTopicItem.size()];
-		
-		for (TopicItem pTopicItem : pDocTopicItem.getTopics())
-			sortedP[pTopicItem.getTopicNum()] = pTopicItem.getProportion();
-		
-		for (TopicItem qTopicItem : qDocTopicItem.getTopics())
-			sortedQ[qTopicItem.getTopicNum()] = qTopicItem.getProportion();
-
-		divergence = Maths.jensenShannonDivergence(sortedP, sortedQ);
-		
-		logger.debug("P distribution values: ");
-		for (int i = 0; i < sortedP.length; i++)
-			System.out.format("%.3f,", sortedP[i]);
-
-		logger.debug("\n");
-
-		logger.debug("Q distribution values: ");
-		for (int i = 0; i < sortedQ.length; i++)
-			System.out.format("%.3f,", sortedQ[i]);
-
-		logger.debug("\n");
-
-		logger.debug("Jensen Shannon Divergence: " + divergence);
-		logger.debug("Symmetric Kullback Leibler Divergence: "
-				+ symmKLDivergence(pDocTopicItem, qDocTopicItem));
 		
 		return divergence;
 	}
@@ -234,8 +188,7 @@ public class TopicUtil {
 	}
 	
 	public static void setDocTopicForCluster(DocTopics docTopics, Cluster leaf) {
-		String strippedLeafClassName = ConfigUtil
-			.stripParensEnclosedClassNameWithPackageName(leaf);
+		String strippedLeafClassName = leaf.getName().substring(leaf.getName().lastIndexOf('.')+1,leaf.getName().length()-1);
 		String dollarSign = "$";
 		if (strippedLeafClassName.contains(dollarSign)) {
 			String anonInnerClassRegExpr = ".*\\$\\D.*";
@@ -264,8 +217,7 @@ public class TopicUtil {
 	 */
 	public static void setDocTopicForEntity(DocTopics docTopics, Entity leaf, String type) throws Exception {
 		if (type.equals("java")) {
-			String strippedLeafClassName = ConfigUtil
-					.stripParensEnclosedClassNameWithPackageName(leaf);
+			String strippedLeafClassName = leaf.name.substring(leaf.name.lastIndexOf('.')+1,leaf.name.length());
 
 			String dollarSign = "$";
 			if (strippedLeafClassName.contains(dollarSign)) {

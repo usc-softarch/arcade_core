@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.clustering;
+package edu.usc.softarch.arcade.clustering.techniques;
 
 import java.io.FileNotFoundException;
 import java.io.File;
@@ -10,7 +10,10 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.FastCluster;
+import edu.usc.softarch.arcade.clustering.FastClusterArchitecture;
+import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.Granule;
 import edu.usc.softarch.arcade.config.Config.Language;
@@ -21,16 +24,16 @@ public class ClusteringAlgoRunner {
 	private static Logger logger =
 		LogManager.getLogger(ClusteringAlgoRunner.class);
 	
-	protected static List<FastCluster> fastClusters;
+	public static FastClusterArchitecture fastClusters;
 	protected static ArrayList<Cluster> clusters;
 	protected static FastFeatureVectors fastFeatureVectors;
 	protected static double maxClusterGain = 0;
-	protected static int numClustersAtMaxClusterGain = 0;
+	public static int numClustersAtMaxClusterGain = 0;
 	protected static int numberOfEntitiesToBeClustered = 0;
 	// #endregion ATTRIBUTES -----------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public static List<FastCluster> getFastClusters() { return fastClusters; }
+	public static FastClusterArchitecture getFastClusters() { return fastClusters; }
 
 	public static void setFastFeatureVectors(
 			FastFeatureVectors inFastFeatureVectors) {
@@ -39,7 +42,7 @@ public class ClusteringAlgoRunner {
 	// #endregion ACCESSORS ------------------------------------------------------
 	
 	protected static void initializeClusters(String srcDir) {
-		fastClusters = new ArrayList<>();
+		fastClusters = new FastClusterArchitecture();
 
 		// For each node in the adjacency matrix
 		for (String name : fastFeatureVectors.getFeatureVectorNames()) {
@@ -148,7 +151,7 @@ public class ClusteringAlgoRunner {
 		if (Config.getClustersToWriteList().contains(fastClusters.size())) {
 			String postProcMsg = "Performing post processing at " + fastClusters.size() + " number of clusters";
 			logger.debug(postProcMsg);
-			ClusterUtil.fastClusterPostProcessing(fastClusters,fastFeatureVectors);
+			fastClusters.fastClusterPostProcessing(fastFeatureVectors);
 		}
 	}
 }

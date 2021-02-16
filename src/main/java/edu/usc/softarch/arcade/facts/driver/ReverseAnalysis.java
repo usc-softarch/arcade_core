@@ -25,7 +25,7 @@ import org.apache.commons.lang3.tuple.MutablePair;
 
 import cc.mallet.util.Maths;
 import edu.usc.softarch.arcade.MetricsDriver;
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.clustering.Entity;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.TopicUtil;
@@ -440,7 +440,8 @@ public class ReverseAnalysis
 				{
 					double simMeasure = 0;
 					try {
-						simMeasure = TopicUtil.jsDivergence(entity1.docTopicItem, entity2.docTopicItem);
+						simMeasure =
+							entity1.docTopicItem.getJsDivergence(entity2.docTopicItem);
 					} catch (DistributionSizeMismatchException e) {
 						e.printStackTrace(); //TODO handle it
 					}

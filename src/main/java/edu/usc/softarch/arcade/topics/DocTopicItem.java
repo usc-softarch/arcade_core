@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import cc.mallet.util.Maths;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -96,6 +99,29 @@ public class DocTopicItem implements Serializable {
 				return false;
 
 		return true;
+	}
+
+	public double getJsDivergence(DocTopicItem toCompare)
+			throws DistributionSizeMismatchException {
+		double divergence = 0;
+
+		// Error due to size mismatch
+		if (this.size() != toCompare.size())
+			throw new DistributionSizeMismatchException(
+				"P and Q for Jensen Shannon Divergence not the same size");
+		
+		double[] sortedP = new double[this.size()];
+		double[] sortedQ = new double[this.size()];
+		
+		for (TopicItem pTopicItem : this.getTopics())
+			sortedP[pTopicItem.getTopicNum()] = pTopicItem.getProportion();
+		
+		for (TopicItem qTopicItem : toCompare.getTopics())
+			sortedQ[qTopicItem.getTopicNum()] = qTopicItem.getProportion();
+
+		divergence = Maths.jensenShannonDivergence(sortedP, sortedQ);
+		
+		return divergence;
 	}
 	// #endregion ACCESSORS ------------------------------------------------------
 

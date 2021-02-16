@@ -90,16 +90,12 @@ public class FastCluster {
 			Double c2Value = c2.getNonZeroFeatureMap().get(index);
 			
 			Double newFeatureValue = null;
-			if (c1Value == null && c2Value != null) {
+			if (c1Value == null && c2Value != null)
 				newFeatureValue = Double.valueOf( (c2Value*c2.getNumEntities()) /(c1.getNumEntities()+c2.getNumEntities()));
-				
-			}
-			else if (c2Value == null && c1Value != null) {
+			else if (c2Value == null && c1Value != null)
 				newFeatureValue = Double.valueOf((c1Value*c1.getNumEntities())/(c1.getNumEntities()+c2.getNumEntities()));
-			}
-			else if (c1Value != null && c2Value != null) {
+			else if (c1Value != null && c2Value != null)
 				newFeatureValue = Double.valueOf((c1Value*c1.getNumEntities()+ c2Value*c2.getNumEntities())/(c1.getNumEntities()+c2.getNumEntities()));
-			}
 			
 			if (newFeatureValue != null)
 				nonZeroFeatureMap.put(index, newFeatureValue);
@@ -113,21 +109,29 @@ public class FastCluster {
 			Double c2Value = c2.getNonZeroFeatureMap().get(index);
 			
 			Double newFeatureValue = null;
-			if (c1Value == null && c2Value != null) {
+			if (c1Value == null && c2Value != null)
 				newFeatureValue = Double.valueOf(c2Value/(c1.getNumEntities()+c2.getNumEntities()));
-				
-			}
-			else if (c2Value == null && c1Value != null) {
+			else if (c2Value == null && c1Value != null)
 				newFeatureValue = Double.valueOf(c1Value/(c1.getNumEntities()+c2.getNumEntities()));
-			}
-			else if (c1Value != null && c2Value != null) {
+			else if (c1Value != null && c2Value != null)
 				newFeatureValue = Double.valueOf((c1Value + c2Value)/(c1.getNumEntities()+c2.getNumEntities()));
-			}
 			
 			if (newFeatureValue != null)
 				nonZeroFeatureMap.put(index, newFeatureValue);
-			
 		}
+	}
+
+	public double computeCentroidUsingStructuralData() {
+		double centroidSum = 0;
+		Set<Integer> clusterKeys = getNonZeroFeatureMap().keySet();
+
+		for (Integer key : clusterKeys)
+			centroidSum += getNonZeroFeatureMap().get(key).doubleValue();
+
+		double centroidAvg = centroidSum / getFeaturesLength();
+
+		// centroid
+		return centroidAvg / getNumEntities();
 	}
 	
 	public String toString() {

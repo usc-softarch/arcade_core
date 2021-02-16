@@ -41,8 +41,6 @@ public class FileUtil {
 	 * @param theFile Name or path to desired file's prefix.
 	 */
 	public static String extractFilenamePrefix(final File theFile) {
-		logger.entry(theFile);
-		logger.traceExit();
 		return FilenameUtils.getBaseName(theFile.getName());
 	}
 
@@ -62,8 +60,6 @@ public class FileUtil {
 	 * @param theFile Name or path to desired file's extension.
 	 */
 	public static String extractFilenameSuffix(final File theFile) {
-		logger.entry(theFile);
-		logger.traceExit();
 		return FilenameUtils.getExtension(theFile.getName());
 	}
 
@@ -152,7 +148,7 @@ public class FileUtil {
 	 */
 	public static List<File> sortFileListByVersion(List<File> inList,
 		boolean reverse) {
-		List<File> outList = new ArrayList<File>(inList);
+		List<File> outList = new ArrayList<>(inList);
 
 		Collections.sort(
 			outList,
@@ -213,10 +209,7 @@ public class FileUtil {
 	 * @return
 	 */
 	public static File checkFile(final String fileName, final boolean create,
-		final boolean exitOnNoExist) {
-
-		logger.entry(fileName, create, exitOnNoExist);
-
+			final boolean exitOnNoExist) {
 		final File f = new File(fileName);
 
 		// Check if file exists
@@ -268,7 +261,6 @@ public class FileUtil {
 		final boolean exitOnNoExist) {
 		//TODO Check if create should have priority over exitOnNoExist
 
-		logger.entry(dirName, create, exitOnNoExist);
 		final File f = new File(dirName);
 
 		// Check if given file is a directory
@@ -339,8 +331,6 @@ public class FileUtil {
 	 */
 	public static String extractVersionPretty(final String name) {
 		//TODO Refactor to call extractVersionFromFilename()
-		logger.entry(name);
-
 		String patternString = "[0-9]+\\.[0-9]+(\\.[0-9]+)*+(-(RC|ALPHA|BETA|M" +
 			"|Rc|Alpha|Beta|rc|alpha|beta|deb|b|a|final|Final|FINAL)[0-9]+)*";
 		final Pattern p = Pattern.compile(patternString);

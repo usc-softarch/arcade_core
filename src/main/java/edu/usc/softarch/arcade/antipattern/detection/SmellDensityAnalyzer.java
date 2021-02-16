@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
+import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.util.FileListing;
@@ -38,17 +39,17 @@ public class SmellDensityAnalyzer {
 			if (file.getName().endsWith(".ser"))
 				orderedSerFiles.add(file);
 		 	
-		Map<String,Set<Smell>> versionSmells = new LinkedHashMap<>();
+		Map<String,SmellCollection> versionSmells = new LinkedHashMap<>();
 		String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*";
 		
 		for (File file : orderedSerFiles) {
 			logger.debug(file.getName());
-			Set<Smell> smells = SmellUtil.deserializeDetectedSmells(file.getAbsolutePath());
+			SmellCollection smells = new SmellCollection(file.getAbsolutePath());
 			logger.debug("\tcontains " + smells.size() + " smells");
 			
 			logger.debug("\tListing detected smells for file" + file.getName() + ": ");
 			for (Smell smell : smells) {
-				logger.debug("\t" + SmellUtil.getSmellAbbreviation(smell) + " " + smell);
+				logger.debug("\t" + smell.getSmellType() + " " + smell);
 				
 			}
 			
@@ -75,11 +76,11 @@ public class SmellDensityAnalyzer {
 		double[] clustersRatioArr = new double[versionClusters.keySet().size()];
 		int idx = 0;
 		for (String version : versionClusters.keySet()) {
-			Set<Smell> smells = versionSmells.get(version);
+			SmellCollection smells = versionSmells.get(version);
 			
 			Set<ConcernCluster> allSmellyClusters = new HashSet<>();
 			for (Smell smell : smells) {
-				allSmellyClusters.addAll(smell.clusters);
+				allSmellyClusters.addAll(smell.getClusters());
 			}
 			
 			Set<ConcernCluster> clusters = versionClusters.get(version);

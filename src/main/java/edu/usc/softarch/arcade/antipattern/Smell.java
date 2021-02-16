@@ -13,21 +13,12 @@ public class Smell {
 		bco, bdc, buo, spf
 	}
 
-	@Deprecated
-	public Set<ConcernCluster> clusters;
 	private Set<ConcernCluster> newClusters;
 	private final SmellType smellType;
 	private final int topicNum;
 	// #endregion FIELDS ---------------------------------------------------------
 
 	// #region CONSTRUCTORS ------------------------------------------------------
-	@Deprecated
-	public Smell() {
-		this.smellType = SmellType.spf;
-		this.topicNum = -1;
-		this.clusters = new HashSet<>();
-	}
-
 	public Smell(SmellType smellType) {
 		this.smellType = smellType;
 		this.topicNum = -1;
@@ -54,13 +45,6 @@ public class Smell {
 	// #endregion ACCESSORS ------------------------------------------------------
 	
 	public String toString() {
-		if(clusters != null) {
-			// Makes a list by calling "toString" on every ConcernCluster in clusters
-			List<String> clusterTexts =
-				clusters.stream().map(ConcernCluster::toString)
-					.collect(Collectors.toList());
-			return String.join(",", clusterTexts);
-		}
 		// Makes a list by calling "toString" on every ConcernCluster in clusters
 		List<String> clusterTexts =
 			newClusters.stream().map(ConcernCluster::toString)
@@ -77,15 +61,11 @@ public class Smell {
 			return false;
 		else {
 			Smell inSmell = (Smell) obj;
-			if(clusters != null)
-				return this.clusters.equals(inSmell.clusters);
 			return this.newClusters.equals(inSmell.getClusters());
 		}
 	}
 	
 	public int hashCode() {
-		if(clusters != null)
-			return this.clusters.hashCode();
 		return this.getClusters().hashCode();
 	}
 }

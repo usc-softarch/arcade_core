@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class ClusterGraphToDotConverter {

@@ -1,10 +1,9 @@
-package edu.usc.softarch.arcade.clustering;
+package edu.usc.softarch.arcade.clustering.techniques;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -14,14 +13,31 @@ import org.apache.logging.log4j.LogManager;
 import org.xml.sax.SAXException;
 
 import edu.usc.softarch.arcade.classgraphs.ClassGraph;
+import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
+import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
+import edu.usc.softarch.arcade.clustering.Feature;
+import edu.usc.softarch.arcade.clustering.PreSelectedStoppingCriterion;
+import edu.usc.softarch.arcade.clustering.StoppingCriterion;
 import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.util.StopWatch;
 
 /**
  * @author joshua
  */
 public class ClusteringEngine {
 	private static Logger logger = LogManager.getLogger(ClusteringEngine.class);
+
+	class ClusterGainStoppingCriterion implements StoppingCriterion {
+		public boolean notReadyToStop() {
+			return ClusteringAlgoRunner.fastClusters.size() != 1
+				&& ClusteringAlgoRunner.fastClusters.size() != ClusteringAlgoRunner.numClustersAtMaxClusterGain;
+		}
+	}
+
+	class SingleClusterStoppingCriterion implements StoppingCriterion {
+		public boolean notReadyToStop() {
+			return ClusteringAlgoRunner.fastClusters.size() != 1;
+		}
+	}
 
 	public ClusteringEngine() { }
 
@@ -31,8 +47,6 @@ public class ClusteringEngine {
 
 	public void run() throws Exception {
 		FastFeatureVectors fastFeatureVectors = null;
-
-		ArrayList<FastCluster> fastClusters = null;
 		
 		File fastFeatureVectorsFile = new File(
 				Config.getFastFeatureVectorsFilename());
@@ -53,9 +67,6 @@ public class ClusteringEngine {
 		}
 		logger.debug("Read in serialized feature vectors...");
 
-		StopWatch stopwatch = new StopWatch();
-
-		stopwatch.start();
 		if (Config.getCurrentClusteringAlgorithm()
 				.equals(ClusteringAlgorithmType.WCA)) {
 			WcaRunner.setFastFeatureVectors(fastFeatureVectors);
@@ -88,17 +99,6 @@ public class ClusteringEngine {
 				LimboRunner.computeClusters(new ClusterGainStoppingCriterion());
 			}
 		}
-		stopwatch.stop();
-
-		String timeInSecsToComputeClusters = "Time in seconds to compute clusters: "
-				+ stopwatch.getElapsedTimeSecs();
-		String timeInMilliSecondsToComputeClusters = "Time in milliseconds to compute clusters: "
-				+ stopwatch.getElapsedTime();
-		logger.debug(timeInSecsToComputeClusters);
-		System.out.println(timeInSecsToComputeClusters);
-		logger.debug(timeInMilliSecondsToComputeClusters);
-		System.out.println(timeInMilliSecondsToComputeClusters);
-		logger.debug("Final clusters: " + fastClusters);
 	}
 
 	public class SharedFeature {

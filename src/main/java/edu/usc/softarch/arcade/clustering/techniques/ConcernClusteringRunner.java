@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.clustering;
+package edu.usc.softarch.arcade.clustering.techniques;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,10 +9,17 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
+import edu.usc.softarch.arcade.clustering.FastCluster;
+import edu.usc.softarch.arcade.clustering.FastClusterArchitecture;
+import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
+import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
+import edu.usc.softarch.arcade.clustering.MaxSimData;
+import edu.usc.softarch.arcade.clustering.StoppingCriterion;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.SimMeasure;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
+import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
@@ -21,6 +28,15 @@ import edu.usc.softarch.arcade.util.StopWatch;
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	private static Logger logger =
 		LogManager.getLogger(ConcernClusteringRunner.class);
+
+	public static class PreSelectedStoppingCriterion implements StoppingCriterion {
+		public boolean notReadyToStop() {
+			return ClusteringAlgoRunner.fastClusters.size() != 1
+					&& ClusteringAlgoRunner.fastClusters.size() != Config
+							.getNumClusters();
+		}
+	}
+
 	private String language;
 	
 	/**
@@ -28,7 +44,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	 * @param srcDir directories with java or c files
 	 * @param numTopics number of topics to extract
 	 */
-	ConcernClusteringRunner(FastFeatureVectors vecs,
+	public ConcernClusteringRunner(FastFeatureVectors vecs,
 			String srcDir, String artifactsDir, String language) {
 		setFastFeatureVectors(vecs);
 		initializeClusters(srcDir); // Initially, every node gets a cluster
@@ -41,12 +57,13 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		StopWatch loopSummaryStopwatch = new StopWatch();
 		loopSummaryStopwatch.start();
 
-		List<List<Double>> simMatrix = createSimilarityMatrix(fastClusters);
+		List<List<Double>> simMatrix =
+			fastClusters.createSimilarityMatrixUsingJSDivergence();
 
 		while (stoppingCriterion.notReadyToStop()) {
 			if (Config.stoppingCriterion
 					.equals(Config.StoppingCriterionConfig.clustergain)) {
-				double clusterGain = ClusterUtil.computeClusterGainUsingTopics(fastClusters);
+				double clusterGain = fastClusters.computeClusterGainUsingTopics();
 				checkAndUpdateClusterGain(clusterGain);
 			}
 
@@ -110,7 +127,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		for (FastCluster c : fastClusters)
 			TopicUtil.setDocTopicForFastClusterForMalletApi(c, this.language);
 		
-		List<FastCluster> jspRemoveList = new ArrayList<>();
+		FastClusterArchitecture jspRemoveList = new FastClusterArchitecture();
 		for (FastCluster c : fastClusters) {
 			if (c.getName().endsWith("_jsp")) {
 				logger.debug("Adding " + c.getName() + " to jspRemoveList...");
@@ -133,7 +150,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		}
 		
 		logger.debug("Removing singleton clusters with no doc-topic and are non-inner classes...");
-		List<FastCluster> excessClusters = new ArrayList<>();
+		FastClusterArchitecture excessClusters = new FastClusterArchitecture();
 		for (FastCluster c : fastClusters) {
 			if (c.docTopicItem == null && !c.getName().contains("$")) {
 				logger.error("Could not find doc-topic for non-inner class: " + c.getName());
@@ -141,7 +158,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			}
 		}
 		
-		List<FastCluster> excessInners = new ArrayList<>();
+		FastClusterArchitecture excessInners = new FastClusterArchitecture();
 		for (FastCluster excessCluster : excessClusters) {
 			for (FastCluster cluster : fastClusters) {
 				if (parentClassMap.containsKey(cluster)) {
@@ -155,7 +172,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		fastClusters.removeAll(excessClusters);
 		fastClusters.removeAll(excessInners);
 
-		ArrayList<FastCluster> updatedFastClusters = new ArrayList<>(fastClusters);
+		FastClusterArchitecture updatedFastClusters =
+			new FastClusterArchitecture(fastClusters);
 		for (String key : parentClassMap.keySet()) {
 			for (FastCluster nestedCluster : fastClusters) {
 				if (nestedCluster.getName().equals(key)) {
@@ -173,7 +191,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 		fastClusters = updatedFastClusters;
 		
-		List<FastCluster> clustersWithMissingDocTopics = new ArrayList<>();
+		FastClusterArchitecture clustersWithMissingDocTopics =
+			new FastClusterArchitecture();
 		for (FastCluster c : fastClusters) {
 			if (c.docTopicItem == null) {
 				logger.error("Could not find doc-topic for: " + c.getName());
@@ -296,7 +315,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			double currJSDivergence = 0;
 			if (Config.getCurrSimMeasure().equals(SimMeasure.js)) {
 				try {
-					currJSDivergence = TopicUtil.jsDivergence(newCluster.docTopicItem, currCluster.docTopicItem);
+					currJSDivergence =
+						newCluster.docTopicItem.getJsDivergence(currCluster.docTopicItem);
 				} catch (DistributionSizeMismatchException e) {
 					e.printStackTrace(); //TODO handle it
 				}
@@ -310,49 +330,5 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			simMatrix.get(fastClusters.size()-1).set(i, currJSDivergence);
 			simMatrix.get(i).set(fastClusters.size()-1, currJSDivergence);
 		}
-	}
-	
-	public static List<List<Double>> createSimilarityMatrix(
-			List<FastCluster> clusters) {
-		List<List<Double>> simMatrixObj = new ArrayList<>(clusters.size());
-		
-		for (int i=0;i<clusters.size();i++) {
-			simMatrixObj.add(new ArrayList<>(clusters.size()));
-		}
-
-		for (int i=0;i<clusters.size();i++) {
-			FastCluster cluster = clusters.get(i);
-			for (int j=0;j<clusters.size();j++) {
-				FastCluster otherCluster = clusters.get(j);
-				boolean isShowingEachSimilarityComparison = false;
-				if (isShowingEachSimilarityComparison) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("Comparing " + cluster.getName() + " to "
-								+ otherCluster.getName());
-						TopicUtil.printTwoDocTopics(cluster.docTopicItem,
-								otherCluster.docTopicItem);
-					}
-				}
-
-				double currJSDivergence = 0;
-
-				if (Config.getCurrSimMeasure().equals(SimMeasure.js)) {
-					try {
-						currJSDivergence = TopicUtil.jsDivergence(cluster.docTopicItem, otherCluster.docTopicItem);
-					} catch (DistributionSizeMismatchException e) {
-						e.printStackTrace(); //TODO handle it
-					}
-				}
-				else if (Config.getCurrSimMeasure().equals(SimMeasure.scm)) {
-					currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(cluster, otherCluster);
-				}
-				else {
-					throw new IllegalArgumentException("Invalid similarity measure: " + Config.getCurrSimMeasure());
-				}
-				
-				simMatrixObj.get(i).add(currJSDivergence);
-			}
-		}
-		return simMatrixObj;
 	}
 }

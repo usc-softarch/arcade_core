@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.clustering;
+package edu.usc.softarch.arcade.clustering.techniques;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,12 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
+import edu.usc.softarch.arcade.clustering.FastCluster;
+import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
+import edu.usc.softarch.arcade.clustering.MaxSimData;
+import edu.usc.softarch.arcade.clustering.StoppingCriterion;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.StopWatch;
 
@@ -22,7 +27,8 @@ public class LimboRunner extends ClusteringAlgoRunner {
 		
 		StopWatch matrixCreateTimer = new StopWatch();
 		matrixCreateTimer.start();
-		List<List<Double>> simMatrix = createSimilarityMatrix(fastClusters);
+		List<List<Double>> simMatrix = fastClusters
+			.createSimilarityMatrixUsingInfoLoss(numberOfEntitiesToBeClustered);
 		matrixCreateTimer.stop();
 		logger.debug("time to create similarity matrix: "
 				+ matrixCreateTimer.getElapsedTime());
@@ -31,8 +37,7 @@ public class LimboRunner extends ClusteringAlgoRunner {
 			if (Config.stoppingCriterion
 					.equals(Config.StoppingCriterionConfig.clustergain)) {
 				double clusterGain = 0;
-				clusterGain = ClusterUtil
-						.computeClusterGainUsingStructuralDataFromFastFeatureVectors(fastClusters);
+				clusterGain = fastClusters.computeClusterGainUsingStructuralData();
 				checkAndUpdateClusterGain(clusterGain);
 			}
 
@@ -175,30 +180,5 @@ public class LimboRunner extends ClusteringAlgoRunner {
 		}
 		msData.currentMaxSim = leastInfoLossMeasure;
 		return msData;
-	}
-
-	private static List<List<Double>> createSimilarityMatrix(
-			List<FastCluster> clusters) {
-		
-		List<List<Double>> simMatrixObj = new ArrayList<>(clusters.size());
-		
-		for (int i=0;i<clusters.size();i++) {
-			simMatrixObj.add(new ArrayList<>(clusters.size()));
-		}
-
-		for (int i=0;i<clusters.size();i++) {
-			FastCluster cluster = clusters.get(i);
-			for (int j=0;j<clusters.size();j++) {
-				FastCluster otherCluster = clusters.get(j);
-
-				double currSimMeasure = 0;
-				currSimMeasure = FastSimCalcUtil.getInfoLossMeasure(numberOfEntitiesToBeClustered,cluster,
-							otherCluster);
-				
-				simMatrixObj.get(i).add(currSimMeasure);
-			}
-		}
-		
-		return simMatrixObj;
 	}
 }

@@ -22,7 +22,6 @@ import cc.mallet.pipe.TokenSequenceRemoveStopwords;
 import cc.mallet.topics.TopicInferencer;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -225,6 +224,28 @@ public class DocTopics {
 		String data = FileUtil.readFile(file.getAbsolutePath(),
 			Charset.defaultCharset());
 		return new Instance(data, "X", depsStyleFilename, file.getAbsolutePath());
+	}
+
+	public static DocTopicItem computeGlobalCentroidUsingTopics(
+			List<DocTopicItem> docTopicItems) {
+		int firstNonNullDocTopicItemIndex = 0;
+		for (; docTopicItems.get(firstNonNullDocTopicItemIndex) == null
+				&& firstNonNullDocTopicItemIndex < docTopicItems.size(); firstNonNullDocTopicItemIndex++) {
+		}
+		DocTopicItem mergedDocTopicItem = new DocTopicItem(
+			docTopicItems.get(firstNonNullDocTopicItemIndex));
+		for (int i = firstNonNullDocTopicItemIndex; i < docTopicItems.size(); i++) {
+			if (docTopicItems.get(i) == null)
+				continue;
+			DocTopicItem currDocTopicItem = docTopicItems.get(i);
+			try {
+				mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
+					mergedDocTopicItem, currDocTopicItem);
+			} catch (UnmatchingDocTopicItemsException e) {
+				e.printStackTrace(); //TODO handle it
+			}
+		}
+		return mergedDocTopicItem;
 	}
 	// #endregion PROCESSING -----------------------------------------------------
 

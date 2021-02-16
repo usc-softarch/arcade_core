@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class ClusterGraphDensityCalculator {

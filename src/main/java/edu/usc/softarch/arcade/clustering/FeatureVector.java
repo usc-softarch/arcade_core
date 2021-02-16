@@ -39,6 +39,10 @@ public class FeatureVector extends ArrayList<Feature> {
 	// #region ACCESSORS ---------------------------------------------------------
 	public String getName() { return this.name; }
 	public DocTopicItem getDocTopicItem() { return this.docTopicItem; }
+	public String getInnermostPackageName() {
+		return getName().substring(
+			getName().lastIndexOf('.') + 1, getName().length() - 1);
+	}
 
 	public void setName(String name) { this.name = name; }
 	public void setDocTopicItem(DocTopicItem docTopicItem) {
@@ -58,6 +62,46 @@ public class FeatureVector extends ArrayList<Feature> {
 		for (Feature f : this)
 			if (tgtStr.equals(f.getEdge().getTgtStr()))
 				f.setValue(value);
+	}
+
+	public double getSumSharedFeatures(FeatureVector toCompare) {
+		double sharedFeatureSum = 0;
+
+		for (int i = 0; i < this.size(); i++) {
+			Feature f1 = this.get(i);
+			Feature f2 = toCompare.get(i);
+			
+			if (f1.getValue() > 0 && f2.getValue() > 0)
+				sharedFeatureSum = f1.getValue() + f2.getValue();
+		}
+		
+		return sharedFeatureSum;
+	}
+
+	public int getNum01Features(FeatureVector toCompare) {
+		int count = 0;
+		
+		for (int i = 0; i < this.size(); i++) {
+			Feature f1 = this.get(i);
+			Feature f2 = toCompare.get(i);
+			
+			if (f1.getValue() == 0 && f2.getValue() > 0) count++;
+		}
+
+		return count;
+	}
+
+	public int getNum10Features(FeatureVector toCompare) {
+		int count = 0;
+
+		for (int i = 0; i < this.size(); i++) {
+			Feature f1 = this.get(i);
+			Feature f2 = toCompare.get(i);
+			
+			if (f1.getValue() > 0 && f2.getValue() == 0) count++;
+		}
+		
+		return count;
 	}
 	// #endregion ACCESSORS ------------------------------------------------------
 	

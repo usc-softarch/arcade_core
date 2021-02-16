@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,13 +25,10 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import com.thoughtworks.xstream.XStream;
 
-import edu.usc.softarch.arcade.antipattern.BcoSmell;
-import edu.usc.softarch.arcade.antipattern.BdcSmell;
-import edu.usc.softarch.arcade.antipattern.BuoSmell;
 import edu.usc.softarch.arcade.antipattern.Smell;
-import edu.usc.softarch.arcade.antipattern.SpfSmell;
+import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.StringGraph;
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
@@ -100,14 +96,14 @@ public class ArchSmellDetector {
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 	
 	// #region PUBLIC INTERFACE --------------------------------------------------
-	public Set<Smell> run(boolean runStructural, boolean runConcern, 
-			boolean runSerialize) {
+	public SmellCollection run(boolean runStructural, boolean runConcern, 
+			boolean runSerialize) throws IOException {
 		// Make sure at least one type of smell detection algorithms was selected
 		if(!runConcern && !runStructural)
 			throw new IllegalArgumentException(); //TODO sort this out properly
 
 		// Initialize variables
-		Set<Smell> detectedSmells = new LinkedHashSet<>();
+		SmellCollection detectedSmells = new SmellCollection();
 		Set<ConcernCluster> clusters = loadClusters();
 		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
 
@@ -130,18 +126,18 @@ public class ArchSmellDetector {
 		for (Entry<String,Set<String>> entry : smellClustersMap.entrySet())
 			logger.debug(entry.getKey() + " : " + entry.getValue());
 		for (Smell smell : detectedSmells)
-			logger.debug(SmellUtil.getSmellAbbreviation(smell) + " " + smell);
+			logger.debug(smell.getSmellType() + " " + smell);
 
 		// Serialize results
 		if(runSerialize)
-			serializeDetectedSmells(detectedSmellsFilename, detectedSmells);
+			detectedSmells.serializeSmellCollection(detectedSmellsFilename);
 
 		// Return results
 		return detectedSmells;
 	}
 
 	public void runConcernDetectionAlgs(Set<ConcernCluster> clusters,
-			Set<Smell> detectedSmells, Map<String,Set<String>> clusterSmellMap) {
+			SmellCollection detectedSmells, Map<String,Set<String>> clusterSmellMap) {
 		if (this.tmeMethod == TopicModelExtractionMethod.MALLET_API)
 			buildConcernClustersFromMalletAPI(clusters);
 		if (this.tmeMethod == TopicModelExtractionMethod.VAR_MALLET_FILE)
@@ -163,7 +159,7 @@ public class ArchSmellDetector {
 	}
 
 	public void runStructuralDetectionAlgs(Set<ConcernCluster> clusters,
-			Set<Smell> detectedSmells, Map<String,Set<String>> clusterSmellMap) {
+			SmellCollection detectedSmells, Map<String,Set<String>> clusterSmellMap) {
 		Map<String, Set<String>> depMap = 
 		ClusterUtil.buildDependenciesMap(this.depsRsfFilename);
 	
@@ -179,8 +175,8 @@ public class ArchSmellDetector {
 	}
 
 	@Deprecated
-	public void runAllDetectionAlgs() {
-		Set<Smell> detectedSmells = new LinkedHashSet<>();
+	public void runAllDetectionAlgs() throws IOException {
+		SmellCollection detectedSmells = new SmellCollection();
 		Set<ConcernCluster> clusters = loadClusters();
 		
 		if (this.tmeMethod == TopicModelExtractionMethod.MALLET_API)
@@ -230,14 +226,14 @@ public class ArchSmellDetector {
 			logger.debug(entry.getKey() + " : " + entry.getValue());
 		
 		for (Smell smell : detectedSmells)
-			logger.debug(SmellUtil.getSmellAbbreviation(smell) + " " + smell);
+			logger.debug(smell.getSmellType() + " " + smell);
 
-		serializeDetectedSmells(detectedSmellsFilename, detectedSmells);
+		detectedSmells.serializeSmellCollection(detectedSmellsFilename);
 	}
 	
 	@Deprecated
-	public void runStructuralDetectionAlgs() {
-		Set<Smell> detectedSmells = new LinkedHashSet<>();
+	public void runStructuralDetectionAlgs() throws IOException {
+		SmellCollection detectedSmells = new SmellCollection();
 		Set<ConcernCluster> clusters = loadClusters();
 		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
 		
@@ -267,9 +263,9 @@ public class ArchSmellDetector {
 			logger.debug(entry.getKey() + " : " + entry.getValue());
 		
 		for (Smell smell : detectedSmells)
-			logger.debug(SmellUtil.getSmellAbbreviation(smell) + " " + smell);
+			logger.debug(smell.getSmellType() + " " + smell);
 
-		serializeDetectedSmells(detectedSmellsFilename, detectedSmells);
+		detectedSmells.serializeSmellCollection(detectedSmellsFilename);
 	}
 	// #endregion PUBLIC INTERFACE -----------------------------------------------
 
@@ -286,24 +282,6 @@ public class ArchSmellDetector {
 			logger.debug(cluster.getName());
 
 		return clusters;
-	}
-
-	/**
-	 * Serializes the results of a smell analysis.
-	 * 
-	 * @param detectedSmellsFilename Path to an output file to serialize into.
-	 * @param detectedSmells Set of smells detected in the analysis.
-	 */
-	private void serializeDetectedSmells(String detectedSmellsFilename,
-			Set<Smell> detectedSmells) {
-		try (PrintWriter writer =
-				new PrintWriter(detectedSmellsFilename, StandardCharsets.UTF_8)) {
-			XStream xstream = new XStream();
-			String xml = xstream.toXML(detectedSmells);
-	    writer.println(xml);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void buildConcernClustersFromConfigTopicsFile(
@@ -409,7 +387,7 @@ public class ArchSmellDetector {
 	}
 
 	// #region DETECTION ALGORITHMS ----------------------------------------------
-	protected void detectBuo(Set<Smell> detectedSmells,
+	protected void detectBuo(SmellCollection detectedSmells,
 			Set<ConcernCluster> clusters,	Map<String, Set<String>> clusterSmellMap,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
 		Set<String> vertices = directedGraph.vertexSet();
@@ -486,7 +464,7 @@ public class ArchSmellDetector {
 		}
 	}
 
-	protected void detectBdc(Set<Smell> detectedSmells,
+	protected void detectBdc(SmellCollection detectedSmells,
 			Set<ConcernCluster> clusters,	Map<String, Set<String>> clusterSmellMap,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
 		System.out.println("Finding cycles...");
@@ -520,21 +498,19 @@ public class ArchSmellDetector {
 		}
 		
 		for (Set<String> bdcConnectedSet : bdcConnectedSets) {
-			Smell bdc = new BdcSmell();
-			Set<ConcernCluster> bdcClusters = new HashSet<>();
+			Smell bdc = new Smell(Smell.SmellType.bdc);
 			for (String clusterName : bdcConnectedSet) {
 				ConcernCluster cluster = getMatchingCluster(clusterName,clusters);
 				assert cluster != null : "No matching cluster found for " + clusterName;
-				bdcClusters.add(cluster);
+				bdc.addCluster(cluster);
 			}
-			bdc.clusters = new HashSet<ConcernCluster>(bdcClusters);
 			detectedSmells.add(bdc);
 		}
 		
 		logger.debug("Number of strongly connected components: " + relevantConnectedSetCount);
 	}
 
-	protected StandardDeviation detectBco(Set<Smell> detectedSmells,
+	protected StandardDeviation detectBco(SmellCollection detectedSmells,
 			Set<ConcernCluster> clusters,
 			Map<String, Set<String>> clusterSmellMap) {
 		System.out.println("Finding brick concern overload instances...");
@@ -574,8 +550,8 @@ public class ArchSmellDetector {
 			if (concernCount > concernCountMean + concernCountStdDev) {
 				logger.debug("\t" + cluster.getName() + " has brick concern overload.");
 				
-				Smell bco = new BcoSmell();
-				bco.clusters.add(cluster);
+				Smell bco = new Smell(Smell.SmellType.bco);
+				bco.addCluster(cluster);
 				detectedSmells.add(bco);
 				
 				updateSmellMap(clusterSmellMap, cluster.getName(), "bco");
@@ -584,10 +560,10 @@ public class ArchSmellDetector {
 		return stdDev;
 	}
 
-	private void addDetectedBuoSmell(Set<Smell> detectedSmells,
+	private void addDetectedBuoSmell(SmellCollection detectedSmells,
 			Set<ConcernCluster> clusters, String vertex) {
-		Smell buo = new BuoSmell();
-		buo.clusters.add(getMatchingCluster(vertex,clusters));
+		Smell buo = new Smell(Smell.SmellType.buo);
+		buo.addCluster(getMatchingCluster(vertex,clusters));
 		detectedSmells.add(buo);
 	}
 	
@@ -627,7 +603,7 @@ public class ArchSmellDetector {
 	protected void detectSpfNew(
 			Set<ConcernCluster> clusters,
 			Map<String, Set<String>> clusterSmellsMap,
-			Set<Smell> detectedSmells) {
+			SmellCollection detectedSmells) {
 		logger.info("Finding scattered parasitic functionality instances...");
 
 		// Setting thresholds for detection algorithm
@@ -676,8 +652,9 @@ public class ArchSmellDetector {
 				}
 			}
 			
-			Smell spf = new SpfSmell(topicNum);
-			spf.clusters = new HashSet<>(affectedClusters);
+			Smell spf = new Smell(topicNum);
+			for (ConcernCluster affectedCluster : affectedClusters)
+				spf.addCluster(affectedCluster);
 			detectedSmells.add(spf);
 		}
 	}

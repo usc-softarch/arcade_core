@@ -1,0 +1,276 @@
+package edu.usc.softarch.arcade.clustering;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import edu.usc.softarch.arcade.classgraphs.StringEdge;
+import edu.usc.softarch.arcade.config.Config;
+import edu.usc.softarch.arcade.config.Config.SimMeasure;
+import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
+import edu.usc.softarch.arcade.topics.DocTopicItem;
+import edu.usc.softarch.arcade.topics.DocTopics;
+
+public class FastClusterArchitecture extends ArrayList<FastCluster> {
+  private static final long serialVersionUID = 1L;
+  private static Logger logger =
+    LogManager.getLogger(FastClusterArchitecture.class);
+
+  public FastClusterArchitecture() { super(); }
+
+  public FastClusterArchitecture(FastClusterArchitecture fca) {
+    super();
+    for (FastCluster fc : fca)
+      this.add(fc);
+  }
+
+  public Map<String, Integer> createFastClusterNameToNodeNumberMap() {
+		Map<String, Integer> clusterNameToNodeNumberMap = new HashMap<>();
+		for (int i = 0; i < this.size(); i++) {
+			FastCluster cluster = this.get(i);
+			clusterNameToNodeNumberMap.put(cluster.getName(), Integer.valueOf(i));
+		}
+		return clusterNameToNodeNumberMap;
+	}
+
+  public Map<Integer, String> createNodeNumberToFastClusterNameMap(
+			Map<String, Integer> clusterNameToNodeNumberMap) {
+		Map<Integer, String> nodeNumberToClusterNameMap = new TreeMap<>();
+
+		for (FastCluster cluster : this)
+			nodeNumberToClusterNameMap.put(
+				clusterNameToNodeNumberMap.get(cluster.getName()), cluster.getName());
+
+		return nodeNumberToClusterNameMap;
+	}
+
+  public void writeFastClusterRSFFileUsingConfigName(
+			Map<String, Integer> clusterNameToNodeNumberMap)
+      throws FileNotFoundException {
+		String currentClustersDetailedRsfFilename =
+      Config.getClustersRSFFilename(this.size());
+		writeFastClustersRsfFile(
+      clusterNameToNodeNumberMap, currentClustersDetailedRsfFilename);
+	}
+
+  public void writeFastClustersRsfFile(
+			Map<String, Integer> clusterNameToNodeNumberMap,
+			String currentClustersDetailedRsfFilename)
+			throws FileNotFoundException {
+		File rsfFile = new File(currentClustersDetailedRsfFilename);
+
+    try (PrintWriter out = new PrintWriter(
+        new OutputStreamWriter(
+        new FileOutputStream(rsfFile), StandardCharsets.UTF_8))) {
+      logger.trace("Printing each cluster and its leaves...");
+      for (FastCluster cluster : this) {
+        Integer currentNodeNumber =
+          clusterNameToNodeNumberMap.get(cluster.getName());
+        logger.trace("Cluster name: " + currentNodeNumber);
+        logger.trace("Cluster node number: " + cluster);
+        String[] entities = cluster.getName().split(",");
+        Set<String> entitiesSet = new HashSet<>(Arrays.asList(entities));
+        int entityCount = 0;
+        for (String entity : entitiesSet) {
+          logger.trace(entityCount + ":\t" + entity);
+          out.println("contain " + currentNodeNumber + " " + entity);
+          entityCount++;
+        }
+      }
+    }
+	}
+
+  public void fastClusterPostProcessing(
+      FastFeatureVectors fastFeatureVectors) {
+		StringGraph clusterGraph = generateFastClusterGraph(
+			fastFeatureVectors.getNamesInFeatureSet());
+
+		Map<String, Integer> clusterNameToNodeNumberMap =
+      createFastClusterNameToNodeNumberMap();
+		Map<Integer, String> nodeNumberToClusterNameMap =
+      createNodeNumberToFastClusterNameMap(clusterNameToNodeNumberMap);
+
+		try {
+			clusterGraph.writeNumberedNodeDotFileWithTextMappingFile(
+				Config.getClusterGraphDotFilename(),
+				clusterNameToNodeNumberMap, nodeNumberToClusterNameMap);
+			writeFastClusterRSFFileUsingConfigName(clusterNameToNodeNumberMap);
+			clusterGraph.writeXMLClusterGraph(Config.getClusterGraphXMLFilename());
+		} catch (FileNotFoundException
+				| ParserConfigurationException
+				| TransformerException e) {
+			e.printStackTrace();
+		}
+	}
+
+  private StringGraph generateFastClusterGraph(List<String> namesInFeatureSet) {
+		StringGraph clusterGraph = new StringGraph();
+		for (FastCluster c1 : this) {
+			for (FastCluster c2 : this) {
+				Set<Integer> c1Keys = c1.getNonZeroFeatureMap().keySet();
+				for (Integer key : c1Keys) {
+					String c1FeatureName = namesInFeatureSet.get(key);
+					String[] c2Entities = c2.getName().split(",");
+					for (String c2EntityName : c2Entities) {
+						if (c1FeatureName.equals(c2EntityName)) {
+							logger.trace(
+								"Adding edge (" + c1.getName() + "," + c2.getName() + ")");
+							clusterGraph.addEdge(new StringEdge(c1.getName(), c2.getName()));
+						}
+					}
+				}
+			}
+		}
+
+		return clusterGraph;
+	}
+
+  public double computeClusterGainUsingStructuralData() {
+		List<Double> clusterCentroids = new ArrayList<>();
+
+		for (FastCluster cluster : this) {
+			double centroid = cluster.computeCentroidUsingStructuralData();
+			clusterCentroids.add(centroid);
+		}
+
+		double globalCentroid = computeGlobalCentroidForStructuralData(clusterCentroids);
+
+		double clusterGain = 0;
+		for (int i = 0; i < clusterCentroids.size(); i++)
+			clusterGain += (this.get(i).getNumEntities() - 1)	* Math.pow(
+        Math.abs(globalCentroid - clusterCentroids.get(i).doubleValue()), 2);
+
+		return clusterGain;
+	}
+
+  private double computeGlobalCentroidForStructuralData(
+			List<Double> clusterCentroids) {
+		double centroidSum = 0;
+
+		for (Double centroid : clusterCentroids)
+			centroidSum += centroid.doubleValue();
+
+		return centroidSum / clusterCentroids.size();
+	}
+
+  public List<List<Double>> createSimilarityMatrixUsingJSDivergence() {
+		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
+
+		for (int i = 0; i < this.size(); i++)
+			simMatrixObj.add(new ArrayList<>(this.size()));
+
+		for (int i = 0; i < this.size(); i++) {
+			FastCluster cluster = this.get(i);
+			for (int j = 0; j < this.size(); j++) {
+				FastCluster otherCluster = this.get(j);
+				double currJSDivergence = 0;
+
+				if (Config.getCurrSimMeasure().equals(SimMeasure.js))
+					try {
+						currJSDivergence =
+							cluster.docTopicItem.getJsDivergence(otherCluster.docTopicItem);
+					} catch (DistributionSizeMismatchException e) {
+						e.printStackTrace(); //TODO handle it
+					}
+				else if (Config.getCurrSimMeasure().equals(SimMeasure.scm))
+					currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(cluster, otherCluster);
+				else
+					throw new IllegalArgumentException("Invalid similarity measure: " + Config.getCurrSimMeasure());
+				
+				simMatrixObj.get(i).add(currJSDivergence);
+			}
+		}
+		return simMatrixObj;
+	}
+
+  public List<List<Double>> createSimilarityMatrixUsingInfoLoss(
+      int numberOfEntitiesToBeClustered) {
+		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
+		
+		for (int i = 0; i < this.size(); i++)
+			simMatrixObj.add(new ArrayList<>(this.size()));
+
+		for (int i = 0; i < this.size(); i++) {
+			FastCluster cluster = this.get(i);
+			for (int j = 0; j < this.size(); j++) {
+				FastCluster otherCluster = this.get(j);
+
+				double currSimMeasure = 0;
+				currSimMeasure = FastSimCalcUtil.getInfoLossMeasure(numberOfEntitiesToBeClustered, cluster,	otherCluster);
+				
+				simMatrixObj.get(i).add(currSimMeasure);
+			}
+		}
+		
+		return simMatrixObj;
+	}
+
+  public List<List<Double>> createSimilarityMatrixUsingUEM() {
+		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
+		
+		for (int i = 0; i < this.size(); i++)
+			simMatrixObj.add(new ArrayList<>(this.size()));
+
+		for (int i = 0; i < this.size(); i++) {
+			FastCluster cluster = this.get(i);
+			for (int j = 0; j < this.size(); j++) {
+				FastCluster otherCluster = this.get(j);
+
+				double currSimMeasure = 0;
+				if (Config.getCurrSimMeasure().equals(SimMeasure.uem))
+					currSimMeasure =
+            FastSimCalcUtil.getUnbiasedEllenbergMeasure(cluster, otherCluster);
+				else if (Config.getCurrSimMeasure().equals(SimMeasure.uemnm))
+					currSimMeasure =
+            FastSimCalcUtil.getUnbiasedEllenbergMeasureNM(cluster, otherCluster);
+				else
+					throw new IllegalArgumentException(Config.getCurrSimMeasure()
+            + " is not a valid similarity measure for WCA");
+				
+				simMatrixObj.get(i).add(currSimMeasure);
+			}
+		}
+		
+		return simMatrixObj;
+	}
+
+  public double computeClusterGainUsingTopics() {
+		List<DocTopicItem> docTopicItems = new ArrayList<>();
+		for (FastCluster c : this)
+			docTopicItems.add(c.docTopicItem);
+		DocTopicItem globalDocTopicItem =
+      DocTopics.computeGlobalCentroidUsingTopics(docTopicItems);
+		logger.debug("Global Centroid Using Topics: "
+			+ globalDocTopicItem.toStringWithLeadingTabsAndLineBreaks(0));
+
+		double clusterGain = 0;
+
+		for (int i = 0; i < docTopicItems.size(); i++) {
+			try {
+				clusterGain += (this.get(i).getNumEntities() - 1)
+					* docTopicItems.get(i).getJsDivergence(globalDocTopicItem);
+			} catch (DistributionSizeMismatchException e) {
+				e.printStackTrace(); //TODO handle it
+			}
+		}
+
+		return clusterGain;
+	}
+}

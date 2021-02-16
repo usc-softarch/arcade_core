@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.clustering;
+package edu.usc.softarch.arcade.clustering.drivers;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +13,8 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.techniques.ConcernClusteringRunner;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.SimMeasure;
 import edu.usc.softarch.arcade.config.Config.StoppingCriterionConfig;
@@ -111,17 +112,16 @@ public class BatchClusteringEngine {
 		Config.setNumClusters(numClusters);
 		Config.stoppingCriterion = StoppingCriterionConfig.preselected;
 		Config.setCurrSimMeasure(SimMeasure.js);
-		runner.computeClustersWithConcernsAndFastClusters(new PreSelectedStoppingCriterion());
+		runner.computeClustersWithConcernsAndFastClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion());
 
 		String arcClustersFilename = outputDirName + fs
-				+ revisionNumber + "_" + numTopics + "_topics_"
-				+ runner.getFastClusters().size() + "_arc_clusters.rsf";
+			+ revisionNumber + "_" + numTopics + "_topics_"
+			+ runner.getFastClusters().size() + "_arc_clusters.rsf";
 		// need to build the map before writing the file
-		Map<String, Integer> clusterNameToNodeNumberMap = ClusterUtil
-				.createFastClusterNameToNodeNumberMap(runner.getFastClusters());
-		ClusterUtil.writeFastClustersRsfFile(
-				clusterNameToNodeNumberMap, runner.getFastClusters(),
-				arcClustersFilename);
+		Map<String, Integer> clusterNameToNodeNumberMap =
+			runner.getFastClusters().createFastClusterNameToNodeNumberMap();
+		runner.getFastClusters().writeFastClustersRsfFile(
+				clusterNameToNodeNumberMap, arcClustersFilename);
 
 		Config.setDepsRsfFilename(depsRsfFile.getAbsolutePath());
 		String detectedSmellsFilename = outputDirName + fs

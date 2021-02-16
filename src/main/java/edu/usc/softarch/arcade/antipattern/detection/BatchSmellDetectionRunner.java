@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.antipattern.detection;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
@@ -15,7 +16,7 @@ import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchSmellDetectionRunner {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		String gtRsfsDir = args[1];
 		String docTopicsFile = args[2];
 		String selectedLang = args[3];

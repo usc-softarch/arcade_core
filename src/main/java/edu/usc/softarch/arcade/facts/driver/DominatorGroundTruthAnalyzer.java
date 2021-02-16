@@ -22,41 +22,43 @@ import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Forest;
 import edu.uci.ics.jung.graph.Tree;
 import edu.uci.ics.jung.graph.util.Pair;
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ClusterUtil;
 
 public class DominatorGroundTruthAnalyzer {
-	private static Logger logger = LogManager.getLogger(DominatorGroundTruthAnalyzer.class);
+	private static Logger logger =
+		LogManager.getLogger(DominatorGroundTruthAnalyzer.class);
 	
 	static Factory<Integer> edgeFactory = new Factory<Integer>() {
 		int i = 0;
-
 		public Integer create() { return i++; }
 	};
 
 	static Factory<String> vertexFactory = new Factory<String>() {
 		int i = 0;
-
 		public String create() { return "V" + i++; }
 	};
 	
 	public static void main(String[] args) {
+		// Load arguments
 		String depsFilename = args[0];
 		String clustersFilename = args[1];
 		String outFilename = args[2];
 		
+		// Load files
 		RsfReader.loadRsfDataFromFile(depsFilename);
 		List<List<String>> depFacts = RsfReader.unfilteredFacts;
-		
 		RsfReader.loadRsfDataFromFile(clustersFilename);
 		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
 		
-		Map<String,Set<String>> clusterMap = ClusterUtil.buildClusterMap(clusterFacts);
+		// Run analysis
+		Map<String,Set<String>> clusterMap =
+			ClusterUtil.buildClusterMap(clusterFacts);
+		Map<String,Set<MutablePair<String,String>>> internalEdgeMap =
+			ClusterUtil.buildInternalEdgesPerCluster(clusterMap, depFacts);
+		Map<String, Double> ratioMap =
+			computeDominatorCriteriaIndicatorValues(clusterMap, internalEdgeMap);
 		
-		Map<String,Set<MutablePair<String,String>>> internalEdgeMap = ClusterUtil.buildInternalEdgesPerCluster(clusterMap, depFacts);
-		
-		Map<String, Double> ratioMap = computeDominatorCriteriaIndicatorValues(
-				clusterMap, internalEdgeMap);
-		
+		// Serialize results
 		try (FileWriter out = new FileWriter(outFilename)) {
 			for (Entry<String, Double> entry : ratioMap.entrySet())
 				out.write(entry.getKey() + "," + entry.getValue() + "\n");
@@ -122,7 +124,7 @@ public class DominatorGroundTruthAnalyzer {
 				}
 				String dom = entry.getKey();
 				int count = entry.getValue();
-				if (count > topCount && dom.trim() != "ST") {
+				if (count > topCount && !dom.trim().equals("ST")) {
 					topDom = dom;
 					topCount = count;
 				}

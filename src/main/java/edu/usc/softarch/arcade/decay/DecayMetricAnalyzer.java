@@ -14,7 +14,7 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.usc.softarch.arcade.clustering.StringGraph;
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;

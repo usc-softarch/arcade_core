@@ -19,6 +19,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
+import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -50,24 +51,20 @@ public class SmellAnalyzer {
 		}
 		writer.println("version, bdc, buo, bco, spf, all");
 		for (File file : inputFiles) {
-			Set<Smell> smells = SmellUtil.deserializeDetectedSmells(file
-					.getAbsolutePath());
+			SmellCollection smells = new SmellCollection(file.getAbsolutePath());
 
 			int buoCount = 0;
 			int bdcCount = 0;
 			int spfCount = 0;
 			int bcoCount = 0;
 			for (Smell smell : smells) {
-				if (SmellUtil.getSmellAbbreviation(smell).equals("buo"))
-					buoCount++;
-				if (SmellUtil.getSmellAbbreviation(smell).equals("bdc"))
-					bdcCount++;
-				if (SmellUtil.getSmellAbbreviation(smell).equals("spf"))
-					spfCount++;
-				if (SmellUtil.getSmellAbbreviation(smell).equals("bco"))
-					bcoCount++;
-				System.out.println(SmellUtil.getSmellAbbreviation(smell) + " "
-						+ smell);
+				switch (smell.getSmellType()) {
+					case buo:	buoCount++;	break;
+					case bdc: bdcCount++; break;
+					case spf: spfCount++; break;
+					case bco: bcoCount++; break;
+				}
+				System.out.println(smell.getSmellType() + " "	+ smell);
 			}
 			int sumCount = buoCount + bdcCount + spfCount + bcoCount;
 			total += sumCount;
@@ -103,7 +100,7 @@ public class SmellAnalyzer {
 		HSSFWorkbook workbook = new HSSFWorkbook();  
 		 
 		for (File file : inputFiles) {
-			Set<Smell> smells = SmellUtil.deserializeDetectedSmells(file.getAbsolutePath());
+			SmellCollection smells = new SmellCollection(file.getAbsolutePath());
 			HSSFSheet sheet = workbook.createSheet(FileUtil.extractFilenamePrefix(file));  
 			sheet.setColumnWidth(0, 15000);
 			//set headers
@@ -124,29 +121,25 @@ public class SmellAnalyzer {
 			Map<String, SmellCount> entityMap = new HashMap<>();
 
 			for (Smell smell : smells) {
-				Set<ConcernCluster > clusters = SmellUtil.getSmellClusters(smell);
+				Set<ConcernCluster > clusters = smell.getClusters();
 				for(ConcernCluster cluster : clusters) {
 					Set<String> entities = cluster.getEntities();
 					for(String entity : entities) {
 						if(entityMap.containsKey(entity)) {
-							if (SmellUtil.getSmellAbbreviation(smell).equals("buo"))
-								entityMap.get(entity).buo++;
-							if (SmellUtil.getSmellAbbreviation(smell).equals("bdc"))
-								entityMap.get(entity).bdc++;
-							if (SmellUtil.getSmellAbbreviation(smell).equals("spf"))
-								entityMap.get(entity).spf++;
-							if (SmellUtil.getSmellAbbreviation(smell).equals("bco"))
-								entityMap.get(entity).bco++;
+							switch (smell.getSmellType()) {
+								case buo:	entityMap.get(entity).buo++;	break;
+								case bdc: entityMap.get(entity).bdc++; break;
+								case spf: entityMap.get(entity).spf++; break;
+								case bco: entityMap.get(entity).bco++; break;
+							}
 						} else {
 							SmellCount smellCount = new SmellCount();
-							if (SmellUtil.getSmellAbbreviation(smell).equals("buo"))
-								smellCount.buo++;
-							if (SmellUtil.getSmellAbbreviation(smell).equals("bdc"))
-								smellCount.bdc++;
-							if (SmellUtil.getSmellAbbreviation(smell).equals("spf"))
-								smellCount.spf++;
-							if (SmellUtil.getSmellAbbreviation(smell).equals("bco"))
-								smellCount.bco++;
+							switch (smell.getSmellType()) {
+								case buo:	smellCount.buo++;	break;
+								case bdc: smellCount.bdc++; break;
+								case spf: smellCount.spf++; break;
+								case bco: smellCount.bco++; break;
+							}
 							entityMap.put(entity, smellCount);
 						}
 						entityMap.get(entity).all++;
@@ -194,7 +187,7 @@ public class SmellAnalyzer {
 		HSSFWorkbook workbook = new HSSFWorkbook();  
 		 
 		for (File file : inputFiles) {
-			Set<Smell> smells = SmellUtil.deserializeDetectedSmells(file.getAbsolutePath());
+			SmellCollection smells = new SmellCollection(file.getAbsolutePath());
 			HSSFSheet sheet = workbook.createSheet(FileUtil.extractFilenamePrefix(file));  
 			sheet.setColumnWidth(0, 15000);
 			//set headers
@@ -215,27 +208,23 @@ public class SmellAnalyzer {
 			Map<String, SmellCount> clusterMap = new HashMap<>();
 
 			for (Smell smell : smells) {
-				Set<ConcernCluster> clusters = SmellUtil.getSmellClusters(smell);
+				Set<ConcernCluster> clusters = smell.getClusters();
 				for (ConcernCluster cluster: clusters) {
 					if (clusterMap.containsKey(cluster.getName())) {
-						if (SmellUtil.getSmellAbbreviation(smell).equals("buo"))
-							clusterMap.get(cluster.getName()).buo++;
-						if (SmellUtil.getSmellAbbreviation(smell).equals("bdc"))
-							clusterMap.get(cluster.getName()).bdc++;
-						if (SmellUtil.getSmellAbbreviation(smell).equals("spf"))
-							clusterMap.get(cluster.getName()).spf++;
-						if (SmellUtil.getSmellAbbreviation(smell).equals("bco"))
-							clusterMap.get(cluster.getName()).bco++;
+						switch (smell.getSmellType()) {
+							case buo:	clusterMap.get(cluster.getName()).buo++;	break;
+							case bdc: clusterMap.get(cluster.getName()).bdc++; break;
+							case spf: clusterMap.get(cluster.getName()).spf++; break;
+							case bco: clusterMap.get(cluster.getName()).bco++; break;
+						}
 					} else {
 						SmellCount smellCount = new SmellCount();
-						if (SmellUtil.getSmellAbbreviation(smell).equals("buo"))
-							smellCount.buo++;
-						if (SmellUtil.getSmellAbbreviation(smell).equals("bdc"))
-							smellCount.bdc++;
-						if (SmellUtil.getSmellAbbreviation(smell).equals("spf"))
-							smellCount.spf++;
-						if (SmellUtil.getSmellAbbreviation(smell).equals("bco"))
-							smellCount.bco++;
+						switch (smell.getSmellType()) {
+							case buo:	smellCount.buo++;	break;
+							case bdc: smellCount.bdc++; break;
+							case spf: smellCount.spf++; break;
+							case bco: smellCount.bco++; break;
+						}
 						clusterMap.put(cluster.getName(), smellCount);
 					}
 					clusterMap.get(cluster.getName()).all++;

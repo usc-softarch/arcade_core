@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.clustering;
+package edu.usc.softarch.arcade.metrics;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.clustering.util;
+package edu.usc.softarch.arcade.clustering;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,9 +16,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -27,16 +23,9 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
-import edu.usc.softarch.arcade.clustering.FastCluster;
-import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
-import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
-import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
-import edu.usc.softarch.arcade.topics.DocTopicItem;
-import edu.usc.softarch.arcade.topics.TopicUtil;
-import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.extractors.cda.odem.Dependencies;
 import edu.usc.softarch.extractors.cda.odem.DependsOn;
 import edu.usc.softarch.extractors.cda.odem.Type;
@@ -46,182 +35,6 @@ import edu.usc.softarch.extractors.cda.odem.Type;
  */
 public class ClusterUtil {
 	private static Logger logger = LogManager.getLogger(ClusterUtil.class);
-
-	public static StringGraph generateFastClusterGraph(
-			Collection<FastCluster> splitClusters,
-			List<String> namesInFeatureSet) {
-		boolean debugMethod = false;
-		StringGraph clusterGraph = new StringGraph();
-		for (FastCluster c1 : splitClusters) {
-			for (FastCluster c2 : splitClusters) {
-				Set<Integer> c1Keys = c1.getNonZeroFeatureMap().keySet();
-				for (Integer key : c1Keys) {
-					Double c1FeatureValue = c1.getNonZeroFeatureMap().get(key);
-					String c1FeatureName = namesInFeatureSet.get(key);
-					String[] c2Entities = c2.getName().split(",");
-					for (String c2EntityName : c2Entities) {
-						if (debugMethod) {
-							logger.debug("c1FeatureName: " + c1FeatureName
-									+ ", c1FeatureValue: " + c1FeatureValue);
-							logger.debug("c2EntityName: " + c2EntityName);
-						}
-
-						if (c1FeatureName.equals(c2EntityName)) {
-							logger.trace("Adding edge (" + c1.getName() + "," + c2.getName() + ")");
-							clusterGraph.addEdge(new StringEdge(c1.getName(), c2.getName()));
-						}
-					}
-				}
-			}
-		}
-		return clusterGraph;
-	}
-
-	public static double computeCentroidUsingStructuralData(FastCluster cluster) {
-		double centroidSum = 0;
-		Set<Integer> clusterKeys = cluster.getNonZeroFeatureMap().keySet();
-
-		for (Integer key : clusterKeys)
-			centroidSum += cluster.getNonZeroFeatureMap().get(key).doubleValue();
-
-		double centroidAvg = centroidSum / cluster.getFeaturesLength();
-
-		// centroid
-		return centroidAvg / cluster.getNumEntities();
-	}
-
-	public static double computeGlobalCentroidForStructuralData(
-			List<Double> clusterCentroids) {
-		double centroidSum = 0;
-
-		for (Double centroid : clusterCentroids)
-			centroidSum += centroid.doubleValue();
-
-		return centroidSum / clusterCentroids.size();
-	}
-
-	public static double computeClusterGainUsingStructuralDataFromFastFeatureVectors(
-			List<FastCluster> fastClusters) {
-		ArrayList<Double> clusterCentroids = new ArrayList<>();
-
-		for (FastCluster cluster : fastClusters) {
-			double centroid = computeCentroidUsingStructuralData(cluster);
-			clusterCentroids.add(centroid);
-		}
-
-		double globalCentroid = computeGlobalCentroidForStructuralData(clusterCentroids);
-
-		double clusterGain = 0;
-		for (int i = 0; i < clusterCentroids.size(); i++)
-			clusterGain += (fastClusters.get(i).getNumEntities() - 1)
-				* Math.pow(Math.abs(globalCentroid - clusterCentroids.get(i).doubleValue()), 2);
-
-		return clusterGain;
-	}
-
-	public static DocTopicItem computeGlobalCentroidUsingTopics(
-			List<DocTopicItem> docTopicItems) {
-		int firstNonNullDocTopicItemIndex = 0;
-		for (; docTopicItems.get(firstNonNullDocTopicItemIndex) == null
-				&& firstNonNullDocTopicItemIndex < docTopicItems.size(); firstNonNullDocTopicItemIndex++) {
-		}
-		DocTopicItem mergedDocTopicItem = new DocTopicItem(
-			docTopicItems.get(firstNonNullDocTopicItemIndex));
-		for (int i = firstNonNullDocTopicItemIndex; i < docTopicItems.size(); i++) {
-			if (docTopicItems.get(i) == null)
-				continue;
-			DocTopicItem currDocTopicItem = docTopicItems.get(i);
-			try {
-				mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
-					mergedDocTopicItem, currDocTopicItem);
-			} catch (UnmatchingDocTopicItemsException e) {
-				e.printStackTrace(); //TODO handle it
-			}
-		}
-		return mergedDocTopicItem;
-	}
-
-	public static double computeClusterGainUsingTopics(
-			List<FastCluster> clusters) {
-		ArrayList<DocTopicItem> docTopicItems = new ArrayList<>();
-		for (FastCluster c : clusters)
-			docTopicItems.add(c.docTopicItem);
-		DocTopicItem globalDocTopicItem = computeGlobalCentroidUsingTopics(docTopicItems);
-		logger.debug("Global Centroid Using Topics: "
-			+ globalDocTopicItem.toStringWithLeadingTabsAndLineBreaks(0));
-
-		double clusterGain = 0;
-
-		for (int i = 0; i < docTopicItems.size(); i++) {
-			try {
-				clusterGain += (clusters.get(i).getNumEntities() - 1)
-					* TopicUtil.jsDivergence(docTopicItems.get(i), globalDocTopicItem);
-			} catch (DistributionSizeMismatchException e) {
-				e.printStackTrace(); //TODO handle it
-			}
-		}
-
-		return clusterGain;
-	}
-
-	public static Map<String, Integer> createFastClusterNameToNodeNumberMap(
-			List<FastCluster> clusters) {
-		HashMap<String, Integer> clusterNameToNodeNumberMap = new HashMap<>();
-		for (int i = 0; i < clusters.size(); i++) {
-			FastCluster cluster = clusters.get(i);
-			clusterNameToNodeNumberMap.put(cluster.getName(), Integer.valueOf(i));
-		}
-		return clusterNameToNodeNumberMap;
-	}
-
-	public static Map<Integer, String> createNodeNumberToFastClusterNameMap(
-			List<FastCluster> clusters,
-			Map<String, Integer> clusterNameToNodeNumberMap) {
-		Map<Integer, String> nodeNumberToClusterNameMap = new TreeMap<>();
-
-		for (FastCluster cluster : clusters)
-			nodeNumberToClusterNameMap.put(
-				clusterNameToNodeNumberMap.get(cluster.getName()), cluster.getName());
-
-		return nodeNumberToClusterNameMap;
-	}
-
-	public static void writeFastClusterRSFFileUsingConfigName(
-			Map<String, Integer> clusterNameToNodeNumberMap,
-			List<FastCluster> clusters) throws FileNotFoundException {
-		String currentClustersDetailedRsfFilename = Config.getClustersRSFFilename(clusters.size());
-		writeFastClustersRsfFile(clusterNameToNodeNumberMap, clusters,
-			currentClustersDetailedRsfFilename);
-	}
-
-	public static void writeFastClustersRsfFile(
-			Map<String, Integer> clusterNameToNodeNumberMap,
-			List<FastCluster> clusters,
-			String currentClustersDetailedRsfFilename)
-			throws FileNotFoundException {
-		File rsfFile = new File(currentClustersDetailedRsfFilename);
-
-		FileOutputStream fos = new FileOutputStream(rsfFile);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-		PrintWriter out = new PrintWriter(osw);
-
-		logger.trace("Printing each cluster and its leaves...");
-		for (FastCluster cluster : clusters) {
-			Integer currentNodeNumber = clusterNameToNodeNumberMap.get(cluster.getName());
-			logger.trace("Cluster name: " + currentNodeNumber);
-			logger.trace("Cluster node number: " + cluster);
-			String[] entities = cluster.getName().split(",");
-			Set<String> entitiesSet = new HashSet<>( Arrays.asList(entities) );
-			int entityCount = 0;
-			for (String entity : entitiesSet) {
-				logger.trace(entityCount + ":\t" + entity);
-				out.println("contain " + currentNodeNumber + " " + entity);
-				entityCount++;
-			}
-		}
-
-		out.close();
-	}
 
 	public static void printSimilarFeatures(FastCluster c1, FastCluster c2,
 			FastFeatureVectors fastFeatureVectors) {
@@ -479,38 +292,6 @@ public class ClusterUtil {
 		}
 
 		return edges;
-	}
-	
-	public static void fastClusterPostProcessing(List<FastCluster> fastClusters, FastFeatureVectors fastFeatureVectors) {
-
-		boolean outputResultingClusterGraph = false;
-		StringGraph clusterGraph = ClusterUtil.generateFastClusterGraph(
-				fastClusters, fastFeatureVectors.getNamesInFeatureSet());
-		if (outputResultingClusterGraph) {
-			logger.debug("Resulting ClusterGraph...");
-			logger.debug(clusterGraph);
-		}
-
-		Map<String, Integer> clusterNameToNodeNumberMap = ClusterUtil
-				.createFastClusterNameToNodeNumberMap(fastClusters);
-		Map<Integer, String> nodeNumberToClusterNameMap = ClusterUtil
-				.createNodeNumberToFastClusterNameMap(fastClusters,
-						clusterNameToNodeNumberMap);
-
-		try {
-			clusterGraph.writeNumberedNodeDotFileWithTextMappingFile(
-					Config.getClusterGraphDotFilename(),
-					clusterNameToNodeNumberMap, nodeNumberToClusterNameMap);
-			ClusterUtil.writeFastClusterRSFFileUsingConfigName(clusterNameToNodeNumberMap,
-					fastClusters);
-			clusterGraph.writeXMLClusterGraph(Config.getClusterGraphXMLFilename());
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	public static Map<String, Set<String>> buildDependenciesMap(String depsRsfFilename) {

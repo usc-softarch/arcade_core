@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
+import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -35,7 +36,7 @@ public class SmellEvolutionAnalyzer {
 		int idx = 0;
 		for (File file : orderedSerFiles) {
 			logger.debug(file.getName());
-			Set<Smell> smells = SmellUtil.deserializeDetectedSmells(file.getAbsolutePath());
+			SmellCollection smells = new SmellCollection(file.getAbsolutePath());
 			logger.debug("\tcontains " + smells.size() + " smells");
 			
 			smellCounts[idx] = smells.size();
@@ -43,7 +44,7 @@ public class SmellEvolutionAnalyzer {
 			
 			logger.debug("\tListing detected smells for file" + file.getName() + ": ");
 			for (Smell smell : smells) {
-				logger.debug("\t" + SmellUtil.getSmellAbbreviation(smell) + " " + smell);
+				logger.debug("\t" + smell.getSmellType() + " " + smell);
 			}
 			
 			Pattern p = Pattern.compile("[0-9]+\\.[0-9]+(\\.[0-9]+)*");
