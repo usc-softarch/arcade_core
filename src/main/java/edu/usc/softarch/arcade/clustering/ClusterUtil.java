@@ -1,19 +1,11 @@
 package edu.usc.softarch.arcade.clustering;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -23,7 +15,6 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 import edu.usc.softarch.extractors.cda.odem.Dependencies;

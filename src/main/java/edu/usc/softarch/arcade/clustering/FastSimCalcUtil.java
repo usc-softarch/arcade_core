@@ -4,8 +4,6 @@ import java.util.Set;
 
 import cc.mallet.util.Maths;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
-import edu.usc.softarch.arcade.topics.TopicUtil;
-
 
 public class FastSimCalcUtil {
 	 
