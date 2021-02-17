@@ -16,7 +16,6 @@ import edu.usc.softarch.arcade.clustering.FastClusterArchitecture;
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.Granule;
-import edu.usc.softarch.arcade.config.Config.Language;
 import edu.usc.softarch.arcade.util.FileListing;
 
 public class ClusteringAlgoRunner {
@@ -41,7 +40,7 @@ public class ClusteringAlgoRunner {
 	}
 	// #endregion ACCESSORS ------------------------------------------------------
 	
-	protected static void initializeClusters(String srcDir) {
+	protected static void initializeClusters(String srcDir, String language) {
 		fastClusters = new FastClusterArchitecture();
 
 		// For each node in the adjacency matrix
@@ -53,7 +52,7 @@ public class ClusteringAlgoRunner {
 				fastFeatureVectors.getNamesInFeatureSet());
 			
 			// Add the cluster except extraordinary circumstances (assume always)
-			addClusterConditionally(fastCluster);
+			addClusterConditionally(fastCluster, language);
 		}
 		
 		// Unknown whether this block ever executes
@@ -87,9 +86,9 @@ public class ClusteringAlgoRunner {
 	/**
 	 * For almost all situations, adds the cluster to the list.
 	 */
-	private static void addClusterConditionally(FastCluster fastCluster) {
+	private static void addClusterConditionally(FastCluster fastCluster, String language) {
 		// If the source language is C or C++, add the only C-based entities
-		if (Config.getSelectedLanguage().equals(Language.c)) {
+		if (language.equalsIgnoreCase("c")) {
 			Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
 			// First condition to be assumed true
 			// Second condition to be assumed true
@@ -111,7 +110,7 @@ public class ClusteringAlgoRunner {
 
 		// If the source language is Java, add all clusters
 		// Second condition to be assumed true
-		if (Config.getSelectedLanguage().equals(Language.java))
+		if (language.equalsIgnoreCase("java"))
 			fastClusters.add(fastCluster);
 	}
 	

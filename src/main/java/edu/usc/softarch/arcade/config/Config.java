@@ -15,9 +15,6 @@ public class Config {
 	public enum SimMeasure { uem, uemnm, js, ilm, scm }
 	public enum Granule { func, file, clazz	}
 	
-	/* Project-specific configuration data */
-	public static Language selectedLanguage = Language.java;
-	
 	/* Clustering configuration data */
 	//TODO Pretty sure this is also dead
 	private static ClusteringAlgorithmType currentClusteringAlgorithm = 
@@ -63,9 +60,4 @@ public class Config {
 	public static int getNumClusters() { return numClusters; }
 	public static void setNumClusters(int inNumClusters) {
 		numClusters = inNumClusters; }
-
-	public static Language getSelectedLanguage() { return selectedLanguage; }
-
-	public static void setSelectedLanguage(Language inLang) {
-		selectedLanguage = inLang; }
 }

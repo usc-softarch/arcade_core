@@ -1,18 +1,14 @@
 package edu.usc.softarch.arcade.topics;
 
 import java.io.FileNotFoundException;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.Entity;
 import edu.usc.softarch.arcade.clustering.FastCluster;
-import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.config.Config.Language;
 
 /**
  * @author joshua

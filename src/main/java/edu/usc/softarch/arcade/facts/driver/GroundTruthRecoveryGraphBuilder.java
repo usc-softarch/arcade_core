@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
 import edu.usc.softarch.arcade.clustering.StringGraph;
-import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.GroundTruthFileParser;

@@ -19,10 +19,10 @@ public class WcaRunner extends ClusteringAlgoRunner {
 	private static Logger logger = LogManager.getLogger(WcaRunner.class);
 
 	public static void computeClustersWithPQAndWCA(
-			StoppingCriterion stopCriterion) {
+			StoppingCriterion stopCriterion, String language) {
 		StopWatch loopSummaryStopwatch = new StopWatch();
 
-		initializeClusters(null);
+		initializeClusters(null, language);
 
 		loopSummaryStopwatch.start();
 		

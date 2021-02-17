@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 
 import mojo.MoJoCalculator;
 
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -26,11 +25,6 @@ public class BatchSmellDetectionRunner {
 		File gtRsfsDirFile = new File(gtRsfsDir);
 		File[] newGtFiles =
 			gtRsfsDirFile.listFiles(file -> file.getName().endsWith(".rsf"));
-
-		if (selectedLang.equals("c"))
-			Config.setSelectedLanguage(Config.Language.c);
-		else if (selectedLang.equals("java"))
-			Config.setSelectedLanguage(Config.Language.java);
 
 		try (PrintWriter writer = new PrintWriter(techniquesDir
 				+ File.separatorChar + "mojofm_mapping.csv", "UTF-8")) {

@@ -44,7 +44,7 @@ public class ClusteringEngine {
 			ParserConfigurationException, SAXException, IOException {
 	}
 
-	public void run(String fastFeatureVectorsFilePath) throws Exception {
+	public void run(String fastFeatureVectorsFilePath, String language) throws Exception {
 		FastFeatureVectors fastFeatureVectors = null;
 		
 		File fastFeatureVectorsFile = new File(fastFeatureVectorsFilePath);
@@ -71,14 +71,14 @@ public class ClusteringEngine {
 			if (Config.stoppingCriterion
 					.equals(Config.StoppingCriterionConfig.preselected)) {
 				StoppingCriterion stopCriterion = new ConcernClusteringRunner.PreSelectedStoppingCriterion();
-				WcaRunner.computeClustersWithPQAndWCA(stopCriterion);
+				WcaRunner.computeClustersWithPQAndWCA(stopCriterion, language);
 			}
 			if (Config.stoppingCriterion
 					.equals(Config.StoppingCriterionConfig.clustergain)) {
 				StoppingCriterion singleClusterStopCriterion = new SingleClusterStoppingCriterion();
-				WcaRunner.computeClustersWithPQAndWCA(singleClusterStopCriterion);
+				WcaRunner.computeClustersWithPQAndWCA(singleClusterStopCriterion, language);
 				StoppingCriterion clusterGainStopCriterion = new ClusterGainStoppingCriterion();
-				WcaRunner.computeClustersWithPQAndWCA(clusterGainStopCriterion);
+				WcaRunner.computeClustersWithPQAndWCA(clusterGainStopCriterion, language);
 			}
 		}
 		
@@ -92,9 +92,9 @@ public class ClusteringEngine {
 		
 		if (Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.LIMBO)) {
 			LimboRunner.setFastFeatureVectors(fastFeatureVectors);
-			LimboRunner.computeClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion());
+			LimboRunner.computeClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion(), language);
 			if (Config.stoppingCriterion.equals(Config.StoppingCriterionConfig.clustergain)) {
-				LimboRunner.computeClusters(new ClusterGainStoppingCriterion());
+				LimboRunner.computeClusters(new ClusterGainStoppingCriterion(), language);
 			}
 		}
 	}

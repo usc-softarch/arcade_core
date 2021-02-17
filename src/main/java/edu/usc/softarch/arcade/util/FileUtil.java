@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -394,5 +395,24 @@ public class FileUtil {
 			return dir.split("$")[0];
 		else
 			return dir;
+	}
+
+	public static boolean checkClassesDirs(File inputDir, String classesDirs) {
+		String fs = File.separator;
+		// List all files in inputDir
+		List<File> versionDirectories = Arrays.asList(inputDir.listFiles());
+		// Remove if not a directory
+		versionDirectories.removeIf((File file) -> !file.isDirectory());
+
+		for (File d : versionDirectories) {
+			File currentClassesDir = FileUtil.checkDir(d.getAbsolutePath() + fs
+				+ classesDirs, false, false);
+			if (!currentClassesDir.isDirectory()) {
+				logger.debug("Classes directory " + d.getAbsolutePath()
+					+ " does not exist!");
+				return false;
+			}
+		}
+		return true;
 	}
 }

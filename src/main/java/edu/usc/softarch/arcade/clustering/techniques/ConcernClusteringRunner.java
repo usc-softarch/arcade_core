@@ -31,8 +31,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	public static class PreSelectedStoppingCriterion implements StoppingCriterion {
 		public boolean notReadyToStop() {
 			return ClusteringAlgoRunner.fastClusters.size() != 1
-					&& ClusteringAlgoRunner.fastClusters.size() != Config
-							.getNumClusters();
+				&& ClusteringAlgoRunner.fastClusters.size() != Config.getNumClusters();
 		}
 	}
 
@@ -46,7 +45,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	public ConcernClusteringRunner(FastFeatureVectors vecs,
 			String srcDir, String artifactsDir, String language) {
 		setFastFeatureVectors(vecs);
-		initializeClusters(srcDir); // Initially, every node gets a cluster
+		initializeClusters(srcDir, language); // Initially, every node gets a cluster
 		initializeDocTopicsForEachFastCluster(srcDir, artifactsDir);
 		this.language = language;
 	}

@@ -17,10 +17,10 @@ import edu.usc.softarch.arcade.util.StopWatch;
 public class LimboRunner extends ClusteringAlgoRunner {
 	private static Logger logger = LogManager.getLogger(LimboRunner.class);
 
-	public static void computeClusters(StoppingCriterion stopCriterion) {
+	public static void computeClusters(StoppingCriterion stopCriterion, String language) {
 		StopWatch loopSummaryStopwatch = new StopWatch();
 
-		initializeClusters(null);
+		initializeClusters(null, language);
 
 		loopSummaryStopwatch.start();
 		

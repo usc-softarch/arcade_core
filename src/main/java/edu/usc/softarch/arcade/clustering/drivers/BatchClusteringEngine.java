@@ -80,7 +80,6 @@ public class BatchClusteringEngine {
 		String revisionNumber = folder.getName();
 		String fullClassesDir =	folder.getAbsolutePath() + fs + inClassesDir;
 		String fullSrcDir = folder.getAbsolutePath() + fs;
-		if (language.equals("c")) Config.selectedLanguage = Config.Language.c;
 		
 		// Ensure binaries directory exists
 		File classesDirFile = new File(fullClassesDir);
@@ -129,7 +128,7 @@ public class BatchClusteringEngine {
 		logger.debug("Running smell detecion for revision "	+ revisionNumber);
 		ArchSmellDetector asd = new ArchSmellDetector(
 			depsRsfFile.getAbsolutePath(), arcClustersFilename,
-			detectedSmellsFilename, Config.selectedLanguage.toString(),
+			detectedSmellsFilename, language,
 			TopicModelExtractionMethod.MALLET_API, TopicUtil.docTopics);
 		asd.run(true, true, true);
 	}

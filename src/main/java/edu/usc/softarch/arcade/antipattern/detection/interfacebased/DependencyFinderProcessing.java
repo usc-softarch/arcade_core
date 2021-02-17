@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.antipattern.detection.interfacebased;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,6 +38,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import edu.usc.softarch.arcade.antipattern.detection.StringMatrix;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -45,124 +48,400 @@ import edu.usc.softarch.arcade.util.FileUtil;
  * Find interface based architectural smell + co-change smell
  */
 public class DependencyFinderProcessing {
+	// #region ATTRIBUTES --------------------------------------------------------
+	// Utility data
 	private static Logger logger =
 		LogManager.getLogger(DependencyFinderProcessing.class);
-	private static String summary ="SUMMARY:\n version, unused interface, unused block, sloppy, lego, function overload, duplicate functionality, logical deps\n";
-	private static String details ="DETAILS:\n";
+	private String summary = "SUMMARY:\n version, unused interface, unused block, sloppy, lego, function overload, duplicate functionality, logical deps\n";
+	private String details = "DETAILS:\n";
 	private static JSONObject details_json = new JSONObject();
 	
-	private Map<String, List<String>> clusterList = new HashMap<>();		
+	// Base data
+	private String logicalDep;
+	private String outputDest;
+	private String packageName;
+
+	// Processing data
+	StringMatrix clusterList = new StringMatrix();		
 	private Map<String, String> class2component = new HashMap<>();
 	private Map<Integer, Set<String>> codeClone = new HashMap<>();
-	// Keep whole dependencies in Memory, using map
-	// Only keep inbound at the moment
-	// Mapping class name and Methond
-	private Map<String, List<String>> methodList = new HashMap<>();
-	// Mapping method name and inbound/outbound methods
-	private Map<String, List<String>> inboundDependencies = new HashMap<>();
-	private Map<String, List<String>> outboundDependencies = new HashMap<>();
-	private Map<String, List<String>> inboundClasses = new HashMap<>();
-	private Map<String, List<String>> outboundClasses = new HashMap<>();
-	private Map<String, List<String>> classLogicalDependencies = new HashMap<>();
+	StringMatrix methodList = new StringMatrix();
+	StringMatrix inboundDependencies = new StringMatrix();
+	StringMatrix outboundDependencies = new StringMatrix();
+	StringMatrix inboundClasses = new StringMatrix();
+	StringMatrix outboundClasses = new StringMatrix();
+	StringMatrix classLogicalDependencies = new StringMatrix();
+	// #endregion ATTRIBUTES -----------------------------------------------------
+
+	// #region CONSTRUCTORS ------------------------------------------------------
+	public DependencyFinderProcessing(String logicalDep, String outputDest,
+			String packageName) {
+		this.logicalDep = logicalDep;
+		this.outputDest = outputDest;
+		this.packageName = packageName;
+	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
 	
-	public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
-		String testRSF;
-		String testDefFinder;
-		String testClone;
-		String logicalDep;
-		String outputDest;
-		String packageName;
-		
-		if (args.length == 7)	{
-			testRSF = args[0] + args[1];
-			testDefFinder = args[0] + args[2];
-			testClone = args[0] + args[3];
-			logicalDep = args[0] + args[4];
-			packageName = args[5]; 
-			outputDest = args[0] + args[6];		
-		} else {
-			testRSF = "subject_systems\\Struts2\\acdc\\cluster";
-			testDefFinder = "subject_systems\\Struts2\\depfinder";
-			testClone = "subject_systems\\Struts2\\clone";
-			logicalDep = "subject_systems\\Struts2\\struts2_cleaned.csv";
-			outputDest = "subject_systems\\Struts2\\struts2_acdc_interface_smell.csv";
-			packageName = "org.apache.struts2";
-		}
-		final File depFinderDir = FileUtil.checkDir(testDefFinder, false, false);
-		final File clustersDir = FileUtil.checkDir(testRSF, false, false);
-		final File cloneDir = FileUtil.checkDir(testClone, false, false);
+	// #region IO ----------------------------------------------------------------
+	/**
+	 * Parameters are
+	 * 0 - Root system directory
+	 * 1 - Relative path of clustered RSF files directory
+	 * 2 - Relative path of DepFinder XML files directory
+	 * 3 - Relative path of clones XML files directory
+	 * 4 - Relative path of _cleaned.csv file
+	 * 5 - Fully qualified name of the package under analysis
+	 * 6 - Relative path of the output file
+	 */
+	public static void main(String[] args)
+			throws IOException, ParserConfigurationException, SAXException {
+		if (args.length != 7)
+			throw new IOException("Wrong number of arguments.");
 
-		List<File> fileList = FileListing.getFileListing(depFinderDir);
-		fileList = FileUtil.sortFileListByVersion(fileList);
-		final Set<File> orderedSerFiles = new LinkedHashSet<>();
-		for (final File file : fileList)
-			if (file.getName().endsWith(".xml"))
-				orderedSerFiles.add(file);
-		
-		fileList = FileListing.getFileListing(clustersDir);
-		fileList = FileUtil.sortFileListByVersion(fileList);
-		final Set<File> clusterFiles = new LinkedHashSet<>();
-		for (final File file : fileList)
-			if (file.getName().endsWith(".rsf"))
-				clusterFiles.add(file);
-		
-		fileList = FileListing.getFileListing(cloneDir);
-		fileList = FileUtil.sortFileListByVersion(fileList);
-		final Set<File> cloneFiles = new LinkedHashSet<>();
-		for (final File file : fileList)
-			if (file.getName().endsWith(".xml"))
-				cloneFiles.add(file);
+		// Parsing arguments
+		String rootDir = args[0];
+		String rsfDir = rootDir + args[1];
+		String depFinderDir = rootDir + args[2];
+		String clonesDir = rootDir + args[3];
+		String logicalDep = rootDir + args[4];
+		String outputDest = args[5];
+		String packageName = rootDir + args[6];
 
-		Map<String, String> versionSmells = new LinkedHashMap<>();
-		final String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*+((-|\\.)(RC|ALPHA|BETA|M|Rc|Alpha|Beta|rc|alpha|beta)[0-9])*";
-		for (final File file : orderedSerFiles) {
+		// Execution
+		DependencyFinderProcessing dfp = new DependencyFinderProcessing(
+			logicalDep, outputDest, packageName);
+		dfp.batchRun(rsfDir, depFinderDir, clonesDir);
+		
+	}
+
+	private Set<File> loadDirFilterExtension(File dir, String extension) 
+			throws FileNotFoundException {
+		List<File> fileList = FileListing.getFileListing(dir);
+		fileList = FileUtil.sortFileListByVersion(fileList);
+		Set<File> result = new LinkedHashSet<>();
+		for (File file : fileList)
+			if (file.getName().endsWith(extension))
+				result.add(file);
+
+		return result;
+	}
+
+	private Map<String, String> readFilesToMap(Set<File> files) 
+			throws IOException {
+		String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*+((-|\\.)(RC|ALPHA"
+			+ "|BETA|M|Rc|Alpha|Beta|rc|alpha|beta)[0-9])*";
+
+		Map<String, String> result = new LinkedHashMap<>();
+		for (File file : files) {
 			logger.debug(file.getName());
-			final String version = FileUtil.extractVersionFromFilename(versionSchemeExpr, file.getName());
-			assert !version.equals("") : "Could not extract version";
-			versionSmells.put(version, file.getAbsolutePath());
+			String version =
+				FileUtil.extractVersionFromFilename(versionSchemeExpr, file.getName());
+			if (version.equals(""))
+				throw new IOException("Could not extract version");
+			result.put(version, file.getAbsolutePath());
+		}
+
+		return result;
+	}
+
+	private void loadSmellsFile(String xmlFilePath)
+			throws IOException, ParserConfigurationException, SAXException {
+		Document doc = loadXmlFile(xmlFilePath, true);
+
+		// Load smells file
+		logger.info("Started processing XML input");
+		this.methodList = loadMethodList(doc);
+		StringMatrix[] dependencies = loadDependencies(doc);
+		this.inboundDependencies = dependencies[0];
+		this.outboundDependencies = dependencies[1];
+		StringMatrix[] classes = loadClasses(doc);
+		this.inboundClasses = classes[0];
+		this.outboundClasses = classes[1];
+		logger.info("Finished processing XML input");
+	}
+
+	private Document loadXmlFile(String xmlFilePath, boolean useEntityResolver)
+			throws IOException, ParserConfigurationException, SAXException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		factory.setValidating(true);
+		factory.setIgnoringElementContentWhitespace(true);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		if (useEntityResolver) {
+			builder.setEntityResolver(new EntityResolver() {
+				@Override
+				public InputSource resolveEntity(String arg0, String arg1)
+						throws SAXException, IOException {
+					return new InputSource(new StringReader("<?xml version='1.0' encoding='UTF-8'?>"));
+				}
+			});
+		}
+		File file	= new File(xmlFilePath);
+		return builder.parse(file);
+	}
+
+	private StringMatrix loadMethodList(Document doc) {
+		StringMatrix methodList = new StringMatrix();
+
+		NodeList nclist = doc.getElementsByTagName("class");
+		for (int k = 0; k < nclist.getLength(); k++){
+			Node node = nclist.item(k);
+			logger.debug("\nCurrent Element :" + node.getNodeName());
+			Element eElement = (Element) node;
+			String key = eElement.getElementsByTagName("name").item(0).getTextContent();	
+			logger.debug("Current key :" + key);
+			NodeList nflist = eElement.getElementsByTagName("feature");
+			List<String> methods	= new ArrayList<>();
+			for (int n = 0; n < nflist.getLength(); n++){
+				Element	e = (Element) nflist.item(n);
+				methods.add(e.getElementsByTagName("name").item(0).getTextContent());
+				logger.debug("Current methods :" + e.getElementsByTagName("name").item(0).getTextContent());
+			}
+			methodList.put(key, methods);
+		}
+
+		return methodList;
+	}
+
+	private StringMatrix[] loadDependencies(Document doc) {
+		StringMatrix inboundDeps = new StringMatrix();
+		StringMatrix outboundDeps = new StringMatrix();
+
+		// Building inbound dependencies
+		NodeList nlist = doc.getElementsByTagName("feature");
+		for (int i = 0; i < nlist.getLength(); i++){
+			Node node = nlist.item(i);
+			logger.debug("\nCurrent Element :" + node.getNodeName());
+			 
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) node;
+				String key = eElement.getElementsByTagName("name").item(0).getTextContent();		
+				logger.debug("Current key :" + key);
+
+				//Get inbounds
+				NodeList inboundNode = eElement.getElementsByTagName("inbound");
+				List<String> inbounds = new ArrayList<>();
+	 			for (int j = 0; j < inboundNode.getLength(); j++) {
+	 				inbounds.add(inboundNode.item(j).getTextContent());
+	 				logger.debug("Current inbound :" + inboundNode.item(j).getTextContent());
+	 			}
+	 			
+	 			//Get outbounds
+	 			NodeList outboundNode = eElement.getElementsByTagName("outbound");
+				List<String> outbounds = new ArrayList<>();
+	 			for (int j = 0; j < outboundNode.getLength(); j++) {
+	 				outbounds.add(outboundNode.item(j).getTextContent());
+	 				logger.debug("Current inbound :" + outboundNode.item(j).getTextContent());
+	 			}
+	 			if (key.startsWith(packageName)){
+					inboundDeps.put(key, inbounds);
+					outboundDeps.put(key, outbounds);
+	 			}
+			}
+		}
+
+		return new StringMatrix[] { inboundDeps, outboundDeps };
+	}
+
+	private StringMatrix[] loadClasses(Document doc) {
+		StringMatrix inboundClasses = new StringMatrix();
+		StringMatrix outboundClasses = new StringMatrix();
+
+		// Doing the samething with class type
+		NodeList nlist = doc.getElementsByTagName("class");
+		for (int i = 0; i < nlist.getLength(); i++) {
+			Node node = nlist.item(i);
+			logger.debug("\nCurrent Element :" + node.getNodeName());
+			 
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) node;
+				String key = eElement.getElementsByTagName("name").item(0).getTextContent();		
+				logger.debug("Current key :" + key);
+
+				//Get inbounds
+				NodeList inboundNode = eElement.getElementsByTagName("inbound");
+				List<String> inbounds = new ArrayList<>();
+	 			for (int j = 0; j < inboundNode.getLength(); j++) {
+	 				inbounds.add(inboundNode.item(j).getTextContent());
+	 				logger.debug("Current inbound :" + inboundNode.item(j).getTextContent());
+	 			}
+	 			
+	 			//Get outbounds
+	 			NodeList outboundNode = eElement.getElementsByTagName("outbound");
+				List<String> outbounds	= new ArrayList<>();
+	 			for (int j = 0; j < outboundNode.getLength(); j++){
+	 				outbounds.add(outboundNode.item(j).getTextContent());
+	 				logger.debug("Current inbound :" + outboundNode.item(j).getTextContent());
+	 			}
+	 			if (key.startsWith(packageName)) {
+		 			inboundClasses.put(key, inbounds);
+		 			outboundClasses.put(key, outbounds);
+	 			}
+			}
+		}
+
+		return new StringMatrix[] { inboundClasses, outboundClasses };
+	}
+
+	private StringMatrix readClusterFile(String filePath) {
+		StringMatrix clusterList = new StringMatrix();
+		List<List<String>> facts = new ArrayList<>();
+
+		try (BufferedReader in = new BufferedReader(new FileReader(filePath))) {
+			for (String line = in.readLine(); line != null; line = in.readLine()) {
+				logger.debug(line);
+
+				if (line.trim().isEmpty()) continue;
+
+				final Scanner s = new Scanner(line);
+				final String expr = "([^\"\\s][^\\s]*[^\"\\s]*)|([\"][^\"]*[\"])";
+
+				final String arcType = s.findInLine(expr);
+				final String startNode = s.findInLine(expr);
+				final String endNode = s.findInLine(expr);
+				final List<String> fact =
+					new ArrayList<>(Arrays.asList(arcType, startNode, endNode));
+
+				logger.debug(fact);
+				facts.add(fact);
+				// add to cluster
+				List<String> currentCluster = clusterList.get(startNode);
+				if (currentCluster == null)
+					currentCluster = new ArrayList<>();
+				currentCluster.add(endNode);
+				clusterList.put(startNode, currentCluster);
+				class2component.put(endNode, startNode);
+				if (s.findInLine(expr) != null) {
+					logger.error("Found non-triple in file: " + line);
+					System.exit(1);
+				}
+
+				s.close();
+			}
+		} catch (final IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+
+		return clusterList;
+	}
+
+	public Map<Integer, Set<String>> loadClonesFile(String xmlFilePath)
+			throws ParserConfigurationException, SAXException, IOException {
+		Document doc = loadXmlFile(xmlFilePath, false);
+		Map<Integer, Set<String>> codeCloneFromFile = new HashMap<>();		
+		
+		logger.info("Started processing clone");
+		// Building class method mapping
+		NodeList nclist = doc.getElementsByTagName("duplication");
+		for (int k = 0; k < nclist.getLength(); k++) {
+			Node node = nclist.item(k);
+			logger.debug("\nCurrent Element :" + node.getNodeName());
+			Element eElement = (Element) node;
+			NodeList duplicatedFiles = eElement.getElementsByTagName("file");
+			
+			//Keep tracks of duplicated class files
+			// Handle className
+			Set<String> tmp = new HashSet<>();
+			for (int i = 0; i < duplicatedFiles.getLength(); i++) {
+				Element e = (Element) duplicatedFiles.item(i);
+				if (!e.getAttribute("path").contains("src"))
+					continue;
+				String path = e.getAttribute("path");
+				String className = "";
+				if (path.contains("//"))
+					className = e.getAttribute("path").replace("\\", ".").split("\\.src")[1].replace(".java", "").substring(1);
+				else if (path.contains("/"))
+				  className = e.getAttribute("path").replace("/", ".").split("\\.src")[1].replace(".java", "").substring(1);
+				if (className.startsWith("main."))
+					className = className.replace("main.", "");
+				if (className.startsWith("test."))
+					className = className.replace("test.", "");
+				tmp.add(className);
+			}
+			codeCloneFromFile.put(k, tmp);
 		}
 		
-		Map<String, String> clusterSmells = new LinkedHashMap<>();
-		for (final File file : clusterFiles) {
-			logger.debug(file.getName());
-			final String version = FileUtil.extractVersionFromFilename(versionSchemeExpr, file.getName());
-			assert !version.equals("") : "Could not extract version";
-			clusterSmells.put(version, file.getAbsolutePath());
+		// Building inbound dependencies
+		logger.info("Finished processing clone input");
+		return codeCloneFromFile;
+	}
+
+	private StringMatrix readLogicalDeps(String logicalDep){
+		StringMatrix storage = new StringMatrix();
+		String line = "";
+		String cvsSplitBy = ",";
+	 
+		try (BufferedReader br = new BufferedReader(new FileReader(logicalDep))) {
+			br.readLine();
+			while ((line = br.readLine()) != null) {
+			  // use comma as separator
+				String[] classes = line.split(cvsSplitBy);
+				
+				String first = classes[0];
+				String second = classes[1];
+				List<String> tmp = storage.get(first);
+				if (tmp == null)
+					tmp = new ArrayList<>();
+				tmp.add(second);
+				storage.put(first, tmp);
+				
+				tmp = storage.get(second);
+				if (tmp == null)
+					tmp = new ArrayList<>();
+				tmp.add(first);
+				storage.put(second, tmp);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
+		return storage;
+	}
+	// #endregion IO -------------------------------------------------------------
+
+	// #region INTERFACE ---------------------------------------------------------
+	public void batchRun(String rsfDir, String depFinderDir, String clonesDir) 
+			throws IOException, ParserConfigurationException, SAXException {
+		// Loading inputs
+		File depsDir = FileUtil.checkDir(depFinderDir, false, false);
+		File clustersDir = FileUtil.checkDir(rsfDir, false, false);
+		File cloneDir = FileUtil.checkDir(clonesDir, false, false);
+		Set<File> orderedSerFiles = loadDirFilterExtension(depsDir, ".xml");
+		Set<File> clusterFiles = loadDirFilterExtension(clustersDir, ".rsf");
+		Set<File> cloneFiles = loadDirFilterExtension(cloneDir, ".xml");
+		Map<String, String> versionSmells = readFilesToMap(orderedSerFiles);
+		Map<String, String> clusterSmells = readFilesToMap(clusterFiles);
+		Map<String, String> cloneVersions = readFilesToMap(cloneFiles);
 		
-		Map<String, String> cloneVersions = new LinkedHashMap<>();
-		for (final File file : cloneFiles) {
-			logger.debug(file.getName());
-			final String version = FileUtil.extractVersionFromFilename(versionSchemeExpr, file.getName());
-			assert !version.equals("") : "Could not extract version";
-			cloneVersions.put(version, file.getAbsolutePath());
-		}
-		
+		// Batch execution
 		for (String key : versionSmells.keySet()) {
-			logger.info("Start detecting smells for one version:" + versionSmells.get(key)+", "+clusterSmells.get(key));
+			logger.info("Start detecting smells for one version:"
+				+ versionSmells.get(key) + ", " + clusterSmells.get(key));
 			String smellFile = versionSmells.get(key);
 			String clusterFile =  clusterSmells.get(key);
 			String cloneFile = cloneVersions.get(key);
 			if (smellFile == null || clusterFile == null || cloneFile == null)
 				continue;
-			single(versionSmells.get(key), clusterSmells.get(key), packageName, cloneVersions.get(key), key, logicalDep, outputDest);
+			run(versionSmells.get(key), clusterSmells.get(key),
+				cloneVersions.get(key), key);
 		}
 	}
 
-	private static void single(String testDoc, String testRSF, String packageName, String testClone, String version, String logicalDep, String outputDest)
+	public void run(String smellsPath, String clustersPath,	String clonesPath,
+			String version)
 			throws IOException, ParserConfigurationException, SAXException {
-		DependencyFinderProcessing dp = new DependencyFinderProcessing(testDoc, packageName);
-		dp.clusterList = dp.readClusterFile(testRSF);
-		dp.codeClone = dp.codeCloneUpdate(testClone);
-		dp.classLogicalDependencies = dp.readLogicalDeps(logicalDep);
-		//detect smell
+		loadSmellsFile(smellsPath);
+		this.clusterList = readClusterFile(clustersPath);
+		this.codeClone = loadClonesFile(clonesPath);
+		this.classLogicalDependencies = readLogicalDeps(logicalDep);
 		logger.info("Start detecting smells");
 		
 		details += "\n" + version + ":\n";
 		JSONObject list_files_per_versions = new JSONObject();
 		details_json.put(version, list_files_per_versions);
 		
-		dp.DetectSmell(version, packageName);
+		DetectSmell(version, packageName);
 		
 		// finish summary and move to new version
 		summary += "\n";
@@ -172,6 +451,7 @@ public class DependencyFinderProcessing {
 			e.printStackTrace();
 		}
 	}
+	// #endregion INTERFACE ------------------------------------------------------
 	
 	public void detectLogicalDepBetweenComponents(String version) {
 		Map<String, Set<String>> storage = new HashMap<>();
@@ -223,236 +503,6 @@ public class DependencyFinderProcessing {
 			}
 		}
 		summary += total + ",";
-	}
-	
-	public Map<String, List<String>> readLogicalDeps(String logicalDep){
-		Map<String, List<String>> storage = new HashMap<>();
-		String line = "";
-		String cvsSplitBy = ",";
-	 
-		try (BufferedReader br = new BufferedReader(new FileReader(logicalDep))) {
-			br.readLine();
-			while ((line = br.readLine()) != null) {
-			  // use comma as separator
-				String[] classes = line.split(cvsSplitBy);
-				
-				String first = classes[0];
-				String second = classes[1];
-				List<String> tmp = storage.get(first);
-				if (tmp == null)
-					tmp = new ArrayList<>();
-				tmp.add(second);
-				storage.put(first, tmp);
-				
-				tmp = storage.get(second);
-				if (tmp == null)
-					tmp = new ArrayList<>();
-				tmp.add(first);
-				storage.put(second, tmp);
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		return storage;
-	}
-	
-	
-	public Map<String, List<String>> readClusterFile(String filePath) {
-		Map<String, List<String>> clusterList = new HashMap<>();
-		// Read rsf file and generate the mapping of clusters and classes
-		final List<List<String>> facts = new ArrayList<>();
-
-		try (BufferedReader in = new BufferedReader(new FileReader(filePath))) {
-			String line;
-			while ((line = in.readLine()) != null) {
-				logger.debug(line);
-
-				if (line.trim().isEmpty()) continue;
-
-				final Scanner s = new Scanner(line);
-				final String expr = "([^\"\\s][^\\s]*[^\"\\s]*)|([\"][^\"]*[\"])";
-
-				final String arcType = s.findInLine(expr);
-				final String startNode = s.findInLine(expr);
-				final String endNode = s.findInLine(expr);
-				final List<String> fact =
-					new ArrayList<>(Arrays.asList(arcType, startNode, endNode));
-
-				logger.debug(fact);
-				facts.add(fact);
-				// add to cluster
-				List<String> currentCluster = clusterList.get(startNode);
-				if (currentCluster == null)
-					currentCluster = new ArrayList<>();
-				currentCluster.add(endNode);
-				clusterList.put(startNode, currentCluster);
-				class2component.put(endNode, startNode);
-				if (s.findInLine(expr) != null) {
-					logger.error("Found non-triple in file: " + line);
-					System.exit(1);
-				}
-
-				s.close();
-			}
-		} catch (final IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		return clusterList;
-	}
-
-	public DependencyFinderProcessing(String xmlFilePath, String packageName) throws IOException, ParserConfigurationException, SAXException{
-		// Run processing to input dependency into file
-		//Handle by DOM Parser
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setValidating(true);
-		factory.setIgnoringElementContentWhitespace(true);
-		
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		builder.setEntityResolver(new EntityResolver() {
-			@Override
-			public InputSource resolveEntity(String arg0, String arg1)
-					throws SAXException, IOException {
-				return new InputSource(new StringReader("<?xml version='1.0' encoding='UTF-8'?>"));
-			}
-		});
-		File file	= new File(xmlFilePath);
-		Document doc = builder.parse(file);
-		
-		logger.info("Started processing XML input");
-		// Building class method mapping
-		NodeList nclist = doc.getElementsByTagName("class");
-		for (int k = 0; k < nclist.getLength(); k++){
-			Node node = nclist.item(k);
-			logger.debug("\nCurrent Element :" + node.getNodeName());
-			Element eElement = (Element) node;
-			String key = eElement.getElementsByTagName("name").item(0).getTextContent();	
-			logger.debug("Current key :" + key);
-			NodeList nflist = eElement.getElementsByTagName("feature");
-			List<String> methods	= new ArrayList<>();
-			for (int n = 0; n < nflist.getLength(); n++){
-				Element	e = (Element) nflist.item(n);
-				methods.add(e.getElementsByTagName("name").item(0).getTextContent());
-				logger.debug("Current methods :" + e.getElementsByTagName("name").item(0).getTextContent());
-			}
-			methodList.put(key, methods);
-		}
-		
-		// Building inbound dependencies
-		NodeList nlist = doc.getElementsByTagName("feature");
-		for (int i = 0; i < nlist.getLength(); i++){
-			Node node = nlist.item(i);
-			logger.debug("\nCurrent Element :" + node.getNodeName());
-			 
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element eElement = (Element) node;
-				String key = eElement.getElementsByTagName("name").item(0).getTextContent();		
-				logger.debug("Current key :" + key);
-
-				//Get inbounds
-				NodeList inboundNode = eElement.getElementsByTagName("inbound");
-				List<String> inbounds = new ArrayList<>();
-	 			for (int j = 0; j < inboundNode.getLength(); j++) {
-	 				inbounds.add(inboundNode.item(j).getTextContent());
-	 				logger.debug("Current inbound :" + inboundNode.item(j).getTextContent());
-	 			}
-	 			
-	 			//Get outbounds
-	 			NodeList outboundNode = eElement.getElementsByTagName("outbound");
-				List<String> outbounds = new ArrayList<>();
-	 			for (int j = 0; j < outboundNode.getLength(); j++) {
-	 				outbounds.add(outboundNode.item(j).getTextContent());
-	 				logger.debug("Current inbound :" + outboundNode.item(j).getTextContent());
-	 			}
-	 			if (key.startsWith(packageName)){
-		 			inboundDependencies.put(key, inbounds);
-		 			outboundDependencies.put(key, outbounds);
-	 			}
-			}
-		}
-		
-		// Doing the samething with class type
-		nlist = doc.getElementsByTagName("class");
-		for (int i = 0; i < nlist.getLength(); i++) {
-			Node node = nlist.item(i);
-			logger.debug("\nCurrent Element :" + node.getNodeName());
-			 
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element eElement = (Element) node;
-				String key = eElement.getElementsByTagName("name").item(0).getTextContent();		
-				logger.debug("Current key :" + key);
-
-				//Get inbounds
-				NodeList inboundNode = eElement.getElementsByTagName("inbound");
-				List<String> inbounds = new ArrayList<>();
-	 			for (int j = 0; j < inboundNode.getLength(); j++) {
-	 				inbounds.add(inboundNode.item(j).getTextContent());
-	 				logger.debug("Current inbound :" + inboundNode.item(j).getTextContent());
-	 			}
-	 			
-	 			//Get outbounds
-	 			NodeList outboundNode = eElement.getElementsByTagName("outbound");
-				List<String> outbounds	= new ArrayList<>();
-	 			for (int j = 0; j < outboundNode.getLength(); j++){
-	 				outbounds.add(outboundNode.item(j).getTextContent());
-	 				logger.debug("Current inbound :" + outboundNode.item(j).getTextContent());
-	 			}
-	 			if (key.startsWith(packageName)) {
-		 			inboundClasses.put(key, inbounds);
-		 			outboundClasses.put(key, outbounds);
-	 			}
-			}
-		}
-		
-		// Handling code clone part
-		logger.info("Finished processing XML input");
-	}
-
-	public Map<Integer, Set<String>> codeCloneUpdate(String xmlFilePath) throws ParserConfigurationException, SAXException, IOException {
-		//Handle by DOM Parser
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setValidating(true);
-		factory.setIgnoringElementContentWhitespace(true);
-		
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		File file = new File(xmlFilePath);
-		Document doc = builder.parse(file);
-		Map<Integer, Set<String>> codeCloneFromFile = new HashMap<>();		
-		
-		logger.info("Started processing clone");
-		// Building class method mapping
-		NodeList nclist = doc.getElementsByTagName("duplication");
-		for (int k = 0; k < nclist.getLength(); k++) {
-			Node node = nclist.item(k);
-			logger.debug("\nCurrent Element :" + node.getNodeName());
-			Element eElement = (Element) node;
-			NodeList duplicatedFiles = eElement.getElementsByTagName("file");
-			
-			//Keep tracks of duplicated class files
-			// Handle className
-			Set<String> tmp = new HashSet<>();
-			for (int i = 0; i < duplicatedFiles.getLength(); i++) {
-				Element e = (Element) duplicatedFiles.item(i);
-				if (!e.getAttribute("path").contains("src"))
-					continue;
-				String path = e.getAttribute("path");
-				String className = "";
-				if (path.contains("//"))
-					className = e.getAttribute("path").replace("\\", ".").split("\\.src")[1].replace(".java", "").substring(1);
-				else if (path.contains("/"))
-				  className = e.getAttribute("path").replace("/", ".").split("\\.src")[1].replace(".java", "").substring(1);
-				if (className.startsWith("main."))
-					className = className.replace("main.", "");
-				if (className.startsWith("test."))
-					className = className.replace("test.", "");
-				tmp.add(className);
-			}
-			codeCloneFromFile.put(k, tmp);
-		}
-		
-		// Building inbound dependencies
-		logger.info("Finished processing clone input");
-		return codeCloneFromFile;
 	}
 	
 	public void DetectSmell(String version, String packageName) {
@@ -761,7 +811,7 @@ public class DependencyFinderProcessing {
 		return className;
 	}
 	
-	private static void writeToFile(String content,String path) throws IOException {
+	private static void writeToFile(String content, String path) throws IOException {
 		File file = new File(path);
 		File json_file = new File(path+".json");
 		// if file doesnt exists, then create it
