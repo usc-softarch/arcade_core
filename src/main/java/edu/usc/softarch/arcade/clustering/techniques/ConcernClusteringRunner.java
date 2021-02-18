@@ -29,9 +29,14 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		LogManager.getLogger(ConcernClusteringRunner.class);
 
 	public static class PreSelectedStoppingCriterion implements StoppingCriterion {
+		private int numClusters;
+
+		public PreSelectedStoppingCriterion(int numClusters) {
+			this.numClusters = numClusters; }
+
 		public boolean notReadyToStop() {
 			return ClusteringAlgoRunner.fastClusters.size() != 1
-				&& ClusteringAlgoRunner.fastClusters.size() != Config.getNumClusters();
+				&& ClusteringAlgoRunner.fastClusters.size() != numClusters;
 		}
 	}
 
@@ -75,10 +80,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 		loopSummaryStopwatch.stop();
 		logger.debug("Time in milliseconds to compute clusters: "
-				+ loopSummaryStopwatch.getElapsedTime());
+			+ loopSummaryStopwatch.getElapsedTime());
 		logger.debug("max cluster gain: " + maxClusterGain);
 		logger.debug("num clusters at max cluster gain: "
-				+ numClustersAtMaxClusterGain);
+			+ numClustersAtMaxClusterGain);
 	}
 	
 	private static MaxSimData identifyMostSimClusters(List<List<Double>> simMatrix) {
@@ -219,16 +224,16 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			MaxSimData data) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("In, "
-					+ Thread.currentThread().getStackTrace()[1].getMethodName()
-					+ ", \nMax Similar Clusters: ");
+				+ Thread.currentThread().getStackTrace()[1].getMethodName()
+				+ ", \nMax Similar Clusters: ");
 			logger.debug("sim value(" + data.rowIndex + "," + data.colIndex + "): " + data.currentMaxSim);
 			logger.debug("\n");
 			logger.debug("most sim clusters: " + fastClusters.get(data.rowIndex).getName() + ", " + fastClusters.get(data.colIndex).getName());
 			TopicUtil.printTwoDocTopics(fastClusters.get(data.rowIndex).docTopicItem,
-					fastClusters.get(data.colIndex).docTopicItem);
+				fastClusters.get(data.colIndex).docTopicItem);
 
 			logger.debug("before merge, fast clusters size: "
-					+ fastClusters.size());
+				+ fastClusters.size());
 		}
 	}
 	
@@ -286,28 +291,28 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		fastClusters.add(newCluster);
 		
 		List<Double> newRow = new ArrayList<>(fastClusters.size());
-		for (int i=0; i < fastClusters.size(); i++)
+		for (int i = 0; i < fastClusters.size(); i++)
 			newRow.add(Double.MAX_VALUE);
 		
 		simMatrix.add(newRow);
 		
 		// adding a new value to create new column for all but the last row, which
 		// already has the column for the new cluster
-		for (int i=0; i < fastClusters.size()-1; i++)
+		for (int i = 0; i < fastClusters.size() - 1; i++)
 			simMatrix.get(i).add(Double.MAX_VALUE);
 		
 		if (simMatrix.size() != fastClusters.size())
 			throw new RuntimeException("simMatrix.size(): " + simMatrix.size()
 				+ " is not equal to fastClusters.size(): " + fastClusters.size());
 		
-		for (int i=0; i < fastClusters.size(); i++)
+		for (int i = 0; i < fastClusters.size(); i++)
 			if ( simMatrix.get(i).size() != fastClusters.size() )
 				throw new RuntimeException("simMatrix.get(" + i + ").size(): "
 					+ simMatrix.get(i).size() + " is not equal to fastClusters.size(): "
 					+ fastClusters.size());
 	
 		
-		for (int i=0; i < fastClusters.size(); i++) {
+		for (int i = 0; i < fastClusters.size(); i++) {
 			FastCluster currCluster = fastClusters.get(i);
 			double currJSDivergence = 0;
 			if (Config.getCurrSimMeasure().equals(SimMeasure.js)) {
@@ -318,12 +323,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 					e.printStackTrace(); //TODO handle it
 				}
 			}
-			else if (Config.getCurrSimMeasure().equals(SimMeasure.scm)) {
+			else if (Config.getCurrSimMeasure().equals(SimMeasure.scm))
 				currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(newCluster, currCluster);
-			}
-			else {
+			else
 				throw new IllegalArgumentException("Invalid similarity measure: " + Config.getCurrSimMeasure());
-			}
 			simMatrix.get(fastClusters.size()-1).set(i, currJSDivergence);
 			simMatrix.get(i).set(fastClusters.size()-1, currJSDivergence);
 		}

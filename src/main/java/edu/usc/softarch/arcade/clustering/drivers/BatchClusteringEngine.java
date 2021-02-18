@@ -45,11 +45,9 @@ public class BatchClusteringEngine {
 		// Logging
 		logger.debug("All files in " + inputDir + ":");
 		logger.debug(String.join("\n", fileSetNames));
-		for (File file : fileSet) {
-			if (file.isDirectory()) {
+		for (File file : fileSet)
+			if (file.isDirectory())
 				logger.debug("Identified directory: " + file.getName());
-			}
-		}
 		
 		// location of classes file, jar, or zip
 		String inClassesDir = args[2];
@@ -102,27 +100,27 @@ public class BatchClusteringEngine {
 		int numTopics = (int) ((double) builder.getNumSourceEntities() * 0.18);
 		
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
-				builder.getFfVecs(), fullSrcDir, outputDirName + "/base", language);
+			builder.getFfVecs(), fullSrcDir, outputDirName + "/base", language);
 
 		// have to set some Config settings before executing the runner
 		// number of clusters to obtain is based on the number of entities
 		int numClusters = (int) ((double) runner.getFastClusters().size() * .20);
-		Config.setNumClusters(numClusters);
 		Config.stoppingCriterion = StoppingCriterionConfig.preselected;
 		Config.setCurrSimMeasure(SimMeasure.js);
-		runner.computeClustersWithConcernsAndFastClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion());
+		runner.computeClustersWithConcernsAndFastClusters(
+			new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters));
 
-		String arcClustersFilename = outputDirName + fs
-			+ revisionNumber + "_" + numTopics + "_topics_"
-			+ runner.getFastClusters().size() + "_arc_clusters.rsf";
+		String arcClustersFilename = outputDirName + fs	+ revisionNumber + "_"
+			+ numTopics + "_topics_" + runner.getFastClusters().size()
+			+ "_arc_clusters.rsf";
 		// need to build the map before writing the file
 		Map<String, Integer> clusterNameToNodeNumberMap =
 			runner.getFastClusters().createFastClusterNameToNodeNumberMap();
 		runner.getFastClusters().writeFastClustersRsfFile(
-				clusterNameToNodeNumberMap, arcClustersFilename);
+			clusterNameToNodeNumberMap, arcClustersFilename);
 
-		String detectedSmellsFilename = outputDirName + fs
-				+ revisionNumber + "_arc_smells.ser";
+		String detectedSmellsFilename = outputDirName + fs + revisionNumber
+			+ "_arc_smells.ser";
 
 		// Need to provide docTopics first
 		logger.debug("Running smell detecion for revision "	+ revisionNumber);

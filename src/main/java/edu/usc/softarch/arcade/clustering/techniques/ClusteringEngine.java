@@ -13,7 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.xml.sax.SAXException;
 
 import edu.usc.softarch.arcade.classgraphs.ClassGraph;
-import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.clustering.Feature;
 import edu.usc.softarch.arcade.clustering.StoppingCriterion;
@@ -44,37 +43,32 @@ public class ClusteringEngine {
 			ParserConfigurationException, SAXException, IOException {
 	}
 
-	public void run(String fastFeatureVectorsFilePath, String language) throws Exception {
+	public void run(String fastFeatureVectorsFilePath, String language,
+			String clusteringAlgorithm, String stoppingCriterion,
+			int numClusters) throws Exception {
 		FastFeatureVectors fastFeatureVectors = null;
 		
 		File fastFeatureVectorsFile = new File(fastFeatureVectorsFilePath);
 
-		ObjectInputStream objInStream = new ObjectInputStream(
-				new FileInputStream(fastFeatureVectorsFile));
-
 		// Deserialize the object
-		try {
+		try (ObjectInputStream objInStream = new ObjectInputStream(
+				new FileInputStream(fastFeatureVectorsFile))) {
 			fastFeatureVectors = (FastFeatureVectors) objInStream.readObject();
 			logger.debug("feature set size: "+ fastFeatureVectors.getNamesInFeatureSet().size());
 			logger.debug("Names in Feature Set:");
 			logger.debug(fastFeatureVectors.getNamesInFeatureSet());
-			objInStream.close();
-
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		logger.debug("Read in serialized feature vectors...");
 
-		if (Config.getCurrentClusteringAlgorithm()
-				.equals(ClusteringAlgorithmType.WCA)) {
+		if (clusteringAlgorithm.equalsIgnoreCase("wca")) {
 			WcaRunner.setFastFeatureVectors(fastFeatureVectors);
-			if (Config.stoppingCriterion
-					.equals(Config.StoppingCriterionConfig.preselected)) {
-				StoppingCriterion stopCriterion = new ConcernClusteringRunner.PreSelectedStoppingCriterion();
+			if (stoppingCriterion.equalsIgnoreCase("preselected")) {
+				StoppingCriterion stopCriterion = new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters);
 				WcaRunner.computeClustersWithPQAndWCA(stopCriterion, language);
 			}
-			if (Config.stoppingCriterion
-					.equals(Config.StoppingCriterionConfig.clustergain)) {
+			if (stoppingCriterion.equalsIgnoreCase("clustergain")) {
 				StoppingCriterion singleClusterStopCriterion = new SingleClusterStoppingCriterion();
 				WcaRunner.computeClustersWithPQAndWCA(singleClusterStopCriterion, language);
 				StoppingCriterion clusterGainStopCriterion = new ClusterGainStoppingCriterion();
@@ -84,18 +78,15 @@ public class ClusteringEngine {
 		
 		for (int numTopics : Config.getNumTopicsList()) {
 			Config.setNumTopics(numTopics);
-			if (Config.getCurrentClusteringAlgorithm().equals(
-					ClusteringAlgorithmType.ARC)) {
+			if (clusteringAlgorithm.equalsIgnoreCase("arc"))
 				throw new Exception("there is a null instead of outputDir/base"); 
-			}
 		}
 		
-		if (Config.getCurrentClusteringAlgorithm().equals(ClusteringAlgorithmType.LIMBO)) {
+		if (clusteringAlgorithm.equalsIgnoreCase("limbo")) {
 			LimboRunner.setFastFeatureVectors(fastFeatureVectors);
-			LimboRunner.computeClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion(), language);
-			if (Config.stoppingCriterion.equals(Config.StoppingCriterionConfig.clustergain)) {
+			LimboRunner.computeClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters), language);
+			if (stoppingCriterion.equalsIgnoreCase("clustergain"))
 				LimboRunner.computeClusters(new ClusterGainStoppingCriterion(), language);
-			}
 		}
 	}
 

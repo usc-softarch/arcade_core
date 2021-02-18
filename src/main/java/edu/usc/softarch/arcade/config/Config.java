@@ -26,7 +26,6 @@ public class Config {
 
 	public static StoppingCriterionConfig stoppingCriterion = 
 		StoppingCriterionConfig.clustergain;
-	private static int numClusters = 1;
 	public static ClusteringAlgorithmType getCurrentClusteringAlgorithm() {
 		return currentClusteringAlgorithm; }
 	
@@ -57,7 +56,4 @@ public class Config {
 	public static int getStartNumClustersRange() { return startNumClustersRange; }
 	public static int getEndNumClustersRange() { return endNumClustersRange; }
 	public static int getRangeNumClustersStep() { return rangeNumClustersStep; }
-	public static int getNumClusters() { return numClusters; }
-	public static void setNumClusters(int inNumClusters) {
-		numClusters = inNumClusters; }
 }
