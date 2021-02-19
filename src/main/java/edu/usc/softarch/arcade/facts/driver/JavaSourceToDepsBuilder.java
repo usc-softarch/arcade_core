@@ -15,7 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import classycle.Analyser;
 import classycle.ClassAttributes;
 import classycle.graph.AtomicVertex;
-import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
+import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -50,8 +50,7 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 		TypedEdgeGraph typedEdgeGraph = new TypedEdgeGraph();
 		for (Pair<String,String> edge : edges)
 			typedEdgeGraph.addEdge("depends", edge.getLeft(), edge.getRight());
-		FeatureVectorMap fvMap = new FeatureVectorMap(typedEdgeGraph);
-		this.ffVecs = fvMap.convertToFastFeatureVectors();
+		this.ffVecs = new FastFeatureVectors(typedEdgeGraph);
 	}
 
 	/**

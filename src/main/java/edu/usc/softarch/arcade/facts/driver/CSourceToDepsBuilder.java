@@ -19,7 +19,7 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
+import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -35,7 +35,7 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		String mkDepCmd = "perl " + pwd + File.separator + "mkdep.pl";
 		
 		String[] cmds = { mkFilesCmd, mkDepCmd };
-		for (String cmd : cmds)	execCmd(cmd,inputDir);
+		for (String cmd : cmds)	execCmd(cmd, inputDir);
 		
 		String makeDepFileLocation = inputDir + File.separator + "make.dep";
 		Map<String, List<String>> depMap = buildDeps(makeDepFileLocation);
@@ -43,27 +43,26 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		
 		List<List<String>> unfilteredFacts = RsfReader.loadRsfDataFromFile(depsRsfFilepath);
 				
-		numSourceEntities = unfilteredFacts.size();
+		this.numSourceEntities = unfilteredFacts.size();
 		
 		TypedEdgeGraph typedEdgeGraph = new TypedEdgeGraph();
-		edges = new LinkedHashSet<Pair<String,String>>();
+		this.edges = new LinkedHashSet<Pair<String,String>>();
 		for (List<String> fact : unfilteredFacts) {
 			String source = fact.get(1);
 			String target = fact.get(2);
 			
-			typedEdgeGraph.addEdge("depends",source,target);
+			typedEdgeGraph.addEdge("depends", source, target);
 			
-			Pair<String,String> edge = new ImmutablePair<>(source,target);
-			edges.add(edge);
+			Pair<String,String> edge = new ImmutablePair<>(source, target);
+			this.edges.add(edge);
 		}
 		
 		Set<String> sources = new HashSet<>();
 		for (Pair<String,String> edge : edges)
 			sources.add(edge.getLeft());
-		numSourceEntities = sources.size();
-		
-		FeatureVectorMap fvMap = new FeatureVectorMap(typedEdgeGraph);
-		ffVecs = fvMap.convertToFastFeatureVectors();
+		this.numSourceEntities = sources.size();
+
+		this.ffVecs = new FastFeatureVectors(typedEdgeGraph);
 	}
 
 	private Map<String, List<String>> buildDeps(String filename)
