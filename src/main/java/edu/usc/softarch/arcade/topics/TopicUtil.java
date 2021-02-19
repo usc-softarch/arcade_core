@@ -17,11 +17,6 @@ public class TopicUtil {
 	public static DocTopics docTopics;
 	private static Logger logger = LogManager.getLogger(TopicUtil.class);
 	
-	public static String convertJavaClassWithPackageNameToDocTopicName
-			(String name) {
-		return name.replace("\\.", "/") + ".java";
-	}
-	
 	public static DocTopics getDocTopicsFromFile(String filename) {
 		DocTopics docTopics = null;
 		try {

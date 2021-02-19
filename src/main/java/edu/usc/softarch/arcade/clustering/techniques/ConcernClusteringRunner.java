@@ -16,8 +16,6 @@ import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
 import edu.usc.softarch.arcade.clustering.MaxSimData;
 import edu.usc.softarch.arcade.clustering.StoppingCriterion;
-import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.config.Config.SimMeasure;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicUtil;
@@ -56,16 +54,15 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 	
 	public void computeClustersWithConcernsAndFastClusters(
-			StoppingCriterion stoppingCriterion) {
+			StoppingCriterion stoppingCriterion, String stopCriterion, String simMeasure) {
 		StopWatch loopSummaryStopwatch = new StopWatch();
 		loopSummaryStopwatch.start();
 
 		List<List<Double>> simMatrix =
-			fastClusters.createSimilarityMatrixUsingJSDivergence();
+			fastClusters.createSimilarityMatrixUsingJSDivergence(simMeasure);
 
 		while (stoppingCriterion.notReadyToStop()) {
-			if (Config.stoppingCriterion
-					.equals(Config.StoppingCriterionConfig.clustergain)) {
+			if (stopCriterion.equalsIgnoreCase("clustergain")) {
 				double clusterGain = fastClusters.computeClusterGainUsingTopics();
 				checkAndUpdateClusterGain(clusterGain);
 			}
@@ -73,7 +70,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			MaxSimData data  = identifyMostSimClusters(simMatrix);
 			printDataForTwoMostSimilarClustersWithTopicsForConcerns(data);
 			FastCluster newCluster = mergeFastClustersUsingTopics(data);
-			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix);
+			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix, simMeasure);
 
 			logger.debug("after merge, clusters size: " + fastClusters.size());
 		}
@@ -259,7 +256,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 	
 	private static void updateFastClustersAndSimMatrixToReflectMergedCluster(
-			MaxSimData data, FastCluster newCluster, List<List<Double>> simMatrix) {
+			MaxSimData data, FastCluster newCluster, List<List<Double>> simMatrix,
+			String simMeasure) {
 		FastCluster cluster = fastClusters.get(data.rowIndex);
 		FastCluster otherCluster = fastClusters.get(data.colIndex);
 		
@@ -315,7 +313,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		for (int i = 0; i < fastClusters.size(); i++) {
 			FastCluster currCluster = fastClusters.get(i);
 			double currJSDivergence = 0;
-			if (Config.getCurrSimMeasure().equals(SimMeasure.js)) {
+			if (simMeasure.equalsIgnoreCase("js")) {
 				try {
 					currJSDivergence =
 						newCluster.docTopicItem.getJsDivergence(currCluster.docTopicItem);
@@ -323,10 +321,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 					e.printStackTrace(); //TODO handle it
 				}
 			}
-			else if (Config.getCurrSimMeasure().equals(SimMeasure.scm))
+			else if (simMeasure.equalsIgnoreCase("scm"))
 				currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(newCluster, currCluster);
 			else
-				throw new IllegalArgumentException("Invalid similarity measure: " + Config.getCurrSimMeasure());
+				throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
 			simMatrix.get(fastClusters.size()-1).set(i, currJSDivergence);
 			simMatrix.get(i).set(fastClusters.size()-1, currJSDivergence);
 		}

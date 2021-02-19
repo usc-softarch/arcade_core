@@ -221,8 +221,7 @@ public class ArchSmellDetector {
 
 	private DocTopicItem setDocTopicItemForJavaFromMalletFile(String entity) {
 		DocTopicItem newDocTopicItem;
-		String docTopicName = 
-			TopicUtil.convertJavaClassWithPackageNameToDocTopicName(entity);
+		String docTopicName = entity.replace("\\.", "/") + ".java";
 		newDocTopicItem = docTopics.getDocTopicItemForJava(docTopicName);
 		return newDocTopicItem;
 	}

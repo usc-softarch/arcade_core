@@ -17,8 +17,6 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.config.Config.SimMeasure;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
@@ -100,7 +98,7 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 		return centroidSum / clusterCentroids.size();
 	}
 
-  public List<List<Double>> createSimilarityMatrixUsingJSDivergence() {
+  public List<List<Double>> createSimilarityMatrixUsingJSDivergence(String simMeasure) {
 		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
 
 		for (int i = 0; i < this.size(); i++)
@@ -112,17 +110,17 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 				FastCluster otherCluster = this.get(j);
 				double currJSDivergence = 0;
 
-				if (Config.getCurrSimMeasure().equals(SimMeasure.js))
+				if (simMeasure.equalsIgnoreCase("js"))
 					try {
 						currJSDivergence =
 							cluster.docTopicItem.getJsDivergence(otherCluster.docTopicItem);
 					} catch (DistributionSizeMismatchException e) {
 						e.printStackTrace(); //TODO handle it
 					}
-				else if (Config.getCurrSimMeasure().equals(SimMeasure.scm))
+				else if (simMeasure.equalsIgnoreCase("scm"))
 					currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(cluster, otherCluster);
 				else
-					throw new IllegalArgumentException("Invalid similarity measure: " + Config.getCurrSimMeasure());
+					throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
 				
 				simMatrixObj.get(i).add(currJSDivergence);
 			}
@@ -152,7 +150,7 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 		return simMatrixObj;
 	}
 
-  public List<List<Double>> createSimilarityMatrixUsingUEM() {
+  public List<List<Double>> createSimilarityMatrixUsingUEM(String simMeasure) {
 		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
 		
 		for (int i = 0; i < this.size(); i++)
@@ -164,14 +162,14 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 				FastCluster otherCluster = this.get(j);
 
 				double currSimMeasure = 0;
-				if (Config.getCurrSimMeasure().equals(SimMeasure.uem))
+				if (simMeasure.equalsIgnoreCase("uem"))
 					currSimMeasure =
             FastSimCalcUtil.getUnbiasedEllenbergMeasure(cluster, otherCluster);
-				else if (Config.getCurrSimMeasure().equals(SimMeasure.uemnm))
+				else if (simMeasure.equalsIgnoreCase("uemnm"))
 					currSimMeasure =
             FastSimCalcUtil.getUnbiasedEllenbergMeasureNM(cluster, otherCluster);
 				else
-					throw new IllegalArgumentException(Config.getCurrSimMeasure()
+					throw new IllegalArgumentException(simMeasure
             + " is not a valid similarity measure for WCA");
 				
 				simMatrixObj.get(i).add(currSimMeasure);

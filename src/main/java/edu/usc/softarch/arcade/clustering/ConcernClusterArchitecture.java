@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +51,12 @@ public class ConcernClusterArchitecture extends HashSet<ConcernCluster> {
 
 	// #region IO ----------------------------------------------------------------
 	public static ConcernClusterArchitecture loadFromRsf(String rsfFilename) {
-		RsfReader.loadRsfDataFromFile(rsfFilename);
+		try {
+			RsfReader.loadRsfDataFromFile(rsfFilename);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+
 		Iterable<List<String>> clusterFacts = RsfReader.filteredRoutineFacts;
 		ConcernClusterArchitecture clusters = new ConcernClusterArchitecture();
 		for (List<String> fact : clusterFacts) {
@@ -165,7 +171,11 @@ public class ConcernClusterArchitecture extends HashSet<ConcernCluster> {
 			directedGraph.addVertex(cluster.getName());
 		logger.debug("No. of vertices: " + directedGraph.vertexSet().size());
 		
-		RsfReader.loadRsfDataFromFile(depsRsfFilename);
+		try {
+			RsfReader.loadRsfDataFromFile(depsRsfFilename);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		Iterable<List<String>> depFacts = RsfReader.filteredRoutineFacts;
 		
 		for (List<String> fact : depFacts) {

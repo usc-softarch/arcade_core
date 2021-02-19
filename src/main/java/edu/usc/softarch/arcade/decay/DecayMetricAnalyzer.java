@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.decay;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -72,9 +73,19 @@ public class DecayMetricAnalyzer {
 		
 		logger.info("avg stability: " + avgStability);
 		
-		RsfReader.loadRsfDataFromFile(depsRsfFilename);
+		try {
+			RsfReader.loadRsfDataFromFile(depsRsfFilename);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+
 		List<List<String>> depFacts = RsfReader.unfilteredFacts;
-		RsfReader.loadRsfDataFromFile(clustersFilename);
+		try {
+			RsfReader.loadRsfDataFromFile(clustersFilename);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
 		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
 		Map<String,Set<String>> clusterMap = ClusterUtil.buildClusterMap(clusterFacts);
 		Map<String,Set<MutablePair<String,String>>> internalEdgeMap = ClusterUtil.buildInternalEdgesPerCluster(clusterMap, depFacts);

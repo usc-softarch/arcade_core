@@ -15,28 +15,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import classycle.Analyser;
 import classycle.ClassAttributes;
 import classycle.graph.AtomicVertex;
-import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
-	// #region FIELDS ------------------------------------------------------------
-	private FastFeatureVectors ffVecs = null;
-	private int numSourceEntities = 0;
-	// #endregion FIELDS ---------------------------------------------------------
-	
-	// #region ACCESSORS ---------------------------------------------------------
-	@Override
-	public Set<Pair<String,String>> getEdges() { return this.edges; }
-	
-	@Override
-	public int getNumSourceEntities() { return this.numSourceEntities; }
-
-	@Override
-	public FastFeatureVectors getFfVecs() {	return this.ffVecs; }
-	// #endregion ACCESSORS ------------------------------------------------------
-
 	// #region PROCESSING --------------------------------------------------------
 	public void build(String classesDirPath, String depsRsfFilename)
 			throws IOException {

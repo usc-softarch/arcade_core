@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.util.FileUtil;
-import edu.usc.softarch.arcade.util.StopWatch;
 
 public class RsfReader {
 	private static Logger logger = LogManager.getLogger(RsfReader.class);
@@ -28,7 +27,8 @@ public class RsfReader {
 	public static Set<String> allNodesSet;
 	public static List<List<String>> unfilteredFacts;
 	
-	public static List<List<String>> extractFactsFromRSF(String rsfFilename) {
+	public static List<List<String>> extractFactsFromRSF(String rsfFilename)
+			throws IOException {
 		// List of facts extracted from RSF File
 		List<List<String>> facts = new ArrayList<>();
 
@@ -59,16 +59,12 @@ public class RsfReader {
 				}
 				s.close();
 			}
-		} catch (IOException e) {
-			e.printStackTrace(); //TODO Treat properly
 		}
+
 		return facts;
 	}
 
-	public static void loadRsfDataFromFile(String rsfFilename) {
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-
+	public static void loadRsfDataFromFile(String rsfFilename) throws IOException {
 		unfilteredFacts = extractFactsFromRSF(rsfFilename);
 
 		List<String> unfilteredFactsText =
@@ -113,9 +109,6 @@ public class RsfReader {
 		
 		allNodesSet = new HashSet<>(startNodesSet);
 		allNodesSet.addAll(endNodesSet);
-		
-		stopWatch.stop();
-		logger.debug("Elapsed time in milliseconds: " + stopWatch.getElapsedTime());
 	}
 
 	private static List<String> convertFactsToEndNodesList(

@@ -10,22 +10,12 @@ import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
  * @author joshua
  */
 public class Config {
-	public enum StoppingCriterionConfig { preselected, clustergain }
-	public enum Language { java, c }
-	public enum SimMeasure { uem, uemnm, js, ilm, scm }
 	public enum Granule { func, file, clazz	}
 	
 	/* Clustering configuration data */
 	//TODO Pretty sure this is also dead
 	private static ClusteringAlgorithmType currentClusteringAlgorithm = 
 		ClusteringAlgorithmType.WCA;
-	private static SimMeasure currSimMeasure = SimMeasure.uem;
-	public static SimMeasure getCurrSimMeasure() { return currSimMeasure; }
-	public static void setCurrSimMeasure(SimMeasure currSimMeasure) {
-		Config.currSimMeasure = currSimMeasure;	}
-
-	public static StoppingCriterionConfig stoppingCriterion = 
-		StoppingCriterionConfig.clustergain;
 	public static ClusteringAlgorithmType getCurrentClusteringAlgorithm() {
 		return currentClusteringAlgorithm; }
 	

@@ -11,13 +11,12 @@ import edu.usc.softarch.arcade.clustering.FastCluster;
 import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
 import edu.usc.softarch.arcade.clustering.MaxSimData;
 import edu.usc.softarch.arcade.clustering.StoppingCriterion;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.util.StopWatch;
 
 public class LimboRunner extends ClusteringAlgoRunner {
 	private static Logger logger = LogManager.getLogger(LimboRunner.class);
 
-	public static void computeClusters(StoppingCriterion stopCriterion, String language) {
+	public static void computeClusters(StoppingCriterion stopCriterion, String language, String stoppingCriterion) {
 		StopWatch loopSummaryStopwatch = new StopWatch();
 
 		initializeClusters(null, language);
@@ -33,8 +32,7 @@ public class LimboRunner extends ClusteringAlgoRunner {
 				+ matrixCreateTimer.getElapsedTime());
 
 		while (stopCriterion.notReadyToStop()) {
-			if (Config.stoppingCriterion
-					.equals(Config.StoppingCriterionConfig.clustergain)) {
+			if (stoppingCriterion.equalsIgnoreCase("clustergain")) {
 				double clusterGain = 0;
 				clusterGain = fastClusters.computeClusterGainUsingStructuralData();
 				checkAndUpdateClusterGain(clusterGain);

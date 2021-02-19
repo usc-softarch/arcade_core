@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -137,7 +138,12 @@ public class ClusterUtil {
 	}
 	
 	public static Map<String, Set<String>> buildDependenciesMap(String depsRsfFilename) {
-		RsfReader.loadRsfDataFromFile(depsRsfFilename);
+		try {
+			RsfReader.loadRsfDataFromFile(depsRsfFilename);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
 		Iterable<List<String>> depFacts = RsfReader.filteredRoutineFacts;
 		
 		Map<String,Set<String>> depMap = new HashMap<>();

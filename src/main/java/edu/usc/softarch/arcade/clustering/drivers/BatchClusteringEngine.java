@@ -14,9 +14,6 @@ import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.clustering.techniques.ConcernClusteringRunner;
-import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.config.Config.SimMeasure;
-import edu.usc.softarch.arcade.config.Config.StoppingCriterionConfig;
 import edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder;
 import edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder;
 import edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder;
@@ -105,10 +102,9 @@ public class BatchClusteringEngine {
 		// have to set some Config settings before executing the runner
 		// number of clusters to obtain is based on the number of entities
 		int numClusters = (int) ((double) runner.getFastClusters().size() * .20);
-		Config.stoppingCriterion = StoppingCriterionConfig.preselected;
-		Config.setCurrSimMeasure(SimMeasure.js);
 		runner.computeClustersWithConcernsAndFastClusters(
-			new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters));
+			new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters),
+			"preselected", "js");
 
 		String arcClustersFilename = outputDirName + fs	+ revisionNumber + "_"
 			+ numTopics + "_topics_" + runner.getFastClusters().size()

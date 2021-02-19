@@ -1,37 +1,32 @@
 package edu.usc.softarch.arcade.facts.driver;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class CSourceToDepsBuilder extends SourceToDepsBuilder {
-	public static FastFeatureVectors ffVecs = null;
-	public static int numSourceEntities = 0;
-	
 	@Override
-	public Set<Pair<String,String>> getEdges() {
-		return this.edges;
-	}
-
-	public static void main(String[] args) throws IOException {
-		(new CSourceToDepsBuilder()).build(args[0], args[1]);
-	}
-
-	@Override
-	public void build(String classesDirPath, String depsRsfFilename) throws IOException {
+	public void build(String classesDirPath, String depsRsfFilename)
+			throws IOException {
 		String inputDir = FileUtil.tildeExpandPath(classesDirPath);
 		String depsRsfFilepath = FileUtil.tildeExpandPath(depsRsfFilename);
 		
@@ -41,14 +36,11 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		
 		
 		String[] cmds = { mkFilesCmd, mkDepCmd };
-		for (String cmd : cmds) {
-			execCmd(cmd,inputDir);
-		}
+		for (String cmd : cmds)	execCmd(cmd,inputDir);
 		
 		String makeDepFileLocation = inputDir + File.separator + "make.dep";
-		String[] makeDepReaderArgs = {makeDepFileLocation,depsRsfFilepath};
-		
-		MakeDepReader.main(makeDepReaderArgs);
+		Map<String, List<String>> depMap = buildDeps(makeDepFileLocation);
+		serializeResults(depsRsfFilepath, depMap);
 		
 		RsfReader.loadRsfDataFromFile(depsRsfFilepath);
 				
@@ -67,35 +59,78 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		}
 		
 		Set<String> sources = new HashSet<>();
-		for (Pair<String,String> edge : edges) {
+		for (Pair<String,String> edge : edges)
 			sources.add(edge.getLeft());
-		}
 		numSourceEntities = sources.size();
 		
 		FeatureVectorMap fvMap = new FeatureVectorMap(typedEdgeGraph);
 		ffVecs = fvMap.convertToFastFeatureVectors();
 	}
 
-	private static void execCmd(String cmd, String inputDir) throws IOException {
+	private Map<String, List<String>> buildDeps(String filename)
+			throws IOException {
+		Map<String, List<String>> depMap = new HashMap<>();
+
+		try (Scanner scanner = new Scanner(new FileInputStream(filename))) {
+			String currDotCFile = "";
+			
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				String[] tokens = line.split("\\s");
+				
+				for (String token : tokens) {
+					String trimmedToken = token.trim();
+					
+					if (trimmedToken.endsWith(".c") || trimmedToken.endsWith(".h")) {
+						List<String> deps = null;
+						if (depMap.containsKey(currDotCFile))
+							deps = depMap.get(currDotCFile);
+						else
+							deps = new ArrayList<>();
+						deps.add(trimmedToken);
+						depMap.put(currDotCFile,deps);
+					}
+					if (trimmedToken.endsWith(".o:")) {
+						trimmedToken = trimmedToken.substring(0, trimmedToken.length() - 1);
+						currDotCFile = trimmedToken.replace(".o", ".c");
+					}
+					logger.debug(trimmedToken + "");
+				}
+				logger.debug("\n");
+			}
+		}
+		
+		Set<String> cFiles = depMap.keySet();
+		for (String cFile : cFiles) {
+			logger.debug(cFile + " has dependencies to ");
+			for (String dep : depMap.get(cFile))
+				logger.debug("\t" + dep);
+		}
+
+		return depMap;
+	}
+
+	private void serializeResults(String outRsfFile,
+			Map<String, List<String>> depMap) throws IOException {
+		Set<String> cFiles = depMap.keySet();
+		try (BufferedWriter out = new BufferedWriter(new FileWriter(outRsfFile))) {
+			for (String cFile : cFiles) {
+				List<String> deps = depMap.get(cFile);
+				for (String dep : deps)
+					out.write("depends " + cFile + " " + dep + "\n");
+			}
+		}
+	}
+
+	private void execCmd(String cmd, String inputDir) throws IOException {
 		System.out.println("Executing command: " + cmd);
 		Process process = Runtime.getRuntime().exec(cmd,null,new File(inputDir));
 
 		String line;
 		BufferedReader in = new BufferedReader(new InputStreamReader(
-				process.getInputStream()));
-		while ((line = in.readLine()) != null) {
+			process.getInputStream()));
+		while ((line = in.readLine()) != null)
 			System.out.println(line);
-		}
 		in.close();		
-	}
-
-	@Override
-	public int getNumSourceEntities() {
-		return numSourceEntities;
-	}
-
-	@Override
-	public FastFeatureVectors getFfVecs() {
-		return ffVecs;
 	}
 }

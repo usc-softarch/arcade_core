@@ -45,7 +45,7 @@ public class ClusteringEngine {
 
 	public void run(String fastFeatureVectorsFilePath, String language,
 			String clusteringAlgorithm, String stoppingCriterion,
-			int numClusters) throws Exception {
+			int numClusters, String simMeasure) throws Exception {
 		FastFeatureVectors fastFeatureVectors = null;
 		
 		File fastFeatureVectorsFile = new File(fastFeatureVectorsFilePath);
@@ -66,13 +66,13 @@ public class ClusteringEngine {
 			WcaRunner.setFastFeatureVectors(fastFeatureVectors);
 			if (stoppingCriterion.equalsIgnoreCase("preselected")) {
 				StoppingCriterion stopCriterion = new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters);
-				WcaRunner.computeClustersWithPQAndWCA(stopCriterion, language);
+				WcaRunner.computeClustersWithPQAndWCA(stopCriterion, language, stoppingCriterion, simMeasure);
 			}
 			if (stoppingCriterion.equalsIgnoreCase("clustergain")) {
 				StoppingCriterion singleClusterStopCriterion = new SingleClusterStoppingCriterion();
-				WcaRunner.computeClustersWithPQAndWCA(singleClusterStopCriterion, language);
+				WcaRunner.computeClustersWithPQAndWCA(singleClusterStopCriterion, language, stoppingCriterion, simMeasure);
 				StoppingCriterion clusterGainStopCriterion = new ClusterGainStoppingCriterion();
-				WcaRunner.computeClustersWithPQAndWCA(clusterGainStopCriterion, language);
+				WcaRunner.computeClustersWithPQAndWCA(clusterGainStopCriterion, language, stoppingCriterion, simMeasure);
 			}
 		}
 		
@@ -84,9 +84,9 @@ public class ClusteringEngine {
 		
 		if (clusteringAlgorithm.equalsIgnoreCase("limbo")) {
 			LimboRunner.setFastFeatureVectors(fastFeatureVectors);
-			LimboRunner.computeClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters), language);
+			LimboRunner.computeClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters), language, stoppingCriterion);
 			if (stoppingCriterion.equalsIgnoreCase("clustergain"))
-				LimboRunner.computeClusters(new ClusterGainStoppingCriterion(), language);
+				LimboRunner.computeClusters(new ClusterGainStoppingCriterion(), language, stoppingCriterion);
 		}
 	}
 

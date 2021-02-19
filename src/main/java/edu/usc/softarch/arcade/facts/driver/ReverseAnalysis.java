@@ -407,14 +407,22 @@ public class ReverseAnalysis {
 				break;
 		}
 		
-		RsfReader.loadRsfDataFromFile(depsFilename);
-		List<List<String>> depFacts = RsfReader.unfilteredFacts;	
-		
-		RsfReader.loadRsfDataFromFile(authFilename);
-		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
-		
-		RsfReader.loadRsfDataFromFile(pkgFilename);
-		List<List<String>> pkgFacts = RsfReader.unfilteredFacts;
+		List<List<String>> depFacts = null;
+		List<List<String>> clusterFacts = null;
+		List<List<String>> pkgFacts = null;
+
+		try {
+			RsfReader.loadRsfDataFromFile(depsFilename);
+			depFacts = RsfReader.unfilteredFacts;	
+			
+			RsfReader.loadRsfDataFromFile(authFilename);
+			clusterFacts = RsfReader.unfilteredFacts;
+			
+			RsfReader.loadRsfDataFromFile(pkgFilename);
+			pkgFacts = RsfReader.unfilteredFacts;
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 		
 		System.out.println("Finished loading data from all files");
 		ReverseAnalysis ra;
