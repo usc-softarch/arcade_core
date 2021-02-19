@@ -34,7 +34,6 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		String mkFilesCmd = "perl " + pwd + File.separator + "mkfiles.pl";
 		String mkDepCmd = "perl " + pwd + File.separator + "mkdep.pl";
 		
-		
 		String[] cmds = { mkFilesCmd, mkDepCmd };
 		for (String cmd : cmds)	execCmd(cmd,inputDir);
 		
@@ -42,13 +41,13 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		Map<String, List<String>> depMap = buildDeps(makeDepFileLocation);
 		serializeResults(depsRsfFilepath, depMap);
 		
-		RsfReader.loadRsfDataFromFile(depsRsfFilepath);
+		List<List<String>> unfilteredFacts = RsfReader.loadRsfDataFromFile(depsRsfFilepath);
 				
-		numSourceEntities = RsfReader.unfilteredFacts.size();
+		numSourceEntities = unfilteredFacts.size();
 		
 		TypedEdgeGraph typedEdgeGraph = new TypedEdgeGraph();
 		edges = new LinkedHashSet<Pair<String,String>>();
-		for (List<String> fact : RsfReader.unfilteredFacts) {
+		for (List<String> fact : unfilteredFacts) {
 			String source = fact.get(1);
 			String target = fact.get(2);
 			

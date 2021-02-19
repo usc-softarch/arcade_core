@@ -19,11 +19,8 @@ public class ClusterGraphToDotConverter {
 		List<List<String>> clusterFacts = null;
 		
 		try {
-			RsfReader.loadRsfDataFromFile(depsFilename);
-			depFacts = RsfReader.unfilteredFacts;
-			
-			RsfReader.loadRsfDataFromFile(clustersFilename);
-			clusterFacts = RsfReader.unfilteredFacts;
+			depFacts = RsfReader.loadRsfDataFromFile(depsFilename);
+			clusterFacts = RsfReader.loadRsfDataFromFile(clustersFilename);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}

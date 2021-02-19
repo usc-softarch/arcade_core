@@ -138,13 +138,13 @@ public class ClusterUtil {
 	}
 	
 	public static Map<String, Set<String>> buildDependenciesMap(String depsRsfFilename) {
+		Iterable<List<String>> depFacts = null;
+
 		try {
-			RsfReader.loadRsfDataFromFile(depsRsfFilename);
+			depFacts = RsfReader.loadRsfDataFromFile(depsRsfFilename);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		
-		Iterable<List<String>> depFacts = RsfReader.filteredRoutineFacts;
 		
 		Map<String,Set<String>> depMap = new HashMap<>();
 		

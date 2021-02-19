@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 import edu.usc.softarch.arcade.classgraphs.ClassGraph;
 import edu.usc.softarch.arcade.classgraphs.SootClassEdge;
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
-import edu.usc.softarch.arcade.facts.driver.RsfReader;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
 
 import soot.SootClass;
@@ -88,22 +87,6 @@ public class FeatureVectorMap {
 					featureSetEdges.add(Arrays.asList(source,target));
 				}
 			}
-		}
-		
-		if (RsfReader.untypedEdgesSet != null) {
-			Set<List<String>> intersectionSet = new HashSet<>(featureSetEdges);
-			intersectionSet.retainAll(RsfReader.untypedEdgesSet);
-			logger.debug("Printing intersection of rsf reader untyped edges set and feature set edges...");
-			logger.debug("intersection set size: " + intersectionSet.size());
-			logger.debug(String.join("\n", intersectionSet.stream()
-				.map(List::toString).collect(Collectors.toList())));
-
-			Set<List<String>> differenceSet = new HashSet<>(featureSetEdges);
-			differenceSet.removeAll(RsfReader.untypedEdgesSet);
-			logger.debug("Printing difference of rsf reader untyped edges set and feature set edges...");
-			logger.debug("difference set size: " + differenceSet.size());
-			logger.debug(String.join("\n", differenceSet.stream()
-				.map(List::toString).collect(Collectors.toList())));
 		}
 	}
 

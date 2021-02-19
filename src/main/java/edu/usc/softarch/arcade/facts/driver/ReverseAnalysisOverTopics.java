@@ -163,47 +163,43 @@ public class ReverseAnalysisOverTopics {
 		}
 	}
 
+	/**
+	 * Arguments are:
+	 * 0 - *_deps.rsf file for a given system
+	 * 1 - *_clean_ground_truth_recovery.rsf for the same system
+	 */
 	public static void main(String[] args) {
-		System.out.println("IN MAIN");
+		String depsFile = args[0];
+		String gtFile = args[1];
+		List<List<String>> depFacts = null;
+		List<List<String>> clusterFacts = null;
 
 		try {
-			RsfReader.loadRsfDataFromFile("archstudio4_deps (1).rsf");
+			depFacts = RsfReader.loadRsfDataFromFile(depsFile);
+			clusterFacts = RsfReader.loadRsfDataFromFile(gtFile);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
 
-		List<List<String>> depFacts = RsfReader.unfilteredFacts;
-
-		try {
-			RsfReader
-				.loadRsfDataFromFile("archstudio4_clean_ground_truth_recovery.rsf");
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		
-		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
 		System.out.println("Finished loading data from both files");
 
 		Map<Integer, String> docTopicFilesMap = buildDocTopicFilesMap();
 
 		initializeFileIO();
 
-		Map<String, Set<String>> clusterMap = ClusterUtil
-				.buildClusterMap(clusterFacts);
-		Map<String, Map<String, Entity>> clusterNameToEntities = buildFeatureSetPerClusterEntity(
-				clusterMap, depFacts);
+		Map<String, Set<String>> clusterMap =
+			ClusterUtil.buildClusterMap(clusterFacts);
+		Map<String, Map<String, Entity>> clusterNameToEntities =
+			buildFeatureSetPerClusterEntity(clusterMap, depFacts);
 
-		Set<Integer> numTopicsSet = new TreeSet<>(
-				docTopicFilesMap.keySet());
-
-		Set<String> orderedClusterNames = new TreeSet<>(
-				clusterNameToEntities.keySet());
+		Set<Integer> numTopicsSet = new TreeSet<>(docTopicFilesMap.keySet());
+		Set<String> orderedClusterNames =
+			new TreeSet<>(clusterNameToEntities.keySet());
 
 		try {
 			out.write(",");
-			for (String clusterName : orderedClusterNames) {
+			for (String clusterName : orderedClusterNames)
 				out.write(clusterName + ",");
-			}
 			out.newLine();
 
 			for (int numTopics : numTopicsSet) {

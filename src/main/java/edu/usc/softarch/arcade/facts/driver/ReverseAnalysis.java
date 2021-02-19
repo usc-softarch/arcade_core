@@ -412,14 +412,9 @@ public class ReverseAnalysis {
 		List<List<String>> pkgFacts = null;
 
 		try {
-			RsfReader.loadRsfDataFromFile(depsFilename);
-			depFacts = RsfReader.unfilteredFacts;	
-			
-			RsfReader.loadRsfDataFromFile(authFilename);
-			clusterFacts = RsfReader.unfilteredFacts;
-			
-			RsfReader.loadRsfDataFromFile(pkgFilename);
-			pkgFacts = RsfReader.unfilteredFacts;
+			depFacts = RsfReader.loadRsfDataFromFile(depsFilename);
+			clusterFacts = RsfReader.loadRsfDataFromFile(authFilename);
+			pkgFacts = RsfReader.loadRsfDataFromFile(pkgFilename);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}

@@ -85,12 +85,6 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 	// #endregion PROCESSING -----------------------------------------------------
 
 	// #region IO ----------------------------------------------------------------
-	public static void main(String[] args) throws IOException {
-		String classesDirPath = args[0];
-		String depsRsfFilename = args[1];
-		(new JavaSourceToDepsBuilder()).build(classesDirPath, depsRsfFilename);
-	}
-
 	private void serializeEdges(Set<Pair<String, String>> edges,
 			String depsRsfFilepath) throws FileNotFoundException{
 		PrintStream out = new PrintStream(depsRsfFilepath);

@@ -11,13 +11,13 @@ public class RsfToDotConverter {
 	public static void main(String[] args) {
 		String rsfFilename = args[0];
 		String dotFilename = args[1];
+		List<List<String>> facts = null;
+
 		try {
-			RsfReader.loadRsfDataFromFile(rsfFilename);
+			facts = RsfReader.loadRsfDataFromFile(rsfFilename);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		
-		List<List<String>> facts = RsfReader.unfilteredFacts;
 		
 		try (FileWriter out = new FileWriter(dotFilename)) {
 			out.write("digraph G {\n");

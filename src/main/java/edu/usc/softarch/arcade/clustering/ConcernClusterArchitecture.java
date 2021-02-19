@@ -51,13 +51,14 @@ public class ConcernClusterArchitecture extends HashSet<ConcernCluster> {
 
 	// #region IO ----------------------------------------------------------------
 	public static ConcernClusterArchitecture loadFromRsf(String rsfFilename) {
+		Iterable<List<String>> clusterFacts = null;
+
 		try {
-			RsfReader.loadRsfDataFromFile(rsfFilename);
+			clusterFacts = RsfReader.loadRsfDataFromFile(rsfFilename);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
 
-		Iterable<List<String>> clusterFacts = RsfReader.filteredRoutineFacts;
 		ConcernClusterArchitecture clusters = new ConcernClusterArchitecture();
 		for (List<String> fact : clusterFacts) {
 			String clusterName = fact.get(1).trim();
@@ -170,13 +171,14 @@ public class ConcernClusterArchitecture extends HashSet<ConcernCluster> {
 		for (ConcernCluster cluster : this)
 			directedGraph.addVertex(cluster.getName());
 		logger.debug("No. of vertices: " + directedGraph.vertexSet().size());
+
+		Iterable<List<String>> depFacts = null;
 		
 		try {
-			RsfReader.loadRsfDataFromFile(depsRsfFilename);
+			depFacts = RsfReader.loadRsfDataFromFile(depsRsfFilename);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Iterable<List<String>> depFacts = RsfReader.filteredRoutineFacts;
 		
 		for (List<String> fact : depFacts) {
 			String source = fact.get(1).trim();

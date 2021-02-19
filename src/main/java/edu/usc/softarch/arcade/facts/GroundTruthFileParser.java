@@ -121,13 +121,14 @@ public class GroundTruthFileParser {
 
 	public static void parseRsf(String groundTruthFile) {
 		clusterMap = new HashMap<>();
+		List<List<String>> unfilteredFacts = null;
 		try {
-			RsfReader.loadRsfDataFromFile(groundTruthFile);
+			unfilteredFacts = RsfReader.loadRsfDataFromFile(groundTruthFile);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
 		
-		for (List<String> fact : RsfReader.unfilteredFacts) {
+		for (List<String> fact : unfilteredFacts) {
 
 			String clusterName = fact.get(1).trim();
 			String containedClass = fact.get(2).trim();

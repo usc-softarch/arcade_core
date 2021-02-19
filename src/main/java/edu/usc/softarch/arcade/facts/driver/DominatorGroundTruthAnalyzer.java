@@ -43,22 +43,16 @@ public class DominatorGroundTruthAnalyzer {
 		String depsFilename = args[0];
 		String clustersFilename = args[1];
 		String outFilename = args[2];
+		List<List<String>> depFacts = null;
+		List<List<String>> clusterFacts = null;
 		
 		// Load files
 		try {
-			RsfReader.loadRsfDataFromFile(depsFilename);
+			depFacts = RsfReader.loadRsfDataFromFile(depsFilename);
+			clusterFacts = RsfReader.loadRsfDataFromFile(clustersFilename);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-
-		List<List<String>> depFacts = RsfReader.unfilteredFacts;
-		try {
-			RsfReader.loadRsfDataFromFile(clustersFilename);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		
-		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
 		
 		// Run analysis
 		Map<String,Set<String>> clusterMap =

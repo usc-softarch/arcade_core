@@ -72,21 +72,17 @@ public class DecayMetricAnalyzer {
 		avgStability = detectStability(directedGraph);
 		
 		logger.info("avg stability: " + avgStability);
+
+		List<List<String>> depFacts = null;
+		List<List<String>> clusterFacts = null;
 		
 		try {
-			RsfReader.loadRsfDataFromFile(depsRsfFilename);
+			depFacts = RsfReader.loadRsfDataFromFile(depsRsfFilename);
+			clusterFacts = RsfReader.loadRsfDataFromFile(clustersFilename);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
 
-		List<List<String>> depFacts = RsfReader.unfilteredFacts;
-		try {
-			RsfReader.loadRsfDataFromFile(clustersFilename);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		
-		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
 		Map<String,Set<String>> clusterMap = ClusterUtil.buildClusterMap(clusterFacts);
 		Map<String,Set<MutablePair<String,String>>> internalEdgeMap = ClusterUtil.buildInternalEdgesPerCluster(clusterMap, depFacts);
 		Map<String,Set<MutablePair<String,String>>> externalEdgeMap = ClusterUtil.buildExternalEdgesPerCluster(clusterMap, depFacts);
