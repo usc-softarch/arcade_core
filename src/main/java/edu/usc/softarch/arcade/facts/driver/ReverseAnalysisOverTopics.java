@@ -166,11 +166,21 @@ public class ReverseAnalysisOverTopics {
 	public static void main(String[] args) {
 		System.out.println("IN MAIN");
 
-		RsfReader.loadRsfDataFromFile("archstudio4_deps (1).rsf");
+		try {
+			RsfReader.loadRsfDataFromFile("archstudio4_deps (1).rsf");
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+
 		List<List<String>> depFacts = RsfReader.unfilteredFacts;
 
-		RsfReader
+		try {
+			RsfReader
 				.loadRsfDataFromFile("archstudio4_clean_ground_truth_recovery.rsf");
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
 		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
 		System.out.println("Finished loading data from both files");
 

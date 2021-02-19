@@ -121,7 +121,11 @@ public class GroundTruthFileParser {
 
 	public static void parseRsf(String groundTruthFile) {
 		clusterMap = new HashMap<>();
-		RsfReader.loadRsfDataFromFile(groundTruthFile);
+		try {
+			RsfReader.loadRsfDataFromFile(groundTruthFile);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 		
 		for (List<String> fact : RsfReader.unfilteredFacts) {
 

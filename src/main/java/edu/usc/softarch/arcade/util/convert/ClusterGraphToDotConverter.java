@@ -14,12 +14,19 @@ public class ClusterGraphToDotConverter {
 		String depsFilename = args[0];
 		String clustersFilename = args[1];
 		String dotFilename = args[2];
+
+		List<List<String>> depFacts = null;
+		List<List<String>> clusterFacts = null;
 		
-		RsfReader.loadRsfDataFromFile(depsFilename);
-		List<List<String>> depFacts = RsfReader.unfilteredFacts;
-		
-		RsfReader.loadRsfDataFromFile(clustersFilename);
-		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
+		try {
+			RsfReader.loadRsfDataFromFile(depsFilename);
+			depFacts = RsfReader.unfilteredFacts;
+			
+			RsfReader.loadRsfDataFromFile(clustersFilename);
+			clusterFacts = RsfReader.unfilteredFacts;
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 		
 		Map<String,Set<String>> clusterMap = ClusterUtil.buildClusterMap(clusterFacts);
 		

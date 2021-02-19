@@ -11,7 +11,12 @@ public class RsfToDotConverter {
 	public static void main(String[] args) {
 		String rsfFilename = args[0];
 		String dotFilename = args[1];
-		RsfReader.loadRsfDataFromFile(rsfFilename);
+		try {
+			RsfReader.loadRsfDataFromFile(rsfFilename);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
 		List<List<String>> facts = RsfReader.unfilteredFacts;
 		
 		try (FileWriter out = new FileWriter(dotFilename)) {
