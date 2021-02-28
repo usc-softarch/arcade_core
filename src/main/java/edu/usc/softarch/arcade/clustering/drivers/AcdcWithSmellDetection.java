@@ -108,10 +108,9 @@ public class AcdcWithSmellDetection {
 		// subdirectory of dir
 		String acdcClusteredFile = outputDir.getAbsolutePath() + fs
 			+ versionFolderName + "_acdc_clustered.rsf";
-		String[] acdcArgs = { depsRsfFile.getAbsolutePath(), acdcClusteredFile };
 		
 		logger.debug("Running acdc for revision " + versionFolderName);
-		ACDC.main(acdcArgs);
+		ACDC.run(depsRsfFile.getAbsolutePath(), acdcClusteredFile);
 		
 		logger.debug("Running smell detecion for revision " + versionFolderName);
 

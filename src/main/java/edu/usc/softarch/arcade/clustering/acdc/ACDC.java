@@ -22,10 +22,6 @@ import org.apache.logging.log4j.Logger;
  */
 public class ACDC {
 	private static final Logger logger = LogManager.getLogger(ACDC.class);
-
-  public static void main(String [] args) {
-		run(args[0], args[1]);
-	}
 	
 	public static void run(String inputName, String outputName) {
 		IO.set_debug_level(0);

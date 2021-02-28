@@ -41,12 +41,13 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		Map<String, List<String>> depMap = buildDeps(makeDepFileLocation);
 		serializeResults(depsRsfFilepath, depMap);
 		
-		List<List<String>> unfilteredFacts = RsfReader.loadRsfDataFromFile(depsRsfFilepath);
-				
+		List<List<String>> unfilteredFacts =
+			RsfReader.loadRsfDataFromFile(depsRsfFilepath);
+		
 		this.numSourceEntities = unfilteredFacts.size();
 		
 		TypedEdgeGraph typedEdgeGraph = new TypedEdgeGraph();
-		this.edges = new LinkedHashSet<Pair<String,String>>();
+		this.edges = new LinkedHashSet<Pair<String, String>>();
 		for (List<String> fact : unfilteredFacts) {
 			String source = fact.get(1);
 			String target = fact.get(2);
@@ -58,7 +59,7 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		}
 		
 		Set<String> sources = new HashSet<>();
-		for (Pair<String,String> edge : edges)
+		for (Pair<String,String> edge : this.edges)
 			sources.add(edge.getLeft());
 		this.numSourceEntities = sources.size();
 
@@ -81,28 +82,18 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 					
 					if (trimmedToken.endsWith(".c") || trimmedToken.endsWith(".h")) {
 						List<String> deps = null;
-						if (depMap.containsKey(currDotCFile))
-							deps = depMap.get(currDotCFile);
-						else
-							deps = new ArrayList<>();
+						deps = depMap.containsKey(currDotCFile)
+							? depMap.get(currDotCFile)
+							: new ArrayList<>();
 						deps.add(trimmedToken);
-						depMap.put(currDotCFile,deps);
+						depMap.put(currDotCFile, deps);
 					}
 					if (trimmedToken.endsWith(".o:")) {
 						trimmedToken = trimmedToken.substring(0, trimmedToken.length() - 1);
 						currDotCFile = trimmedToken.replace(".o", ".c");
 					}
-					logger.debug(trimmedToken + "");
 				}
-				logger.debug("\n");
 			}
-		}
-		
-		Set<String> cFiles = depMap.keySet();
-		for (String cFile : cFiles) {
-			logger.debug(cFile + " has dependencies to ");
-			for (String dep : depMap.get(cFile))
-				logger.debug("\t" + dep);
 		}
 
 		return depMap;
