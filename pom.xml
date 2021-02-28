@@ -243,7 +243,7 @@
               <archive>
                 <manifest>
                   <!-- CHANGE THIS LINE TO CHANGE MAIN CLASS -->
-                  <mainClass>edu.usc.softarch.arcade.AcdcWithSmellDetection</mainClass>
+                  <mainClass>edu.usc.softarch.arcade.clustering.drivers.AcdcWithSmellDetection</mainClass>
                   <!-- CHANGE THIS LINE TO CHANGE MAIN CLASS -->
                 </manifest>
               </archive>
