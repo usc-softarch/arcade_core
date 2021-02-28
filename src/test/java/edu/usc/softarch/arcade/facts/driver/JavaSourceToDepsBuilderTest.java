@@ -42,9 +42,10 @@ public class JavaSourceToDepsBuilderTest {
     // RsfCompare.compareTo returns 0 if files have the same contents
     assertEquals(resultRsf.compareTo(oracleRsf), 0);
   }
+  
   @Test
   public void buildTest1() {
-    // Builds the dependencies RSF file for Josh's ARCADE version
+    // Builds the dependencies RSF file for struts2 (2.3.30)
     char fs = File.separatorChar;
     String classesDirPath = "." + fs + "src" + fs + "test" + fs + "resources"
       + fs + "JavaSourceToDepsBuilderTest_resources"
@@ -74,7 +75,7 @@ public class JavaSourceToDepsBuilderTest {
 
   @Test
   public void buildTest2() {
-    // Builds the dependencies RSF file for Josh's ARCADE version
+    // Builds the dependencies RSF file for struts2 (2.5.2)
     char fs = File.separatorChar;
     String classesDirPath = "." + fs + "src" + fs + "test" + fs + "resources"
       + fs + "JavaSourceToDepsBuilderTest_resources"
