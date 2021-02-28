@@ -14,7 +14,7 @@ import edu.usc.softarch.arcade.util.RsfCompare;
 public class JavaSourceToDepsBuilderTest {
   // #region TESTS build -------------------------------------------------------
   @Test
-  public void buildTestOld() {
+  public void buildTestOldArcade() {
     // Builds the dependencies RSF file for Josh's ARCADE version
     char fs = File.separatorChar;
     String classesDirPath = "." + fs + "src" + fs + "test" + fs + "resources"
@@ -44,14 +44,14 @@ public class JavaSourceToDepsBuilderTest {
   }
   
   @Test
-  public void buildTest1() {
+  public void struts2BuildTest1() {
     // Builds the dependencies RSF file for struts2 (2.3.30)
     char fs = File.separatorChar;
     String classesDirPath = "." + fs + "src" + fs + "test" + fs + "resources"
       + fs + "JavaSourceToDepsBuilderTest_resources"
       + fs + "binaries" + fs + "struts-2.3.30" + fs + "lib_struts";
     String depsRsfFilename = "." + fs + "target" + fs + "test_results" + fs 
-      + "JavaSourceToDepsBuilderTest" + fs + "buildTest1Result.rsf";
+      + "JavaSourceToDepsBuilderTest" + fs + "struts2BuildTest1Result.rsf";
 
     // Run JavaSourceToDepsBuilder.build()
     assertDoesNotThrow(() -> (
@@ -74,14 +74,14 @@ public class JavaSourceToDepsBuilderTest {
   }
 
   @Test
-  public void buildTest2() {
+  public void struts2BuildTest2() {
     // Builds the dependencies RSF file for struts2 (2.5.2)
     char fs = File.separatorChar;
     String classesDirPath = "." + fs + "src" + fs + "test" + fs + "resources"
       + fs + "JavaSourceToDepsBuilderTest_resources"
       + fs + "binaries" + fs + "struts-2.5.2" + fs + "lib_struts";
     String depsRsfFilename = "." + fs + "target" + fs + "test_results" + fs 
-      + "JavaSourceToDepsBuilderTest" + fs + "buildTest2Result.rsf";
+      + "JavaSourceToDepsBuilderTest" + fs + "struts2BuildTest2Result.rsf";
 
     // Run JavaSourceToDepsBuilder.build()
     assertDoesNotThrow(() -> (

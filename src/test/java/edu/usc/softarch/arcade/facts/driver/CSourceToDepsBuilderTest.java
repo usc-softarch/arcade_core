@@ -13,15 +13,15 @@ import edu.usc.softarch.arcade.util.RsfCompare;
 
 public class CSourceToDepsBuilderTest {
     @Test
-    public void buildTest1() {
+    public void httpdBuildTest1(){
         char fs = File.separatorChar;
-        // Builds dependencies rsf for httpd 2.3.8
+        // Builds the dependencies rsf for httpd 2.3.8
         String classesDirPath = "." + fs + "src" + fs + "test" + fs + "resources" 
             + fs + "CSourceToDepsBuilderTest_resources"
             + fs + "binaries" + fs + "httpd-2.3.8";
-        // Path for output file (rsf file - list of dependencies)
+        // Path for dependencies rsf output
         String depsRsfFilename = "." + fs + "target" + fs + "test_results" 
-            + fs + "CSourceToDepsBuilderTest" + fs + "buildTest1Result.rsf";
+            + fs + "CSourceToDepsBuilderTest" + fs + "httpdBuildTest1Result.rsf";
 
         // Run CSourceToDepsBuilder.build()
         assertDoesNotThrow(() -> ( // to avoid exceptions stopping JUnit from running tests
@@ -43,15 +43,15 @@ public class CSourceToDepsBuilderTest {
         assertEquals(resultRsf.compareTo(oracleRsf), 0);
     }
     @Test
-    public void buildTest2() {
+    public void httpdBuildTest2() {
         char fs = File.separatorChar;
-        // Builds dependencies rsf for httpd 2.4.26
+        // Builds the dependencies rsf for httpd 2.4.26
         String classesDirPath = "." + fs + "src" + fs + "test" + fs + "resources" 
             + fs + "CSourceToDepsBuilderTest_resources"
             + fs + "binaries" + fs + "httpd-2.4.26";
-        // Path for output file (rsf file - list of dependencies)
+        // Path for dependencies rsf output
         String depsRsfFilename = "." + fs + "target" + fs + "test_results" 
-            + fs + "CSourceToDepsBuilderTest" + fs + "buildTest2Result.rsf";
+            + fs + "CSourceToDepsBuilderTest" + fs + "httpdBuildTest2Result.rsf";
 
         // Run CSourceToDepsBuilder.build()
         assertDoesNotThrow(() -> ( // to avoid exceptions stopping JUnit from running tests
@@ -72,5 +72,4 @@ public class CSourceToDepsBuilderTest {
         // RsfCompare.compareTo returns 0 if files have the same contents
         assertEquals(resultRsf.compareTo(oracleRsf), 0);
     }
-    
 }
