@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
 import edu.usc.softarch.arcade.util.FileUtil;
+import edu.usc.softarch.arcade.util.RsfCompare;
 
 public class JavaSourceToDepsBuilderTest {
   // #region TESTS build -------------------------------------------------------
@@ -36,7 +37,10 @@ public class JavaSourceToDepsBuilderTest {
       { return FileUtil.readFile(oraclePath, StandardCharsets.UTF_8); });
     
     // Check oracle
-    assertEquals(result, oracle);
+    RsfCompare resultRsf = new RsfCompare(result);
+    RsfCompare oracleRsf = new RsfCompare(oracle);
+    // RsfCompare.compareTo returns 0 if files have the same contents
+    assertEquals(resultRsf.compareTo(oracleRsf), 0);
   }
   // #endregion TESTS build ----------------------------------------------------
 }
