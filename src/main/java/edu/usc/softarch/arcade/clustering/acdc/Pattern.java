@@ -88,11 +88,11 @@ public abstract class Pattern {
 	}
 	
 	public static void induceEdges(List<Node> v) {
-		logger.info("The following " + v.size()
+		logger.trace("The following " + v.size()
 			+ " nodes were selected for edge induction");
 		
 		for (Node current : v) {
-			logger.info(current.getName());
+			logger.trace(current.getName());
 
 			inductionStep(current, false);
 			inductionStep(current, true);
@@ -126,7 +126,7 @@ public abstract class Pattern {
 
 	private static void createEdge(Node n1, Node n2) {
 		Edge e = new Edge(n1, n2, "induced");
-		logger.info("\tInduced edge from " + n1.getName() + " to " + n2.getName());
+		logger.trace("\tInduced edge from " + n1.getName() + " to " + n2.getName());
 		n1.addOutEdge(e);
 		n2.addInEdge(e);
 	}
