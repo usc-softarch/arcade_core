@@ -6,101 +6,61 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.RsfCompare;
 
 public class JavaSourceToDepsBuilderTest {
-  // #region TESTS build -------------------------------------------------------
-  @Test
-  public void buildTestOldArcade() {
-    // Builds the dependencies RSF file for Josh's ARCADE version
-    char fs = File.separatorChar;
-    String classesDirPath = "." + fs + "src" + fs + "test" + fs + "resources"
-      + fs + "JavaSourceToDepsBuilderTest_resources_old"
-      + fs + "arcade_old_binaries";
-    String depsRsfFilename = "." + fs + "target" + fs + "test_results" + fs 
-      + "JavaSourceToDepsBuilderTest" + fs + "buildTestOldResult.rsf";
+  // @Before
+  // public void setUp(){
+  //   // Create ./target/test_results/JavaSourceToDepsBuilderTest/ if it does not already exist
+  //   char fs = File.separatorChar;
+  //   String outputPath = "." + fs + "target" + fs + "test_results" + fs + "JavaSourceToDepsBuilderTest";
+  //   File directory = new File(outputPath);
+  //   if (!directory.exists()){
+  //     directory.mkdirs();
+  //   }
+  // }
+
+  @ParameterizedTest
+  @CsvSource({
+    // Old ARCADE
+    ".///src///test///resources///JavaSourceToDepsBuilderTest_resources_old///arcade_old_binaries,"
+    + ".///target///test_results///JavaSourceToDepsBuilderTest///buildTestOldARCADEResult.rsf," 
+    + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources_old///arcade_old_deps_oracle.rsf",
+    // struts2 (2.3.30)
+    ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.3.30///lib_struts,"
+    + ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.3.30buildTestResult.rsf,"
+    + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf",
+    // struts2 (2.5.2)
+    ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.5.2///lib_struts,"
+    + ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.5.2buildTestResult.rsf,"
+    + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf",
+  })
+  public void buildTest(String classesDirPath, String depsRsfFilename, String oraclePath){
+    /** Builds the dependencies RSF file for Java system**/
+    // Format the paths properly
+    String classes = classesDirPath.replace("///", File.separator);
+    String deps = depsRsfFilename.replace("///", File.separator);
+    String oracle = oraclePath.replace("///", File.separator);
 
     // Run JavaSourceToDepsBuilder.build()
-    assertDoesNotThrow(() -> (
-      new JavaSourceToDepsBuilder()).build(classesDirPath, depsRsfFilename));
-    String result = assertDoesNotThrow(() -> 
-      { return FileUtil.readFile(depsRsfFilename, StandardCharsets.UTF_8); });
-    
-    // Load oracle
-    String oraclePath = "." + fs + "src" + fs + "test" + fs + "resources"
-      + fs + "JavaSourceToDepsBuilderTest_resources_old"
-      + fs + "arcade_old_deps_oracle.rsf";
-    String oracle = assertDoesNotThrow(() ->
-      { return FileUtil.readFile(oraclePath, StandardCharsets.UTF_8); });
-    
-    // Check oracle
-    RsfCompare resultRsf = new RsfCompare(result);
-    RsfCompare oracleRsf = new RsfCompare(oracle);
-    // RsfCompare.compareTo returns 0 if files have the same contents
-    assertEquals(resultRsf.compareTo(oracleRsf), 0);
-  }
-  
-  @Test
-  public void struts2BuildTest1() {
-    // Builds the dependencies RSF file for struts2 (2.3.30)
-    char fs = File.separatorChar;
-    String classesDirPath = "." + fs + "src" + fs + "test" + fs + "resources"
-      + fs + "JavaSourceToDepsBuilderTest_resources"
-      + fs + "binaries" + fs + "struts-2.3.30" + fs + "lib_struts";
-    String depsRsfFilename = "." + fs + "target" + fs + "test_results" + fs 
-      + "JavaSourceToDepsBuilderTest" + fs + "struts2BuildTest1Result.rsf";
+    assertDoesNotThrow(() -> (new JavaSourceToDepsBuilder()).build(classes, deps));
+    String result = assertDoesNotThrow(() ->
+      { return FileUtil.readFile(deps, StandardCharsets.UTF_8); });
 
-    // Run JavaSourceToDepsBuilder.build()
-    assertDoesNotThrow(() -> (
-      new JavaSourceToDepsBuilder()).build(classesDirPath, depsRsfFilename));
-    String result = assertDoesNotThrow(() -> 
-      { return FileUtil.readFile(depsRsfFilename, StandardCharsets.UTF_8); });
-    
     // Load oracle
-    String oraclePath = "." + fs + "src" + fs + "test" + fs + "resources"
-      + fs + "JavaSourceToDepsBuilderTest_resources"
-      + fs + "struts-2.3.30_deps.rsf";
-    String oracle = assertDoesNotThrow(() ->
-      { return FileUtil.readFile(oraclePath, StandardCharsets.UTF_8); });
-    
-    // Check oracle
-    RsfCompare resultRsf = new RsfCompare(result);
-    RsfCompare oracleRsf = new RsfCompare(oracle);
-    // RsfCompare.compareTo returns 0 if files have the same contents
-    assertEquals(resultRsf.compareTo(oracleRsf), 0);
-  }
+    String oracleResult = assertDoesNotThrow(() ->
+      { return FileUtil.readFile(oracle, StandardCharsets.UTF_8); });
 
-  @Test
-  public void struts2BuildTest2() {
-    // Builds the dependencies RSF file for struts2 (2.5.2)
-    char fs = File.separatorChar;
-    String classesDirPath = "." + fs + "src" + fs + "test" + fs + "resources"
-      + fs + "JavaSourceToDepsBuilderTest_resources"
-      + fs + "binaries" + fs + "struts-2.5.2" + fs + "lib_struts";
-    String depsRsfFilename = "." + fs + "target" + fs + "test_results" + fs 
-      + "JavaSourceToDepsBuilderTest" + fs + "struts2BuildTest2Result.rsf";
 
-    // Run JavaSourceToDepsBuilder.build()
-    assertDoesNotThrow(() -> (
-      new JavaSourceToDepsBuilder()).build(classesDirPath, depsRsfFilename));
-    String result = assertDoesNotThrow(() -> 
-      { return FileUtil.readFile(depsRsfFilename, StandardCharsets.UTF_8); });
-    
-    // Load oracle
-    String oraclePath = "." + fs + "src" + fs + "test" + fs + "resources"
-      + fs + "JavaSourceToDepsBuilderTest_resources"
-      + fs + "struts-2.5.2_deps.rsf";
-    String oracle = assertDoesNotThrow(() ->
-      { return FileUtil.readFile(oraclePath, StandardCharsets.UTF_8); });
-    
-    // Check oracle
+    // Use RsfCompare.compareTo to compare file contents
+        // returns 0 if files have the same contents
     RsfCompare resultRsf = new RsfCompare(result);
-    RsfCompare oracleRsf = new RsfCompare(oracle);
-    // RsfCompare.compareTo returns 0 if files have the same contents
-    assertEquals(resultRsf.compareTo(oracleRsf), 0);
+    RsfCompare oracleRsf = new RsfCompare(oracleResult);
+    assertEquals(0, oracleRsf.compareTo(resultRsf));
   }
-  // #endregion TESTS build ----------------------------------------------------
 }
