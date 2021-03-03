@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -13,6 +15,15 @@ import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.RsfCompare;
 
 public class ACDCTest {
+  @BeforeEach
+  public void setUp(){
+    // Create rsf file output path ./target/test_results/ACDCTest/ if it does not already exist
+    char fs = File.separatorChar;
+    String outputPath = "." + fs + "target" + fs + "test_results" + fs + "ACDCTest";
+    File directory = new File(outputPath);
+    directory.mkdirs();
+  }
+
   @ParameterizedTest
   @CsvSource({
     // Old ARCADE

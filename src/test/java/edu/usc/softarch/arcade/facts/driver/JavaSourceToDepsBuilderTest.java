@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -14,30 +14,27 @@ import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.RsfCompare;
 
 public class JavaSourceToDepsBuilderTest {
-  // @Before
-  // public void setUp(){
-  //   // Create ./target/test_results/JavaSourceToDepsBuilderTest/ if it does not already exist
-  //   char fs = File.separatorChar;
-  //   String outputPath = "." + fs + "target" + fs + "test_results" + fs + "JavaSourceToDepsBuilderTest";
-  //   File directory = new File(outputPath);
-  //   if (!directory.exists()){
-  //     directory.mkdirs();
-  //   }
-  // }
+  @BeforeEach
+  public void setUp(){
+    // Create ./target/test_results/JavaSourceToDepsBuilderTest/ if it does not already exist
+    char fs = File.separatorChar;
+    String outputPath = "." + fs + "target" + fs + "test_results" + fs + "JavaSourceToDepsBuilderTest";
+		(new File(outputPath)).mkdirs();
+  }
 
   @ParameterizedTest
   @CsvSource({
     // Old ARCADE
     ".///src///test///resources///JavaSourceToDepsBuilderTest_resources_old///arcade_old_binaries,"
-    + ".///target///test_results///JavaSourceToDepsBuilderTest///buildTestOldARCADEResult.rsf," 
+    + ".///target///test_results///JavaSourceToDepsBuilderTest///arcade_buildTestResult.rsf," 
     + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources_old///arcade_old_deps_oracle.rsf",
     // struts2 (2.3.30)
     ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.3.30///lib_struts,"
-    + ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.3.30buildTestResult.rsf,"
+    + ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.3.30_buildTestResult.rsf,"
     + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf",
     // struts2 (2.5.2)
     ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.5.2///lib_struts,"
-    + ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.5.2buildTestResult.rsf,"
+    + ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.5.2_buildTestResult.rsf,"
     + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf",
   })
   public void buildTest(String classesDirPath, String depsRsfFilename, String oraclePath){
