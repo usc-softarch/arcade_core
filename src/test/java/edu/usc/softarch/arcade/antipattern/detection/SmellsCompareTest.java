@@ -1,25 +1,27 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import java.io.*;
+import java.io.File;
 import java.util.AbstractCollection;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.acdc.ACDC;
 
-public class SerCompare{
+public class SmellsCompareTest{
   String OraclePath;
   String source_deps_rsf_path;
   String ACDC_output_cluster_path;
   String targetSerFilename;
   ArchSmellDetector asd;
 
-  @Before
+  @BeforeEach
   public void setUp(){
     char fs = File.separatorChar;
 
@@ -31,7 +33,13 @@ public class SerCompare{
     + fs + "JavaSourceToDepsBuilderTest_resources" + fs +"arcade_old_deps_oracle.rsf";
 
     ACDC_output_cluster_path = "." + fs + "target" + fs + "ACDC_test_results" + fs + "test_old_deps_acdc_clustered.rsf";
-      ACDC.run(source_deps_rsf_path, ACDC_output_cluster_path);
+
+    assertDoesNotThrow(() ->  ACDC.run(source_deps_rsf_path, ACDC_output_cluster_path));
+
+    String targetSerPath = "." + fs + "target" + fs + "test_results";
+
+    File directory = new File(targetSerPath);
+    directory.mkdirs();
 
     targetSerFilename = "." + fs + "target" + fs + "test_results" + fs 
       + "ACDC_test_compare_smells_with_concerns.ser";
@@ -43,39 +51,27 @@ public class SerCompare{
   //These two tests below will fail because there are problems with the generated .ser files which does not match the oracles.
 
 
-    @Test
-    public void test_ACDC_with_concerns(){
-        
-        try{         
-            asd.run(true, true, true); 
-            SmellCollection OracleSmells = new SmellCollection(OraclePath);
-            SmellCollection TargetSmells = new SmellCollection(targetSerFilename);
-  
+    @ParameterizedTest
+    @CsvSource({
+      // Test with concerns
+      "true",
+      //Without concerns
+      "false"
+    })
+    public void test_ACDC_compare_smells(String concerns){       
+          
+            assertDoesNotThrow(() -> asd.run(true, Boolean.parseBoolean(concerns), true)); 
+            SmellCollection OracleSmells = assertDoesNotThrow(() -> {
+              return new SmellCollection(OraclePath);
+            });
+            SmellCollection TargetSmells = assertDoesNotThrow(() -> {
+              return new SmellCollection(targetSerFilename);
+            });
+
             AbstractCollection<Smell> OracleAbs = (AbstractCollection<Smell>)OracleSmells;
             AbstractCollection<Smell> TargetAbs = (AbstractCollection<Smell>)TargetSmells;
   
             assertTrue(OracleAbs.containsAll(TargetAbs));
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-
     }
-
-    @Test
-    public void test_ACDC_without_concerns(){
-      try{          
-          asd.run(true, false, true);
-          SmellCollection OracleSmells = new SmellCollection(OraclePath);
-          SmellCollection TargetSmells = new SmellCollection(targetSerFilename);
-
-          AbstractCollection<Smell> OracleAbs = (AbstractCollection<Smell>)OracleSmells;
-          AbstractCollection<Smell> TargetAbs = (AbstractCollection<Smell>)TargetSmells;
-
-          assertTrue(OracleAbs.containsAll(TargetAbs));
-      }catch(IOException e){
-          e.printStackTrace();
-      }
-
-  }
 
 }
