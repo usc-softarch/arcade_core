@@ -1,6 +1,6 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.io.File;
@@ -56,6 +56,6 @@ public class CSourceToDepsBuilderTest {
             // returns 0 if files have the same contents
         RsfCompare resultRsf = new RsfCompare(result);
         RsfCompare oracleRsf = new RsfCompare(oracleResult);
-        assertEquals(0, oracleRsf.compareTo(resultRsf));
+        assertTrue(oracleRsf.equals(resultRsf));
     }
 }

@@ -1,6 +1,6 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.io.File;
@@ -28,14 +28,14 @@ public class JavaSourceToDepsBuilderTest {
     ".///src///test///resources///JavaSourceToDepsBuilderTest_resources_old///arcade_old_binaries,"
     + ".///target///test_results///JavaSourceToDepsBuilderTest///arcade_buildTestResult.rsf," 
     + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources_old///arcade_old_deps_oracle.rsf",
-    // struts2 (2.3.30)
-    ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.3.30///lib_struts,"
-    + ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.3.30_buildTestResult.rsf,"
-    + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf",
-    // struts2 (2.5.2)
-    ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.5.2///lib_struts,"
-    + ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.5.2_buildTestResult.rsf,"
-    + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf",
+    // // struts2 (2.3.30)
+    // ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.3.30///lib_struts,"
+    // + ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.3.30_buildTestResult.rsf,"
+    // + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf",
+    // // struts2 (2.5.2)
+    // ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.5.2///lib_struts,"
+    // + ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.5.2_buildTestResult.rsf,"
+    // + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf",
   })
   public void buildTest(String classesDirPath, String depsRsfFilename, String oraclePath){
     /** Builds the dependencies RSF file for Java system**/
@@ -58,6 +58,6 @@ public class JavaSourceToDepsBuilderTest {
         // returns 0 if files have the same contents
     RsfCompare resultRsf = new RsfCompare(result);
     RsfCompare oracleRsf = new RsfCompare(oracleResult);
-    assertEquals(0, oracleRsf.compareTo(resultRsf));
+    assertTrue(oracleRsf.equals(resultRsf));
   }
 }

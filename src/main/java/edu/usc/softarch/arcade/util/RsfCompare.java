@@ -22,5 +22,15 @@ public class RsfCompare implements Comparable<RsfCompare> {
 			return 1;
 		}
 	}
+
+	@Override
+	public boolean equals(Object o){
+		if (!(o instanceof RsfCompare)){
+			return false;
+		}
+
+		RsfCompare toCompare = (RsfCompare)o;
+		return this.rsfSet.equals(toCompare.rsfSet);
+	}
 }
 
