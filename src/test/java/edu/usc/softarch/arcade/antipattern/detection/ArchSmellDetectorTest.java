@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,7 +62,7 @@ public class ArchSmellDetectorTest {
   //       tests for httpd-2.3.8, httpd-2.4.26, structs-2.3.30, and structs 2.5.2
 
   // this test shouldn't pass right now since I haven't solved making this run for a specific version yet
-  // and also making sure I have the right serialized objects for each version
+  // and also making sure I have the serialized objects for each version
 
   @Test
   public void runStructuralDetectionAlgsTest(){
@@ -74,22 +75,22 @@ public class ArchSmellDetectorTest {
     asd.runStructuralDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
     
 		try {
-      String resources_dir = "src///test///resources///ArchSmellDetector_resources///runStructuralDetectionAlgs_resouces///";
+      String resources_dir = "src///test///resources///ArchSmellDetector_resources///runStructuralDetectionAlgs_resources///";
       resources_dir = resources_dir.replace("///", File.separator);
 
       ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + "output_run_clusterSmellMap.txt"));
       Map<String, Set<String>> oracle_clusterSmellMap = (Map<String, Set<String>>) ois.readObject();
-			assert(clusterSmellMap.equals(oracle_clusterSmellMap));
+			assertTrue(clusterSmellMap.equals(oracle_clusterSmellMap));
 			ois.close();
 
 			ois = new ObjectInputStream(new FileInputStream(resources_dir + "output_run_clusters.txt"));
       ConcernClusterArchitecture oracle_clusters = (ConcernClusterArchitecture) ois.readObject();
-			assert(clusters.equals(oracle_clusters));
+			assertTrue(clusters.equals(oracle_clusters));
 			ois.close();
 
 			ois = new ObjectInputStream(new FileInputStream(resources_dir + "output_run_detected_smells.txt"));
       SmellCollection oracle_detectedSmells = (SmellCollection) ois.readObject();
-			assert(detectedSmells.equals(oracle_detectedSmells));
+			assertTrue(detectedSmells.equals(oracle_detectedSmells));
 			ois.close();
 
 		} catch (IOException | ClassNotFoundException e) {
