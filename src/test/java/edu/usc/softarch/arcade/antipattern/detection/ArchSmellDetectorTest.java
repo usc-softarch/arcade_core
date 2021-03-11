@@ -1,5 +1,22 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+
+import edu.usc.softarch.arcade.antipattern.SmellCollection;
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
+import edu.usc.softarch.arcade.clustering.acdc.ACDC;
+
 /*
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,6 +29,69 @@ import org.junit.jupiter.api.Test;
 */
 
 public class ArchSmellDetectorTest {
+
+  String source_deps_rsf_path;
+  String ACDC_output_cluster_path;
+  String targetSerFilename;
+  ArchSmellDetector asd;
+  
+  @BeforeEach
+  public void setUp(){
+    char fs = File.separatorChar;
+
+    source_deps_rsf_path = "." + fs + "src" + fs + "test" + fs + "resources"
+    + fs + "JavaSourceToDepsBuilderTest_resources_old" + fs +"arcade_old_deps_oracle.rsf";
+
+    ACDC_output_cluster_path = "." + fs + "target" + fs + "ACDC_test_results" + fs + "test_old_deps_acdc_clustered.rsf";
+
+    assertDoesNotThrow(() -> ACDC.run(source_deps_rsf_path, ACDC_output_cluster_path));
+
+    String targetSerPath = "." + fs + "target" + fs + "test_results";
+
+    File directory = new File(targetSerPath);
+    directory.mkdirs();
+
+    targetSerFilename = "." + fs + "target" + fs + "test_results" + fs 
+      + "ACDC_test_compare_smells_with_concerns.ser";
+  
+    asd = new ArchSmellDetector(source_deps_rsf_path, ACDC_output_cluster_path, targetSerFilename);
+  }
+
+  @Test
+  public void runStructuralDetectionAlgsTest(){
+
+    // Initialize variables
+		SmellCollection detectedSmells = new SmellCollection();
+		ConcernClusterArchitecture clusters = ConcernClusterArchitecture.loadFromRsf(ACDC_output_cluster_path);
+		Map<String, Set<String>> clusterSmellMap = new HashMap<>();
+
+    assertDoesNotThrow(() -> asd.run(true, false, true));
+    
+		try {
+      ObjectInputStream ois = new ObjectInputStream(new FileInputStream("output_run_struct.txt"));
+		
+      Map<String, Set<String>> test_clusterSmellMap;
+      ConcernClusterArchitecture test_clusters = (ConcernClusterArchitecture) ois.readObject();
+      SmellCollection test_detectedSmells = (SmellCollection) ois.readObject();
+
+			test_clusterSmellMap = (Map<String, Set<String>>) ois.readObject();
+			assert(clusterSmellMap.equals(test_clusterSmellMap));
+			ois.close();
+
+			ois = new ObjectInputStream(new FileInputStream("output_run_clusters.txt"));
+			assert(clusters.equals(test_clusters));
+			ois.close();
+
+			ois = new ObjectInputStream(new FileInputStream("output_run_detected_smells.txt"));
+			assert(detectedSmells.equals(test_detectedSmells));
+			ois.close();
+
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+  }
+
   /* To run these tests, set updateSmellMap to public
   // #region TESTS updateSmellMap ----------------------------------------------
   @Test
