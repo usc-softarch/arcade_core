@@ -116,8 +116,7 @@ public class AcdcWithSmellDetection {
 
 		ArchSmellDetector asd = new ArchSmellDetector(depsRsfFile.getAbsolutePath(),
 			acdcClusteredFile, outputDir.getAbsolutePath() + fs + versionFolderName
-			+ "_acdc_smells.ser");
-
+			+ "_acdc_smells.ser", versionFolderName);
 		asd.run(true, false, true);
 	}
 

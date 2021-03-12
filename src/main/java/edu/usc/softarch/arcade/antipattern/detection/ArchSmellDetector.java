@@ -45,6 +45,7 @@ public class ArchSmellDetector {
 	private DocTopics docTopics;
 	private double scatteredConcernThreshold;
 	private double parasiticConcernThreshold;
+	private String version;
 
 	static final Comparator<TopicItem> TOPIC_PROPORTION_ORDER 
 		= (TopicItem t1, TopicItem t2) -> {
@@ -59,6 +60,12 @@ public class ArchSmellDetector {
 			String detectedSmellsFilename) {
 		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, 
 			"structural-irrelevant", .20, .20, null, null);
+	}
+
+	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, String version) {
+		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, "structural-irrelevant", .20, .20, null,
+				null);
+		this.version = version;
 	}
 
 	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
