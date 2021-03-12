@@ -47,10 +47,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	 */
 	public ConcernClusteringRunner(FastFeatureVectors vecs,
 			String srcDir, String artifactsDir, String language) {
+		this.language = language;
 		setFastFeatureVectors(vecs);
 		initializeClusters(srcDir, language); // Initially, every node gets a cluster
-		initializeDocTopicsForEachFastCluster(srcDir, artifactsDir);
-		this.language = language;
+		initializeDocTopicsForEachFastCluster(srcDir, artifactsDir);	
 	}
 	
 	public void computeClustersWithConcernsAndFastClusters(
