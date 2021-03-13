@@ -19,7 +19,7 @@ import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 
 public class PipeExtractorTest {
-    // Save the present working directory (it's at the root of the repository)
+    // Save the present working directory (i.e. the root of the repository)
     String pwd = System.getProperty("user.dir");
 
     @BeforeEach
@@ -35,7 +35,12 @@ public class PipeExtractorTest {
 
     @ParameterizedTest
     @CsvSource({
-        // Test parameters: [path to system version], [desired output path], [path to oracle pipe file], [system language]
+        // Test parameters: 
+        // [path to system version], 
+        // [desired output path], 
+        // [path to oracle pipe file], 
+        // [system language]
+
         // struts 2.3.30
         "///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.3.30/lib_struts,"
         + "///target///test_results///PipeExtractorTest///,"
@@ -46,6 +51,16 @@ public class PipeExtractorTest {
         + "///target///test_results///PipeExtractorTest///,"
         + "///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.5.2///output.pipe,"
         + "java",
+        // httpd 2.3.8
+        "///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.3.8,"
+        + "///target///test_results///PipeExtractorTest///,"
+        + "///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.3.8///output.pipe,"
+        + "c",
+        // httpd 2.4.26
+        "///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.4.26,"
+        + "///target///test_results///PipeExtractorTest///,"
+        + "///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.4.26///output.pipe,"
+        + "c",
     })
     public void mainTest(String versionDir, String outputDir, String oracleFile, String language){
         /** Integration test for PipeExtractor **/
