@@ -1,6 +1,9 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,23 +12,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.jgrapht.alg.cycle.CycleDetector;
+import org.apache.logging.log4j.Logger;
 import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector;
+import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
-import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
+import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
@@ -109,6 +112,29 @@ public class ArchSmellDetector {
 		SmellCollection detectedSmells = new SmellCollection();
 		ConcernClusterArchitecture clusters = loadClusters();
 		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
+		
+		//Added for testing
+		//Serialization for test oracles.
+		
+		/*
+		char fs = File.separatorChar;
+		ObjectOutputStream oosDSmells = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		+ fs +"ArchSmellDetector_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
+		"struts-2.3.30_output_detectedSmells_before.txt"));
+
+		ObjectOutputStream oosClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		+ fs +"ArchSmellDetector_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
+		"struts-2.3.30_output_clusters_before.txt"));
+
+		ObjectOutputStream oosCSM = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		+ fs +"ArchSmellDetector_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
+		"struts-2.3.30_output_clusterSmellMap_before.txt"));
+
+		oosDSmells.writeObject(detectedSmells);
+		oosClusters.writeObject(clusters);
+		oosCSM.writeObject(clusterSmellMap);
+		*/
+
 
 		// Execute detection algorithms
 		if(runConcern)
@@ -159,6 +185,31 @@ public class ArchSmellDetector {
 
 		detectBco(detectedSmells, clusters, clusterSmellMap);
 		detectSpfNew(clusters, clusterSmellMap, detectedSmells);
+
+		//Added for testing
+		//Serialization for test oracles.
+		/*
+		char fs = File.separatorChar;
+		try{
+		ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		+ fs +"ArchSmellDetector_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
+		"struts-2.3.30_output_detectedSmells_after.txt"));
+
+		ObjectOutputStream oosClusters2 = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		+ fs +"ArchSmellDetector_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
+		"struts-2.3.30_output_clusters_after.txt"));
+
+		ObjectOutputStream oosCSM2 = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		+ fs +"ArchSmellDetector_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
+		"struts-2.3.30_output_clusterSmellMap_after.txt"));
+
+		oosDSmells2.writeObject(detectedSmells);
+		oosClusters2.writeObject(clusters);
+		oosCSM2.writeObject(clusterSmellMap);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		*/
 	}
 
 	public void runStructuralDetectionAlgs(ConcernClusterArchitecture clusters,
@@ -423,6 +474,7 @@ public class ArchSmellDetector {
 			ConcernClusterArchitecture clusters,
 			Map<String, Set<String>> clusterSmellMap) {
 		System.out.println("Finding brick concern overload instances...");
+
 		double concernOverloadTopicThreshold = .10;
 		Map<ConcernCluster,Integer> concernCountMap = new HashMap<>(); 
 		for (ConcernCluster cluster : clusters) {
@@ -466,6 +518,7 @@ public class ArchSmellDetector {
 				updateSmellMap(clusterSmellMap, cluster.getName(), "bco");
 			}
 		}
+		
 		return stdDev;
 	}
 
@@ -514,6 +567,7 @@ public class ArchSmellDetector {
 			Map<String, Set<String>> clusterSmellsMap,
 			SmellCollection detectedSmells) {
 		logger.info("Finding scattered parasitic functionality instances...");
+
 
 		// Setting thresholds for detection algorithm
 		Map<Integer, Integer> topicNumCountMap = new HashMap<>();
@@ -567,6 +621,7 @@ public class ArchSmellDetector {
 				spf.addCluster(affectedCluster);
 			detectedSmells.add(spf);
 		}
+
 	}
 
 	/**

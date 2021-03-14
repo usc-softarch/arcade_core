@@ -7,11 +7,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -86,6 +84,96 @@ public class ArchSmellDetectorTest {
       assertTrue(false); // if we get here, we done goofed
 		}
   }
+
+  @CsvSource({
+    //Input for asd constructor to run on struts-2.3.30
+    "///output///struts-2.3.30_deps.rsf,"
+    + "///output///struts-2.3.30_acdc_clustered.rsf,"
+    + "///output///struts-2.3.30_acdc_smells.ser,"
+    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusterSmellMap_after.txt,"
+    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusters_after.txt,"
+    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_detectedSmells_after.txt,"
+    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusters_before.txt",
+
+    //Input for asd constructor to run on struts-2.5.2
+    "///output///struts-2.5.2_deps.rsf,"
+    + "///output///struts-2.5.2_acdc_clustered.rsf,"
+    + "///output///struts-2.5.2_acdc_smells.ser,"
+    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusterSmellMap_after.txt,"
+    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusters_after.txt,"
+    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_detectedSmells_after.txt,"
+    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusters_before.txt",
+  })
+  @ParameterizedTest
+  public void runConcernDetectionAlgsTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
+                                             String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile,
+                                             String clusterObjectFileBefore){
+
+
+    String resources_dir = "src///test///resources///ArchSmellDetector_resources///";
+    resources_dir = resources_dir.replace("///", File.separator);
+
+    depsRsfFilename = resources_dir + depsRsfFilename.replace("///", File.separator);
+    clustersRsfFilename = resources_dir + clustersRsfFilename.replace("///", File.separator);
+    detectedSmellsFilename = detectedSmellsFilename.replace("///", File.separator);
+
+    clusterSmellMapObjectFile = clusterSmellMapObjectFile.replace("///", File.separator);
+    clusterObjectFile = clusterObjectFile.replace("///", File.separator);
+    smellsObjectFile = smellsObjectFile.replace("///", File.separator);
+    clusterObjectFileBefore = clusterObjectFileBefore.replace("///", File.separator);
+
+    ArchSmellDetector asd;
+    asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename);
+
+    // Initialize variables
+		SmellCollection detectedSmells = new SmellCollection();
+		ConcernClusterArchitecture clusters = ConcernClusterArchitecture.loadFromRsf(clustersRsfFilename);
+		Map<String, Set<String>> clusterSmellMap = new HashMap<>();
+    
+    try{
+      ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterObjectFileBefore));
+      ConcernClusterArchitecture oracle_clusters2 = (ConcernClusterArchitecture) ois.readObject();
+      assertTrue(clusters.equals(oracle_clusters2));
+      // TODO: check if the ConcernClusterArchitecture object is empty?
+      ois.close();
+    }catch(ClassNotFoundException e){
+      e.printStackTrace();
+      assertTrue(false);
+    }catch(IOException e){
+      e.printStackTrace();
+      assertTrue(false);
+    }
+
+    asd.runStructuralDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
+
+    try {
+      ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterSmellMapObjectFile));
+      Map<String, Set<String>> oracle_clusterSmellMap = (Map<String, Set<String>>) ois.readObject();
+			assertTrue(clusterSmellMap.equals(oracle_clusterSmellMap));
+      // TODO: check if this map or sets inside are empty?
+			ois.close();
+
+			ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterObjectFile));
+      ConcernClusterArchitecture oracle_clusters = (ConcernClusterArchitecture) ois.readObject();
+			assertTrue(clusters.equals(oracle_clusters));
+      // TODO: check if the ConcernClusterArchitecture object is empty?
+			ois.close();
+
+			ois = new ObjectInputStream(new FileInputStream(resources_dir + smellsObjectFile));
+      SmellCollection oracle_detectedSmells = (SmellCollection) ois.readObject();
+			assertTrue(detectedSmells.equals(oracle_detectedSmells));
+      // TODO: check if SmellCollection is empty?
+			ois.close();
+
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+      assertTrue(false); // if we get here, we done goofed
+		}
+
+  }
+
+
   /*
   //To run these tests, set updateSmellMap to public
   // #region TESTS updateSmellMap ----------------------------------------------

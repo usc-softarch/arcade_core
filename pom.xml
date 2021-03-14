@@ -40,12 +40,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-params</artifactId>
-      <version>5.8.0-M1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.soot-oss</groupId>
       <artifactId>soot</artifactId>
       <version>4.2.1</version>
