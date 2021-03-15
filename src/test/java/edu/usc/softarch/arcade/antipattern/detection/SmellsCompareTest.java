@@ -30,7 +30,7 @@ public class SmellsCompareTest{
       + fs + "struts-2.3.30_acdc_smells.ser";
 
     source_deps_rsf_path = "." + fs + "src" + fs + "test" + fs + "resources"
-    + fs + "JavaSourceToDepsBuilderTest_resources" + fs +"arcade_old_deps_oracle.rsf";
+    + fs + "JavaSourceToDepsBuilderTest_resources_old" + fs +"arcade_old_deps_oracle.rsf";
 
     ACDC_output_cluster_path = "." + fs + "target" + fs + "ACDC_test_results" + fs + "test_old_deps_acdc_clustered.rsf";
 
