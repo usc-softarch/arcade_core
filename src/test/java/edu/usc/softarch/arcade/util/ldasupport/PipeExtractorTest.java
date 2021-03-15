@@ -40,32 +40,32 @@ public class PipeExtractorTest {
 		// [system language]
 
 		// struts 2.3.30
-		".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.3.30///src,"
-		+ ".///target///test_results///PipeExtractorTest///struts-2.3.30,"
-		+ ".///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.3.30///output.pipe,"
+		"///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30,"
+		+ "///target///test_results///PipeExtractorTest///struts-2.3.30,"
+		+ "///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.3.30///output.pipe,"
 		+ "java",
-		// struts 2.5.2
-		".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.5.2///src,"
-		+ ".///target///test_results///PipeExtractorTest///struts-2.5.2,"
-		+ ".///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.5.2///output.pipe,"
-		+ "java",
-		// httpd 2.3.8
-		".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.3.8,"
-		+ ".///target///test_results///PipeExtractorTest///httpd-2.3.8,"
-		+ ".///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.3.8///output.pipe,"
-		+ "c",
-		// httpd 2.4.26
-		"///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.4.26,"
-		+ "///target///test_results///PipeExtractorTest///httpd-2.4.26,"
-		+ "///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.4.26///output.pipe,"
-		+ "c",
+		// // struts 2.5.2
+		// "///src///test///resources///PipeExtractorTest_resources///src///struts-2.5.2,"
+		// + "///target///test_results///PipeExtractorTest///struts-2.5.2,"
+		// + "///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.5.2///output.pipe,"
+		// + "java",
+		// // httpd 2.3.8
+		// "///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.3.8,"
+		// + "///target///test_results///PipeExtractorTest///httpd-2.3.8,"
+		// + "///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.3.8///output.pipe,"
+		// + "c",
+		// // httpd 2.4.26
+		// "///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.4.26,"
+		// + "///target///test_results///PipeExtractorTest///httpd-2.4.26,"
+		// + "///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.4.26///output.pipe,"
+		// + "c",
 	})
 	public void mainTest(String versionDir, String outputDir, String oracleFile, String language){
 		/** Integration test for PipeExtractor **/
-		String classesDir = versionDir.replace("///", File.separator);
-		String resultDir = outputDir.replace("///", File.separator);
+		String classesDir = pwd + versionDir.replace("///", File.separator);
+		String resultDir = pwd + outputDir.replace("///", File.separator);
 		// Path to oracle pipe file
-		String oraclePath = oracleFile.replace("///", File.separator);
+		String oraclePath = pwd + oracleFile.replace("///", File.separator);
 		(new File(resultDir)).mkdirs();
 		// Call PipeExtractor.main() 
 		// (arguments: sys version dir, output dir, selected language)
@@ -88,8 +88,8 @@ public class PipeExtractorTest {
 		}
 
 		// Compare sets of instances
-		assertEquals(oracle.size(), result.size());
-		// assertTrue(oracle.equals(result)); // fails - comparing sets of instances doesn't work
+		// assertEquals(oracle.size(), result.size()); // passes - same size
+		assertTrue(oracle.equals(result)); // fails - comparing sets of instances doesn't work
 	}
 
 	@AfterEach
