@@ -61,12 +61,12 @@ public class ConcernClusteringRunnerTest {
             builder.getFfVecs(), fullSrcDir, outputDirName + "/base", language);
         
         // Serialize runner.fastClusters, runner.clusters, runner.fastfeaturevectors
-        
+
     }
 
     // TEST ALL METHODS THAT MODIFY FastClusterArchitecture fastClusters
     // updateFastClustersAndSimMatrixToReflectMergedCluster (need to test) - called by computeClustersWithConcernsAndFastClusters 
     // initializeDocTopicsForEachFastCluster --> lots of stuff happens here, test!
-    // updateFastClustersAndSimMatrixToReflectMergedCluster
+
 
 }
