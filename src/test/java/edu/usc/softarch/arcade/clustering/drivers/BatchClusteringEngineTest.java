@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.clustering.drivers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -11,46 +10,70 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import org.junit.jupiter.api.Test;
-
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.RsfCompare;
 
 public class BatchClusteringEngineTest {
     @ParameterizedTest
     @CsvSource({
-        // Input: [dir with system version], [system language], [test file output dir name], [path from dir with system version to its binaries], [oracle path], [expected clusters file name]
+        // Test parameters: 
+        // [dir with single system version], 
+        // [system language], 
+        // [test file output dir name], (IMPORTANT: should also contain output.pipe and infer.mallet files)
+        // [path from dir with system version to its binaries], 
+        // [oracle path], 
+        // [expected clusters file name]
+
         // struts 2.3.30
         ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.3.30,"
         + "java,"
-        + ".///target///test_results///BatchClusteringEngineTest,"
+        + ".///target///test_results///BatchClusteringEngineTest///struts-2.3.30,"
         + "lib_struts,"
         + ".///src///test///resources///BatchClusteringEngineTest_resources,"
         + "struts-2.3.30_239_topics_234_arc_clusters.rsf",
-        // httpd 2.3.8
-        ".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.3.8,"
-        + "c,"
-        + ".///target///test_results///BatchClusteringEngineTest,"
-        + ","
+
+        // struts 2.5.2
+        ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.5.2,"
+        + "java,"
+        + ".///target///test_results///BatchClusteringEngineTest///struts-2.5.2,"
+        + "lib_struts,"
         + ".///src///test///resources///BatchClusteringEngineTest_resources,"
-        + "httpd-2.3.8_46_topics_0_arc_clusters.rsf"
+        + "struts-2.5.2_284_topics_275_arc_clusters.rsf",
+
+        // httpd 2.3.8
+        ".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries,"
+        + "c,"
+        + ".///target///test_results///BatchClusteringEngineTest///httpd-2.3.8,"
+        + "httpd-2.3.8,"
+        + ".///src///test///resources///BatchClusteringEngineTest_resources,"
+        + "httpd-2.3.8_46_topics_0_arc_clusters.rsf",
+
+        // httpd 2.4.10
+        ".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries,"
+        + "c,"
+        + ".///target///test_results///BatchClusteringEngineTest///httpd-2.4.26,"
+        + "httpd-2.4.26,"
+        + ".///src///test///resources///BatchClusteringEngineTest_resources,"
+        + "httpd-2.4.26_50_topics_0_arc_clusters.rsf"
     })
-    // NOTE: test is not working (NPE in TopicUtil.setDocTopicForFastClusterForMalletApi, still investigating)
     public void singleTest(String sysVersionDir, String lang, String testOutputDir, String classesDir, String oraclePath, String arcFilename){
-        /* Tests recovery for a single version of a system */
+        /** Tests recovery for a single version of a system **/
         // Format paths
         String sysDir = sysVersionDir.replace("///", File.separator);
         String outputDirName = testOutputDir.replace("///", File.separator);
         // String inClassesDir = classesDir.replace("///", File.separator);
         String oracleFilePath = oraclePath.replace("///", File.separator);
 
-        assertDoesNotThrow(() -> BatchClusteringEngine.single(new File(sysDir), lang, outputDirName, classesDir));
+        assertDoesNotThrow(() -> {
+            BatchClusteringEngine.single(new File(sysDir), lang, outputDirName, classesDir);
+        });
 
         // Result file with clusters
         String resultClustersFile = outputDirName + File.separator + arcFilename;
-        // The expectation here is that this result clusters file has the same name as the oracle clusters file
+
+        // The expectation here is that this resulting clusters file has the same name as the oracle clusters file
         String result = assertDoesNotThrow(() -> {
-            return FileUtil.readFile(resultClustersFile, StandardCharsets.UTF_8); 
+            return FileUtil.readFile(resultClustersFile, StandardCharsets.UTF_8); // Throws IOException if file does not exist
         });
 
         // Load oracle
