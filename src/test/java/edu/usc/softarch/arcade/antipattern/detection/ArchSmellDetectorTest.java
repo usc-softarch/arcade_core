@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
@@ -170,6 +171,71 @@ public class ArchSmellDetectorTest {
 		}
 
   }
+
+  @CsvSource({
+    //Input for asd constructor to run on struts-2.3.30
+    "///output///struts-2.3.30_deps.rsf,"
+    + "///output///struts-2.3.30_acdc_clustered.rsf,"
+    + "///output///struts-2.3.30_acdc_smells.ser,"
+    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusterSmellMap_after.txt,"
+    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_smellClusterMap_after.txt",
+
+
+    //Input for asd constructor to run on struts-2.5.2
+    "///output///struts-2.5.2_deps.rsf,"
+    + "///output///struts-2.5.2_acdc_clustered.rsf,"
+    + "///output///struts-2.5.2_acdc_smells.ser,"
+    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusterSmellMap_after.txt,"
+    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_smellClusterMap_after.txt",
+  })
+  @ParameterizedTest
+  public void buildSmellToClustersMapTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
+                                          String clusterSmellMapBefore, String clusterSmellMapAter){
+    String resources_dir = "src///test///resources///ArchSmellDetector_resources///";
+    resources_dir = resources_dir.replace("///", File.separator);
+
+    depsRsfFilename = resources_dir + depsRsfFilename.replace("///", File.separator);
+    clustersRsfFilename = resources_dir + clustersRsfFilename.replace("///", File.separator);
+    detectedSmellsFilename = detectedSmellsFilename.replace("///", File.separator);
+
+    clusterSmellMapBefore = clusterSmellMapBefore.replace("///", File.separator);
+    clusterSmellMapAter = clusterSmellMapAter.replace("///", File.separator);
+
+    ArchSmellDetector asd;
+    asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename);
+
+    try {
+      //Read in the clusterSmellMap
+      ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterSmellMapBefore));
+      Map<String, Set<String>> oracle_clusterSmellMapBefore = (Map<String, Set<String>>) ois.readObject();
+      ois.close();
+
+      //Read in the smellClusterMap
+      ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterSmellMapAter));
+      Map<String,Set<String>> oracle_clusterSmellMapAfter = (Map<String, Set<String>>) ois.readObject();
+      ois.close();
+
+      //Generate the output
+      Map<String,Set<String>> smellClusterMap = asd.buildSmellToClustersMap(oracle_clusterSmellMapBefore);
+      assertTrue(smellClusterMap.equals(oracle_clusterSmellMapAfter));
+
+    } catch (FileNotFoundException e) {
+      // TODO Auto-generated catch block
+      assertTrue(false); 
+      e.printStackTrace();
+    } catch (IOException | ClassNotFoundException e) {
+      // TODO Auto-generated catch block
+      assertTrue(false); 
+      e.printStackTrace();
+    }
+    
+    
+    
+
+
+  }
+
+
 
 
   /*

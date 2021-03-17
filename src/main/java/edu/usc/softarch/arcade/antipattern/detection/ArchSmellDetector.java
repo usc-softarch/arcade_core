@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -346,7 +347,9 @@ public class ArchSmellDetector {
 	 * @param clusterSmellMap Map of smells per cluster.
 	 * @return Map of clusters per smell.
 	 */
-	private Map<String, Set<String>> buildSmellToClustersMap(
+
+	//Changed buildSmellToClustersMap from private to protected for testing
+	protected Map<String, Set<String>> buildSmellToClustersMap(
 			Map<String, Set<String>> clusterSmellMap) {
 		Map<String,Set<String>> smellClustersMap = new HashMap<>();
 
@@ -362,6 +365,24 @@ public class ArchSmellDetector {
 				}
 			}
 		}
+
+		//Added for creating test oracles, uncomment to produce new test oracles
+		/*
+		char fs = File.separatorChar;
+		ObjectOutputStream oosSMap;
+		try {
+			oosSMap = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+			+ fs +"ArchSmellDetector_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
+			"struts-2.3.30_output_smellClusterMap_after.txt"));
+			oosSMap.writeObject(smellClustersMap);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
 
 		return smellClustersMap;
 	}
