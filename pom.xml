@@ -63,7 +63,12 @@
     <dependency>
       <groupId>cc.mallet</groupId>
       <artifactId>mallet</artifactId>
-      <version>2.0.8</version>
+      <version>local</version>
+    </dependency>
+    <dependency>
+      <groupId>gnu.trove</groupId>
+      <artifactId>trove</artifactId>
+      <version>local</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -326,6 +331,38 @@
               <repositoryLayout>default</repositoryLayout>
               <groupId>com.ojn.gexf4j</groupId>
               <artifactId>gexf4j</artifactId>
+              <version>local</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>hack-binary3</id>
+            <phase>clean</phase>
+            <configuration>
+              <file>${basedir}/libs/mallet.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>cc.mallet</groupId>
+              <artifactId>mallet</artifactId>
+              <version>local</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>hack-binary4</id>
+            <phase>clean</phase>
+            <configuration>
+              <file>${basedir}/libs/trove-2.0.2.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>gnu.trove</groupId>
+              <artifactId>trove</artifactId>
               <version>local</version>
               <packaging>jar</packaging>
               <generatePom>true</generatePom>

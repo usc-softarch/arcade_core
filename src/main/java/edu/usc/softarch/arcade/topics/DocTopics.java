@@ -51,6 +51,7 @@ public class DocTopics {
 
 	public DocTopics(String srcDir, String artifactsDir, String language) 
 			throws Exception {
+		this();
 		// Begin by importing documents from text to feature sequences
 		List<Pipe> pipeList = new ArrayList<>();
 
@@ -62,18 +63,18 @@ public class DocTopics {
 		pipeList.add(new CharSequenceLowercase());
 		pipeList.add(new CharSequence2TokenSequence(Pattern
 				.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")));
-		pipeList.add(new TokenSequenceRemoveStopwords(new File(
-				"stoplists/en.txt"), "UTF-8", false, false, false));
+		// pipeList.add(new TokenSequenceRemoveStopwords(new File(
+		// 		"stoplists/en.txt"), "UTF-8", false, false, false));
 		
-		if (language.equalsIgnoreCase("c")) {
-			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/ckeywords"), "UTF-8", false, false, false));
-			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/cppkeywords"), "UTF-8", false, false, false));
-		}
-		else
-			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/javakeywords"), "UTF-8", false, false, false));
+		// if (language.equalsIgnoreCase("c")) {
+		// 	pipeList.add(new TokenSequenceRemoveStopwords(new File(
+		// 			"res/ckeywords"), "UTF-8", false, false, false));
+		// 	pipeList.add(new TokenSequenceRemoveStopwords(new File(
+		// 			"res/cppkeywords"), "UTF-8", false, false, false));
+		// }
+		// else
+		// 	pipeList.add(new TokenSequenceRemoveStopwords(new File(
+		// 			"res/javakeywords"), "UTF-8", false, false, false));
 
 		pipeList.add(new StemmerPipe());
 		pipeList.add(new TokenSequence2FeatureSequence());
