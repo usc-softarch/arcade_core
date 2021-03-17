@@ -29,32 +29,32 @@ public class ConcernClusteringRunnerTest {
 		// ... (TBD)
 
 		// // struts 2.3.30
-		// ".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30,"
+		// ".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
 		// + ".///src///test///resources///mallet_resources///struts-2.3.30,"
 		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
 		// + "struts-2.3.30_output_ffVecs_before.txt,"
 		// + "java",
 
 		// // struts 2.5.2
-		// ".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30,"
+		// ".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
 		// + ".///src///test///resources///mallet_resources///struts-2.3.30,"
 		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
 		// + "struts-2.5.2_output_ffVecs_before.txt,"
 		// + "java",
 
 		// // httpd-2.3.8
-		// ".///src///test///resources///PipeExtractorTest_resources///src///httpd-2.3.8,"
+		// ".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.3.8,"
 		// + ".///src///test///resources///mallet_resources///httpd-2.3.8,"
 		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
 		// + "httpd-2.3.8_output_ffVecs_before.txt,"
-		// + "java",
+		// + "c",
 
 		// httpd-2.4.26
-		".///src///test///resources///PipeExtractorTest_resources///src///httpd-2.4.26,"
+		".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.4.26,"
 		+ ".///src///test///resources///mallet_resources///httpd-2.4.26,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
 		+ "httpd-2.4.26_output_ffVecs_before.txt,"
-		+ "java",
+		+ "c",
 	})
 	public void initializeDocTopicsForEachFastClusterTest(String srcDir, String outDir, String resDir, String ffvName, String language){
 		char fs = File.separatorChar;
