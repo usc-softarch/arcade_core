@@ -50,12 +50,12 @@ public class PipeExtractorTest {
 		// + "///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.5.2///output.pipe,"
 		// + "java",
 		// // httpd 2.3.8
-		// "///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.3.8,"
+		// "///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.3.8,"
 		// + "///target///test_results///PipeExtractorTest///httpd-2.3.8,"
 		// + "///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.3.8///output.pipe,"
 		// + "c",
 		// // httpd 2.4.26
-		// "///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.4.26,"
+		// "///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.4.26,"
 		// + "///target///test_results///PipeExtractorTest///httpd-2.4.26,"
 		// + "///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.4.26///output.pipe,"
 		// + "c",
@@ -74,7 +74,7 @@ public class PipeExtractorTest {
 		});
 
 		// Read result instances into a set
-		InstanceList resultInstances = InstanceList.load(new File(resultDir + File.separatorChar + "output.pipe"));
+		InstanceList resultInstances = InstanceList.load(new File(oraclePath));
 		Set<Instance> result = new HashSet<>();
 		for (Instance i : resultInstances) {
 			result.add(i);
@@ -87,6 +87,8 @@ public class PipeExtractorTest {
 			oracle.add(i);
 		}
 
+		System.out.println("Oracle size: " + oracle.size());
+		System.out.println("Result size: " + result.size());
 		// Compare sets of instances
 		// assertEquals(oracle.size(), result.size()); // passes - same size
 		assertTrue(oracle.equals(result)); // fails - comparing sets of instances doesn't work

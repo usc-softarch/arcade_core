@@ -1,9 +1,11 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
@@ -28,12 +30,12 @@ public class ConcernClusteringRunnerTest {
 		// [system language]
 		// ... (TBD)
 
-		// // struts 2.3.30
-		// ".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
-		// + ".///src///test///resources///mallet_resources///struts-2.3.30,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
-		// + "struts-2.3.30_output_ffVecs_before.txt,"
-		// + "java",
+		// struts 2.3.30
+		".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
+		+ ".///src///test///resources///mallet_resources///struts-2.3.30,"
+		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
+		+ "struts-2.3.30_output_ffVecs_before.txt,"
+		+ "java",
 
 		// // struts 2.5.2
 		// ".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
@@ -49,12 +51,12 @@ public class ConcernClusteringRunnerTest {
 		// + "httpd-2.3.8_output_ffVecs_before.txt,"
 		// + "c",
 
-		// httpd-2.4.26
-		".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.4.26,"
-		+ ".///src///test///resources///mallet_resources///httpd-2.4.26,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
-		+ "httpd-2.4.26_output_ffVecs_before.txt,"
-		+ "c",
+		// // httpd-2.4.26
+		// ".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.4.26,"
+		// + ".///src///test///resources///mallet_resources///httpd-2.4.26,"
+		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
+		// + "httpd-2.4.26_output_ffVecs_before.txt,"
+		// + "c",
 	})
 	public void initializeDocTopicsForEachFastClusterTest(String srcDir, String outDir, String resDir, String ffvName, String language){
 		char fs = File.separatorChar;
@@ -65,15 +67,28 @@ public class ConcernClusteringRunnerTest {
 		String outputDir = outDir.replace("///", File.separator);
 		
 		// Deserialize FastFeatureVectors object
-		assertDoesNotThrow( () -> {
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resDir + fs + ffvName));
-			FastFeatureVectors oisffVecs = (FastFeatureVectors)ois.readObject();
+		ObjectInputStream ois;
+		FastFeatureVectors oisffVecs = null;
+		try {
+			ois = new ObjectInputStream(new FileInputStream(resDir + fs + ffvName));
+			oisffVecs = (FastFeatureVectors)ois.readObject();
 			ois.close();
-			// Construct a ConcernClusteringRunner object
-			ConcernClusteringRunner runner = new ConcernClusteringRunner(
-				oisffVecs, fullSrcDir, outputDir + "/base", language);
-		});
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 
+		if (oisffVecs == null){
+			fail("failed to deserialize FastFeatureVectors");
+		}
+		
+		// Construct a ConcernClusteringRunner object
+		ConcernClusteringRunner runner = new ConcernClusteringRunner(
+			oisffVecs, fullSrcDir, outputDir + "/base", language); // calls initializeDocTopicsForEachFastCluster
+		
 	}
 
 	// TEST METHODS

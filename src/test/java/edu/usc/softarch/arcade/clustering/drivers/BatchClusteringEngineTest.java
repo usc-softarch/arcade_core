@@ -16,12 +16,12 @@ import edu.usc.softarch.arcade.util.RsfCompare;
 public class BatchClusteringEngineTest {
     @ParameterizedTest
     @CsvSource({
-        // Test parameters: 
+        /*** Test parameters: ***/
         // [dir with single system version], 
         // [system language], 
         // [test file output dir name], (IMPORTANT: should also contain output.pipe and infer.mallet files)
         // [path from dir with system version to its binaries], 
-        // [oracle path], 
+        // [path to oracle file], 
         // [expected clusters file name]
 
         // struts 2.3.30
@@ -29,32 +29,32 @@ public class BatchClusteringEngineTest {
         + "java,"
         + ".///target///test_results///BatchClusteringEngineTest///struts-2.3.30,"
         + "lib_struts,"
-        + ".///src///test///resources///BatchClusteringEngineTest_resources,"
+        + ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_239_topics_234_arc_clusters.rsf,"
         + "struts-2.3.30_239_topics_234_arc_clusters.rsf",
 
-        // struts 2.5.2
-        ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.5.2,"
-        + "java,"
-        + ".///target///test_results///BatchClusteringEngineTest///struts-2.5.2,"
-        + "lib_struts,"
-        + ".///src///test///resources///BatchClusteringEngineTest_resources,"
-        + "struts-2.5.2_284_topics_275_arc_clusters.rsf",
+        // // struts 2.5.2
+        // ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.5.2,"
+        // + "java,"
+        // + ".///target///test_results///BatchClusteringEngineTest///struts-2.5.2,"
+        // + "lib_struts,"
+        // + ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_284_topics_275_arc_clusters.rsf,"
+        // + "struts-2.5.2_284_topics_275_arc_clusters.rsf",
 
-        // httpd 2.3.8
-        ".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries,"
-        + "c,"
-        + ".///target///test_results///BatchClusteringEngineTest///httpd-2.3.8,"
-        + "httpd-2.3.8,"
-        + ".///src///test///resources///BatchClusteringEngineTest_resources,"
-        + "httpd-2.3.8_46_topics_0_arc_clusters.rsf",
+        // // httpd 2.3.8
+        // ".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.3.8,"
+        // + "c,"
+        // + ".///target///test_results///BatchClusteringEngineTest///httpd-2.3.8,"
+        // + "/,"
+        // + ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_46_topics_0_arc_clusters.rsf,"
+        // + "httpd-2.3.8_46_topics_0_arc_clusters.rsf",
 
-        // httpd 2.4.10
-        ".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries,"
-        + "c,"
-        + ".///target///test_results///BatchClusteringEngineTest///httpd-2.4.26,"
-        + "httpd-2.4.26,"
-        + ".///src///test///resources///BatchClusteringEngineTest_resources,"
-        + "httpd-2.4.26_50_topics_0_arc_clusters.rsf"
+        // // httpd 2.4.26
+        // ".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.4.26,"
+        // + "c,"
+        // + ".///target///test_results///BatchClusteringEngineTest///httpd-2.4.26,"
+        // + "/,"
+        // + ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_50_topics_0_arc_clusters.rsf,"
+        // + "httpd-2.4.26_50_topics_0_arc_clusters.rsf"
     })
     public void singleTest(String sysVersionDir, String lang, String testOutputDir, String classesDir, String oraclePath, String arcFilename){
         /** Tests recovery for a single version of a system **/
@@ -78,7 +78,7 @@ public class BatchClusteringEngineTest {
 
         // Load oracle
         String oracle = assertDoesNotThrow(() -> {
-            return FileUtil.readFile((oracleFilePath + File.separator + arcFilename), StandardCharsets.UTF_8); 
+            return FileUtil.readFile((oracleFilePath), StandardCharsets.UTF_8); 
         });
 
         // RsfCompare.equals() to compare contents of oracle and result files
