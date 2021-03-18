@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.Test;
 
@@ -49,8 +48,8 @@ public class ConcernClusterArchitectureTest {
         String fileName = "src///test///resources///ConcernClusterArchitectureTest_resources///nonexistent.rsf";
         String rsfFile = fileName.replace("///", File.separator);
 
-        // check that an IOException is thrown when trying to load from nonexistent file
-        assertThrows(IOException.class, () -> {
+        // check that an NullPointerException is thrown when trying to load from nonexistent file
+        assertThrows(NullPointerException.class, () -> {
             ConcernClusterArchitecture.loadFromRsf(rsfFile);
         });
     }
