@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 
-public class FastCluster {
+public class FastCluster implements Serializable {
 	// #region ATTRIBUTES --------------------------------------------------------
 	private static Logger logger = LogManager.getLogger(FastCluster.class);
 
@@ -20,6 +21,7 @@ public class FastCluster {
 	private Map<Integer,Double> nonZeroFeatureMap = new HashMap<>();
 	private int featuresLength = 0;
 	public DocTopicItem docTopicItem;
+	private static final long serialVersionUID = 1L;
 	// #endregion ATTRIBUTES -----------------------------------------------------
 
 	// #region CONSTRUCTORS ------------------------------------------------------
