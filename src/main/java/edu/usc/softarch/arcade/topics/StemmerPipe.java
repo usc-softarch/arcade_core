@@ -10,6 +10,7 @@ import cc.mallet.types.TokenSequence;
 
 // code from Miroslav Batchkarov and posted http://comments.gmane.org/gmane.comp.ai.mallet.devel/1724
 public class StemmerPipe extends Pipe {
+	private static final long serialVersionUID = -6776976419878857787L;
 	public Instance pipe(Instance carrier) {
 		SnowballStemmer stemmer = new englishStemmer();
 		TokenSequence in = (TokenSequence) carrier.getData();
