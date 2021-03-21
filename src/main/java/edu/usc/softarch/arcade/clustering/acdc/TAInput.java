@@ -13,11 +13,16 @@ import java.util.regex.Pattern;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
 * This class creates a tree from the info passed 
 * by the input file.
 */
 public class TAInput implements InputHandler {
+	private static Logger logger = LogManager.getLogger(TAInput.class);
+
 	public void readInput(String inputStr, DefaultMutableTreeNode treeModel) {
 		String str;
 		String firstTok;
@@ -55,10 +60,10 @@ public class TAInput implements InputHandler {
 				Matcher m = Pattern.compile(regex).matcher(str);
 				while (m.find()) {
 					if (m.group(1) != null) {
-						System.out.println("Quoted [" + m.group(1) + "]");
+						logger.trace("Quoted [" + m.group(1) + "]");
 						strTokList.add(m.group(1));
 					} else {
-						System.out.println("Plain [" + m.group(2) + "]");
+						logger.trace("Plain [" + m.group(2) + "]");
 						strTokList.add(m.group(2));
 					}
 				}

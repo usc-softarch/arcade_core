@@ -57,7 +57,7 @@ public class OrphanAdoption extends Pattern {
 		int on = orphanNumber();
 		int prevon = on + 1;
 		while(on < prevon) {
-			logger.info("Orphan Number: " + on);
+			logger.trace("Orphan Number: " + on);
 			prevon = on;
 			vAdopted = oneRound(true);
 			vModified.addAll(vAdopted);
@@ -76,9 +76,9 @@ public class OrphanAdoption extends Pattern {
 		// Run oneRoundForward as many times as the #orphans is decreasing
 		do {
 			vAdopted = oneRound(false);
-			logger.info("Before " + vAdopted.size());
+			logger.trace("Before " + vAdopted.size());
 			result.addAll(vAdopted);
-			logger.info("After " + vAdopted.size() + "");
+			logger.trace("After " + vAdopted.size() + "");
 		}	while (!vAdopted.isEmpty());
 		return result;
 	}
@@ -95,11 +95,11 @@ public class OrphanAdoption extends Pattern {
 		for (Node orphan : nodeChildren(root)) {
 			if(orphan.isCluster()) continue; // If child is a cluster, skip
 
-			logger.info("ROA:\torphan =: " + orphan.getName());
+			logger.trace("ROA:\torphan =: " + orphan.getName());
 			DefaultMutableTreeNode tOrphan = orphan.getTreeNode();
 			Map<Node, Double> prospectiveParents = prospectParents(orphan, reverse);
 
-			if(prospectiveParents.isEmpty()) logger.info("\tNOT\t adopted");
+			if(prospectiveParents.isEmpty()) logger.trace("\tNOT\t adopted");
 			else vReturn.addAll(chooseParent(prospectiveParents, tOrphan));
 		}
 		return new ArrayList<>(vReturn);
@@ -207,7 +207,7 @@ public class OrphanAdoption extends Pattern {
 		for (DefaultMutableTreeNode ec : tempAL)
 			vReturn.add((Node) ec.getUserObject());
 
-		logger.info("\twas adopted by ***\t" + max_key.getName());
+		logger.trace("\twas adopted by ***\t" + max_key.getName());
 		return vReturn;
 	}
 }
