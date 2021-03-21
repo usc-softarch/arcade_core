@@ -1,6 +1,8 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,30 +61,37 @@ public class ArchSmellDetectorTest {
 		Map<String, Set<String>> clusterSmellMap = new HashMap<>();
 
     asd.runStructuralDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
+
+    // check that the data structures are not empty after running runStructuralDetectionAlgs
+    assertAll(
+        () -> assertTrue(clusters.size() > 0),
+        () -> assertTrue(detectedSmells.size() > 0),
+        () -> assertTrue(clusterSmellMap.size() > 0)
+      );
     
 		try {
       ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterSmellMapObjectFile));
       Map<String, Set<String>> oracle_clusterSmellMap = (Map<String, Set<String>>) ois.readObject();
-			assertTrue(clusterSmellMap.equals(oracle_clusterSmellMap));
-      // TODO: check if this map or sets inside are empty?
 			ois.close();
 
 			ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterObjectFile));
       ConcernClusterArchitecture oracle_clusters = (ConcernClusterArchitecture) ois.readObject();
-			assertTrue(clusters.equals(oracle_clusters));
-      // TODO: check if the ConcernClusterArchitecture object is empty?
 			ois.close();
 
 			ois = new ObjectInputStream(new FileInputStream(resources_dir + smellsObjectFile));
       SmellCollection oracle_detectedSmells = (SmellCollection) ois.readObject();
-			assertTrue(detectedSmells.equals(oracle_detectedSmells));
-      // TODO: check if SmellCollection is empty?
 			ois.close();
+
+      assertAll(
+        () -> assertTrue(clusterSmellMap.equals(oracle_clusterSmellMap)),
+        () -> assertTrue(clusters.equals(oracle_clusters)),
+        () -> assertTrue(detectedSmells.equals(oracle_detectedSmells))
+      );
 
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-      assertTrue(false); // if we get here, we done goofed
+      fail("Exception caught in runStructuralDetectionAlgsTest"); // if we get here, we done goofed
 		}
   }
 
@@ -131,6 +140,7 @@ public class ArchSmellDetectorTest {
 		ConcernClusterArchitecture clusters = ConcernClusterArchitecture.loadFromRsf(clustersRsfFilename);
 		Map<String, Set<String>> clusterSmellMap = new HashMap<>();
     
+    // TODO: Might not need this try/catch block now that we have unit tests for loadFromRsf
     try{
       ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterObjectFileBefore));
       ConcernClusterArchitecture oracle_clusters2 = (ConcernClusterArchitecture) ois.readObject();
@@ -140,34 +150,41 @@ public class ArchSmellDetectorTest {
     } catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-      assertTrue(false); // if we get here, we done goofed
+      fail("Exception caught in runConcernDetectionAlgsTest"); // if we get here, we done goofed
     }
 
     asd.runConcernDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
 
+    // check that the data structures are not empty after running runConcernDetectionAlgs
+    assertAll(
+        () -> assertTrue(clusters.size() > 0),
+        () -> assertTrue(detectedSmells.size() > 0),
+        () -> assertTrue(clusterSmellMap.size() > 0)
+      );
+
     try {
       ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterSmellMapObjectFile));
       Map<String, Set<String>> oracle_clusterSmellMap = (Map<String, Set<String>>) ois.readObject();
-			assertTrue(clusterSmellMap.equals(oracle_clusterSmellMap));
-      // TODO: check if this map or sets inside are empty?
 			ois.close();
 
 			ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterObjectFile));
       ConcernClusterArchitecture oracle_clusters = (ConcernClusterArchitecture) ois.readObject();
-			assertTrue(clusters.equals(oracle_clusters));
-      // TODO: check if the ConcernClusterArchitecture object is empty?
 			ois.close();
 
 			ois = new ObjectInputStream(new FileInputStream(resources_dir + smellsObjectFile));
       SmellCollection oracle_detectedSmells = (SmellCollection) ois.readObject();
-			assertTrue(detectedSmells.equals(oracle_detectedSmells));
-      // TODO: check if SmellCollection is empty?
 			ois.close();
+
+      assertAll(
+        () -> assertTrue(clusterSmellMap.equals(oracle_clusterSmellMap)),
+        () -> assertTrue(clusters.equals(oracle_clusters)),
+        () -> assertTrue(detectedSmells.equals(oracle_detectedSmells))
+      );
 
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-      assertTrue(false); 
+      fail("Exception caught in runConcernDetectionAlgsTest");
 		}
 
   }
@@ -221,18 +238,13 @@ public class ArchSmellDetectorTest {
 
     } catch (FileNotFoundException e) {
       // TODO Auto-generated catch block
-      assertTrue(false); 
       e.printStackTrace();
+      fail("Exception caught in buildSmellToClustersMapTest"); 
     } catch (IOException | ClassNotFoundException e) {
       // TODO Auto-generated catch block
-      assertTrue(false); 
       e.printStackTrace();
+      fail("Exception caught in buildSmellToClustersMapTest");  
     }
-    
-    
-    
-
-
   }
 
 
