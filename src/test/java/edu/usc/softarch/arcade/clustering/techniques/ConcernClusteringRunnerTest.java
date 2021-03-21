@@ -47,8 +47,8 @@ public class ConcernClusteringRunnerTest {
 		// // struts 2.5.2
 		// ".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
 		// + ".///src///test///resources///mallet_resources///struts-2.3.30,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
-		// + "struts-2.5.2_output_ffVecs_before.txt,"
+		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
+		// + "struts-2.5.2,"
 		// + "java",
 
 		// // httpd-2.3.8
@@ -59,10 +59,10 @@ public class ConcernClusteringRunnerTest {
 		// + "c",
 
 		// // httpd-2.4.26
-		// ".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.4.26,"
+		// ".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.4.26,"
 		// + ".///src///test///resources///mallet_resources///httpd-2.4.26,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
-		// + "httpd-2.4.26_output_ffVecs_before.txt,"
+		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
+		// + "httpd-2.4.26,"
 		// + "c",
 	})
 	public void initDataStructuresTest(String srcDir, String outDir, String resDir, String versionName, String language){
@@ -162,8 +162,8 @@ public class ConcernClusteringRunnerTest {
 		// // struts 2.5.2
 		// ".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
 		// + ".///src///test///resources///mallet_resources///struts-2.3.30,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
-		// + "struts-2.5.2_output_ffVecs_before.txt,"
+		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
+		// + "struts-2.5.2,"
 		// + "java",
 
 		// // httpd-2.3.8
@@ -174,10 +174,10 @@ public class ConcernClusteringRunnerTest {
 		// + "c",
 
 		// // httpd-2.4.26
-		// ".///src///test///resources///CSourceToDepsBuilderTest_resources///binaries///httpd-2.4.26,"
+		// ".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.4.26,"
 		// + ".///src///test///resources///mallet_resources///httpd-2.4.26,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///serialized,"
-		// + "httpd-2.4.26_output_ffVecs_before.txt,"
+		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
+		// + "httpd-2.4.26,"
 		// + "c",
 	})
 	public void computeClustersWithConcernsAndFastClustersTest(String srcDir, String outDir, String resDir, String versionName, String language){
@@ -217,6 +217,7 @@ public class ConcernClusteringRunnerTest {
 		runner = new ConcernClusteringRunner(
 			builderffVecs, fullSrcDir, outputDir + "/base", language);
 		// call computeClustersWithConcernsAndFastClusters()
+		FastClusterArchitecture beforeCompute = ClusteringAlgoRunner.fastClusters;
 		assertDoesNotThrow(() -> {
 			int numClusters = (int) ((double) runner.getFastClusters().size() * .20); // copied from BatchClusteringEngine
 			runner.computeClustersWithConcernsAndFastClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters), "preselected", "js"); // copied from BatchClusteringEngine
@@ -232,8 +233,11 @@ public class ConcernClusteringRunnerTest {
 			ois = new ObjectInputStream(new FileInputStream(resDir + fs + "ds_serialized" + fs + versionName + "_fastClusters_after_compute.txt"));
 			FastClusterArchitecture fastClustersCompute = (FastClusterArchitecture) ois.readObject();
 			ois.close();
+
+			FastClusterArchitecture afterCompute = ClusteringAlgoRunner.fastClusters;
 			assertFalse(fastClustersCompute.isEmpty());
 			assertTrue(fastClustersCompute.size() < fastClustersAfterInit.size()); // size should be less than?
+			assertFalse(afterCompute.equals(beforeCompute));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
