@@ -64,10 +64,10 @@ public class StringEdge implements Serializable {
 		
 		StringEdge e = (StringEdge) o;
 		
-		logger.trace("e.srcStr: " + e.srcStr);
-		logger.trace("this.srcStr: " + this.srcStr);
-		logger.trace("e.tgtStr: " + e.tgtStr);
-		logger.trace("this.tgtStr: " + this.tgtStr);
+		// logger.info("e.srcStr: " + e.srcStr);
+		// logger.info("this.srcStr: " + this.srcStr);
+		// logger.info("e.tgtStr: " + e.tgtStr);
+		// logger.info("this.tgtStr: " + this.tgtStr);
 
 		return (e.srcStr.equals(this.srcStr) &&
 			e.tgtStr.equals(this.tgtStr) &&
