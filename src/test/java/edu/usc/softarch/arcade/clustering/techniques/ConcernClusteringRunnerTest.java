@@ -21,7 +21,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import edu.usc.softarch.arcade.clustering.FastClusterArchitecture;
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 
-// NOTE: run tests sequentially (need to figure out BeforeEach methods/TestInfo for parameter injection here later)
 public class ConcernClusteringRunnerTest {
 	ConcernClusteringRunner runner;
 	// members to check: 
@@ -68,7 +67,7 @@ public class ConcernClusteringRunnerTest {
 	public void initDataStructuresTest(String srcDir, String outDir, String resDir, String versionName, String language){
 		/* Checks that ConcernClusteringRunner.fastFeatureVectors is not null after the ConcernClusteringRunner constructor call */
 		/* Checks that ConcernClusteringRunner.fastClusters is modified in the ConcernClusteringRunner constructor */
-		// TODO: assertAll(), clean up the try/catch statements
+		// TODO: clean up the try/catch statements
 		char fs = File.separatorChar;
 		String outputPath = "." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest";
 		(new File(outputPath)).mkdirs();
@@ -84,14 +83,14 @@ public class ConcernClusteringRunnerTest {
 			builderffVecs = (FastFeatureVectors)ois.readObject();
 			ois.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		}
 
 		if (builderffVecs == null){
@@ -130,14 +129,14 @@ public class ConcernClusteringRunnerTest {
 			ois.close();
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		}
 
 	}
@@ -181,7 +180,7 @@ public class ConcernClusteringRunnerTest {
 		// + "c",
 	})
 	public void computeClustersWithConcernsAndFastClustersTest(String srcDir, String outDir, String resDir, String versionName, String language){
-		// This function updates fastClusters in its call to updateFastClustersAndSimMatrixToReflectMergedCluster()
+		// This function modifies fastClusters in its call to updateFastClustersAndSimMatrixToReflectMergedCluster()
 		// is computeClustersWithConcernsAndFastClusters ever called with stopCriterion = "clustergain"? (I don't think this parameter affects the fastClusters anyway)
 
 		char fs = File.separatorChar;
@@ -199,14 +198,14 @@ public class ConcernClusteringRunnerTest {
 			builderffVecs = (FastFeatureVectors)ois.readObject();
 			ois.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		}
 
 		if (builderffVecs == null){
@@ -235,26 +234,22 @@ public class ConcernClusteringRunnerTest {
 			ois.close();
 
 			FastClusterArchitecture afterCompute = ClusteringAlgoRunner.fastClusters;
+			// Check that fastClusters not empty after computeClustersWithConcernsAndFastClusters call 
 			assertFalse(fastClustersCompute.isEmpty());
-			assertTrue(fastClustersCompute.size() < fastClustersAfterInit.size()); // size should be less than?
+			// The size of the fastClusters should be smaller afterward (I THINK)
+			assertTrue(fastClustersCompute.size() < fastClustersAfterInit.size());
+			// Check that the actual fastClusters before/after are different
 			assertFalse(afterCompute.equals(beforeCompute));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			fail(e.getMessage());
 		}
 		
 	}
-
-
-	// TEST METHODS
-	// computeClustersWithConcernsAndFastClusters 
-	// mergeFastClustersUsingTopics
-	// identifyMostSimClusters
-
 }
