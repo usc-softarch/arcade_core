@@ -65,7 +65,6 @@ public class ACDCTest {
 		});
 
 		// Use RsfCompare.compareTo to compare file contents
-				// returns 0 if files have the same contents
 		RsfCompare resultRsf = new RsfCompare(result);
 		RsfCompare oracleRsf = new RsfCompare(oracleResult);
 		assertTrue(oracleRsf.equals(resultRsf));

@@ -4,74 +4,149 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.io.File;
-import java.util.AbstractCollection;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.acdc.ACDC;
 
 public class SmellsCompareTest{
-  String OraclePath;
-  String source_deps_rsf_path;
-  String ACDC_output_cluster_path;
-  String targetSerFilename;
-  ArchSmellDetector asd;
+	@BeforeEach
+	public void setUp(){
+		char fs = File.separatorChar;
+		String outputPath = "." + fs + "target" + fs + "test_results" + fs + "SmellsCompareTest";
+		File directory = new File(outputPath);
+		directory.mkdirs();
+	}
 
-  @BeforeEach
-  public void setUp(){
-    char fs = File.separatorChar;
+	@ParameterizedTest
+	@CsvSource({
+		/** Test parameters **/
+		// [path to oracle]
+		// [path to deps rsf]
+		// [output directory]
+		// [output path for clusters file]
+		// [desired result ser filename]
 
-    OraclePath = "." + fs + "src" + fs + "test" + fs + "resources"
-      + fs + "ACDCTest_resources"
-      + fs + "struts-2.3.30_acdc_smells.ser";
+		// struts 2.3.30
+		".///src///test///resources///SmellsCompareTest///struts-2.3.30_acdc_smells.ser,"
+		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf,"
+		+ ".///target///test_results///SmellsCompareTest,"
+		+ ".///target///test_results///SmellsCompareTest///struts-2.3.30_acdc_clusters.rsf,"
+		+ "struts-2.3.30_acdc_smells.ser",
 
-    source_deps_rsf_path = "." + fs + "src" + fs + "test" + fs + "resources"
-    + fs + "JavaSourceToDepsBuilderTest_resources_old" + fs +"arcade_old_deps_oracle.rsf";
+		// struts-2.5.2
+		".///src///test///resources///SmellsCompareTest_resources///struts-2.5.2_acdc_smells.ser,"
+		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf,"
+		+ ".///target///test_results///SmellsCompareTest,"
+		+ ".///target///test_results///SmellsCompareTest///struts-2.5.2_acdc_clusters.rsf,"
+		+ "struts-2.5.2_acdc_smells.ser",
 
-    ACDC_output_cluster_path = "." + fs + "target" + fs + "ACDC_test_results" + fs + "test_old_deps_acdc_clustered.rsf";
+		// httpd 2.3.8
+		".///src///test///resources///SmellsCompareTest///httpd-2.3.8_acdc_smells.ser,"
+		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.3.8_deps.rsf,"
+		+ ".///target///test_results///SmellsCompareTest,"
+		+ ".///target///test_results///SmellsCompareTest///httpd-2.3.8_acdc_clusters.rsf,"
+		+ "httpd-2.3.8_acdc_smells.ser",
 
-    assertDoesNotThrow(() ->  ACDC.run(source_deps_rsf_path, ACDC_output_cluster_path));
+		// httpd-2.4.26
+		".///src///test///resources///SmellsCompareTest///httpd-2.4.26_acdc_smells.ser,"
+		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.4.26_deps.rsf,"
+		+ ".///target///test_results///SmellsCompareTest,"
+		+ ".///target///test_results///SmellsCompareTest///httpd-2.4.26_acdc_clusters.rsf,"
+		+ "httpd-2.4.26_acdc_smells.ser",
+	})
+	public void withoutConcernsTest(String oracle, String deps, String output, String clusters, String ser){    
+		/** Run smell analyzer without concerns (ACDC) **/
+		String oraclePath = oracle.replace("///", File.separator);  
+		String depsPath = deps.replace("///", File.separator);
+		String outputPath = output.replace("///", File.separator);
+		String outputClustersPath = clusters.replace ("///", File.separator);
+		
+		// Get clusters
+		ACDC.run(depsPath, outputClustersPath);
+		String resultSerFilename = outputPath + File.separator + ser;
+		ArchSmellDetector asd = new ArchSmellDetector(depsPath, outputClustersPath, resultSerFilename);
+		
+		// Call ArchSmellDetector.run() (with runConcern=false)
+		assertDoesNotThrow(() -> asd.run(true, false, true)); 
 
-    String targetSerPath = "." + fs + "target" + fs + "test_results";
+		// Construct SmellCollection objects out of the result and oracle files
+		SmellCollection resultSmells = assertDoesNotThrow(() -> {
+			return new SmellCollection(resultSerFilename);
+		});
+		SmellCollection oracleSmells = assertDoesNotThrow(() -> {
+			return new SmellCollection(oraclePath);
+		});
 
-    File directory = new File(targetSerPath);
-    directory.mkdirs();
+		// SmellCollection extends HashSet, so we can use equals() to compare the result to the oracle
+		assertTrue(oracleSmells.equals(resultSmells));
+	}
 
-    targetSerFilename = "." + fs + "target" + fs + "test_results" + fs 
-      + "ACDC_test_compare_smells_with_concerns.ser";
-  
-    asd = new ArchSmellDetector(source_deps_rsf_path,
-      ACDC_output_cluster_path, targetSerFilename);
-  }
+	@ParameterizedTest
+	@CsvSource({
+		/** Test parameters **/
+		// [path to oracle]
+		// [path to deps rsf]
+		// [output directory]
+		// [output path for clusters file]
+		// [desired result ser filename]
 
-  //These two tests below will fail because there are problems with the generated .ser files which does not match the oracles.
+		// struts 2.3.30
+		".///src///test///resources///SmellsCompareTest///struts-2.3.30_arc_smells.ser,"
+		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf,"
+		+ ".///target///test_results///SmellsCompareTest,"
+		+ ".///target///test_results///SmellsCompareTest///struts-2.3.30_arc_clusters.rsf,"
+		+ "struts-2.3.30_arc_smells.ser",
 
+		// // struts-2.5.2
+		// ".///src///test///resources///SmellsCompareTest_resources///struts-2.5.2_arc_smells.ser,"
+		// + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf,"
+		// + ".///target///test_results///SmellsCompareTest,"
+		// + ".///target///test_results///SmellsCompareTest///struts-2.5.2_arc_clusters.rsf,"
+		// + "struts-2.5.2_arc_smells.ser",
 
-    @ParameterizedTest
-    @CsvSource({
-      // Test with concerns
-      "true",
-      //Without concerns
-      "false"
-    })
-    public void test_ACDC_compare_smells(String concerns){       
-          
-            assertDoesNotThrow(() -> asd.run(true, Boolean.parseBoolean(concerns), true)); 
-            SmellCollection OracleSmells = assertDoesNotThrow(() -> {
-              return new SmellCollection(OraclePath);
-            });
-            SmellCollection TargetSmells = assertDoesNotThrow(() -> {
-              return new SmellCollection(targetSerFilename);
-            });
+		// TODO: No ARC oracles available for httpd yet (empty smells file due to recovery bug)
+		// // httpd 2.3.8
+		// ".///src///test///resources///SmellsCompareTest///httpd-2.3.8_arc_smells.ser,"
+		// + ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.3.8_deps.rsf,"
+		// + ".///target///test_results///SmellsCompareTest,"
+		// + ".///target///test_results///SmellsCompareTest///httpd-2.3.8_arc_clusters.rsf,"
+		// + "httpd-2.3.8_arc_smells.ser",
 
-            AbstractCollection<Smell> OracleAbs = (AbstractCollection<Smell>)OracleSmells;
-            AbstractCollection<Smell> TargetAbs = (AbstractCollection<Smell>)TargetSmells;
-  
-            assertTrue(OracleAbs.containsAll(TargetAbs));
-    }
+		// // httpd-2.4.26
+		// ".///src///test///resources///SmellsCompareTest///httpd-2.4.26_arc_smells.ser,"
+		// + ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.4.26_deps.rsf,"
+		// + ".///target///test_results///SmellsCompareTest,"
+		// + ".///target///test_results///SmellsCompareTest///httpd-2.4.26_arc_clusters.rsf,"
+		// + "httpd-2.4.26_arc_smells.ser",
+	})
+	public void withConcernsTest(String oracle, String deps, String output, String clusters, String ser){    
+		/** Run smell analyzer WITH concerns (ARC) **/
+		String oraclePath = oracle.replace("///", File.separator);  
+		String depsPath = deps.replace("///", File.separator);
+		String outputPath = output.replace("///", File.separator);
+		String outputClustersPath = clusters.replace ("///", File.separator);
+		
+		// Get clusters
+		ACDC.run(depsPath, outputClustersPath);
+		String resultSerFilename = outputPath + File.separator + ser;
+		ArchSmellDetector asd = new ArchSmellDetector(depsPath, outputClustersPath, resultSerFilename);
+		
+		// Call ArchSmellDetector.run() (with runConcern=true)
+		assertDoesNotThrow(() -> asd.run(true, false, true)); 
 
+		// Construct SmellCollection objects out of the result and oracle files
+		SmellCollection resultSmells = assertDoesNotThrow(() -> {
+			return new SmellCollection(resultSerFilename);
+		});
+		SmellCollection oracleSmells = assertDoesNotThrow(() -> {
+			return new SmellCollection(oraclePath);
+		});
+
+		// SmellCollection extends HashSet, so we can use equals() to compare the result to the oracle
+		assertTrue(oracleSmells.equals(resultSmells));
+	}
 }
