@@ -242,20 +242,6 @@
         </executions>
       </plugin> -->
       <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.0.0-M5</version>
-          <configuration>
-            <excludes>
-              <exclude>PipeExtractorTest_resources/src/struts-2.3.30/**/*</exclude>
-              <exclude>PipeExtractorTest_resources/src/struts-2.5.2/**/*</exclude>
-              <exclude>JavaSourceToDepsBuilderTest_resources_old/**/*</exclude>
-              <exclude>CSourceToDepsBuilderTest_resources/src/httpd-2.3.8/**/*</exclude>
-              <exclude>CSourceToDepsBuilderTest_resources/src/httpd-2.4.26/**/*</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.5.5</version>
         <executions>
@@ -395,6 +381,11 @@
         <configuration>
           <excludes>
             <exclude>JavaSourceToDepsBuilderTest_resources_old/**/*</exclude>
+            <exclude>PipeExtractorTest_resources/src/struts-2.3.30/**/*</exclude>
+            <exclude>PipeExtractorTest_resources/src/struts-2.5.2/**/*</exclude>
+            <exclude>JavaSourceToDepsBuilderTest_resources_old/**/*</exclude>
+            <exclude>CSourceToDepsBuilderTest_resources/src/httpd-2.3.8/**/*</exclude>
+            <exclude>CSourceToDepsBuilderTest_resources/src/httpd-2.4.26/**/*</exclude>
           </excludes>
         </configuration>
       </plugin>
