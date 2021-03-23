@@ -24,8 +24,8 @@
           <string>org.apache.struts2.views.freemarker.tags.I18nModel</string>
           <string>org.apache.struts2.views.freemarker.tags.ActionErrorModel</string>
           <string>com.opensymphony.xwork2.util.ValueStack</string>
-          <string>org.apache.struts2.views.freemarker.tags.FieldErrorModel</string>
           <string>org.apache.struts2.views.freemarker.tags.CheckboxModel</string>
+          <string>org.apache.struts2.views.freemarker.tags.FieldErrorModel</string>
           <string>org.apache.struts2.views.freemarker.tags.DivModel</string>
           <string>org.apache.struts2.views.jsp.ui.ComponentTag</string>
           <string>org.apache.struts2.views.freemarker.tags.BeanModel</string>
@@ -119,8 +119,8 @@
           <string>org.apache.struts2.views.freemarker.tags.IncludeModel</string>
           <string>org.apache.struts2.views.jsp.ui.DivTag</string>
           <string>org.apache.struts2.views.jsp.IteratorTag</string>
-          <string>org.apache.struts2.views.freemarker.tags.IteratorModel</string>
           <string>org.apache.struts2.views.freemarker.tags.TextAreaModel</string>
+          <string>org.apache.struts2.views.freemarker.tags.IteratorModel</string>
           <string>org.apache.struts2.dojo.views.jsp.ui.TabbedPanelTag</string>
         </entities>
       </edu.usc.softarch.arcade.facts.ConcernCluster>
@@ -159,8 +159,8 @@
           <string>com.opensymphony.xwork2.util.location.LocationImpl</string>
           <string>com.opensymphony.xwork2.factory.ConverterFactory</string>
           <string>org.apache.struts2.config.DefaultBeanSelectionProvider</string>
-          <string>com.opensymphony.xwork2.factory.ValidatorFactory</string>
           <string>com.opensymphony.xwork2.conversion.TypeConverterCreator</string>
+          <string>com.opensymphony.xwork2.factory.ValidatorFactory</string>
           <string>com.opensymphony.xwork2.config.entities.PackageConfig$Builder</string>
           <string>org.apache.struts2.util.ContentTypeMatcher</string>
           <string>org.apache.struts2.config.ClasspathPackageProvider$PackageLoader</string>
@@ -174,8 +174,8 @@
           <string>org.apache.struts2.config.ClasspathPackageProvider$1</string>
           <string>org.apache.struts2.util.DefaultContentTypeMatcher</string>
           <string>org.apache.struts2.config.StrutsXmlConfigurationProvider$1</string>
-          <string>org.apache.struts2.config.ParentPackage</string>
           <string>org.apache.struts2.config.ClasspathPackageProvider</string>
+          <string>org.apache.struts2.config.ParentPackage</string>
           <string>org.apache.struts2.config.DefaultSettings</string>
           <string>com.opensymphony.xwork2.inject.ContainerBuilder</string>
           <string>com.opensymphony.xwork2.util.TextParser</string>
@@ -286,8 +286,8 @@
           <string>com.opensymphony.xwork2.interceptor.ScopedModelDriven</string>
           <string>org.apache.commons.validator.ValidatorResources</string>
           <string>java.lang.IllegalArgumentException</string>
-          <string>org.apache.struts2.s1.Struts1Action</string>
           <string>org.apache.struts2.s1.ActionFormValidationInterceptor</string>
+          <string>org.apache.struts2.s1.Struts1Action</string>
           <string>org.apache.struts2.dispatcher.PostbackResult</string>
           <string>org.apache.struts2.interceptor.CreateSessionInterceptor</string>
           <string>com.opensymphony.xwork2.config.entities.ResultConfig</string>
@@ -333,8 +333,8 @@
           <string>org.apache.struts2.jasper.Constants</string>
           <string>java.util.jar.JarEntry</string>
           <string>java.net.URLClassLoader</string>
-          <string>org.apache.struts2.jasper.CustomCompiler</string>
           <string>org.apache.struts2.jasper.JspCompilationContext</string>
+          <string>org.apache.struts2.jasper.CustomCompiler</string>
           <string>java.security.CodeSource</string>
           <string>java.security.PermissionCollection</string>
           <string>java.net.JarURLConnection</string>
@@ -347,8 +347,8 @@
       <edu.usc.softarch.arcade.facts.ConcernCluster>
         <name>org.apache.struts2.portlet.util.ss</name>
         <entities>
-          <string>org.apache.struts2.portlet.util.PortletUrlHelperJSR286</string>
           <string>javax.portlet.BaseURL</string>
+          <string>org.apache.struts2.portlet.util.PortletUrlHelperJSR286</string>
           <string>javax.portlet.MimeResponse</string>
           <string>javax.portlet.ResourceURL</string>
         </entities>
@@ -497,8 +497,8 @@
           <string>org.apache.struts2.StrutsJUnit4TestCase$1</string>
           <string>javax.servlet.jsp.JspPage</string>
           <string>org.apache.struts2.JSPLoader$1</string>
-          <string>org.apache.struts2.jasper.JspC</string>
           <string>org.apache.struts2.JSPLoader$2</string>
+          <string>org.apache.struts2.jasper.JspC</string>
           <string>java.util.concurrent.FutureTask</string>
           <string>java.util.concurrent.Callable</string>
           <string>org.springframework.mock.web.MockHttpServletResponse</string>
@@ -539,8 +539,8 @@
           <string>com.opensymphony.xwork2.util.reflection.ReflectionProvider</string>
           <string>org.apache.struts2.interceptor.debugging.ObjectToHTMLWriter</string>
           <string>org.apache.struts2.interceptor.debugging.DebuggingInterceptor$2</string>
-          <string>org.apache.struts2.interceptor.debugging.DebuggingInterceptor$1</string>
           <string>org.apache.struts2.interceptor.debugging.PrettyPrintWriter</string>
+          <string>org.apache.struts2.interceptor.debugging.DebuggingInterceptor$1</string>
           <string>java.io.CharArrayWriter</string>
           <string>com.opensymphony.xwork2.interceptor.PreResultListener</string>
           <string>org.apache.struts2.interceptor.debugging.DebuggingInterceptor$3</string>
@@ -579,8 +579,8 @@
           <string>javax.el.CompositeELResolver</string>
           <string>javax.el.ArrayELResolver</string>
           <string>org.apache.tiles.startup.AbstractTilesInitializer</string>
-          <string>org.apache.tiles.ognl.ApplicationScopeNestedObjectExtractor</string>
           <string>org.apache.tiles.impl.mgmt.CachingTilesContainer</string>
+          <string>org.apache.tiles.ognl.ApplicationScopeNestedObjectExtractor</string>
           <string>org.apache.tiles.el.JspExpressionFactoryFactory</string>
           <string>org.apache.tiles.locale.LocaleResolver</string>
           <string>org.apache.tiles.ognl.RequestScopeNestedObjectExtractor</string>
@@ -599,8 +599,8 @@
           <string>org.apache.tiles.renderer.AttributeRenderer</string>
           <string>org.apache.struts2.tiles.StrutsFreeMarkerAttributeRenderer</string>
           <string>javax.el.BeanELResolver</string>
-          <string>org.apache.tiles.ognl.TilesContextPropertyAccessorDelegateFactory</string>
           <string>org.apache.tiles.ognl.SessionScopeNestedObjectExtractor</string>
+          <string>org.apache.tiles.ognl.TilesContextPropertyAccessorDelegateFactory</string>
           <string>org.apache.struts2.tiles.StrutsTilesInitializer</string>
           <string>java.util.HashSet</string>
           <string>org.apache.tiles.freemarker.template.TilesFMModelRepository</string>
@@ -610,8 +610,8 @@
           <string>ognl.OgnlRuntime</string>
           <string>org.apache.tiles.evaluator.AttributeEvaluatorFactory</string>
           <string>org.apache.tiles.renderer.impl.BasicRendererFactory</string>
-          <string>org.apache.tiles.factory.TilesContainerFactoryException</string>
           <string>org.apache.tiles.impl.BasicTilesContainer</string>
+          <string>org.apache.tiles.factory.TilesContainerFactoryException</string>
           <string>javax.el.ListELResolver</string>
           <string>org.apache.tiles.util.URLUtil</string>
           <string>org.apache.tiles.renderer.impl.ChainedDelegateAttributeRenderer</string>
@@ -690,9 +690,9 @@
           <string>net.sf.oval.configuration.xml.XMLConfigurer</string>
           <string>com.opensymphony.xwork2.Validateable</string>
           <string>org.apache.struts2.oval.interceptor.OValValidationManager</string>
+          <string>net.sf.oval.context.FieldContext</string>
           <string>com.opensymphony.xwork2.validator.DelegatingValidatorContext</string>
           <string>net.sf.oval.context.MethodReturnValueContext</string>
-          <string>net.sf.oval.context.FieldContext</string>
           <string>net.sf.oval.configuration.annotation.AnnotationsConfigurer</string>
           <string>com.opensymphony.xwork2.validator.ValidatorContext</string>
           <string>org.apache.struts2.oval.annotation.Profiles</string>
@@ -966,8 +966,8 @@
           <string>org.apache.struts2.jasper.xmlparser.XMLEncodingDetector$RewindableInputStream</string>
           <string>org.apache.struts2.jasper.xmlparser.MyEntityResolver</string>
           <string>org.xml.sax.EntityResolver</string>
-          <string>org.apache.struts2.jasper.xmlparser.ParserUtils</string>
           <string>org.apache.struts2.jasper.xmlparser.XMLString</string>
+          <string>org.apache.struts2.jasper.xmlparser.ParserUtils</string>
           <string>org.xml.sax.InputSource</string>
           <string>org.apache.struts2.jasper.xmlparser.UTF8Reader</string>
           <string>org.apache.struts2.jasper.xmlparser.ASCIIReader</string>
@@ -975,10 +975,10 @@
           <string>java.io.Reader</string>
           <string>org.apache.struts2.jasper.xmlparser.EncodingMap</string>
           <string>java.io.EOFException</string>
-          <string>org.apache.struts2.jasper.xmlparser.TreeNode</string>
-          <string>org.xml.sax.SAXParseException</string>
           <string>org.apache.struts2.jasper.xmlparser.XMLStringBuffer</string>
           <string>org.apache.struts2.jasper.xmlparser.UCSReader</string>
+          <string>org.apache.struts2.jasper.xmlparser.TreeNode</string>
+          <string>org.xml.sax.SAXParseException</string>
           <string>javax.xml.parsers.ParserConfigurationException</string>
           <string>javax.xml.parsers.DocumentBuilder</string>
           <string>org.xml.sax.SAXException</string>
@@ -1023,8 +1023,8 @@
         <entities>
           <string>org.apache.struts2.portlet.PortletPhase</string>
           <string>org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper</string>
-          <string>org.apache.struts2.portlet.dispatcher.Jsr286Dispatcher</string>
           <string>org.apache.struts2.portlet.dispatcher.Jsr168Dispatcher</string>
+          <string>org.apache.struts2.portlet.dispatcher.Jsr286Dispatcher</string>
           <string>org.apache.struts2.portlet.servlet.PortletServletOutputStream</string>
           <string>javax.portlet.EventResponse</string>
           <string>javax.portlet.GenericPortlet</string>
@@ -1058,8 +1058,8 @@
           <string>org.apache.tiles.mgmt.MutableTilesContainer</string>
           <string>org.apache.struts2.tiles.annotation.TilesAddListAttribute</string>
           <string>org.apache.tiles.request.servlet.ServletUtil</string>
-          <string>org.apache.tiles.access.TilesAccess</string>
           <string>org.apache.tiles.request.Request</string>
+          <string>org.apache.tiles.access.TilesAccess</string>
         </entities>
       </edu.usc.softarch.arcade.facts.ConcernCluster>
       <edu.usc.softarch.arcade.facts.ConcernCluster>
@@ -1071,13 +1071,13 @@
           <string>org.apache.commons.validator.Validator</string>
           <string>antlr.Token</string>
           <string>antlr.TokenStreamRecognitionException</string>
-          <string>org.apache.commons.validator.util.ValidatorUtils</string>
           <string>antlr.CharBuffer</string>
+          <string>org.apache.commons.validator.util.ValidatorUtils</string>
           <string>antlr.RecognitionException</string>
-          <string>antlr.LLkParser</string>
           <string>antlr.LexerSharedInputState</string>
-          <string>org.apache.struts.validator.validwhen.ValidWhenParser</string>
+          <string>antlr.LLkParser</string>
           <string>antlr.NoViableAltForCharException</string>
+          <string>org.apache.struts.validator.validwhen.ValidWhenParser</string>
           <string>antlr.TokenStreamIOException</string>
           <string>antlr.TokenStreamException</string>
           <string>org.apache.struts.validator.validwhen.ValidWhen</string>
@@ -1088,8 +1088,8 @@
           <string>antlr.NoViableAltException</string>
           <string>antlr.ParserSharedInputState</string>
           <string>antlr.ANTLRHashString</string>
-          <string>antlr.TokenBuffer</string>
           <string>antlr.InputBuffer</string>
+          <string>antlr.TokenBuffer</string>
           <string>antlr.CharScanner</string>
           <string>org.apache.commons.validator.Field</string>
           <string>org.apache.struts.validator.validwhen.ValidWhenLexer</string>
@@ -1156,12 +1156,12 @@
         <entities>
           <string>org.apache.struts2.sitegraph.model.SiteGraphNode</string>
           <string>org.apache.struts2.sitegraph.model.Link</string>
-          <string>org.apache.struts2.sitegraph.renderers.DOTRenderer$TempLink</string>
           <string>org.apache.struts2.sitegraph.renderers.DOTRenderer</string>
+          <string>org.apache.struts2.sitegraph.renderers.DOTRenderer$TempLink</string>
           <string>org.apache.struts2.sitegraph.renderers.DOTRenderer$1</string>
           <string>org.apache.struts2.sitegraph.model.ActionNode</string>
-          <string>com.opensymphony.xwork2.ActionChainResult</string>
           <string>org.apache.struts2.sitegraph.model.Graph</string>
+          <string>com.opensymphony.xwork2.ActionChainResult</string>
           <string>org.apache.struts2.sitegraph.model.Render</string>
           <string>org.apache.struts2.sitegraph.model.ViewNode</string>
           <string>java.io.Writer</string>
@@ -1248,8 +1248,8 @@
           <string>org.apache.struts2.components.Select</string>
           <string>org.apache.struts2.views.annotations.StrutsTagAttribute</string>
           <string>org.apache.struts2.components.Anchor</string>
-          <string>org.apache.struts2.views.velocity.components.SelectDirective</string>
           <string>org.apache.struts2.views.velocity.components.TextDirective</string>
+          <string>org.apache.struts2.views.velocity.components.SelectDirective</string>
           <string>org.apache.struts2.views.velocity.components.HiddenDirective</string>
           <string>org.apache.struts2.views.velocity.components.CheckBoxListDirective</string>
           <string>org.apache.struts2.components.File</string>
@@ -1279,8 +1279,8 @@
           <string>org.apache.struts2.components.ComponentUrlProvider</string>
           <string>org.apache.struts2.views.velocity.components.TokenDirective</string>
           <string>org.apache.struts2.views.TagLibrary</string>
-          <string>org.apache.struts2.views.DefaultTagLibrary</string>
           <string>org.apache.struts2.views.velocity.components.AnchorDirective</string>
+          <string>org.apache.struts2.views.DefaultTagLibrary</string>
           <string>org.apache.struts2.util.AttributeMap</string>
           <string>org.apache.struts2.views.annotations.StrutsTag</string>
           <string>java.util.ResourceBundle</string>
@@ -1291,8 +1291,8 @@
           <string>org.apache.struts2.views.velocity.components.PropertyDirective</string>
           <string>org.apache.struts2.components.UIBean</string>
           <string>org.apache.struts2.components.Date</string>
-          <string>org.apache.struts2.views.velocity.components.URLDirective</string>
           <string>org.apache.struts2.views.velocity.components.ComponentDirective</string>
+          <string>org.apache.struts2.views.velocity.components.URLDirective</string>
           <string>org.apache.struts2.views.jsp.TagUtils</string>
           <string>org.apache.struts2.components.Token</string>
           <string>org.apache.struts2.views.velocity.components.RadioDirective</string>
@@ -1330,8 +1330,8 @@
           <string>org.apache.struts2.portlet.servlet.PortletServletConfig</string>
           <string>javax.servlet.jsp.JspWriter</string>
           <string>org.apache.struts.mock.MockPrincipal</string>
-          <string>org.apache.struts.mock.TestMockBase</string>
           <string>org.apache.struts.mock.MockHttpServletResponse</string>
+          <string>org.apache.struts.mock.TestMockBase</string>
           <string>java.util.HashMap</string>
           <string>junit.awtui.TestRunner</string>
           <string>junit.framework.TestSuite</string>
@@ -1403,8 +1403,8 @@
           <string>org.apache.struts2.el.parser.AstTrue</string>
           <string>org.apache.struts2.el.parser.ELParserConstants</string>
           <string>org.apache.struts2.el.parser.ELParser$LookaheadSuccess</string>
-          <string>org.apache.struts2.el.parser.BooleanNode</string>
           <string>org.apache.struts2.el.parser.AstDiv</string>
+          <string>org.apache.struts2.el.parser.BooleanNode</string>
           <string>org.apache.struts2.el.lang.EvaluationContext</string>
           <string>org.apache.struts2.el.parser.ParseException</string>
           <string>org.apache.struts2.el.parser.TokenMgrError</string>
@@ -1430,9 +1430,9 @@
           <string>org.apache.struts2.el.parser.AstAnd</string>
           <string>org.apache.struts2.el.parser.AstMinus</string>
           <string>org.apache.struts2.el.parser.SimpleNode</string>
+          <string>org.apache.struts2.el.parser.AstOr</string>
           <string>org.apache.struts2.el.parser.AstNot</string>
           <string>org.apache.struts2.el.parser.SimpleCharStream</string>
-          <string>org.apache.struts2.el.parser.AstOr</string>
           <string>java.lang.Object</string>
           <string>java.lang.Class</string>
           <string>org.apache.struts2.el.parser.ELParser$1</string>
@@ -1590,10 +1590,10 @@
           <string>java.io.InputStreamReader</string>
           <string>com.opensymphony.xwork2.interceptor.Interceptor</string>
           <string>org.codehaus.plexus.DefaultPlexusContainer</string>
-          <string>org.codehaus.plexus.PlexusContainer</string>
           <string>org.apache.struts2.plexus.PlexusFilter</string>
-          <string>javax.servlet.ServletContextEvent</string>
+          <string>org.codehaus.plexus.PlexusContainer</string>
           <string>java.io.ByteArrayInputStream</string>
+          <string>javax.servlet.ServletContextEvent</string>
           <string>org.apache.struts2.plexus.PlexusObjectFactory</string>
           <string>javax.servlet.http.HttpSessionEvent</string>
           <string>javax.servlet.ServletContextListener</string>
@@ -1679,8 +1679,8 @@
           <string>org.apache.struts.chain.commands.AbstractRequestNoCache</string>
           <string>org.apache.struts.chain.commands.AbstractPerformInclude</string>
           <string>org.apache.struts.chain.commands.servlet.PopulateActionForm</string>
-          <string>org.apache.struts.chain.commands.AbstractSelectInput</string>
           <string>org.apache.struts.chain.commands.servlet.SelectInput</string>
+          <string>org.apache.struts.chain.commands.AbstractSelectInput</string>
           <string>org.apache.struts.chain.commands.AbstractPerformForward</string>
           <string>org.apache.struts.chain.commands.RemoveCachedMessages</string>
           <string>org.apache.struts.chain.commands.AbstractSelectModule</string>
@@ -2116,8 +2116,8 @@
           <string>org.apache.struts2.components.template.TemplateRenderingContext</string>
           <string>org.apache.struts2.views.java.simple.DivHandler</string>
           <string>org.apache.struts2.util.MakeIterator</string>
-          <string>org.apache.struts2.views.java.simple.ActionErrorHandler</string>
           <string>org.apache.struts2.views.java.simple.ResetHandler</string>
+          <string>org.apache.struts2.views.java.simple.ActionErrorHandler</string>
           <string>org.apache.struts2.interceptor.DateTextFieldInterceptor$DateWord</string>
           <string>org.apache.struts2.views.java.simple.ActionMessageHandler</string>
           <string>java.text.SimpleDateFormat</string>
@@ -2135,8 +2135,8 @@
           <string>org.apache.struts2.views.java.simple.RadioHandler</string>
           <string>org.apache.struts2.views.java.DefaultTagHandlerFactory</string>
           <string>org.apache.struts2.views.java.TagSerializer</string>
-          <string>org.apache.struts2.views.java.simple.FieldErrorHandler</string>
           <string>org.apache.struts2.views.java.simple.AbstractTagHandler</string>
+          <string>org.apache.struts2.views.java.simple.FieldErrorHandler</string>
           <string>org.apache.struts2.views.java.simple.TextAreaHandler</string>
           <string>java.util.Iterator</string>
           <string>org.apache.struts2.views.java.simple.HeadHandler</string>
@@ -2151,8 +2151,8 @@
       <edu.usc.softarch.arcade.facts.ConcernCluster>
         <name>org.apache.struts2.views.freemarker.ss</name>
         <entities>
-          <string>org.apache.struts2.views.freemarker.FreemarkerThemeTemplateLoader</string>
           <string>freemarker.template.utility.StringUtil</string>
+          <string>org.apache.struts2.views.freemarker.FreemarkerThemeTemplateLoader</string>
           <string>freemarker.ext.beans.BeansWrapper</string>
           <string>freemarker.template.TemplateCollectionModel</string>
           <string>org.apache.struts2.views.JspSupportServlet</string>
@@ -2204,8 +2204,8 @@
         <name>org.apache.struts2.views.jasperreports.ss</name>
         <entities>
           <string>net.sf.jasperreports.engine.export.JRPdfExporter</string>
-          <string>org.apache.struts2.views.jasperreports.ValueStackDataSource</string>
           <string>net.sf.jasperreports.engine.JRField</string>
+          <string>org.apache.struts2.views.jasperreports.ValueStackDataSource</string>
           <string>net.sf.jasperreports.engine.JasperCompileManager</string>
           <string>net.sf.jasperreports.engine.JasperReport</string>
           <string>java.sql.Connection</string>
@@ -2214,8 +2214,8 @@
           <string>org.apache.struts2.views.jasperreports.CompileReport</string>
           <string>net.sf.jasperreports.engine.JRRewindableDataSource</string>
           <string>net.sf.jasperreports.engine.JRDataSource</string>
-          <string>net.sf.jasperreports.engine.export.JRRtfExporter</string>
           <string>net.sf.jasperreports.engine.JRExporterParameter</string>
+          <string>net.sf.jasperreports.engine.export.JRRtfExporter</string>
           <string>net.sf.jasperreports.engine.export.JRHtmlExporterParameter</string>
           <string>net.sf.jasperreports.engine.util.JRLoader</string>
           <string>org.apache.struts2.views.jasperreports.JasperReportConstants</string>
@@ -2414,8 +2414,8 @@
           <string>java.net.URLEncoder</string>
           <string>org.apache.struts2.util.RegexPatternMatcher</string>
           <string>java.nio.charset.CharsetEncoder</string>
-          <string>org.apache.struts2.util.PrefixTrie</string>
           <string>com.opensymphony.xwork2.conversion.impl.DefaultTypeConverter</string>
+          <string>org.apache.struts2.util.PrefixTrie</string>
           <string>javax.servlet.http.HttpServletResponseWrapper</string>
           <string>org.apache.struts2.views.util.UrlHelper</string>
           <string>org.apache.struts2.util.StrutsUtil</string>
@@ -2435,8 +2435,8 @@
           <string>org.apache.struts2.portlet.result.PortletResultHelper</string>
           <string>org.apache.struts2.portlet.result.PortletResultHelperJSR168</string>
           <string>javax.portlet.PortletMode</string>
-          <string>javax.portlet.PortletModeException</string>
           <string>org.apache.struts2.portlet.result.PortletResult</string>
+          <string>javax.portlet.PortletModeException</string>
           <string>javax.portlet.PortletException</string>
           <string>org.apache.struts2.portlet.result.PortletResultHelperJSR286</string>
         </entities>

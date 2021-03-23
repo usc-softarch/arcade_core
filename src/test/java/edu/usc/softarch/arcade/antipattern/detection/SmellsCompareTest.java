@@ -23,7 +23,6 @@ public class SmellsCompareTest{
 		directory.mkdirs();
 	}
 
-
 	@ParameterizedTest
 	@CsvSource({
 		/** Test parameters **/
@@ -33,19 +32,33 @@ public class SmellsCompareTest{
 		// [output path for clusters file]
 		// [desired result ser filename]
 
-		// // struts 2.3.30
-		// ".///src///test///resources///ACDCTest_resources///struts-2.3.30_acdc_smells.ser,"
-		// + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf,"
-		// + ".///target///test_results///SmellsCompareTest,"
-		// + ".///target///test_results///SmellsCompareTest///struts-2.3.30_acdc_clusters.rsf,"
-		// + "struts-2.3.30_acdc_smells.ser",
+		// struts 2.3.30
+		".///src///test///resources///SmellsCompareTest///struts-2.3.30_acdc_smells.ser,"
+		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf,"
+		+ ".///target///test_results///SmellsCompareTest,"
+		+ ".///target///test_results///SmellsCompareTest///struts-2.3.30_acdc_clusters.rsf,"
+		+ "struts-2.3.30_acdc_smells.ser",
+
+		// struts-2.5.2
+		".///src///test///resources///SmellsCompareTest_resources///struts-2.5.2_acdc_smells.ser,"
+		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf,"
+		+ ".///target///test_results///SmellsCompareTest,"
+		+ ".///target///test_results///SmellsCompareTest///struts-2.5.2_acdc_clusters.rsf,"
+		+ "struts-2.5.2_acdc_smells.ser",
 
 		// httpd 2.3.8
-		".///src///test///resources///ACDCTest_resources///httpd-2.3.8_acdc_smells.ser,"
+		".///src///test///resources///SmellsCompareTest///httpd-2.3.8_acdc_smells.ser,"
 		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.3.8_deps.rsf,"
 		+ ".///target///test_results///SmellsCompareTest,"
 		+ ".///target///test_results///SmellsCompareTest///httpd-2.3.8_acdc_clusters.rsf,"
 		+ "httpd-2.3.8_acdc_smells.ser",
+
+		// httpd-2.4.26
+		".///src///test///resources///SmellsCompareTest///httpd-2.4.26_acdc_smells.ser,"
+		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.4.26_deps.rsf,"
+		+ ".///target///test_results///SmellsCompareTest,"
+		+ ".///target///test_results///SmellsCompareTest///httpd-2.4.26_acdc_clusters.rsf,"
+		+ "httpd-2.4.26_acdc_smells.ser",
 	})
 	public void withoutConcernsTest(String oracle, String deps, String output, String clusters, String ser){    
 		String oraclePath = oracle.replace("///", File.separator);  
@@ -71,11 +84,64 @@ public class SmellsCompareTest{
 		assertTrue(OracleAbs.containsAll(TargetAbs));
 	}
 
-	// @ParameterizedTest
-	// @CsvSource({
-	// 	// parameters for input files here
-	// })
-	// public void withConcernsTest(){
+	@ParameterizedTest
+	@CsvSource({
+		/** Test parameters **/
+		// [path to oracle]
+		// [path to deps rsf]
+		// [output directory]
+		// [output path for clusters file]
+		// [desired result ser filename]
+// TODO: FIX THESE, ADD ORACLE FILES TO src/test/resources
+		// // struts 2.3.30
+		// ".///src///test///resources///SmellsCompareTest///struts-2.3.30_acdc_smells.ser,"
+		// + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf,"
+		// + ".///target///test_results///SmellsCompareTest,"
+		// + ".///target///test_results///SmellsCompareTest///struts-2.3.30_acdc_clusters.rsf,"
+		// + "struts-2.3.30_acdc_smells.ser",
 
-	// }
+		// // struts-2.5.2
+		// ".///src///test///resources///SmellsCompareTest_resources///struts-2.5.2_acdc_smells.ser,"
+		// + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf,"
+		// + ".///target///test_results///SmellsCompareTest,"
+		// + ".///target///test_results///SmellsCompareTest///struts-2.5.2_acdc_clusters.rsf,"
+		// + "struts-2.5.2_acdc_smells.ser",
+
+		// // httpd 2.3.8
+		// ".///src///test///resources///SmellsCompareTest///httpd-2.3.8_acdc_smells.ser,"
+		// + ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.3.8_deps.rsf,"
+		// + ".///target///test_results///SmellsCompareTest,"
+		// + ".///target///test_results///SmellsCompareTest///httpd-2.3.8_acdc_clusters.rsf,"
+		// + "httpd-2.3.8_acdc_smells.ser",
+
+		// // httpd-2.4.26
+		// ".///src///test///resources///SmellsCompareTest///httpd-2.4.26_acdc_smells.ser,"
+		// + ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.4.26_deps.rsf,"
+		// + ".///target///test_results///SmellsCompareTest,"
+		// + ".///target///test_results///SmellsCompareTest///httpd-2.4.26_acdc_clusters.rsf,"
+		// + "httpd-2.4.26_acdc_smells.ser",
+	})
+	public void withConcernsTest(String oracle, String deps, String output, String clusters, String ser){    
+		String oraclePath = oracle.replace("///", File.separator);  
+		String depsPath = deps.replace("///", File.separator);
+		String outputPath = output.replace("///", File.separator);
+		String outputClustersPath = clusters.replace ("///", File.separator);
+		
+		ACDC.run(depsPath, outputClustersPath);
+		String resultSerFilename = outputPath + File.separator + ser;
+		ArchSmellDetector asd = new ArchSmellDetector(depsPath, outputClustersPath, resultSerFilename);
+		
+		assertDoesNotThrow(() -> asd.run(true, true, true)); 
+		SmellCollection oracleSmells = assertDoesNotThrow(() -> {
+			return new SmellCollection(oraclePath);
+		});
+		SmellCollection resultSmells = assertDoesNotThrow(() -> {
+			return new SmellCollection(resultSerFilename);
+		});
+
+		AbstractCollection<Smell> OracleAbs = (AbstractCollection<Smell>)oracleSmells;
+		AbstractCollection<Smell> TargetAbs = (AbstractCollection<Smell>)resultSmells;
+
+		assertTrue(OracleAbs.containsAll(TargetAbs));
+	}
 }
