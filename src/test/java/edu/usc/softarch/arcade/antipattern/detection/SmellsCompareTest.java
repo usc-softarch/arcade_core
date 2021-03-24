@@ -37,26 +37,26 @@ public class SmellsCompareTest{
 		+ ".///target///test_results///SmellsCompareTest///struts-2.3.30_acdc_clusters.rsf,"
 		+ "struts-2.3.30_acdc_smells.ser",
 
-		// // struts-2.5.2
-		// ".///src///test///resources///SmellsCompareTest_resources///struts-2.5.2_acdc_smells.ser,"
-		// + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf,"
-		// + ".///target///test_results///SmellsCompareTest,"
-		// + ".///target///test_results///SmellsCompareTest///struts-2.5.2_acdc_clusters.rsf,"
-		// + "struts-2.5.2_acdc_smells.ser",
+		// struts 2.5.2
+		".///src///test///resources///SmellsCompareTest_resources///edited_struts-2.5.2_acdc_smells.ser,"
+		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf,"
+		+ ".///target///test_results///SmellsCompareTest,"
+		+ ".///target///test_results///SmellsCompareTest///struts-2.5.2_acdc_clusters.rsf,"
+		+ "struts-2.5.2_acdc_smells.ser",
 
-		// // httpd 2.3.8
-		// ".///src///test///resources///SmellsCompareTest_resources///edited_httpd-2.3.8_acdc_smells.ser,"
-		// + ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.3.8_deps.rsf,"
-		// + ".///target///test_results///SmellsCompareTest,"
-		// + ".///target///test_results///SmellsCompareTest///httpd-2.3.8_acdc_clusters.rsf,"
-		// + "httpd-2.3.8_acdc_smells.ser",
+		// httpd 2.3.8
+		".///src///test///resources///SmellsCompareTest_resources///edited_httpd-2.3.8_acdc_smells.ser,"
+		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.3.8_deps.rsf,"
+		+ ".///target///test_results///SmellsCompareTest,"
+		+ ".///target///test_results///SmellsCompareTest///httpd-2.3.8_acdc_clusters.rsf,"
+		+ "httpd-2.3.8_acdc_smells.ser",
 
-		// // httpd-2.4.26
-		// ".///src///test///resources///SmellsCompareTest_resources///httpd-2.4.26_acdc_smells.ser,"
-		// + ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.4.26_deps.rsf,"
-		// + ".///target///test_results///SmellsCompareTest,"
-		// + ".///target///test_results///SmellsCompareTest///httpd-2.4.26_acdc_clusters.rsf,"
-		// + "httpd-2.4.26_acdc_smells.ser",
+		// httpd 2.4.26
+		".///src///test///resources///SmellsCompareTest_resources///edited_httpd-2.4.26_acdc_smells.ser,"
+		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.4.26_deps.rsf,"
+		+ ".///target///test_results///SmellsCompareTest,"
+		+ ".///target///test_results///SmellsCompareTest///httpd-2.4.26_acdc_clusters.rsf,"
+		+ "httpd-2.4.26_acdc_smells.ser",
 	})
 	public void withoutConcernsTest(String oracle, String deps, String output, String clusters, String ser){    
 		/** Run smell analyzer without concerns (ACDC) **/
