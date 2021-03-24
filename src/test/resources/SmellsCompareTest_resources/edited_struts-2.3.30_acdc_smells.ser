@@ -2678,7 +2678,7 @@
      <int>16</int>
      <float>0.75</float>
      <int>1</int>
-          <edu.usc.softarch.arcade.facts.ConcernCluster reference="../../../../edu.usc.softarch.arcade.antipattern.Smell/clusters/set/edu.usc.softarch.arcade.facts.ConcernCluster[2]"/>
+          <edu.usc.softarch.arcade.facts.ConcernCluster reference="../../../../edu.usc.softarch.arcade.antipattern.Smell[1]/clusters/set/edu.usc.softarch.arcade.facts.ConcernCluster[2]"/>
      </set>
      </clusters>
      <smellType>buo</smellType>
