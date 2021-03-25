@@ -20,22 +20,22 @@ public class BatchClusteringEngineTest {
         // [dir with single system version], 
         // [system language], 
         // [test file output dir name], (IMPORTANT: should also contain output.pipe and infer.mallet files)
-        // [path from dir with system version to its binaries], 
+        // [subject system binaries location], 
         // [path to oracle file], 
         // [expected clusters file name]
 
         // struts 2.3.30
-        ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.3.30,"
+        ".///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.3.30,"
         + "java,"
-        + ".///target///test_results///BatchClusteringEngineTest///struts-2.3.30,"
+        + ".///target///test_results///BatchClusteringEngineTest,"
         + "lib_struts,"
         + ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_239_topics_234_arc_clusters.rsf,"
         + "struts-2.3.30_239_topics_234_arc_clusters.rsf",
 
         // // struts 2.5.2
-        // ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.5.2,"
+        // ".///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.5.2,"
         // + "java,"
-        // + ".///target///test_results///BatchClusteringEngineTest///struts-2.5.2,"
+        // + ".///target///test_results///BatchClusteringEngineTest,"
         // + "lib_struts,"
         // + ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_284_topics_275_arc_clusters.rsf,"
         // + "struts-2.5.2_284_topics_275_arc_clusters.rsf",
@@ -43,18 +43,18 @@ public class BatchClusteringEngineTest {
         // // httpd 2.3.8
         // ".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.3.8,"
         // + "c,"
-        // + ".///target///test_results///BatchClusteringEngineTest///httpd-2.3.8,"
+        // + ".///target///test_results///BatchClusteringEngineTest,"
         // + "/,"
-        // + ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_46_topics_0_arc_clusters.rsf,"
-        // + "httpd-2.3.8_46_topics_0_arc_clusters.rsf",
+        // + ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_46_topics_71_arc_clusters.rsf,"
+        // + "httpd-2.3.8_46_topics_71_arc_clusters.rsf",
 
         // // httpd 2.4.26
         // ".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.4.26,"
         // + "c,"
-        // + ".///target///test_results///BatchClusteringEngineTest///httpd-2.4.26,"
+        // + ".///target///test_results///BatchClusteringEngineTest,"
         // + "/,"
-        // + ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_50_topics_0_arc_clusters.rsf,"
-        // + "httpd-2.4.26_50_topics_0_arc_clusters.rsf"
+        // + ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_50_topics_82_arc_clusters.rsf,"
+        // + "httpd-2.4.26_50_topics_82_arc_clusters.rsf"
     })
     public void singleTest(String sysVersionDir, String lang, String testOutputDir, String classesDir, String oraclePath, String arcFilename){
         /** Tests recovery for a single version of a system **/
