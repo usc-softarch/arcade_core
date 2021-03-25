@@ -175,7 +175,10 @@ public class DocTopics {
 				if (strippedSource.contains(nameWithoutQuotations))
 					return dti;
 			} else if (dti.isCSourced()) {
-				if (dti.getSource().endsWith(nameWithoutQuotations))
+				//FIXME Make sure this works on Linux and find a permanent fix
+				strippedSource = dti.getSource().substring(1, dti.getSource().length());
+				strippedSource = strippedSource.replace("\\\\", "/");
+				if (strippedSource.endsWith(nameWithoutQuotations))
 					return dti;
 			}
 			else if (dti.getSource().endsWith(".S")) {
