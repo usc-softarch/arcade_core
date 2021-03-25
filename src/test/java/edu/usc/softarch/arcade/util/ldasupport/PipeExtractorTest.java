@@ -40,12 +40,12 @@ public class PipeExtractorTest {
 		// [system language]
 
 		// struts 2.3.30
-		"///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30,"
+		"///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.3.30,"
 		+ "///target///test_results///PipeExtractorTest///struts-2.3.30,"
 		+ "///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.3.30///output.pipe,"
 		+ "java",
 		// // struts 2.5.2
-		// "///src///test///resources///PipeExtractorTest_resources///src///struts-2.5.2,"
+		// "///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.5.2,"
 		// + "///target///test_results///PipeExtractorTest///struts-2.5.2,"
 		// + "///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.5.2///output.pipe,"
 		// + "java",

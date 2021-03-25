@@ -37,14 +37,14 @@ public class ConcernClusteringRunnerTest {
 		// ... (TBD)
 
 		// struts 2.3.30
-		".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
+		".///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
 		+ ".///src///test///resources///mallet_resources///struts-2.3.30,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "struts-2.3.30,"
 		+ "java",
 
 		// // struts 2.5.2
-		// ".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
+		// ".///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
 		// + ".///src///test///resources///mallet_resources///struts-2.3.30,"
 		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		// + "struts-2.5.2,"
