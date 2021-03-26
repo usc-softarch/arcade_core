@@ -34,31 +34,31 @@ public class PipeExtractorTest {
 	@ParameterizedTest
 	@CsvSource({
 		// Test parameters: 
-		// [path to system version], 
+		// [path to system version src files], 
 		// [desired output path], 
 		// [path to oracle pipe file],
 		// [system language]
 
 		// struts 2.3.30
 		"///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.3.30,"
-		+ "///target///test_results///PipeExtractorTest///struts-2.3.30,"
+		+ "///target///test_results///BatchClusteringEngineTest///struts-2.3.30///base,"
 		+ "///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.3.30///output.pipe,"
 		+ "java",
-		// // struts 2.5.2
-		// "///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.5.2,"
-		// + "///target///test_results///PipeExtractorTest///struts-2.5.2,"
-		// + "///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.5.2///output.pipe,"
-		// + "java",
-		// // httpd 2.3.8
-		// "///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.3.8,"
-		// + "///target///test_results///PipeExtractorTest///httpd-2.3.8,"
-		// + "///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.3.8///output.pipe,"
-		// + "c",
-		// // httpd 2.4.26
-		// "///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.4.26,"
-		// + "///target///test_results///PipeExtractorTest///httpd-2.4.26,"
-		// + "///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.4.26///output.pipe,"
-		// + "c",
+		// struts 2.5.2
+		"///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.5.2,"
+		+ "///target///test_results///BatchClusteringEngineTest///struts-2.5.2///base,"
+		+ "///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.5.2///output.pipe,"
+		+ "java",
+		// httpd 2.3.8
+		"///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.3.8,"
+		+ "///target///test_results///BatchClusteringEngineTest///httpd-2.3.8///base,"
+		+ "///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.3.8///output.pipe,"
+		+ "c",
+		// httpd 2.4.26
+		"///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.4.26,"
+		+ "///target///test_results///BatchClusteringEngineTest///httpd-2.4.26///base,"
+		+ "///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.4.26///output.pipe,"
+		+ "c",
 	})
 	public void mainTest(String versionDir, String outputDir, String oracleFile, String language){
 		/** Integration test for PipeExtractor **/
@@ -67,6 +67,7 @@ public class PipeExtractorTest {
 		// Path to oracle pipe file
 		String oraclePath = pwd + oracleFile.replace("///", File.separator);
 		(new File(resultDir)).mkdirs();
+		
 		// Call PipeExtractor.main() 
 		// (arguments: sys version dir, output dir, selected language)
 		assertDoesNotThrow( () -> {
@@ -87,11 +88,9 @@ public class PipeExtractorTest {
 			oracle.add(i);
 		}
 
-		System.out.println("Oracle size: " + oracle.size());
-		System.out.println("Result size: " + result.size());
 		// Compare sets of instances
 		assertEquals(oracle.size(), result.size()); // passes - same size
-		// assertTrue(oracle.equals(result)); // fails - comparing sets of instances doesn't work
+		assertTrue(oracle.equals(result)); // fails - comparing sets of instances doesn't work?
 	}
 
 	@AfterEach

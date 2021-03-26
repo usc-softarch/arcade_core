@@ -23,9 +23,6 @@ import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 
 public class ConcernClusteringRunnerTest {
 	ConcernClusteringRunner runner;
-	// members to check: 
-		// public static FastClusterArchitecture fastClusters;
-		// protected static FastFeatureVectors fastFeatureVectors;
 	@ParameterizedTest
 	@CsvSource({
 		/*** Test parameters: ***/ 
@@ -34,7 +31,6 @@ public class ConcernClusteringRunnerTest {
 		// [path to serialized objects (resources directory)],
 		// [system version]
 		// [system language]
-		// ... (TBD)
 
 		// struts 2.3.30
 		".///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
@@ -43,31 +39,30 @@ public class ConcernClusteringRunnerTest {
 		+ "struts-2.3.30,"
 		+ "java",
 
-		// // struts 2.5.2
-		// ".///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
-		// + ".///src///test///resources///mallet_resources///struts-2.3.30,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		// + "struts-2.5.2,"
-		// + "java",
+		// struts 2.5.2
+		".///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
+		+ ".///src///test///resources///mallet_resources///struts-2.3.30,"
+		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
+		+ "struts-2.5.2,"
+		+ "java",
 
-		// // httpd-2.3.8
-		// ".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.3.8,"
-		// + ".///src///test///resources///mallet_resources///httpd-2.3.8,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		// + "httpd-2.3.8,"
-		// + "c",
+		// httpd-2.3.8
+		".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.3.8,"
+		+ ".///src///test///resources///mallet_resources///httpd-2.3.8,"
+		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
+		+ "httpd-2.3.8,"
+		+ "c",
 
-		// // httpd-2.4.26
-		// ".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.4.26,"
-		// + ".///src///test///resources///mallet_resources///httpd-2.4.26,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		// + "httpd-2.4.26,"
-		// + "c",
+		// httpd-2.4.26
+		".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.4.26,"
+		+ ".///src///test///resources///mallet_resources///httpd-2.4.26,"
+		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
+		+ "httpd-2.4.26,"
+		+ "c",
 	})
 	public void initDataStructuresTest(String srcDir, String outDir, String resDir, String versionName, String language){
 		/* Checks that ConcernClusteringRunner.fastFeatureVectors is not null after the ConcernClusteringRunner constructor call */
 		/* Checks that ConcernClusteringRunner.fastClusters is modified in the ConcernClusteringRunner constructor */
-		// TODO: clean up the try/catch statements
 		char fs = File.separatorChar;
 		String outputPath = "." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest";
 		(new File(outputPath)).mkdirs();
@@ -149,31 +144,30 @@ public class ConcernClusteringRunnerTest {
 		// [path to serialized objects (resources directory)],
 		// [system version]
 		// [system language]
-		// ... (TBD)
 
 		// struts 2.3.30
-		".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
+		".///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
 		+ ".///src///test///resources///mallet_resources///struts-2.3.30,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "struts-2.3.30,"
 		+ "java",
 
 		// // struts 2.5.2
-		// ".///src///test///resources///PipeExtractorTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
+		// ".///src///test///resources///BatchClusteringEngineTest_resources///src///struts-2.3.30," // PLACE SRC FILES HERE
 		// + ".///src///test///resources///mallet_resources///struts-2.3.30,"
 		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		// + "struts-2.5.2,"
 		// + "java",
 
 		// // httpd-2.3.8
-		// ".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.3.8,"
+		// ".///src///test///resources///BatchClusteringEngineTest_resources///src///httpd-2.3.8,"
 		// + ".///src///test///resources///mallet_resources///httpd-2.3.8,"
 		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		// + "httpd-2.3.8,"
 		// + "c",
 
 		// // httpd-2.4.26
-		// ".///src///test///resources///CSourceToDepsBuilderTest_resources///src///httpd-2.4.26,"
+		// ".///src///test///resources///BatchClusteringEngineTest_resources///src///httpd-2.4.26,"
 		// + ".///src///test///resources///mallet_resources///httpd-2.4.26,"
 		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		// + "httpd-2.4.26,"

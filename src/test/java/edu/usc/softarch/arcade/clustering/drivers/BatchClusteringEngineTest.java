@@ -92,8 +92,8 @@ public class BatchClusteringEngineTest {
 		/*** Test parameters: ***/
 		// [dir with single system version], 
 		// [system language], 
-		// [test file output dir name], (IMPORTANT: should also contain base/output.pipe and base/infer.mallet)
-		// [subject system binaries location], 
+		// [test file output dir name], (IMPORTANT: must also contain base/output.pipe and base/infer.mallet)
+		// [system binaries location], 
 		// [path to oracle file], 
 		// [expected clusters file name]
 
