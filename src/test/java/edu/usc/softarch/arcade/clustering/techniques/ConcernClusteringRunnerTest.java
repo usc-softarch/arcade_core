@@ -151,26 +151,26 @@ public class ConcernClusteringRunnerTest {
 		+ "struts-2.3.30,"
 		+ "java",
 
-		// // struts 2.5.2
-		// ".///subject_systems///src///Struts2///struts-2.5.2,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.5.2,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		// + "struts-2.5.2,"
-		// + "java",
+		// struts 2.5.2
+		".///subject_systems///src///Struts2///struts-2.5.2,"
+		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.5.2,"
+		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
+		+ "struts-2.5.2,"
+		+ "java",
 
-		// // httpd-2.3.8
-		// ".///subject_systems///src///httpd///httpd-2.3.8,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.3.8,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		// + "httpd-2.3.8,"
-		// + "c",
+		// httpd-2.3.8
+		".///subject_systems///src///httpd///httpd-2.3.8,"
+		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.3.8,"
+		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
+		+ "httpd-2.3.8,"
+		+ "c",
 
-		// // httpd-2.4.26
-		// ".///subject_systems///src///httpd///httpd-2.4.26,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.4.26,"
-		// + ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		// + "httpd-2.4.26,"
-		// + "c",
+		// httpd-2.4.26
+		".///subject_systems///src///httpd///httpd-2.4.26,"
+		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.4.26,"
+		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
+		+ "httpd-2.4.26,"
+		+ "c",
 	})
 	public void computeClustersWithConcernsAndFastClustersTest(String srcDir, String outDir, String resDir, String versionName, String language){
 		// This function modifies fastClusters in its call to updateFastClustersAndSimMatrixToReflectMergedCluster()
