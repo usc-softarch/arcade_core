@@ -33,10 +33,10 @@ public class JavaSourceToDepsBuilderTest {
 		".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.3.30///lib_struts,"
 		+ ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.3.30_buildTestResult.rsf,"
 		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf",
-		// // struts2 (2.5.2)
-		// ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.5.2///lib_struts,"
-		// + ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.5.2_buildTestResult.rsf,"
-		// + ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf",
+		// struts2 (2.5.2)
+		".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.5.2///lib_struts,"
+		+ ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.5.2_buildTestResult.rsf,"
+		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf",
 	})
 	public void buildTest(String classesDirPath, String depsRsfFilename, String oraclePath){
 		/** Builds the dependencies RSF file for Java system **/
@@ -54,8 +54,7 @@ public class JavaSourceToDepsBuilderTest {
 		String oracleResult = assertDoesNotThrow(() ->
 			{ return FileUtil.readFile(oracle, StandardCharsets.UTF_8); });
 
-		// Use RsfCompare.compareTo to compare file contents
-				// returns 0 if files have the same contents
+		// Use RsfCompare.equals to compare file contents
 		RsfCompare resultRsf = new RsfCompare(result);
 		RsfCompare oracleRsf = new RsfCompare(oracleResult);
 		assertTrue(oracleRsf.equals(resultRsf));
