@@ -144,8 +144,9 @@ public class ArchSmellDetectorTest {
     try{
       ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterObjectFileBefore));
       ConcernClusterArchitecture oracle_clusters2 = (ConcernClusterArchitecture) ois.readObject();
+      
       assertTrue(clusters.equals(oracle_clusters2));
-      // TODO: check if the ConcernClusterArchitecture object is empty?
+      
       ois.close();
     } catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -155,7 +156,7 @@ public class ArchSmellDetectorTest {
 
     asd.runConcernDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
 
-    // check that the data structures are not empty after running runConcernDetectionAlgs
+    //check that the data structures are not empty after running runConcernDetectionAlgs
     assertAll(
         () -> assertTrue(clusters.size() > 0),
         () -> assertTrue(detectedSmells.size() > 0),
