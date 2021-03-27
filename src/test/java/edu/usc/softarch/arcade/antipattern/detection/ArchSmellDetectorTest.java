@@ -113,7 +113,7 @@ public class ArchSmellDetectorTest {
   })
   @ParameterizedTest
   public void runStructuralDetectionAlgsTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
-                                             String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile){
+                                             String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile, String version){
     String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
 
     resources_dir = resources_dir.replace("///", File.separator);
