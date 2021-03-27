@@ -7,10 +7,10 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="log4j.test.Log4jTest" level="debug">
+        <Logger name="log4j.test.Log4jTest" level="info">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Root level="debug">
+        <Root level="info">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>

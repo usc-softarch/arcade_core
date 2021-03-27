@@ -29,10 +29,6 @@ public class JavaSourceToDepsBuilderTest {
 		// [directory in which to place result rsf], 
 		// [oracle rsf file location]
 
-		// Old ARCADE
-		".///src///test///resources///JavaSourceToDepsBuilderTest_resources_old///arcade_old_binaries,"
-		+ ".///target///test_results///JavaSourceToDepsBuilderTest///arcade_buildTestResult.rsf," 
-		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources_old///arcade_old_deps_oracle.rsf",
 		// struts2 (2.3.30)
 		".///src///test///resources///JavaSourceToDepsBuilderTest_resources///binaries///struts-2.3.30///lib_struts,"
 		+ ".///target///test_results///JavaSourceToDepsBuilderTest///struts-2.3.30_buildTestResult.rsf,"
@@ -58,8 +54,7 @@ public class JavaSourceToDepsBuilderTest {
 		String oracleResult = assertDoesNotThrow(() ->
 			{ return FileUtil.readFile(oracle, StandardCharsets.UTF_8); });
 
-		// Use RsfCompare.compareTo to compare file contents
-				// returns 0 if files have the same contents
+		// Use RsfCompare.equals to compare file contents
 		RsfCompare resultRsf = new RsfCompare(result);
 		RsfCompare oracleRsf = new RsfCompare(oracleResult);
 		assertTrue(oracleRsf.equals(resultRsf));

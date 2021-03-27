@@ -1,5 +1,10 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +55,54 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		this.language = language;
 		setFastFeatureVectors(vecs);
 		initializeClusters(srcDir, language); // Initially, every node gets a cluster
-		initializeDocTopicsForEachFastCluster(srcDir, artifactsDir);	
+		// /*** BEGIN SERIALIZATION CODE ***/
+		// char fs = File.separatorChar;
+		// // Serialize fastClusters before initializeDocTopicsForEachFastCluster() call (wherein every node gets a cluster)
+		// ObjectOutputStream oosfastClusters;
+		// try {
+		// 	oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ds_serialized" + fs + 
+		// 	"struts-2.3.30_fastClusters_before_init.txt"));
+		// 	oosfastClusters.writeObject(fastClusters);
+		// 	oosfastClusters.close();
+		// } catch (FileNotFoundException e) {
+		// 	e.printStackTrace();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
+		// /*** END SERIALIZATION CODE ***/
+
+		initializeDocTopicsForEachFastCluster(srcDir, artifactsDir);
+		
+		// /*** BEGIN SERIALIZATION CODE ***/
+		// // Serialize fastFeatureVectors
+		// ObjectOutputStream oosfastFeatureVectors;
+		// try {
+		// 	oosfastFeatureVectors = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ds_serialized" + fs + 
+		// 	"struts-2.3.30_fastFeatureVectors_init.txt"));
+		// 	oosfastFeatureVectors.writeObject(fastFeatureVectors);
+		// 	oosfastFeatureVectors.close();
+		// } catch (FileNotFoundException e) {
+		// 	e.printStackTrace();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
+		// // Serialize fastClusters after initializeDocTopicsForEachFastCluster() call
+		// try {
+		// 	oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ds_serialized" + fs + 
+		// 	"struts-2.3.30_fastClusters_after_init.txt"));
+		// 	oosfastClusters.writeObject(fastClusters);
+		// 	oosfastClusters.close();
+		// } catch (FileNotFoundException e) {
+		// 	e.printStackTrace();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
+		// /*** END SERIALIZATION CODE ***/
+
+
 	}
 	
 	public void computeClustersWithConcernsAndFastClusters(
@@ -62,18 +114,35 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			fastClusters.createSimilarityMatrixUsingJSDivergence(simMeasure);
 
 		while (stoppingCriterion.notReadyToStop()) {
-			if (stopCriterion.equalsIgnoreCase("clustergain")) {
+			if (stopCriterion.equalsIgnoreCase("clustergain")) { //? is this function ever called with stopCriterion = "clustergain"
 				double clusterGain = fastClusters.computeClusterGainUsingTopics();
-				checkAndUpdateClusterGain(clusterGain);
+				checkAndUpdateClusterGain(clusterGain); // does this function affect the fastClusters? NO
 			}
 
 			MaxSimData data  = identifyMostSimClusters(simMatrix);
 			printDataForTwoMostSimilarClustersWithTopicsForConcerns(data);
 			FastCluster newCluster = mergeFastClustersUsingTopics(data);
-			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix, simMeasure);
+			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix, simMeasure); // fastClusters updated here
 
 			logger.debug("after merge, clusters size: " + fastClusters.size());
 		}
+
+		// /*** BEGIN SERIALIZATION CODE ***/
+		// // Serialize fastClusters after updateFastClustersAndSimMatrixToReflectMergedCluster() call (wherein 2 clusters are removed and one is added)
+		// char fs = File.separatorChar;
+		// ObjectOutputStream oosfastClusters;
+		// try {
+		// 	oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ds_serialized" + fs + 
+		// 	"struts-2.3.30_fastClusters_after_compute.txt"));
+		// 	oosfastClusters.writeObject(fastClusters);
+		// 	oosfastClusters.close();
+		// } catch (FileNotFoundException e) {
+		// 	e.printStackTrace();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
+		// /*** END SERIALIZATION CODE ***/
 
 		loopSummaryStopwatch.stop();
 		logger.debug("Time in milliseconds to compute clusters: "
@@ -167,7 +236,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				}
 			}
 		}
-		
+
 		fastClusters.removeAll(excessClusters);
 		fastClusters.removeAll(excessInners);
 

@@ -25,10 +25,6 @@ public class ACDCTest {
 
 	@ParameterizedTest
 	@CsvSource({
-		// Old ARCADE
-		".///src///test///resources///JavaSourceToDepsBuilderTest_resources_old///arcade_old_deps_oracle.rsf,"
-		+ ".///target///test_results///ACDCTest///arcade_mainTestResult.rsf,"
-		+ ".///src///test///resources///ACDCTest_resources_old///arcade_old_cluster_oracle.rsf",
 		// struts 2.3.30
 		".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf,"
 		+ ".///target///test_results///ACDCTest///struts2.3.30_mainTestResult.rsf,"
@@ -65,7 +61,6 @@ public class ACDCTest {
 		});
 
 		// Use RsfCompare.compareTo to compare file contents
-				// returns 0 if files have the same contents
 		RsfCompare resultRsf = new RsfCompare(result);
 		RsfCompare oracleRsf = new RsfCompare(oracleResult);
 		assertTrue(oracleRsf.equals(resultRsf));

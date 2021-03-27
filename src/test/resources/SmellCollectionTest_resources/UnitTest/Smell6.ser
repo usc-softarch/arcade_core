@@ -1,0 +1,28 @@
+<edu.usc.softarch.arcade.antipattern.SmellCollection serialization="custom">
+  <unserializable-parents/>
+  <set>
+    <default/>
+    <int>16</int>
+    <float>0.75</float>
+    <int>1</int>
+    <edu.usc.softarch.arcade.antipattern.Smell>
+      <clusters serialization="custom">
+        <unserializable-parents/>
+        <set>
+          <default/>
+          <int>16</int>
+          <float>0.75</float>
+          <int>1</int>
+          <edu.usc.softarch.arcade.facts.ConcernCluster>
+            <name>NAMEOFCLUSTER</name>
+            <entities>
+              <string>NAMEOFENTITY</string>
+            </entities>
+          </edu.usc.softarch.arcade.facts.ConcernCluster>
+        </set>
+      </clusters>
+      <smellType>BDC</smellType>
+      <topicNum>-1</topicNum>
+    </edu.usc.softarch.arcade.antipattern.Smell>
+  </set>
+</edu.usc.softarch.arcade.antipattern.SmellCollection>
