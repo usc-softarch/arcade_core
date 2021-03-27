@@ -120,15 +120,15 @@ public class ArchSmellDetector {
 		/*
 		char fs = File.separatorChar;
 		ObjectOutputStream oosDSmells = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		+ fs +"ArchSmellDetector_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
+		+ fs +"ArchSmellDetectorTest_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
 		"struts-2.3.30_output_detectedSmells_before.txt"));
 
 		ObjectOutputStream oosClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		+ fs +"ArchSmellDetector_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
+		+ fs +"ArchSmellDetectorTest_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
 		"struts-2.3.30_output_clusters_before.txt"));
 
 		ObjectOutputStream oosCSM = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		+ fs +"ArchSmellDetector_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
+		+ fs +"ArchSmellDetectorTest_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
 		"struts-2.3.30_output_clusterSmellMap_before.txt"));
 
 		oosDSmells.writeObject(detectedSmells);
@@ -192,7 +192,7 @@ public class ArchSmellDetector {
 		/*
 		char fs = File.separatorChar;
 		try{
-			String resources_dir = "src///test///resources///ArchSmellDetector_resources///runConcernDetectionAlgs_resources///";
+			String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runConcernDetectionAlgs_resources///";
 			resources_dir = resources_dir.replace("///", File.separator);
 			
 			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_detectedSmells_after.txt"));
@@ -225,7 +225,7 @@ public class ArchSmellDetector {
 		//Added for testing
 		//Serialization for test oracles.
 		/*
-		String resources_dir = "src///test///resources///ArchSmellDetector_resources///runStructuralDetectionAlgs_resources///";
+		String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runStructuralDetectionAlgs_resources///";
       	resources_dir = resources_dir.replace("///", File.separator);
 		ObjectOutputStream oos;
 		try {
@@ -372,7 +372,7 @@ public class ArchSmellDetector {
 		ObjectOutputStream oosSMap;
 		try {
 			oosSMap = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-			+ fs +"ArchSmellDetector_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
+			+ fs +"ArchSmellDetectorTest_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
 			"struts-2.3.30_output_smellClusterMap_after.txt"));
 			oosSMap.writeObject(smellClustersMap);
 		} catch (FileNotFoundException e) {
