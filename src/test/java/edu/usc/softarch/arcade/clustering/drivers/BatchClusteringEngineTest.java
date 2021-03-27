@@ -73,8 +73,10 @@ public class BatchClusteringEngineTest {
 		String resultClustersFile = outputDirName + File.separator + arcFilename;
 
 		// The expectation here is that this resulting clusters file has the same name as the oracle clusters file
-		String result = assertDoesNotThrow(() -> { // should probably use a better assertion fail message....
-			return FileUtil.readFile(resultClustersFile, StandardCharsets.UTF_8); // Throws IOException if file does not exist
+		assertTrue(new File(resultClustersFile).exists());
+
+		String result = assertDoesNotThrow(() -> {
+			return FileUtil.readFile(resultClustersFile, StandardCharsets.UTF_8);
 		});
 
 		// Load oracle
@@ -98,7 +100,7 @@ public class BatchClusteringEngineTest {
 		// [expected clusters file name]
 
 		// struts 2.3.30
-		".///subject_systems///src///Struts2///struts-2.3.30,"
+		".///subject_systems///Struts2///src///struts-2.3.30,"
 		+ "java,"
 		+ ".///target///test_results///BatchClusteringEngineTest///struts-2.3.30,"
 		+ "lib_struts,"
@@ -106,7 +108,7 @@ public class BatchClusteringEngineTest {
 		+ "struts-2.3.30_arc_smells.ser",
 
 		// struts 2.5.2
-		".///subject_systems///src///Struts2///struts-2.5.2,"
+		".///subject_systems///Struts2///src///struts-2.5.2,"
 		+ "java,"
 		+ ".///target///test_results///BatchClusteringEngineTest///struts-2.5.2,"
 		+ "lib_struts,"
@@ -114,7 +116,7 @@ public class BatchClusteringEngineTest {
 		+ "struts-2.5.2_arc_smells.ser",
 
 		// httpd 2.3.8
-		".///subject_systems///src///httpd///httpd-2.3.8,"
+		".///subject_systems///httpd///src///httpd-2.3.8,"
 		+ "c,"
 		+ ".///target///test_results///BatchClusteringEngineTest////httpd-2.3.8,"
 		+ "/,"
@@ -122,7 +124,7 @@ public class BatchClusteringEngineTest {
 		+ "httpd-2.3.8_arc_smells.ser",
 
 		// httpd 2.4.26
-		".///subject_systems///src///httpd///httpd-2.4.26,"
+		".///subject_systems///httpd///src///httpd-2.4.26,"
 		+ "c,"
 		+ ".///target///test_results///BatchClusteringEngineTest///httpd-2.4.26,"
 		+ "/,"
