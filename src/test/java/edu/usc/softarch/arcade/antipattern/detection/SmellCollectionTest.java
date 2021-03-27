@@ -25,12 +25,13 @@ import edu.usc.softarch.arcade.clustering.drivers.AcdcWithSmellDetection;
 import fj.data.HashSet;
 
 public class SmellCollectionTest {
+    char fs = File.separatorChar;
     // part 1 Test on serialization
     
     @Test
     // Single buo 1
     public void smellCollectionTest_Unit_BUO1() {
-        String serFile = ".\\src\\test\\resources\\SmellTest_resources\\UnitTest\\Smell1.ser";
+        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell1.ser";
         
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
@@ -45,7 +46,7 @@ public class SmellCollectionTest {
     @Test
     // Single buo 2
     public void smellCollectionTest_Unit_BUO2() {
-        String serFile = ".\\src\\test\\resources\\SmellTest_resources\\UnitTest\\Smell2.ser";
+        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell2.ser";
         
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
@@ -60,7 +61,7 @@ public class SmellCollectionTest {
     @Test
     // multiple buo
     public void smellCollectionTest_Unit_BUO3() {
-        String serFile = ".\\src\\test\\resources\\SmellTest_resources\\UnitTest\\Smell3.ser";
+        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell3.ser";
         
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
@@ -75,7 +76,7 @@ public class SmellCollectionTest {
     @Test
     // Mix buo with spf
     public void smellCollectionTest_Unit_BUO4() {
-        String serFile = ".\\src\\test\\resources\\SmellTest_resources\\UnitTest\\Smell4.ser";
+        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell4.ser";
         
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
@@ -95,7 +96,7 @@ public class SmellCollectionTest {
     @Test
     // Single spf 1
     public void smellCollectionTest_Unit_SPF1() {
-        String serFile = ".\\src\\test\\resources\\SmellTest_resources\\UnitTest\\Smell5.ser";
+        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell5.ser";
         
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
@@ -110,7 +111,7 @@ public class SmellCollectionTest {
     @Test
     // Single spf 1
     public void smellCollectionTest_Unit_BDC1() {
-        String serFile = ".\\src\\test\\resources\\SmellTest_resources\\UnitTest\\Smell6.ser";
+        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell6.ser";
         
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
@@ -125,7 +126,7 @@ public class SmellCollectionTest {
     @Test
     // Single spf 1
     public void smellCollectionTest_Unit_BCO1() {
-        String serFile = ".\\src\\test\\resources\\SmellTest_resources\\UnitTest\\Smell7.ser";
+        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell7.ser";
         
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
@@ -140,7 +141,7 @@ public class SmellCollectionTest {
     @Test
     // pressure spf 1
     public void smellCollectionTest_Unit_BCO_Pressure() {
-        String serFile = ".\\src\\test\\resources\\SmellTest_resources\\UnitTest\\Smell8.ser";
+        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell8.ser";
         
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
@@ -155,7 +156,7 @@ public class SmellCollectionTest {
     @Test
     // all smell
     public void smellCollectionTest_Unit_allSmell() {
-        String serFile = ".\\src\\test\\resources\\SmellTest_resources\\UnitTest\\Smell9.ser";
+        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell9.ser";
         
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
@@ -188,7 +189,7 @@ public class SmellCollectionTest {
     @Test
     // all smell
     public void smellCollectionTest_Unit_allSmell2() {
-        String serFile = ".\\src\\test\\resources\\SmellTest_resources\\UnitTest\\Smell10.ser";
+        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell10.ser";
         
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
@@ -221,10 +222,10 @@ public class SmellCollectionTest {
 
     @ParameterizedTest
     @CsvSource({
-        ".\\src\\test\\resources\\SmellTest_resources\\struts-2.5.2_acdc_smells.ser" + ", " + ".\\src\\test\\resources\\SmellTest_resources\\serialized\\struts-2.5.2_acdc_smells_serialized.ser",
-        ".\\src\\test\\resources\\SmellTest_resources\\httpd-2.4.26_acdc_smells.ser" + ", " + ".\\src\\test\\resources\\SmellTest_resources\\serialized\\httpd-2.4.26_acdc_smells_serialized.ser",
-        ".\\src\\test\\resources\\SmellTest_resources\\httpd-2.3.8_acdc_smells.ser" + ", " + ".\\src\\test\\resources\\SmellTest_resources\\serialized\\httpd-2.3.8_acdc_smells_serialized.ser",
-        ".\\src\\test\\resources\\SmellTest_resources\\struts-2.3.30_acdc_smells.ser" + ", " + ".\\src\\test\\resources\\SmellTest_resources\\serialized\\struts-2.3.30_acdc_smells_serialized.ser"
+        ".///src///test///resources///SmellCollectionTest_resources///struts-2.5.2_acdc_smells.ser" + ", " + ".///src///test///resources///SmellCollectionTest_resources///serialized///struts-2.5.2_acdc_smells_serialized.ser",
+        ".///src///test///resources///SmellCollectionTest_resources///httpd-2.4.26_acdc_smells.ser" + ", " + ".///src///test///resources///SmellCollectionTest_resources///serialized///httpd-2.4.26_acdc_smells_serialized.ser",
+        ".///src///test///resources///SmellCollectionTest_resources///httpd-2.3.8_acdc_smells.ser" + ", " + ".///src///test///resources///SmellCollectionTest_resources///serialized///httpd-2.3.8_acdc_smells_serialized.ser",
+        ".///src///test///resources///SmellCollectionTest_resources///struts-2.3.30_acdc_smells.ser" + ", " + ".///src///test///resources///SmellCollectionTest_resources///serialized///struts-2.3.30_acdc_smells_serialized.ser"
     })
 
     // part 2 serialize then deserialize
