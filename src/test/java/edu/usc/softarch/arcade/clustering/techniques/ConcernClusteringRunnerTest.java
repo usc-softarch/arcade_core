@@ -33,28 +33,28 @@ public class ConcernClusteringRunnerTest {
 		// [system language]
 
 		// struts 2.3.30
-		".///subject_systems///src///Struts2///struts-2.3.30,"
+		".///subject_systems///Struts2///src///struts-2.3.30,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.3.30,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "struts-2.3.30,"
 		+ "java",
 
 		// struts 2.5.2
-		".///subject_systems///src///Struts2///struts-2.5.2,"
+		".///subject_systems///Struts2///src///struts-2.5.2,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.5.2,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "struts-2.5.2,"
 		+ "java",
 
 		// httpd-2.3.8
-		".///subject_systems///src///httpd///httpd-2.3.8,"
+		".///subject_systems///httpd///src///httpd-2.3.8,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.3.8,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "httpd-2.3.8,"
 		+ "c",
 
 		// httpd-2.4.26
-		".///subject_systems///src///httpd///httpd-2.4.26,"
+		".///subject_systems///httpd///src///httpd-2.4.26,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.4.26,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "httpd-2.4.26,"
