@@ -99,7 +99,8 @@ public class ArchSmellDetectorTest {
     + "///output///struts-2.3.30_acdc_smells.ser,"
     + "///runStructuralDetectionAlgs_resources///struts-2.3.30_output_run_clusterSmellMap.txt,"
     + "///runStructuralDetectionAlgs_resources///struts-2.3.30_output_run_clusters.txt,"
-    + "///runStructuralDetectionAlgs_resources///struts-2.3.30_output_run_detected_smells.txt",
+    + "///runStructuralDetectionAlgs_resources///struts-2.3.30_output_run_detected_smells.txt,"
+    + "struts-2.3.30",
 
     //Input for asd constructor to run on struts-2.5.2
     "///output///struts-2.5.2_deps.rsf,"
@@ -107,13 +108,14 @@ public class ArchSmellDetectorTest {
     + "///output///struts-2.5.2_acdc_smells.ser,"
     + "///runStructuralDetectionAlgs_resources///struts-2.5.2_output_run_clusterSmellMap.txt,"
     + "///runStructuralDetectionAlgs_resources///struts-2.5.2_output_run_clusters.txt,"
-    + "///runStructuralDetectionAlgs_resources///struts-2.5.2_output_run_detected_smells.txt",
-    
+    + "///runStructuralDetectionAlgs_resources///struts-2.5.2_output_run_detected_smells.txt,"
+    + "struts-2.5.2",
   })
   @ParameterizedTest
   public void runStructuralDetectionAlgsTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
                                              String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile){
     String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
+
     resources_dir = resources_dir.replace("///", File.separator);
 
     depsRsfFilename = resources_dir + depsRsfFilename.replace("///", File.separator);
@@ -125,7 +127,7 @@ public class ArchSmellDetectorTest {
     smellsObjectFile = smellsObjectFile.replace("///", File.separator);
 
     ArchSmellDetector asd;
-    asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename);
+    asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, version);
     
     // Initialize variables
 		SmellCollection detectedSmells = new SmellCollection();
@@ -175,7 +177,8 @@ public class ArchSmellDetectorTest {
     + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusterSmellMap_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusters_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_detectedSmells_after.txt,"
-    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusters_before.txt",
+    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusters_before.txt,"
+    + "struts-2.3.30",
 
     //Input for asd constructor to run on struts-2.5.2
     "///output///struts-2.5.2_deps.rsf,"
@@ -184,12 +187,13 @@ public class ArchSmellDetectorTest {
     + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusterSmellMap_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusters_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_detectedSmells_after.txt,"
-    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusters_before.txt",
+    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusters_before.txt,"
+    + "struts-2.5.2",
   })
   @ParameterizedTest
   public void runConcernDetectionAlgsTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
                                              String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile,
-                                             String clusterObjectFileBefore){
+                                             String clusterObjectFileBefore, String version){
 
 
     String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
@@ -205,7 +209,7 @@ public class ArchSmellDetectorTest {
     clusterObjectFileBefore = clusterObjectFileBefore.replace("///", File.separator);
 
     ArchSmellDetector asd;
-    asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename);
+    asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, version);
 
     // Initialize variables
 		SmellCollection detectedSmells = new SmellCollection();
@@ -216,8 +220,9 @@ public class ArchSmellDetectorTest {
     try{
       ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterObjectFileBefore));
       ConcernClusterArchitecture oracle_clusters2 = (ConcernClusterArchitecture) ois.readObject();
+      
       assertTrue(clusters.equals(oracle_clusters2));
-      // TODO: check if the ConcernClusterArchitecture object is empty?
+      
       ois.close();
     } catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -227,7 +232,7 @@ public class ArchSmellDetectorTest {
 
     asd.runConcernDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
 
-    // check that the data structures are not empty after running runConcernDetectionAlgs
+    //check that the data structures are not empty after running runConcernDetectionAlgs
     assertAll(
         () -> assertTrue(clusters.size() > 0),
         () -> assertTrue(detectedSmells.size() > 0),
