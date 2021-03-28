@@ -26,7 +26,7 @@ public class BatchClusteringEngineTest {
 		// [expected clusters file name]
 
 		// struts 2.3.30
-		".///subject_systems///Struts2///src///struts-2.3.30,"
+		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.3.30,"
 		+ "java,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30///arc,"
 		+ "lib_struts,"
@@ -34,7 +34,7 @@ public class BatchClusteringEngineTest {
 		+ "struts-2.3.30_239_topics_234_arc_clusters.rsf",
 
 		// struts 2.5.2
-		".///subject_systems///Struts2///src///struts-2.5.2,"
+		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.5.2,"
 		+ "java,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2///arc,"
 		+ "lib_struts,"
@@ -42,7 +42,7 @@ public class BatchClusteringEngineTest {
 		+ "struts-2.5.2_284_topics_275_arc_clusters.rsf",
 
 		// httpd 2.3.8
-		".///subject_systems///httpd///src///httpd-2.3.8,"
+		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
 		+ "c,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8///arc,"
 		+ "/,"
@@ -50,7 +50,7 @@ public class BatchClusteringEngineTest {
 		+ "httpd-2.3.8_46_topics_71_arc_clusters.rsf",
 
 		// httpd 2.4.26
-		".///subject_systems///httpd///src///httpd-2.4.26,"
+		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
 		+ "c,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26///arc,"
 		+ "/,"
@@ -100,7 +100,7 @@ public class BatchClusteringEngineTest {
 		// [expected clusters file name]
 
 		// struts 2.3.30
-		".///subject_systems///Struts2///src///struts-2.3.30,"
+		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.3.30,"
 		+ "java,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30///arc,"
 		+ "lib_struts,"
@@ -108,7 +108,7 @@ public class BatchClusteringEngineTest {
 		+ "struts-2.3.30_arc_smells.ser",
 
 		// struts 2.5.2
-		".///subject_systems///Struts2///src///struts-2.5.2,"
+		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.5.2,"
 		+ "java,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2///arc,"
 		+ "lib_struts,"
@@ -116,7 +116,7 @@ public class BatchClusteringEngineTest {
 		+ "struts-2.5.2_arc_smells.ser",
 
 		// httpd 2.3.8
-		".///subject_systems///httpd///src///httpd-2.3.8,"
+		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
 		+ "c,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8///arc,"
 		+ "/,"
@@ -124,7 +124,7 @@ public class BatchClusteringEngineTest {
 		+ "httpd-2.3.8_arc_smells.ser",
 
 		// httpd 2.4.26
-		".///subject_systems///httpd///src///httpd-2.4.26,"
+		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
 		+ "c,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26///arc,"
 		+ "/,"
