@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.facts;
 
 import java.util.Set;
+import java.io.Serializable;
 import java.util.HashSet;
 
 import edu.usc.softarch.arcade.topics.DocTopicItem;
@@ -8,7 +9,8 @@ import edu.usc.softarch.arcade.topics.DocTopicItem;
 /**
  * @author joshua
  */
-public class ConcernCluster {
+public class ConcernCluster implements Serializable {
+	private static final long serialVersionUID = 1L;
 	// #region FIELDS ------------------------------------------------------------
 	private String name;
 	private Set<String> entities = new HashSet<>();
