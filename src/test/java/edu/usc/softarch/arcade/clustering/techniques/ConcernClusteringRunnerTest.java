@@ -115,7 +115,7 @@ public class ConcernClusteringRunnerTest {
 			);
 
 			// Deserialize fastFeatureVectors from after setFastFeatureVectors() call
-			ois = new ObjectInputStream(new FileInputStream(resDir + fs + "ds_serialized" + fs + versionName + "_fastfeatureVectors_init.txt"));
+			ois = new ObjectInputStream(new FileInputStream(resDir + fs + "ds_serialized" + fs + versionName + "_fastFeatureVectors_init.txt"));
 			FastFeatureVectors ffvInit = (FastFeatureVectors) ois.readObject();
 			// Should not be null
 			assertNotNull(ffvInit);
