@@ -28,7 +28,7 @@ public class BatchClusteringEngineTest {
 		// struts 2.3.30
 		".///subject_systems///Struts2///src///struts-2.3.30,"
 		+ "java,"
-		+ ".///target///test_results///BatchClusteringEngineTest///struts-2.3.30,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30,"
 		+ "lib_struts,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_239_topics_234_arc_clusters.rsf,"
 		+ "struts-2.3.30_239_topics_234_arc_clusters.rsf",
@@ -36,7 +36,7 @@ public class BatchClusteringEngineTest {
 		// struts 2.5.2
 		".///subject_systems///Struts2///src///struts-2.5.2,"
 		+ "java,"
-		+ ".///target///test_results///BatchClusteringEngineTest///struts-2.5.2,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2,"
 		+ "lib_struts,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_284_topics_275_arc_clusters.rsf,"
 		+ "struts-2.5.2_284_topics_275_arc_clusters.rsf",
@@ -44,7 +44,7 @@ public class BatchClusteringEngineTest {
 		// httpd 2.3.8
 		".///subject_systems///httpd///src///httpd-2.3.8,"
 		+ "c,"
-		+ ".///target///test_results///BatchClusteringEngineTest///httpd-2.3.8,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8,"
 		+ "/,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_46_topics_71_arc_clusters.rsf,"
 		+ "httpd-2.3.8_46_topics_71_arc_clusters.rsf",
@@ -52,7 +52,7 @@ public class BatchClusteringEngineTest {
 		// httpd 2.4.26
 		".///subject_systems///httpd///src///httpd-2.4.26,"
 		+ "c,"
-		+ ".///target///test_results///BatchClusteringEngineTest///httpd-2.4.26,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26,"
 		+ "/,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_50_topics_82_arc_clusters.rsf,"
 		+ "httpd-2.4.26_50_topics_82_arc_clusters.rsf"
@@ -102,7 +102,7 @@ public class BatchClusteringEngineTest {
 		// struts 2.3.30
 		".///subject_systems///Struts2///src///struts-2.3.30,"
 		+ "java,"
-		+ ".///target///test_results///BatchClusteringEngineTest///struts-2.3.30,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30,"
 		+ "lib_struts,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_arc_smells.ser,"
 		+ "struts-2.3.30_arc_smells.ser",
@@ -110,7 +110,7 @@ public class BatchClusteringEngineTest {
 		// struts 2.5.2
 		".///subject_systems///Struts2///src///struts-2.5.2,"
 		+ "java,"
-		+ ".///target///test_results///BatchClusteringEngineTest///struts-2.5.2,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2,"
 		+ "lib_struts,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_arc_smells.ser,"
 		+ "struts-2.5.2_arc_smells.ser",
@@ -118,7 +118,7 @@ public class BatchClusteringEngineTest {
 		// httpd 2.3.8
 		".///subject_systems///httpd///src///httpd-2.3.8,"
 		+ "c,"
-		+ ".///target///test_results///BatchClusteringEngineTest////httpd-2.3.8,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8,"
 		+ "/,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_arc_smells.ser,"
 		+ "httpd-2.3.8_arc_smells.ser",
@@ -126,7 +126,7 @@ public class BatchClusteringEngineTest {
 		// httpd 2.4.26
 		".///subject_systems///httpd///src///httpd-2.4.26,"
 		+ "c,"
-		+ ".///target///test_results///BatchClusteringEngineTest///httpd-2.4.26,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26,"
 		+ "/,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_arc_smells.ser,"
 		+ "httpd-2.4.26_arc_smells.ser"
