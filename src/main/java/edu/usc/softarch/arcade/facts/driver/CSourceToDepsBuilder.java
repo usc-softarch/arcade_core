@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +66,14 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		this.numSourceEntities = sources.size();
 
 		this.ffVecs = new FastFeatureVectors(typedEdgeGraph);
+		/*** BEGIN SERIALIZATION CODE ***/
+		// char fs = File.separatorChar;
+		// ObjectOutputStream oosffVecs = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ffVecs_serialized" + fs + 
+		// 	"httpd-2.3.8_ffVecs_builder.txt"));
+		// oosffVecs.writeObject(ffVecs);
+		// oosffVecs.close();
+		/*** END SERIALIZATION CODE ***/
 	}
 
 	private Map<String, List<String>> buildDeps(String filename)
