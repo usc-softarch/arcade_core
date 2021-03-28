@@ -381,8 +381,8 @@
         <configuration>
           <excludes>
             <exclude>JavaSourceToDepsBuilderTest_resources_old/**/*</exclude>
-            <exclude>CSourceToDepsBuilderTest_resources/src/httpd-2.3.8/**/*</exclude>
-            <exclude>CSourceToDepsBuilderTest_resources/src/httpd-2.4.26/**/*</exclude>
+            <exclude>subject_systems_resources/Struts2/src/struts-2.3.30/**/*</exclude>
+            <exclude>subject_systems_resources/Struts2/src/struts-2.5.2/**/*</exclude>
           </excludes>
         </configuration>
       </plugin>

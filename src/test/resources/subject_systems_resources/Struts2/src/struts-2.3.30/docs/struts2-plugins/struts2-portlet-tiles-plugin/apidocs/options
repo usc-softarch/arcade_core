@@ -1,0 +1,30 @@
+-classpath
+'/Users/lukaszlenart/Projects/Apache/struts-2-3/target/checkout/plugins/portlet-tiles/target/classes:/Users/lukaszlenart/.m2/repository/asm/asm-commons/3.3/asm-commons-3.3.jar:/Users/lukaszlenart/.m2/repository/org/apache/commons/commons-lang3/3.2/commons-lang3-3.2.jar:/Users/lukaszlenart/.m2/repository/org/freemarker/freemarker/2.3.22/freemarker-2.3.22.jar:/Users/lukaszlenart/.m2/repository/commons-beanutils/commons-beanutils/1.8.0/commons-beanutils-1.8.0.jar:/Users/lukaszlenart/Projects/Apache/struts-2-3/target/checkout/xwork-core/target/xwork-core-2.3.30.jar:/Users/lukaszlenart/.m2/repository/asm/asm-tree/3.3/asm-tree-3.3.jar:/Users/lukaszlenart/.m2/repository/ognl/ognl/3.0.19/ognl-3.0.19.jar:/Users/lukaszlenart/.m2/repository/javax/portlet/portlet-api/2.0/portlet-api-2.0.jar:/Users/lukaszlenart/.m2/repository/commons-io/commons-io/2.2/commons-io-2.2.jar:/Users/lukaszlenart/.m2/repository/javassist/javassist/3.11.0.GA/javassist-3.11.0.GA.jar:/Users/lukaszlenart/.m2/repository/org/apache/tiles/tiles-el/2.2.2/tiles-el-2.2.2.jar:/Users/lukaszlenart/.m2/repository/org/apache/tiles/tiles-api/2.2.2/tiles-api-2.2.2.jar:/Users/lukaszlenart/.m2/repository/org/apache/tiles/tiles-servlet/2.2.2/tiles-servlet-2.2.2.jar:/Users/lukaszlenart/.m2/repository/commons-fileupload/commons-fileupload/1.3.2/commons-fileupload-1.3.2.jar:/Users/lukaszlenart/.m2/repository/commons-digester/commons-digester/2.0/commons-digester-2.0.jar:/Users/lukaszlenart/.m2/repository/org/apache/tiles/tiles-core/2.2.2/tiles-core-2.2.2.jar:/Users/lukaszlenart/.m2/repository/org/slf4j/jcl-over-slf4j/1.5.8/jcl-over-slf4j-1.5.8.jar:/Users/lukaszlenart/.m2/repository/javax/servlet/jsp-api/2.0/jsp-api-2.0.jar:/Users/lukaszlenart/Projects/Apache/struts-2-3/target/checkout/plugins/tiles/target/struts2-tiles-plugin-2.3.30.jar:/Users/lukaszlenart/.m2/repository/org/apache/tiles/tiles-template/2.2.2/tiles-template-2.2.2.jar:/Users/lukaszlenart/.m2/repository/javax/servlet/servlet-api/2.4/servlet-api-2.4.jar:/Users/lukaszlenart/Projects/Apache/struts-2-3/target/checkout/core/target/struts2-core-2.3.30.jar:/Users/lukaszlenart/.m2/repository/org/slf4j/slf4j-api/1.7.12/slf4j-api-1.7.12.jar:/Users/lukaszlenart/.m2/repository/org/apache/tiles/tiles-portlet/2.2.2/tiles-portlet-2.2.2.jar:/Users/lukaszlenart/.m2/repository/org/apache/tiles/tiles-ognl/2.2.2/tiles-ognl-2.2.2.jar:/Users/lukaszlenart/.m2/repository/asm/asm/3.3/asm-3.3.jar:/Users/lukaszlenart/Projects/Apache/struts-2-3/target/checkout/plugins/portlet/target/struts2-portlet-plugin-2.3.30.jar:/Users/lukaszlenart/.m2/repository/org/apache/tiles/tiles-freemarker/2.2.2/tiles-freemarker-2.2.2.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/Users/lukaszlenart/Projects/Apache/struts-2-3/target/checkout/plugins/portlet-tiles/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2000-2016 <a href="http://www.apache.org">Apache Software Foundation</a>. All Rights Reserved.'
+-charset
+'UTF-8'
+-d
+'/Users/lukaszlenart/Projects/Apache/struts-2-3/target/checkout/plugins/portlet-tiles/target/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'Struts 2 Portlet Tiles Plugin 2.3.30 API'
+-linkoffline
+'http://download.oracle.com/javase/1.5.0/docs/api' '/Users/lukaszlenart/Projects/Apache/struts-2-3/target/checkout/plugins/portlet-tiles/target/javadoc-bundle-options'
+-linkoffline
+'http://struts.apache.org/struts2-core/apidocs' '/Users/lukaszlenart/Projects/Apache/struts-2-3/target/checkout/core/target/apidocs'
+-linkoffline
+'http://struts.apache.org/struts2-plugins/struts2-portlet-plugin/apidocs' '/Users/lukaszlenart/Projects/Apache/struts-2-3/target/checkout/plugins/portlet/target/apidocs'
+-linkoffline
+'http://struts.apache.org/struts2-plugins/struts2-tiles-plugin/apidocs' '/Users/lukaszlenart/Projects/Apache/struts-2-3/target/checkout/plugins/tiles/target/apidocs'
+-use
+-version
+-windowtitle
+'Struts 2 Portlet Tiles Plugin 2.3.30 API'

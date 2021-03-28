@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><!--
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              This file is generated from xml source: DO NOT EDIT
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      -->
+<title>mod_authz_host - Apache HTTP Server</title>
+<link href="../style/css/manual.css" rel="stylesheet" media="all" type="text/css" title="Main stylesheet" />
+<link href="../style/css/manual-loose-100pc.css" rel="alternate stylesheet" media="all" type="text/css" title="No Sidebar - Default font size" />
+<link href="../style/css/manual-print.css" rel="stylesheet" media="print" type="text/css" />
+<link href="../images/favicon.ico" rel="shortcut icon" /></head>
+<body>
+<div id="page-header">
+<p class="menu"><a href="../mod/">Modules</a> | <a href="../mod/directives.html">Directives</a> | <a href="../faq/">FAQ</a> | <a href="../glossary.html">Glossary</a> | <a href="../sitemap.html">Sitemap</a></p>
+<p class="apache">Apache HTTP Server Version 2.3</p>
+<img alt="" src="../images/feather.gif" /></div>
+<div class="up"><a href="./"><img title="&lt;-" alt="&lt;-" src="../images/left.gif" /></a></div>
+<div id="path">
+<a href="http://www.apache.org/">Apache</a> &gt; <a href="http://httpd.apache.org/">HTTP Server</a> &gt; <a href="http://httpd.apache.org/docs/">Documentation</a> &gt; <a href="../">Version 2.3</a> &gt; <a href="./">Modules</a></div>
+<div id="page-content">
+<div id="preamble"><h1>Apache Module mod_authz_host</h1>
+<div class="toplang">
+<p><span>Available Languages: </span><a href="../en/mod/mod_authz_host.html" title="English">&nbsp;en&nbsp;</a> |
+<a href="../fr/mod/mod_authz_host.html" hreflang="fr" rel="alternate" title="Français">&nbsp;fr&nbsp;</a></p>
+</div>
+<table class="module"><tr><th><a href="module-dict.html#Description">Description:</a></th><td>Group authorizations based on host (name or IP
+address)</td></tr>
+<tr><th><a href="module-dict.html#Status">Status:</a></th><td>Base</td></tr>
+<tr><th><a href="module-dict.html#ModuleIdentifier">Module Identifier:</a></th><td>authz_host_module</td></tr>
+<tr><th><a href="module-dict.html#SourceFile">Source File:</a></th><td>mod_authz_host.c</td></tr>
+<tr><th><a href="module-dict.html#Compatibility">Compatibility:</a></th><td>Available in Apache 2.3 and later</td></tr></table>
+<h3>Summary</h3>
+
+    <p>The authorization providers implemented by <code class="module"><a href="../mod/mod_authz_host.html">mod_authz_host</a></code> are
+    registered using the <code class="directive"><a href="../mod/mod_authz_core.html#require">Require</a></code>
+    directive. The directive can be referenced within a 
+    <code class="directive"><a href="../mod/core.html#directory">&lt;Directory&gt;</a></code>,
+    <code class="directive"><a href="../mod/core.html#files">&lt;Files&gt;</a></code>, 
+    or <code class="directive"><a href="../mod/core.html#location">&lt;Location&gt;</a></code> section
+    as well as <code><a href="core.html#accessfilename">.htaccess</a>
+    </code> files to control access to particular parts of the server.
+    Access can be controlled based on the client hostname, IP address, or
+    other characteristics of the client request, as captured in <a href="../env.html">environment variables</a>.</p>
+
+    <p>In general, access restriction directives apply to all
+    access methods (<code>GET</code>, <code>PUT</code>,
+    <code>POST</code>, etc). This is the desired behavior in most
+    cases. However, it is possible to restrict some methods, while
+    leaving other methods unrestricted, by enclosing the directives
+    in a <code class="directive"><a href="../mod/core.html#limit">&lt;Limit&gt;</a></code> section.</p>
+</div>
+<div id="quickview"><h3 class="directives">Directives</h3>
+<p>This module provides no
+            directives.</p>
+<h3>Topics</h3>
+<ul id="topics">
+<li><img alt="" src="../images/down.gif" /> <a href="#requiredirectives">The Require Directives</a></li>
+</ul><h3>See also</h3>
+<ul class="seealso">
+<li><a href="../howto/auth.html">Authentication, Authorization,
+    and Access Control</a></li>
+<li><code class="directive"><a href="../mod/mod_authz_core.html#require">Require</a></code></li>
+</ul></div>
+<div class="top"><a href="#page-header"><img alt="top" src="../images/up.gif" /></a></div>
+<div class="section">
+<h2><a name="requiredirectives" id="requiredirectives">The Require Directives</a></h2>
+
+    <p>Apache's <code class="directive"><a href="../mod/mod_authz_core.html#require">Require</a></code> 
+    directive is used during the authorization phase to ensure that a user is allowed or
+    denied access to a resource.  mod_authz_host extends the 
+    authorization types with <code>env</code>, <code>ip</code>, 
+    <code>host</code> and <code>all</code>.  Other authorization types may also be 
+    used but may require that additional authorization modules be loaded.</p>
+
+    <p>These authorization providers affect which hosts can
+    access an area of the server. Access can be controlled by
+    hostname, IP Address, IP Address range, or by other
+    characteristics of the client request captured in environment
+    variables.</p>
+
+<h3><a name="reqenv" id="reqenv">Require env</a></h3>
+
+    <p>The <code>env</code> provider allows access to the server
+    to be controlled based on the existence of an <a href="../env.html">environment variable</a>. When <code>Require 
+    env <var>env-variable</var></code> is specified, then the request is
+    allowed access if the environment variable <var>env-variable</var>
+    exists. The server provides the ability to set environment
+    variables in a flexible way based on characteristics of the client
+    request using the directives provided by
+    <code class="module"><a href="../mod/mod_setenvif.html">mod_setenvif</a></code>. Therefore, this directive can be
+    used to allow access based on such factors as the clients
+    <code>User-Agent</code> (browser type), <code>Referer</code>, or
+    other HTTP request header fields.</p>
+    
+    <div class="example"><h3>Example:</h3><p><code>
+      SetEnvIf User-Agent ^KnockKnock/2\.0 let_me_in<br />
+      &lt;Directory /docroot&gt;<br />
+      <span class="indent">
+        Require env let_me_in<br />
+      </span>
+      &lt;/Directory&gt;
+    </code></p></div>
+    
+    <p>In this case, browsers with a user-agent string beginning
+    with <code>KnockKnock/2.0</code> will be allowed access, and all
+    others will be denied.</p>
+
+
+
+<h3><a name="reqip" id="reqip">Require ip</a></h3>
+
+    <p>The <code>ip</code> provider allows access to the server
+    to be controlled based on the IP address of the remote client. 
+    When <code>Require ip <var>ip-address</var></code> is specified, 
+    then the request is allowed access if the IP address matches.</p>
+
+    <p>A full IP address:</p>
+    
+    <div class="example"><p><code>
+      Require ip 10.1.2.3<br />
+      Require ip 192.168.1.104 192.168.1.205
+    </code></p></div>
+
+    <p>An IP address of a host allowed access</p>
+    
+    <p>A partial IP address:</p>
+    
+    <div class="example"><p><code>
+      Require ip 10.1<br />
+      Require ip 10 172.20 192.168.2
+    </code></p></div>
+    <p>The first 1 to 3 bytes of an IP address, for subnet
+    restriction.</p>
+    
+    <p>A network/netmask pair:</p>
+    
+    <div class="example"><p><code>
+      Require ip 10.1.0.0/255.255.0.0
+    </code></p></div>
+    <p>A network a.b.c.d, and a netmask w.x.y.z. For more
+    fine-grained subnet restriction.</p>
+    
+    <p>A network/nnn CIDR specification:</p>
+    
+    <div class="example"><p><code>
+      Require ip 10.1.0.0/16
+    </code></p></div>
+    <p>Similar to the previous case, except the netmask consists of
+    nnn high-order 1 bits.</p>
+    
+    <p>Note that the last three examples above match exactly the
+    same set of hosts.</p>
+    
+    <p>IPv6 addresses and IPv6 subnets can be specified as shown
+    below:</p>
+    
+    <div class="example"><p><code>
+     Require ip 2001:db8::a00:20ff:fea7:ccea<br />
+     Require ip 2001:db8::a00:20ff:fea7:ccea/10
+    </code></p></div>
+
+
+
+
+<h3><a name="reqhost" id="reqhost">Require host</a></h3>
+
+    <p>The <code>host</code> provider allows access to the server
+    to be controlled based on the host name of the remote client. 
+    When <code>Require host <var>host-name</var></code> is specified, 
+    then the request is allowed access if the host name matches.</p>
+
+    <p>A (partial) domain-name</p>
+    
+    <div class="example"><p><code>
+    Require host apache.org<br />
+    Require host .net example.edu
+    </code></p></div>
+    
+    <p>Hosts whose names match, or end in, this string are allowed
+    access. Only complete components are matched, so the above
+    example will match <code>foo.apache.org</code> but it will not
+    match <code>fooapache.org</code>. This configuration will cause
+    Apache to perform a double reverse DNS lookup on the client IP
+    address, regardless of the setting of the <code class="directive"><a href="../mod/core.html#hostnamelookups">HostnameLookups</a></code> directive.  It will do
+    a reverse DNS lookup on the IP address to find the associated
+    hostname, and then do a forward lookup on the hostname to assure
+    that it matches the original IP address.  Only if the forward
+    and reverse DNS are consistent and the hostname matches will
+    access be allowed.</p>
+
+
+
+<h3><a name="reqall" id="reqall">Require all</a></h3>
+
+    <p>The <code>all</code> provider mimics the functionality the
+    was previously provided by the 'Allow from all' and 'Deny from all'
+    directives.  This provider can take one of two arguments which are 
+    'granted' or 'denied'.  The following examples will grant or deny 
+    access to all requests.</p>
+
+    <div class="example"><p><code>
+    Require all granted<br />
+    </code></p></div>
+
+    <div class="example"><p><code>
+    Require all denied<br />
+    </code></p></div>
+
+
+
+
+</div>
+</div>
+<div class="bottomlang">
+<p><span>Available Languages: </span><a href="../en/mod/mod_authz_host.html" title="English">&nbsp;en&nbsp;</a> |
+<a href="../fr/mod/mod_authz_host.html" hreflang="fr" rel="alternate" title="Français">&nbsp;fr&nbsp;</a></p>
+</div><div id="footer">
+<p class="apache">Copyright 2010 The Apache Software Foundation.<br />Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.</p>
+<p class="menu"><a href="../mod/">Modules</a> | <a href="../mod/directives.html">Directives</a> | <a href="../faq/">FAQ</a> | <a href="../glossary.html">Glossary</a> | <a href="../sitemap.html">Sitemap</a></p></div>
+</body></html>
