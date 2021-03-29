@@ -1,0 +1,5 @@
+org.apache.struts2.dojo.components
+org.apache.struts2.dojo.views
+org.apache.struts2.dojo.views.freemarker.tags
+org.apache.struts2.dojo.views.jsp.ui
+org.apache.struts2.dojo.views.velocity.components
