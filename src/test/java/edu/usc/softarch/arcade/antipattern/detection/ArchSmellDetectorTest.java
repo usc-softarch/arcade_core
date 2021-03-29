@@ -95,23 +95,51 @@ public class ArchSmellDetectorTest {
 	}
 
   @CsvSource({
+
+    /** Test parameters **/
+		// [input deps rsf file path]
+		// [input file path for clusters file]
+    // [output ser file path]
+    // [oracle clustermap serialized object]
+    // [oracle clusters serialized object]
+    // [oracle detected smells serialized object]
+		// [version]
+
     //Input for asd constructor to run on struts-2.3.30
-    "///output///struts-2.3.30_deps.rsf,"
-    + "///output///struts-2.3.30_acdc_clustered.rsf,"
-    + "///output///struts-2.3.30_acdc_smells.ser,"
+    "///input_files///struts-2.3.30_deps.rsf,"
+    + "///input_files///struts-2.3.30_acdc_clustered.rsf,"
+    + "///target///test_results///ArchSmellDetectorTest///struts-2.3.30_acdc_smells.ser,"
     + "///runStructuralDetectionAlgs_resources///struts-2.3.30_output_run_clusterSmellMap.txt,"
     + "///runStructuralDetectionAlgs_resources///struts-2.3.30_output_run_clusters.txt,"
     + "///runStructuralDetectionAlgs_resources///struts-2.3.30_output_run_detected_smells.txt,"
     + "struts-2.3.30",
 
     //Input for asd constructor to run on struts-2.5.2
-    "///output///struts-2.5.2_deps.rsf,"
-    + "///output///struts-2.5.2_acdc_clustered.rsf,"
-    + "///output///struts-2.5.2_acdc_smells.ser,"
+    "///input_files///struts-2.5.2_deps.rsf,"
+    + "///input_files///struts-2.5.2_acdc_clustered.rsf,"
+    + "///target///test_results///ArchSmellDetectorTest///struts-2.5.2_acdc_smells.ser,"
     + "///runStructuralDetectionAlgs_resources///struts-2.5.2_output_run_clusterSmellMap.txt,"
     + "///runStructuralDetectionAlgs_resources///struts-2.5.2_output_run_clusters.txt,"
     + "///runStructuralDetectionAlgs_resources///struts-2.5.2_output_run_detected_smells.txt,"
     + "struts-2.5.2",
+
+    //Input for asd constructor to run on httpd 2.3.8 - RESOURCES ARE PLACEHOLDERS REPLACE LATER
+    "///input_files///httpd-2.3.8_deps.rsf,"
+    + "///input_files///httpd-2.3.8_acdc_clustered.rsf,"
+    + "///target///test_results///ArchSmellDetectorTest///httpd-2.3.8_acdc_smells.ser,"
+    + "///runStructuralDetectionAlgs_resources///httpd-2.3.8_output_run_clusterSmellMap.txt,"
+    + "///runStructuralDetectionAlgs_resources///httpd-2.3.8_output_run_clusters.txt,"
+    + "///runStructuralDetectionAlgs_resources///httpd-2.3.8_output_run_detected_smells.txt,"
+    + "httpd-2.3.8",
+
+    //Input for asd constructor to run on httpd 2.4.26 - RESOURCES ARE PLACEHOLDERS REPLACE LATER
+    "///input_files///httpd-2.4.26_deps.rsf,"
+    + "///input_files///httpd-2.4.26_acdc_clustered.rsf,"
+    + "///target///test_results///ArchSmellDetectorTest///httpd-2.4.26_acdc_smells.ser,"
+    + "///runStructuralDetectionAlgs_resources///httpd-2.4.26_output_run_clusterSmellMap.txt,"
+    + "///runStructuralDetectionAlgs_resources///httpd-2.4.26_output_run_clusters.txt,"
+    + "///runStructuralDetectionAlgs_resources///httpd-2.4.26_output_run_detected_smells.txt,"
+    + "httpd-2.4.26",
   })
   @ParameterizedTest
   public void runStructuralDetectionAlgsTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
@@ -199,7 +227,6 @@ public class ArchSmellDetectorTest {
                                              String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile,
                                              String clusterObjectFileBefore,String topics, String version){
 
-
     String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
     resources_dir = resources_dir.replace("///", File.separator);
 
@@ -270,7 +297,6 @@ public class ArchSmellDetectorTest {
 			e.printStackTrace();
       fail("Exception caught in runConcernDetectionAlgsTest");
 		}
-
   }
 
   @CsvSource({
@@ -332,7 +358,6 @@ public class ArchSmellDetectorTest {
       fail("Exception caught in buildSmellToClustersMapTest");  
     }
   }
-
 
 
 
