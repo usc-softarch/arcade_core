@@ -88,6 +88,14 @@ public class ArchSmellDetector {
 	}
 
 	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
+	String detectedSmellsFilename, String language,
+	TopicModelExtractionMethod tmeMethod,	DocTopics docTopics, String version) {
+		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename,
+		language, .20, .20, tmeMethod, docTopics);
+		this.version = version;
+	}
+
+	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
 			String detectedSmellsFilename, String language,
 			double scatteredConcernThreshold, double parasiticConcernThreshold,
 			TopicModelExtractionMethod tmeMethod, DocTopics docTopics) {
@@ -113,28 +121,6 @@ public class ArchSmellDetector {
 		SmellCollection detectedSmells = new SmellCollection();
 		ConcernClusterArchitecture clusters = loadClusters();
 		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
-		
-		//Added for testing
-		//Serialization for test oracles.
-		
-		/*
-		char fs = File.separatorChar;
-		ObjectOutputStream oosDSmells = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		+ fs +"ArchSmellDetectorTest_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
-		"struts-2.3.30_output_detectedSmells_before.txt"));
-
-		ObjectOutputStream oosClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		+ fs +"ArchSmellDetectorTest_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
-		"struts-2.3.30_output_clusters_before.txt"));
-
-		ObjectOutputStream oosCSM = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		+ fs +"ArchSmellDetectorTest_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
-		"struts-2.3.30_output_clusterSmellMap_before.txt"));
-
-		oosDSmells.writeObject(detectedSmells);
-		oosClusters.writeObject(clusters);
-		oosCSM.writeObject(clusterSmellMap);
-		*/
 
 
 		// Execute detection algorithms
@@ -168,6 +154,39 @@ public class ArchSmellDetector {
 
 	public void runConcernDetectionAlgs(ConcernClusterArchitecture clusters,
 			SmellCollection detectedSmells, Map<String,Set<String>> clusterSmellMap) {
+
+		
+		//Added for testing
+		//Serialization for test oracles.
+		
+		/*
+		char fs = File.separatorChar;
+		try{
+			String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runConcernDetectionAlgs_resources///";
+			resources_dir = resources_dir.replace("///", File.separator);
+
+			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_detectedSmells_before.txt"));
+			oosDSmells2.writeObject(detectedSmells);
+			oosDSmells2.flush();
+			oosDSmells2.close();
+
+
+
+			ObjectOutputStream oosClusters2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusters_before.txt"));
+			oosClusters2.writeObject(clusters);
+			oosClusters2.flush();
+			oosClusters2.close();
+
+			ObjectOutputStream oosCSM2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusterSmellMap_before.txt"));
+			oosCSM2.writeObject(clusterSmellMap);
+			oosCSM2.flush();
+			oosCSM2.close();
+
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		*/
+
 		if (this.tmeMethod == TopicModelExtractionMethod.MALLET_API)
 			buildConcernClustersFromMalletAPI(clusters);
 		if (this.tmeMethod == TopicModelExtractionMethod.VAR_MALLET_FILE)
@@ -190,18 +209,24 @@ public class ArchSmellDetector {
 		//Added for testing
 		//Serialization for test oracles.
 		/*
-		char fs = File.separatorChar;
 		try{
 			String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runConcernDetectionAlgs_resources///";
 			resources_dir = resources_dir.replace("///", File.separator);
 			
 			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_detectedSmells_after.txt"));
-			ObjectOutputStream oosClusters2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusters_after.txt"));
-			ObjectOutputStream oosCSM2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusterSmellMap_after.txt"));
-
 			oosDSmells2.writeObject(detectedSmells);
+			oosDSmells2.flush();
+			oosDSmells2.close();
+			ObjectOutputStream oosClusters2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusters_after.txt"));
 			oosClusters2.writeObject(clusters);
+			oosClusters2.flush();
+			oosClusters2.close();
+			ObjectOutputStream oosCSM2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusterSmellMap_after.txt"));
 			oosCSM2.writeObject(clusterSmellMap);
+			oosCSM2.flush();
+			oosCSM2.close();
+			
+			
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -369,17 +394,16 @@ public class ArchSmellDetector {
 		//Added for creating test oracles, uncomment to produce new test oracles
 		/*
 		char fs = File.separatorChar;
-		ObjectOutputStream oosSMap;
-		try {
-			oosSMap = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-			+ fs +"ArchSmellDetectorTest_resources" + fs + "runConcernDetectionAlgs_resources" + fs + 
-			"struts-2.3.30_output_smellClusterMap_after.txt"));
-			oosSMap.writeObject(smellClustersMap);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		try{
+			String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runConcernDetectionAlgs_resources///";
+			resources_dir = resources_dir.replace("///", File.separator);
+
+			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_smellClusterMap_after.txt"));
+			oosDSmells2.writeObject(smellClustersMap);
+			oosDSmells2.flush();
+			oosDSmells2.close();
+
+		}catch(IOException e){
 			e.printStackTrace();
 		}
 		*/

@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.topics;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,9 @@ import edu.usc.softarch.arcade.util.FileUtil;
 /**
  * @author joshua
  */
-public class DocTopics {
+public class DocTopics implements Serializable{
 	// #region FIELDS ------------------------------------------------------------
+	static final long serialVersionUID = 1L;
 	private static Logger logger = LogManager.getLogger(DocTopics.class);
 	private List<DocTopicItem> dtItemList;
 	// #endregion FIELDS ---------------------------------------------------------

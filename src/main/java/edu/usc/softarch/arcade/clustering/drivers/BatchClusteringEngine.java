@@ -1,7 +1,9 @@
 package edu.usc.softarch.arcade.clustering.drivers;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -120,6 +122,25 @@ public class BatchClusteringEngine {
 
 		// Need to provide docTopics first
 		logger.debug("Running smell detecion for revision "	+ revisionNumber);
+
+		//Added for testing
+		//Serialization for test oracles.
+		/*
+		try{
+			//String resources_dir = ".///src///target///";
+			//resources_dir = resources_dir.replace("///", File.separator);
+
+			File out_docs = new File(revisionNumber + "_docTopics.txt");
+			out_docs.createNewFile();
+			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(out_docs,false));
+			oosDSmells2.writeObject(TopicUtil.docTopics);
+			oosDSmells2.flush();
+			oosDSmells2.close();
+
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		*/
 		ArchSmellDetector asd = new ArchSmellDetector(
 			depsRsfFile.getAbsolutePath(), arcClustersFilename,
 			detectedSmellsFilename, language,
