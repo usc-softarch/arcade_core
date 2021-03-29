@@ -55,68 +55,77 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		this.language = language;
 		setFastFeatureVectors(vecs);
 		initializeClusters(srcDir, language); // Initially, every node gets a cluster
-		// /*** BEGIN SERIALIZATION CODE ***/
-		// char fs = File.separatorChar;
-		// // Serialize fastClusters before initializeDocTopicsForEachFastCluster() call (wherein every node gets a cluster)
-		// ObjectOutputStream oosfastClusters;
-		// try {
-		// 	oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ds_serialized" + fs + 
-		// 	"struts-2.3.30_fastClusters_before_init.txt"));
-		// 	oosfastClusters.writeObject(fastClusters);
-		// 	oosfastClusters.close();
-		// } catch (FileNotFoundException e) {
-		// 	e.printStackTrace();
-		// } catch (IOException e) {
-		// 	e.printStackTrace();
-		// }
-		// /*** END SERIALIZATION CODE ***/
-
 		initializeDocTopicsForEachFastCluster(srcDir, artifactsDir);
-		
-		// /*** BEGIN SERIALIZATION CODE ***/
-		// // Serialize fastFeatureVectors
-		// ObjectOutputStream oosfastFeatureVectors;
-		// try {
-		// 	oosfastFeatureVectors = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ds_serialized" + fs + 
-		// 	"struts-2.3.30_fastFeatureVectors_init.txt"));
-		// 	oosfastFeatureVectors.writeObject(fastFeatureVectors);
-		// 	oosfastFeatureVectors.close();
-		// } catch (FileNotFoundException e) {
-		// 	e.printStackTrace();
-		// } catch (IOException e) {
-		// 	e.printStackTrace();
-		// }
-		// // Serialize fastClusters after initializeDocTopicsForEachFastCluster() call
-		// try {
-		// 	oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ds_serialized" + fs + 
-		// 	"struts-2.3.30_fastClusters_after_init.txt"));
-		// 	oosfastClusters.writeObject(fastClusters);
-		// 	oosfastClusters.close();
-		// } catch (FileNotFoundException e) {
-		// 	e.printStackTrace();
-		// } catch (IOException e) {
-		// 	e.printStackTrace();
-		// }
-		// /*** END SERIALIZATION CODE ***/
 
 
 	}
-	
+	// Cloned method for serialization/testing purposes
+	public ConcernClusteringRunner(FastFeatureVectors vecs,
+	String srcDir, String artifactsDir, String language, String versionName) {
+		this.language = language;
+		setFastFeatureVectors(vecs);
+		initializeClusters(srcDir, language); // Initially, every node gets a cluster
+
+
+		/*** BEGIN SERIALIZATION CODE ***/
+		char fs = File.separatorChar;
+		// Serialize fastClusters before initializeDocTopicsForEachFastCluster() call (wherein every node gets a cluster)
+		ObjectOutputStream oosfastClusters;
+		try {
+			oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "target" + fs + "test_results"
+			+ fs +"ConcernClusteringRunnerTest" + fs + "ds_serialized" + fs + versionName + "_fastClusters_before_init.txt"));
+			oosfastClusters.writeObject(fastClusters);
+			oosfastClusters.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		/*** END SERIALIZATION CODE ***/
+
+		initializeDocTopicsForEachFastCluster(srcDir, artifactsDir);
+
+		/*** BEGIN SERIALIZATION CODE ***/
+		// Serialize fastFeatureVectors
+		ObjectOutputStream oosfastFeatureVectors;
+		try {
+			oosfastFeatureVectors = new ObjectOutputStream(new FileOutputStream("." + fs + "target" + fs + "test_results"
+			+ fs +"ConcernClusteringRunnerTest" + fs + "ds_serialized" + fs + versionName + "_fastFeatureVectors_init.txt"));
+			oosfastFeatureVectors.writeObject(fastFeatureVectors);
+			oosfastFeatureVectors.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// Serialize fastClusters after initializeDocTopicsForEachFastCluster() call
+		try {
+			oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "target" + fs + "test_results"
+			+ fs +"ConcernClusteringRunnerTest" + fs + "ds_serialized" + fs + versionName + "_fastClusters_after_init.txt"));
+			oosfastClusters.writeObject(fastClusters);
+			oosfastClusters.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		/*** END SERIALIZATION CODE ***/
+
+
+	}
+	// Cloned method for serialization/testing purposes
 	public void computeClustersWithConcernsAndFastClusters(
-			StoppingCriterion stoppingCriterion, String stopCriterion, String simMeasure) {
-		StopWatch loopSummaryStopwatch = new StopWatch();
+		StoppingCriterion stoppingCriterion, String stopCriterion, String simMeasure, String versionName) {
+			StopWatch loopSummaryStopwatch = new StopWatch();
 		loopSummaryStopwatch.start();
 
 		List<List<Double>> simMatrix =
 			fastClusters.createSimilarityMatrixUsingJSDivergence(simMeasure);
 
 		while (stoppingCriterion.notReadyToStop()) {
-			if (stopCriterion.equalsIgnoreCase("clustergain")) { //? is this function ever called with stopCriterion = "clustergain"
+			if (stopCriterion.equalsIgnoreCase("clustergain")) {
 				double clusterGain = fastClusters.computeClusterGainUsingTopics();
-				checkAndUpdateClusterGain(clusterGain); // does this function affect the fastClusters? NO
+				checkAndUpdateClusterGain(clusterGain);
 			}
 
 			MaxSimData data  = identifyMostSimClusters(simMatrix);
@@ -127,22 +136,52 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			logger.debug("after merge, clusters size: " + fastClusters.size());
 		}
 
-		// /*** BEGIN SERIALIZATION CODE ***/
-		// // Serialize fastClusters after updateFastClustersAndSimMatrixToReflectMergedCluster() call (wherein 2 clusters are removed and one is added)
-		// char fs = File.separatorChar;
-		// ObjectOutputStream oosfastClusters;
-		// try {
-		// 	oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ds_serialized" + fs + 
-		// 	"struts-2.3.30_fastClusters_after_compute.txt"));
-		// 	oosfastClusters.writeObject(fastClusters);
-		// 	oosfastClusters.close();
-		// } catch (FileNotFoundException e) {
-		// 	e.printStackTrace();
-		// } catch (IOException e) {
-		// 	e.printStackTrace();
-		// }
-		// /*** END SERIALIZATION CODE ***/
+		/*** BEGIN SERIALIZATION CODE ***/
+		// Serialize fastClusters after updateFastClustersAndSimMatrixToReflectMergedCluster() call (wherein 2 clusters are removed and one is added)
+		char fs = File.separatorChar;
+		ObjectOutputStream oosfastClusters;
+		try {
+			oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "target" + fs + "test_results"
+			+ fs +"ConcernClusteringRunnerTest" + fs + "ds_serialized" + fs + versionName + "_fastClusters_after_compute.txt"));
+			oosfastClusters.writeObject(fastClusters);
+			oosfastClusters.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		/*** END SERIALIZATION CODE ***/
+
+		loopSummaryStopwatch.stop();
+		logger.debug("Time in milliseconds to compute clusters: "
+			+ loopSummaryStopwatch.getElapsedTime());
+		logger.debug("max cluster gain: " + maxClusterGain);
+		logger.debug("num clusters at max cluster gain: "
+			+ numClustersAtMaxClusterGain);
+}
+	
+
+	public void computeClustersWithConcernsAndFastClusters(
+			StoppingCriterion stoppingCriterion, String stopCriterion, String simMeasure) {
+		StopWatch loopSummaryStopwatch = new StopWatch();
+		loopSummaryStopwatch.start();
+
+		List<List<Double>> simMatrix =
+			fastClusters.createSimilarityMatrixUsingJSDivergence(simMeasure);
+
+		while (stoppingCriterion.notReadyToStop()) {
+			if (stopCriterion.equalsIgnoreCase("clustergain")) {
+				double clusterGain = fastClusters.computeClusterGainUsingTopics();
+				checkAndUpdateClusterGain(clusterGain);
+			}
+
+			MaxSimData data  = identifyMostSimClusters(simMatrix);
+			printDataForTwoMostSimilarClustersWithTopicsForConcerns(data);
+			FastCluster newCluster = mergeFastClustersUsingTopics(data);
+			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix, simMeasure);
+
+			logger.debug("after merge, clusters size: " + fastClusters.size());
+		}
 
 		loopSummaryStopwatch.stop();
 		logger.debug("Time in milliseconds to compute clusters: "
