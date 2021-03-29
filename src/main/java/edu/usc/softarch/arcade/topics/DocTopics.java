@@ -177,7 +177,7 @@ public class DocTopics {
 			} else if (dti.isCSourced()) {
 				//FIXME Make sure this works on Linux and find a permanent fix
 				strippedSource = dti.getSource().substring(1, dti.getSource().length());
-				strippedSource = strippedSource.replace("\\\\", "/");
+				strippedSource = strippedSource.replace("\\", "/");
 				if (strippedSource.endsWith(nameWithoutQuotations))
 					return dti;
 			}
