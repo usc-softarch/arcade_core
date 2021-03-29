@@ -73,7 +73,7 @@ public class BatchClusteringEngineTest {
 		String resultClustersFile = outputDirName + File.separator + arcFilename;
 
 		// The expectation here is that this resulting clusters file has the same name as the oracle clusters file
-		assertTrue(new File(resultClustersFile).exists());
+		assertTrue(new File(resultClustersFile).exists(), "resulting clusters file name does not match oracle clusters file name");
 
 		String result = assertDoesNotThrow(() -> {
 			return FileUtil.readFile(resultClustersFile, StandardCharsets.UTF_8);

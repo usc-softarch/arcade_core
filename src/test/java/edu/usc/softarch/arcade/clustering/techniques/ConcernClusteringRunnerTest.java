@@ -32,28 +32,28 @@ public class ConcernClusteringRunnerTest {
 		// [system language]
 
 		// struts 2.3.30
-		".///subject_systems///Struts2///src///struts-2.3.30,"
+		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.3.30,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.3.30,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "struts-2.3.30,"
 		+ "java",
 
 		// struts 2.5.2
-		".///subject_systems///Struts2///src///struts-2.5.2,"
+		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.5.2,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.5.2,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "struts-2.5.2,"
 		+ "java",
 
 		// httpd-2.3.8
-		".///subject_systems///httpd///src///httpd-2.3.8,"
+		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.3.8,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "httpd-2.3.8,"
 		+ "c",
 
 		// httpd-2.4.26
-		".///subject_systems///httpd///src///httpd-2.4.26,"
+		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.4.26,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "httpd-2.4.26,"
@@ -63,7 +63,7 @@ public class ConcernClusteringRunnerTest {
 		/* Checks that ConcernClusteringRunner.fastFeatureVectors is not null after the ConcernClusteringRunner constructor call */
 		/* Checks that ConcernClusteringRunner.fastClusters is modified in the ConcernClusteringRunner constructor */
 		char fs = File.separatorChar;
-		String outputPath = "." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest";
+		String outputPath = "." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest" + fs + "ds_serialized";
 		(new File(outputPath)).mkdirs();
 		
 		String fullSrcDir = srcDir.replace("///", File.separator);
@@ -91,31 +91,34 @@ public class ConcernClusteringRunnerTest {
 			fail("failed to deserialize FastFeatureVectors from builder object");
 		}
 		
-		// Construct a ConcernClusteringRunner object
+		// Construct a ConcernClusteringRunner object - USING THE CLONE THAT TAKES IN THE VERSION NAME HERE
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
-			builderffVecs, fullSrcDir, outputDir + "/base", language);
+			builderffVecs, fullSrcDir, outputDir + "/base", language, versionName);
 
 		try {
 			// Deserialize fastClusters from before initializeDocTopicsForEachFastCluster() call (wherein every node gets a cluster)
-			ois = new ObjectInputStream(new FileInputStream(resDir + fs + "ds_serialized" + fs + versionName + "_fastClusters_before_init.txt"));
+			ois = new ObjectInputStream(new FileInputStream("." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest" 
+				+ fs + "ds_serialized" + fs + versionName + "_fastClusters_before_init.txt"));
 			FastClusterArchitecture fastClustersBefore = (FastClusterArchitecture) ois.readObject();
 			ois.close();
 			// Deserialize fastClusters from after initializeDocTopicsForEachFastCluster() call
-			ois = new ObjectInputStream(new FileInputStream(resDir + fs + "ds_serialized" + fs + versionName + "_fastClusters_after_init.txt"));
+			ois = new ObjectInputStream(new FileInputStream("." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest" 
+				+ fs + "ds_serialized" + fs + versionName + "_fastClusters_after_init.txt"));
 			FastClusterArchitecture fastClustersAfterInit = (FastClusterArchitecture) ois.readObject();
-			// System.out.println("fastClusters size before: " + fastClustersBefore.size());
-			// System.out.println("fastClusters size after: " + fastClustersAfter.size());
+			System.out.println("fastClusters size before: " + fastClustersBefore.size());
+			System.out.println("fastClusters size after: " + fastClustersAfterInit.size());
 			ois.close();
 
 
-			assertFalse(fastClustersBefore.isEmpty()); // every node should get a cluster, so there should be at least one cluster?
+			assertFalse(fastClustersBefore.isEmpty()); // every node should get a cluster, so there should be at least one cluster
 			assertAll( // Only executed if the previous assertion passes
 				() -> assertFalse(fastClustersAfterInit.isEmpty(), "fastClusters empty after initializeDocTopicsForEachFastCluster"),
 				() -> assertNotEquals(fastClustersAfterInit, fastClustersBefore)
 			);
 
 			// Deserialize fastFeatureVectors from after setFastFeatureVectors() call
-			ois = new ObjectInputStream(new FileInputStream(resDir + fs + "ds_serialized" + fs + versionName + "_fastFeatureVectors_init.txt"));
+			ois = new ObjectInputStream(new FileInputStream("." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest" 
+				+ fs + "ds_serialized" + fs + versionName + "_fastFeatureVectors_init.txt"));
 			FastFeatureVectors ffvInit = (FastFeatureVectors) ois.readObject();
 			// Should not be null
 			assertNotNull(ffvInit);
@@ -144,28 +147,28 @@ public class ConcernClusteringRunnerTest {
 		// [system language]
 
 		// struts 2.3.30
-		".///subject_systems///Struts2///src///struts-2.3.30,"
+		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.3.30,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.3.30,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "struts-2.3.30,"
 		+ "java",
 
 		// struts 2.5.2
-		".///subject_systems///Struts2///src///struts-2.5.2,"
+		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.5.2,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.5.2,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "struts-2.5.2,"
 		+ "java",
 
 		// httpd-2.3.8
-		".///subject_systems///httpd///src///httpd-2.3.8,"
+		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.3.8,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "httpd-2.3.8,"
 		+ "c",
 
 		// httpd-2.4.26
-		".///subject_systems///httpd///src///httpd-2.4.26,"
+		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.4.26,"
 		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
 		+ "httpd-2.4.26,"
@@ -206,22 +209,25 @@ public class ConcernClusteringRunnerTest {
 		
 		// Construct a ConcernClusteringRunner object
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
-			builderffVecs, fullSrcDir, outputDir + "/base", language);
+			builderffVecs, fullSrcDir, outputDir + "/base", language, versionName);
 		// call computeClustersWithConcernsAndFastClusters()
 		// FastClusterArchitecture beforeCompute = ClusteringAlgoRunner.fastClusters;
 		assertDoesNotThrow(() -> {
 			int numClusters = (int) ((double) runner.getFastClusters().size() * .20); // copied from BatchClusteringEngine
-			runner.computeClustersWithConcernsAndFastClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters), "preselected", "js"); // copied from BatchClusteringEngine
+			// USING THE CLONE THAT TAKES IN THE VERSION NAME HERE
+			runner.computeClustersWithConcernsAndFastClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters), "preselected", "js", versionName);
 		});
 
 		// check fastClusters
 		try {
 			// Deserialize initial fastClusters
-			ois = new ObjectInputStream(new FileInputStream(resDir + fs + "ds_serialized" + fs + versionName + "_fastClusters_after_init.txt"));
+			ois = new ObjectInputStream(new FileInputStream("." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest" 
+				+ fs + "ds_serialized" + fs + versionName + "_fastClusters_after_init.txt"));
 			FastClusterArchitecture fastClustersAfterInit = (FastClusterArchitecture) ois.readObject();
 			ois.close();
 			// Deserialize fastClusters from after computeClustersWithConcernsAndFastClusters() call
-			ois = new ObjectInputStream(new FileInputStream(resDir + fs + "ds_serialized" + fs + versionName + "_fastClusters_after_compute.txt"));
+			ois = new ObjectInputStream(new FileInputStream("." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest" 
+				+ fs + "ds_serialized" + fs + versionName + "_fastClusters_after_compute.txt"));
 			FastClusterArchitecture fastClustersCompute = (FastClusterArchitecture) ois.readObject();
 			ois.close();
 
