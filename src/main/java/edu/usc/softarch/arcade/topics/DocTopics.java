@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.topics;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,9 @@ import edu.usc.softarch.arcade.util.FileUtil;
 /**
  * @author joshua
  */
-public class DocTopics {
+public class DocTopics implements Serializable{
 	// #region FIELDS ------------------------------------------------------------
+	static final long serialVersionUID = 1L;
 	private static Logger logger = LogManager.getLogger(DocTopics.class);
 	private List<DocTopicItem> dtItemList;
 	// #endregion FIELDS ---------------------------------------------------------
@@ -51,6 +53,7 @@ public class DocTopics {
 
 	public DocTopics(String srcDir, String artifactsDir, String language) 
 			throws Exception {
+		this();
 		// Begin by importing documents from text to feature sequences
 		List<Pipe> pipeList = new ArrayList<>();
 
@@ -62,18 +65,18 @@ public class DocTopics {
 		pipeList.add(new CharSequenceLowercase());
 		pipeList.add(new CharSequence2TokenSequence(Pattern
 				.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")));
-		pipeList.add(new TokenSequenceRemoveStopwords(new File(
-				"stoplists/en.txt"), "UTF-8", false, false, false));
+		// pipeList.add(new TokenSequenceRemoveStopwords(new File(
+		// 		"stoplists/en.txt"), "UTF-8", false, false, false));
 		
-		if (language.equalsIgnoreCase("c")) {
-			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/ckeywords"), "UTF-8", false, false, false));
-			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/cppkeywords"), "UTF-8", false, false, false));
-		}
-		else
-			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/javakeywords"), "UTF-8", false, false, false));
+		// if (language.equalsIgnoreCase("c")) {
+		// 	pipeList.add(new TokenSequenceRemoveStopwords(new File(
+		// 			"res/ckeywords"), "UTF-8", false, false, false));
+		// 	pipeList.add(new TokenSequenceRemoveStopwords(new File(
+		// 			"res/cppkeywords"), "UTF-8", false, false, false));
+		// }
+		// else
+		// 	pipeList.add(new TokenSequenceRemoveStopwords(new File(
+		// 			"res/javakeywords"), "UTF-8", false, false, false));
 
 		pipeList.add(new StemmerPipe());
 		pipeList.add(new TokenSequence2FeatureSequence());
@@ -174,7 +177,10 @@ public class DocTopics {
 				if (strippedSource.contains(nameWithoutQuotations))
 					return dti;
 			} else if (dti.isCSourced()) {
-				if (dti.getSource().endsWith(nameWithoutQuotations))
+				//FIXME Make sure this works on Linux and find a permanent fix
+				strippedSource = dti.getSource().substring(1, dti.getSource().length());
+				strippedSource = strippedSource.replace("\\", "/");
+				if (strippedSource.endsWith(nameWithoutQuotations))
 					return dti;
 			}
 			else if (dti.getSource().endsWith(".S")) {

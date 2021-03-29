@@ -1,0 +1,9 @@
+<edu.usc.softarch.arcade.antipattern.SmellCollection serialization="custom">
+  <unserializable-parents/>
+  <set>
+    <default/>
+    <int>16</int>
+    <float>0.75</float>
+    <int>0</int>
+  </set>
+</edu.usc.softarch.arcade.antipattern.SmellCollection>

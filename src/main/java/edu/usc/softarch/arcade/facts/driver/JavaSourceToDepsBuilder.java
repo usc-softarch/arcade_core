@@ -2,7 +2,9 @@ package edu.usc.softarch.arcade.facts.driver;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.HashSet;
@@ -51,6 +53,15 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 		for (Pair<String,String> edge : edges)
 			typedEdgeGraph.addEdge("depends", edge.getLeft(), edge.getRight());
 		this.ffVecs = new FastFeatureVectors(typedEdgeGraph);
+
+		/*** BEGIN SERIALIZATION CODE ***/
+		// char fs = File.separatorChar;
+		// ObjectOutputStream oosffVecs = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
+		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ffVecs_serialized" + fs + 
+		// 	"struts-2.3.30_ffVecs_builder.txt"));
+		// oosffVecs.writeObject(ffVecs);
+		// oosffVecs.close();
+		/*** END SERIALIZATION CODE ***/
 	}
 
 	/**

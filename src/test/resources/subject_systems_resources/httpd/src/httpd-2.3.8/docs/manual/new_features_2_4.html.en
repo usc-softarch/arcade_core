@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><!--
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              This file is generated from xml source: DO NOT EDIT
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      -->
+<title>Overview of new features in Apache HTTP Server 2.4 - Apache HTTP Server</title>
+<link href="./style/css/manual.css" rel="stylesheet" media="all" type="text/css" title="Main stylesheet" />
+<link href="./style/css/manual-loose-100pc.css" rel="alternate stylesheet" media="all" type="text/css" title="No Sidebar - Default font size" />
+<link href="./style/css/manual-print.css" rel="stylesheet" media="print" type="text/css" />
+<link href="./images/favicon.ico" rel="shortcut icon" /></head>
+<body id="manual-page"><div id="page-header">
+<p class="menu"><a href="./mod/">Modules</a> | <a href="./mod/directives.html">Directives</a> | <a href="./faq/">FAQ</a> | <a href="./glossary.html">Glossary</a> | <a href="./sitemap.html">Sitemap</a></p>
+<p class="apache">Apache HTTP Server Version 2.3</p>
+<img alt="" src="./images/feather.gif" /></div>
+<div class="up"><a href="./"><img title="&lt;-" alt="&lt;-" src="./images/left.gif" /></a></div>
+<div id="path">
+<a href="http://www.apache.org/">Apache</a> &gt; <a href="http://httpd.apache.org/">HTTP Server</a> &gt; <a href="http://httpd.apache.org/docs/">Documentation</a> &gt; <a href="./">Version 2.3</a></div><div id="page-content"><div id="preamble"><h1>Overview of new features in Apache HTTP Server 2.4</h1>
+<div class="toplang">
+<p><span>Available Languages: </span><a href="./en/new_features_2_4.html" title="English">&nbsp;en&nbsp;</a> |
+<a href="./fr/new_features_2_4.html" hreflang="fr" rel="alternate" title="Français">&nbsp;fr&nbsp;</a></p>
+</div>
+
+  <p>This document describes some of the major changes between the
+     2.2 and 2.4 versions of the Apache HTTP Server. For new features since
+     version 2.0, see the <a href="new_features_2_2.html">2.2 new features</a>
+     document.</p>
+</div>
+<div id="quickview"><ul id="toc"><li><img alt="" src="./images/down.gif" /> <a href="#core">Core Enhancements</a></li>
+<li><img alt="" src="./images/down.gif" /> <a href="#module">Module Enhancements</a></li>
+<li><img alt="" src="./images/down.gif" /> <a href="#programs">Program Enhancements</a></li>
+<li><img alt="" src="./images/down.gif" /> <a href="#developer">Module Developer Changes</a></li>
+</ul></div>
+<div class="top"><a href="#page-header"><img alt="top" src="./images/up.gif" /></a></div>
+<div class="section">
+<h2><a name="core" id="core">Core Enhancements</a></h2>
+    
+    <dl>
+      <dt>KeepAliveTimeout in milliseconds</dt>
+
+      <dd>It is now possible to specify <code class="directive"><a href="./mod/core.html#keepalivetimeout">KeepAliveTimeout</a></code> in milliseconds.
+      </dd>
+ 
+      <dt>Simple MPM</dt>
+      <dd>Cleanroom MPM implementation with advanced thread pool management</dd>
+      
+      <dt>Loadable MPMs</dt>
+      <dd>Multiple MPMs can now be built as loadable modules at compile time.  
+      The MPM of choice can be configured at run time.</dd>
+ 
+      <dt>Per-module and per-directory LogLevel configuration</dt>
+      <dd>The <code class="directive"><a href="./mod/core.html#loglevel">LogLevel</a></code> can now be
+      configured per module and per directory.  New levels <code>trace1</code>
+      to <code>trace8</code> have been added above the <code>debug</code> log
+      level.</dd>
+    </dl>
+  </div><div class="top"><a href="#page-header"><img alt="top" src="./images/up.gif" /></a></div>
+<div class="section">
+<h2><a name="module" id="module">Module Enhancements</a></h2>
+    
+    <dl>
+      <dt><code class="module"><a href="./mod/mod_ssl.html">mod_ssl</a></code></dt>
+
+      <dd><code class="module"><a href="./mod/mod_ssl.html">mod_ssl</a></code> can now be configured to use an
+      OCSP server to check the validation status of a client
+      certificate.  The default responder is configurable, along with
+      the decision on whether to prefer the responder designated in
+      the client certificate itself.</dd>
+      
+      <dd><code class="module"><a href="./mod/mod_ssl.html">mod_ssl</a></code> now also supports OCSP stapling, where the 
+      server pro-actively obtains an OCSP verification of its certificate and 
+      transmits that to the client during the handshake. </dd>
+      
+      <dd><code class="module"><a href="./mod/mod_ssl.html">mod_ssl</a></code> can now be configured to share SSL Session 
+      data between servers through memcached</dd>
+ 
+      <dt><code class="module"><a href="./mod/mod_lua.html">mod_lua</a></code></dt>
+
+      <dd>Embeds the <a href="http://www.lua.org/">Lua</a> language into httpd, 
+      for configuration and small business logic functions.</dd>
+ 
+      <dt><code class="module"><a href="./mod/mod_proxy_fcgi.html">mod_proxy_fcgi</a></code></dt>
+
+      <dd>FastCGI Protocol backend for <code class="module"><a href="./mod/mod_proxy.html">mod_proxy</a></code></dd>
+    </dl>
+  </div><div class="top"><a href="#page-header"><img alt="top" src="./images/up.gif" /></a></div>
+<div class="section">
+<h2><a name="programs" id="programs">Program Enhancements</a></h2>
+    
+    <dl>
+        <dt>fcgistarter</dt>
+        <dd>FastCGI deamon starter utility</dd>
+    </dl>
+  </div><div class="top"><a href="#page-header"><img alt="top" src="./images/up.gif" /></a></div>
+<div class="section">
+<h2><a name="developer" id="developer">Module Developer Changes</a></h2>
+    
+    <dl>
+      <dt>Check Configuration Hook Added</dt>
+
+      <dd>A new hook, <code>check_config</code>, has been added which runs
+          between the <code>pre_config</code> and <code>open_logs</code>
+          hooks.  It also runs before the <code>test_config</code> hook
+          when the <code>-t</code> option is passed to
+          <code class="program"><a href="./programs/httpd.html">httpd</a></code>.  The <code>check_config</code> hook
+          allows modules to review interdependent configuration directive
+          values and adjust them while messages can still be logged to the
+          console.  The user can thus be alerted to misconfiguration problems
+          before the core <code>open_logs</code> hook function redirects
+          console output to the error log.</dd>
+
+      <dt>Expression Parser Added</dt>
+
+      <dd>We now have a general-purpose expression parser, whose API is
+          exposed in <var>ap_expr.h</var>.  This is adapted from the
+          expression parser previously implemented in
+          <code class="module"><a href="./mod/mod_include.html">mod_include</a></code>.</dd>
+
+      <dt>Authorization Logic Containers</dt>
+
+      <dd>Advanced authorization logic may now be specified using the
+          <code class="directive"><a href="./mod/mod_authz_core.html#require">Require</a></code> directive
+          and the related container directives, such as
+          <code class="directive"><a href="./mod/mod_authz_core.html#requireall">&lt;RequireAll&gt;</a></code>, all
+          provided by the <code class="module"><a href="./mod/mod_authz_core.html">mod_authz_core</a></code> module.</dd>
+
+      <dt>Small-Object Caching Interface</dt>
+
+      <dd>The <var>ap_socache.h</var> header exposes a provider-based
+      interface for caching small data objects, based on the previous
+      implementation of the <code class="module"><a href="./mod/mod_ssl.html">mod_ssl</a></code> session cache.
+      Providers using a shared-memory cyclic buffer, disk-based dbm
+      files, and a memcache distributed cache are currently
+      supported.</dd>
+
+    </dl>
+  </div></div>
+<div class="bottomlang">
+<p><span>Available Languages: </span><a href="./en/new_features_2_4.html" title="English">&nbsp;en&nbsp;</a> |
+<a href="./fr/new_features_2_4.html" hreflang="fr" rel="alternate" title="Français">&nbsp;fr&nbsp;</a></p>
+</div><div id="footer">
+<p class="apache">Copyright 2010 The Apache Software Foundation.<br />Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.</p>
+<p class="menu"><a href="./mod/">Modules</a> | <a href="./mod/directives.html">Directives</a> | <a href="./faq/">FAQ</a> | <a href="./glossary.html">Glossary</a> | <a href="./sitemap.html">Sitemap</a></p></div>
+</body></html>

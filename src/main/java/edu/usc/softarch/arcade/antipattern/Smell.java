@@ -1,12 +1,14 @@
 package edu.usc.softarch.arcade.antipattern;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 
-public class Smell {
+public class Smell implements Serializable {
+	private static final long serialVersionUID = 1L;
 	// #region FIELDS ------------------------------------------------------------
 	public enum SmellType {
 		bco, bdc, buo, spf

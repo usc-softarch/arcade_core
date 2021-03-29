@@ -1,6 +1,10 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,23 +13,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.jgrapht.alg.cycle.CycleDetector;
+import org.apache.logging.log4j.Logger;
 import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector;
+import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
-import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
+import edu.usc.softarch.arcade.clustering.StringGraph;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
@@ -45,6 +49,7 @@ public class ArchSmellDetector {
 	private DocTopics docTopics;
 	private double scatteredConcernThreshold;
 	private double parasiticConcernThreshold;
+	private String version;
 
 	static final Comparator<TopicItem> TOPIC_PROPORTION_ORDER 
 		= (TopicItem t1, TopicItem t2) -> {
@@ -61,6 +66,12 @@ public class ArchSmellDetector {
 			"structural-irrelevant", .20, .20, null, null);
 	}
 
+	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, String version) {
+		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, "structural-irrelevant", .20, .20, null,
+				null);
+		this.version = version;
+	}
+
 	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
 			String detectedSmellsFilename, double scatteredConcernThreshold,
 			double parasiticConcernThreshold) {
@@ -74,6 +85,14 @@ public class ArchSmellDetector {
 			TopicModelExtractionMethod tmeMethod,	DocTopics docTopics) {
 		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename,
 			language, .20, .20, tmeMethod, docTopics);
+	}
+
+	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
+	String detectedSmellsFilename, String language,
+	TopicModelExtractionMethod tmeMethod,	DocTopics docTopics, String version) {
+		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename,
+		language, .20, .20, tmeMethod, docTopics);
+		this.version = version;
 	}
 
 	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
@@ -102,6 +121,7 @@ public class ArchSmellDetector {
 		SmellCollection detectedSmells = new SmellCollection();
 		ConcernClusterArchitecture clusters = loadClusters();
 		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
+
 
 		// Execute detection algorithms
 		if(runConcern)
@@ -134,6 +154,39 @@ public class ArchSmellDetector {
 
 	public void runConcernDetectionAlgs(ConcernClusterArchitecture clusters,
 			SmellCollection detectedSmells, Map<String,Set<String>> clusterSmellMap) {
+
+		
+		//Added for testing
+		//Serialization for test oracles.
+		
+		/*
+		char fs = File.separatorChar;
+		try{
+			String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runConcernDetectionAlgs_resources///";
+			resources_dir = resources_dir.replace("///", File.separator);
+
+			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_detectedSmells_before.txt"));
+			oosDSmells2.writeObject(detectedSmells);
+			oosDSmells2.flush();
+			oosDSmells2.close();
+
+
+
+			ObjectOutputStream oosClusters2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusters_before.txt"));
+			oosClusters2.writeObject(clusters);
+			oosClusters2.flush();
+			oosClusters2.close();
+
+			ObjectOutputStream oosCSM2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusterSmellMap_before.txt"));
+			oosCSM2.writeObject(clusterSmellMap);
+			oosCSM2.flush();
+			oosCSM2.close();
+
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		*/
+
 		if (this.tmeMethod == TopicModelExtractionMethod.MALLET_API)
 			buildConcernClustersFromMalletAPI(clusters);
 		if (this.tmeMethod == TopicModelExtractionMethod.VAR_MALLET_FILE)
@@ -152,6 +205,32 @@ public class ArchSmellDetector {
 
 		detectBco(detectedSmells, clusters, clusterSmellMap);
 		detectSpfNew(clusters, clusterSmellMap, detectedSmells);
+
+		//Added for testing
+		//Serialization for test oracles.
+		/*
+		try{
+			String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runConcernDetectionAlgs_resources///";
+			resources_dir = resources_dir.replace("///", File.separator);
+			
+			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_detectedSmells_after.txt"));
+			oosDSmells2.writeObject(detectedSmells);
+			oosDSmells2.flush();
+			oosDSmells2.close();
+			ObjectOutputStream oosClusters2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusters_after.txt"));
+			oosClusters2.writeObject(clusters);
+			oosClusters2.flush();
+			oosClusters2.close();
+			ObjectOutputStream oosCSM2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusterSmellMap_after.txt"));
+			oosCSM2.writeObject(clusterSmellMap);
+			oosCSM2.flush();
+			oosCSM2.close();
+			
+			
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		*/
 	}
 
 	public void runStructuralDetectionAlgs(ConcernClusterArchitecture clusters,
@@ -167,6 +246,33 @@ public class ArchSmellDetector {
 		
 		detectBdc(detectedSmells, clusters, clusterSmellMap, directedGraph);
 		detectBuo(detectedSmells, clusters, clusterSmellMap, directedGraph);
+
+		//Added for testing
+		//Serialization for test oracles.
+		/*
+		String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runStructuralDetectionAlgs_resources///";
+      	resources_dir = resources_dir.replace("///", File.separator);
+		ObjectOutputStream oos;
+		try {
+			oos = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_run_clusterSmellMap.txt"));
+			oos.writeObject(clusterSmellMap);
+			oos.flush();
+			oos.close();
+
+			oos = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_run_clusters.txt"));
+			oos.writeObject(clusters);
+			oos.flush();
+			oos.close();
+
+			oos = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_run_detected_smells.txt"));
+			oos.writeObject(detectedSmells);
+			oos.flush();
+			oos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
 	}
 	// #endregion PUBLIC INTERFACE -----------------------------------------------
 
@@ -266,7 +372,9 @@ public class ArchSmellDetector {
 	 * @param clusterSmellMap Map of smells per cluster.
 	 * @return Map of clusters per smell.
 	 */
-	private Map<String, Set<String>> buildSmellToClustersMap(
+
+	//Changed buildSmellToClustersMap from private to protected for testing
+	protected Map<String, Set<String>> buildSmellToClustersMap(
 			Map<String, Set<String>> clusterSmellMap) {
 		Map<String,Set<String>> smellClustersMap = new HashMap<>();
 
@@ -282,6 +390,23 @@ public class ArchSmellDetector {
 				}
 			}
 		}
+
+		//Added for creating test oracles, uncomment to produce new test oracles
+		/*
+		char fs = File.separatorChar;
+		try{
+			String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runConcernDetectionAlgs_resources///";
+			resources_dir = resources_dir.replace("///", File.separator);
+
+			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_smellClusterMap_after.txt"));
+			oosDSmells2.writeObject(smellClustersMap);
+			oosDSmells2.flush();
+			oosDSmells2.close();
+
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		*/
 
 		return smellClustersMap;
 	}
@@ -416,6 +541,7 @@ public class ArchSmellDetector {
 			ConcernClusterArchitecture clusters,
 			Map<String, Set<String>> clusterSmellMap) {
 		System.out.println("Finding brick concern overload instances...");
+
 		double concernOverloadTopicThreshold = .10;
 		Map<ConcernCluster,Integer> concernCountMap = new HashMap<>(); 
 		for (ConcernCluster cluster : clusters) {
@@ -459,6 +585,7 @@ public class ArchSmellDetector {
 				updateSmellMap(clusterSmellMap, cluster.getName(), "bco");
 			}
 		}
+		
 		return stdDev;
 	}
 
@@ -507,6 +634,7 @@ public class ArchSmellDetector {
 			Map<String, Set<String>> clusterSmellsMap,
 			SmellCollection detectedSmells) {
 		logger.info("Finding scattered parasitic functionality instances...");
+
 
 		// Setting thresholds for detection algorithm
 		Map<Integer, Integer> topicNumCountMap = new HashMap<>();
@@ -560,6 +688,7 @@ public class ArchSmellDetector {
 				spf.addCluster(affectedCluster);
 			detectedSmells.add(spf);
 		}
+
 	}
 
 	/**
