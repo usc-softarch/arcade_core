@@ -381,8 +381,7 @@
         <configuration>
           <excludes>
             <exclude>JavaSourceToDepsBuilderTest_resources_old/**/*</exclude>
-            <exclude>subject_systems_resources/Struts2/src/struts-2.3.30/**/*</exclude>
-            <exclude>subject_systems_resources/Struts2/src/struts-2.5.2/**/*</exclude>
+            <exclude>subject_systems_resources/**/*</exclude>
           </excludes>
         </configuration>
       </plugin>
