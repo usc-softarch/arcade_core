@@ -19,6 +19,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import edu.usc.softarch.arcade.clustering.acdc.ACDC;
+import edu.usc.softarch.arcade.topics.DocTopics;
+import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 
@@ -178,6 +180,7 @@ public class ArchSmellDetectorTest {
     + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusters_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_detectedSmells_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusters_before.txt,"
+    + "///runConcernDetectionAlgs_resources///struts-2.3.30_docTopics.txt,"
     + "struts-2.3.30",
 
     //Input for asd constructor to run on struts-2.5.2
@@ -188,12 +191,13 @@ public class ArchSmellDetectorTest {
     + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusters_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_detectedSmells_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusters_before.txt,"
+    + "///runConcernDetectionAlgs_resources///struts-2.5.2_docTopics.txt,"
     + "struts-2.5.2",
   })
   @ParameterizedTest
   public void runConcernDetectionAlgsTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
                                              String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile,
-                                             String clusterObjectFileBefore, String version){
+                                             String clusterObjectFileBefore,String topics, String version){
 
 
     String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
@@ -207,30 +211,32 @@ public class ArchSmellDetectorTest {
     clusterObjectFile = clusterObjectFile.replace("///", File.separator);
     smellsObjectFile = smellsObjectFile.replace("///", File.separator);
     clusterObjectFileBefore = clusterObjectFileBefore.replace("///", File.separator);
+    topics = topics.replace("///", File.separator);
 
-    ArchSmellDetector asd;
-    asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, version);
 
     // Initialize variables
 		SmellCollection detectedSmells = new SmellCollection();
 		ConcernClusterArchitecture clusters = ConcernClusterArchitecture.loadFromRsf(clustersRsfFilename);
 		Map<String, Set<String>> clusterSmellMap = new HashMap<>();
     
-    // TODO: Might not need this try/catch block now that we have unit tests for loadFromRsf
+    DocTopics docTopic;
+    ArchSmellDetector asd;
     try{
-      ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterObjectFileBefore));
-      ConcernClusterArchitecture oracle_clusters2 = (ConcernClusterArchitecture) ois.readObject();
-      
-      assertTrue(clusters.equals(oracle_clusters2));
-      
+      ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + topics));
+      docTopic = (DocTopics) ois.readObject();
+
+      asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename,"java",
+                        TopicModelExtractionMethod.MALLET_API, docTopic, version);
+
       ois.close();
+      asd.runConcernDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
     } catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
       fail("Exception caught in runConcernDetectionAlgsTest"); // if we get here, we done goofed
     }
 
-    asd.runConcernDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
+    
 
     //check that the data structures are not empty after running runConcernDetectionAlgs
     assertAll(
@@ -252,12 +258,13 @@ public class ArchSmellDetectorTest {
       SmellCollection oracle_detectedSmells = (SmellCollection) ois.readObject();
 			ois.close();
 
+      
       assertAll(
         () -> assertTrue(clusterSmellMap.equals(oracle_clusterSmellMap)),
         () -> assertTrue(clusters.equals(oracle_clusters)),
         () -> assertTrue(detectedSmells.equals(oracle_detectedSmells))
       );
-
+      
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -272,7 +279,8 @@ public class ArchSmellDetectorTest {
     + "///output///struts-2.3.30_acdc_clustered.rsf,"
     + "///output///struts-2.3.30_acdc_smells.ser,"
     + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusterSmellMap_after.txt,"
-    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_smellClusterMap_after.txt",
+    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_smellClusterMap_after.txt,"
+    + "struts-2.3.30",
 
 
     //Input for asd constructor to run on struts-2.5.2
@@ -280,11 +288,12 @@ public class ArchSmellDetectorTest {
     + "///output///struts-2.5.2_acdc_clustered.rsf,"
     + "///output///struts-2.5.2_acdc_smells.ser,"
     + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusterSmellMap_after.txt,"
-    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_smellClusterMap_after.txt",
+    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_smellClusterMap_after.txt,"
+    + "struts-2.5.2",
   })
   @ParameterizedTest
   public void buildSmellToClustersMapTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
-                                          String clusterSmellMapBefore, String clusterSmellMapAter){
+                                          String clusterSmellMapBefore, String clusterSmellMapAter, String version){
     String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
     resources_dir = resources_dir.replace("///", File.separator);
 
@@ -296,7 +305,7 @@ public class ArchSmellDetectorTest {
     clusterSmellMapAter = clusterSmellMapAter.replace("///", File.separator);
 
     ArchSmellDetector asd;
-    asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename);
+    asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, version);
 
     try {
       //Read in the clusterSmellMap
