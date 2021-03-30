@@ -164,7 +164,7 @@
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
-      <version>1.4.15</version>
+      <version>1.4.16</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/xmlpull/xmlpull -->
     <dependency>
@@ -381,6 +381,7 @@
         <configuration>
           <excludes>
             <exclude>JavaSourceToDepsBuilderTest_resources_old/**/*</exclude>
+            <exclude>JavaSourceToDepsBuilderTest_resources/**/*</exclude>
             <exclude>subject_systems_resources/**/*</exclude>
           </excludes>
         </configuration>
@@ -398,6 +399,14 @@
         </includes>
       </resource>
     </resources>
+    <testResources>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+        <excludes>
+          <exclude>**/*</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
   </build>
   <distributionManagement>
 	<repository>
