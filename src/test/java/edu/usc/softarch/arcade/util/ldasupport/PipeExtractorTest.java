@@ -73,7 +73,7 @@ public class PipeExtractorTest {
 		});
 
 		// Read result instances into a set
-		InstanceList resultInstances = InstanceList.load(new File(oraclePath));
+		InstanceList resultInstances = InstanceList.load(new File(resultDir + File.separatorChar + "output.pipe"));
 		Set<Instance> result = new HashSet<>();
 		for (Instance i : resultInstances) {
 			result.add(i);
