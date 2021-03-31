@@ -31,7 +31,7 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
   public FastClusterArchitecture(FastClusterArchitecture fca) {
     super();
     for (FastCluster fc : fca)
-      this.add(fc);
+      this.add(new FastCluster(fc));
   }
 
   public Map<String, Integer> createFastClusterNameToNodeNumberMap() {

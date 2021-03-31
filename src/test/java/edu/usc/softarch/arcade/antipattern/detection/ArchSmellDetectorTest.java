@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.antipattern.detection;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -91,11 +92,10 @@ public class ArchSmellDetectorTest {
 		});
 
 		// SmellCollection extends HashSet, so we can use equals() to compare the result to the oracle
-		assertTrue(oracleSmells.equals(resultSmells));
+		assertEquals(oracleSmells, resultSmells);
 	}
 
   @CsvSource({
-
     /** Test parameters **/
 		// [input deps rsf file path]
 		// [input file path for clusters file]
@@ -123,7 +123,8 @@ public class ArchSmellDetectorTest {
     + "///runStructuralDetectionAlgs_resources///struts-2.5.2_output_run_detected_smells.txt,"
     + "struts-2.5.2",
 
-    //Input for asd constructor to run on httpd 2.3.8 - RESOURCES ARE PLACEHOLDERS REPLACE LATER
+    //Input for asd constructor to run on httpd 2.3.8
+    //TODO RESOURCES ARE PLACEHOLDERS REPLACE LATER
     "///input_files///httpd-2.3.8_deps.rsf,"
     + "///input_files///httpd-2.3.8_acdc_clustered.rsf,"
     + "///target///test_results///ArchSmellDetectorTest///httpd-2.3.8_acdc_smells.ser,"
@@ -132,7 +133,8 @@ public class ArchSmellDetectorTest {
     + "///runStructuralDetectionAlgs_resources///httpd-2.3.8_output_run_detected_smells.txt,"
     + "httpd-2.3.8",
 
-    //Input for asd constructor to run on httpd 2.4.26 - RESOURCES ARE PLACEHOLDERS REPLACE LATER
+    //Input for asd constructor to run on httpd 2.4.26
+    //TODO RESOURCES ARE PLACEHOLDERS REPLACE LATER
     "///input_files///httpd-2.4.26_deps.rsf,"
     + "///input_files///httpd-2.4.26_acdc_clustered.rsf,"
     + "///target///test_results///ArchSmellDetectorTest///httpd-2.4.26_acdc_smells.ser,"
@@ -143,9 +145,8 @@ public class ArchSmellDetectorTest {
   })
   @ParameterizedTest
   public void runStructuralDetectionAlgsTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
-                                             String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile, String version){
+                                             String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile, String version) {
     String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
-
     resources_dir = resources_dir.replace("///", File.separator);
 
     depsRsfFilename = resources_dir + depsRsfFilename.replace("///", File.separator);
@@ -156,8 +157,8 @@ public class ArchSmellDetectorTest {
     clusterObjectFile = clusterObjectFile.replace("///", File.separator);
     smellsObjectFile = smellsObjectFile.replace("///", File.separator);
 
-    ArchSmellDetector asd;
-    asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, version);
+    ArchSmellDetector asd = new ArchSmellDetector(
+      depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, version);
     
     // Initialize variables
 		SmellCollection detectedSmells = new SmellCollection();
@@ -187,13 +188,11 @@ public class ArchSmellDetectorTest {
 			ois.close();
 
       assertAll(
-        () -> assertTrue(clusterSmellMap.equals(oracle_clusterSmellMap)),
-        () -> assertTrue(clusters.equals(oracle_clusters)),
-        () -> assertTrue(detectedSmells.equals(oracle_detectedSmells))
+        () -> assertEquals(oracle_clusterSmellMap, clusterSmellMap),
+        () -> assertEquals(oracle_clusters, clusters),
+        () -> assertEquals(oracle_detectedSmells, detectedSmells)
       );
-
 		} catch (IOException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
       fail("Exception caught in runStructuralDetectionAlgsTest"); // if we get here, we done goofed
 		}
@@ -225,8 +224,7 @@ public class ArchSmellDetectorTest {
   @ParameterizedTest
   public void runConcernDetectionAlgsTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
                                              String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile,
-                                             String clusterObjectFileBefore,String topics, String version){
-
+                                             String clusterObjectFileBefore, String topics, String version) {
     String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
     resources_dir = resources_dir.replace("///", File.separator);
 
@@ -239,7 +237,6 @@ public class ArchSmellDetectorTest {
     smellsObjectFile = smellsObjectFile.replace("///", File.separator);
     clusterObjectFileBefore = clusterObjectFileBefore.replace("///", File.separator);
     topics = topics.replace("///", File.separator);
-
 
     // Initialize variables
 		SmellCollection detectedSmells = new SmellCollection();
@@ -258,12 +255,9 @@ public class ArchSmellDetectorTest {
       ois.close();
       asd.runConcernDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
     } catch (IOException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
       fail("Exception caught in runConcernDetectionAlgsTest"); // if we get here, we done goofed
     }
-
-    
 
     //check that the data structures are not empty after running runConcernDetectionAlgs
     assertAll(
@@ -287,13 +281,12 @@ public class ArchSmellDetectorTest {
 
       
       assertAll(
-        () -> assertTrue(clusterSmellMap.equals(oracle_clusterSmellMap)),
-        () -> assertTrue(clusters.equals(oracle_clusters)),
-        () -> assertTrue(detectedSmells.equals(oracle_detectedSmells))
+        () -> assertEquals(oracle_clusterSmellMap, clusterSmellMap),
+        () -> assertEquals(oracle_clusters, clusters),
+        () -> assertEquals(oracle_detectedSmells, detectedSmells)
       );
       
 		} catch (IOException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
       fail("Exception caught in runConcernDetectionAlgsTest");
 		}
@@ -319,7 +312,7 @@ public class ArchSmellDetectorTest {
   })
   @ParameterizedTest
   public void buildSmellToClustersMapTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
-                                          String clusterSmellMapBefore, String clusterSmellMapAter, String version){
+                                          String clusterSmellMapBefore, String clusterSmellMapAter, String version) {
     String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
     resources_dir = resources_dir.replace("///", File.separator);
 
@@ -330,8 +323,8 @@ public class ArchSmellDetectorTest {
     clusterSmellMapBefore = clusterSmellMapBefore.replace("///", File.separator);
     clusterSmellMapAter = clusterSmellMapAter.replace("///", File.separator);
 
-    ArchSmellDetector asd;
-    asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, version);
+    ArchSmellDetector asd = new ArchSmellDetector(
+      depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, version);
 
     try {
       //Read in the clusterSmellMap
@@ -346,8 +339,7 @@ public class ArchSmellDetectorTest {
 
       //Generate the output
       Map<String,Set<String>> smellClusterMap = asd.buildSmellToClustersMap(oracle_clusterSmellMapBefore);
-      assertTrue(smellClusterMap.equals(oracle_clusterSmellMapAfter));
-
+      assertEquals(oracle_clusterSmellMapAfter, smellClusterMap);
     } catch (FileNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -358,8 +350,6 @@ public class ArchSmellDetectorTest {
       fail("Exception caught in buildSmellToClustersMapTest");  
     }
   }
-
-
 
   /*
   //To run these tests, set updateSmellMap to public

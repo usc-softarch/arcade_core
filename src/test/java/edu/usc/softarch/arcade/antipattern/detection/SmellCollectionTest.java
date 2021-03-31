@@ -1,17 +1,9 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-
-import com.thoughtworks.xstream.XStream;
 
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,56 +12,35 @@ import org.junit.jupiter.params.provider.CsvSource;
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.antipattern.Smell.SmellType;
-import edu.usc.softarch.arcade.clustering.acdc.ACDC;
-import edu.usc.softarch.arcade.clustering.drivers.AcdcWithSmellDetection;
-import fj.data.HashSet;
 
 public class SmellCollectionTest {
     char fs = File.separatorChar;
     // part 1 Test on serialization
     
-    @Test
-    // Single buo 1
-    public void smellCollectionTest_Unit_BUO1() {
-        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell1.ser";
+    @ParameterizedTest
+    @CsvSource({
+        // Single buo 1
+        ".///src///test///resources///SmellCollectionTest_resources///UnitTest///Smell1.ser,"
+        + "1",
+        // Single buo 2
+        ".///src///test///resources///SmellCollectionTest_resources///UnitTest///Smell2.ser,"
+        + "1",
+        // multiple buo
+        ".///src///test///resources///SmellCollectionTest_resources///UnitTest///Smell3.ser,"
+        + "5"
+    })
+    public void smellCollectionTest_Unit_BUO123(
+            String serFilePath, String quantityString) {
+        String serFile = serFilePath.replace("///", File.separator);
+        int quantity = Integer.parseInt(quantityString);
         
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
         });
-        assertTrue(Smells.size() == 1);
+        assertEquals(quantity, Smells.size());
         for (Smell smell : Smells) {
-            assertTrue(smell.getSmellType() == SmellType.buo);
-            assertTrue(smell.getTopicNum() ==  -1);
-        }
-    }
-
-    @Test
-    // Single buo 2
-    public void smellCollectionTest_Unit_BUO2() {
-        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell2.ser";
-        
-        SmellCollection Smells = assertDoesNotThrow(() -> {
-            return new SmellCollection(serFile);
-        });
-        assertTrue(Smells.size() == 1);
-        for (Smell smell : Smells) {
-            assertTrue(smell.getSmellType() == SmellType.buo);
-            assertTrue(smell.getTopicNum() ==  -1);
-        }
-    }
-
-    @Test
-    // multiple buo
-    public void smellCollectionTest_Unit_BUO3() {
-        String serFile = "." + fs + "src" + fs + "test" + fs + "resources" + fs + "SmellCollectionTest_resources" + fs + "UnitTest" + fs + "Smell3.ser";
-        
-        SmellCollection Smells = assertDoesNotThrow(() -> {
-            return new SmellCollection(serFile);
-        });
-        assertTrue(Smells.size() == 5);
-        for (Smell smell : Smells) {
-            assertTrue(smell.getSmellType() == SmellType.buo);
-            assertTrue(smell.getTopicNum() ==  -1);
+            assertEquals(SmellType.buo, smell.getSmellType());
+            assertEquals(-1, smell.getTopicNum());
         }
     }
 
@@ -81,15 +52,13 @@ public class SmellCollectionTest {
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
         });
-        assertTrue(Smells.size() == 2);
+        assertEquals(2, Smells.size());
         for (Smell smell : Smells) {
-            if (smell.getSmellType() != SmellType.buo) {
-                assertTrue(smell.getSmellType() == SmellType.spf);
-            }
-            if (smell.getSmellType() != SmellType.spf) {
-                assertTrue(smell.getSmellType() == SmellType.buo);
-            }
-            assertTrue(smell.getTopicNum() == -1);
+            if (smell.getSmellType() != SmellType.buo)
+                assertEquals(SmellType.spf, smell.getSmellType());
+            if (smell.getSmellType() != SmellType.spf)
+                assertEquals(SmellType.buo, smell.getSmellType());
+            assertEquals(-1, smell.getTopicNum());
         }
     }
 
@@ -101,10 +70,10 @@ public class SmellCollectionTest {
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
         });
-        assertTrue(Smells.size() == 1);
+        assertEquals(1, Smells.size());
         for (Smell smell : Smells) {
-            assertTrue(smell.getSmellType() == SmellType.spf);
-            assertTrue(smell.getTopicNum() ==  -1);
+            assertEquals(SmellType.spf, smell.getSmellType());
+            assertEquals(-1, smell.getTopicNum());
         }
     }
 
@@ -116,10 +85,10 @@ public class SmellCollectionTest {
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
         });
-        assertTrue(Smells.size() == 1);
+        assertEquals(1, Smells.size());
         for (Smell smell : Smells) {
-            assertTrue(smell.getSmellType() == SmellType.bdc);
-            assertTrue(smell.getTopicNum() ==  -1);
+            assertEquals(SmellType.bdc, smell.getSmellType());
+            assertEquals(-1, smell.getTopicNum());
         }
     }
 
@@ -131,10 +100,10 @@ public class SmellCollectionTest {
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
         });
-        assertTrue(Smells.size() == 1);
+        assertEquals(1, Smells.size());
         for (Smell smell : Smells) {
-            assertTrue(smell.getSmellType() == SmellType.bco);
-            assertTrue(smell.getTopicNum() ==  -1);
+            assertEquals(SmellType.bco, smell.getSmellType());
+            assertEquals(-1, smell.getTopicNum());
         }
     }
 
@@ -146,10 +115,10 @@ public class SmellCollectionTest {
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
         });
-        assertTrue(Smells.size() == 14);
+        assertEquals(14, Smells.size());
         for (Smell smell : Smells) {
-            assertTrue(smell.getSmellType() == SmellType.bco);
-            assertTrue(smell.getTopicNum() ==  -1);
+            assertEquals(SmellType.bco, smell.getSmellType());
+            assertEquals(-1, smell.getTopicNum());
         }
     }
 
@@ -161,7 +130,7 @@ public class SmellCollectionTest {
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
         });
-        assertTrue(Smells.size() == 4);
+        assertEquals(4, Smells.size());
         int bco = 0;
         int buo = 0;
         int spf = 0;
@@ -180,10 +149,10 @@ public class SmellCollectionTest {
                 spf += 1;
             }
         }
-        assertTrue(bco == 1);
-        assertTrue(buo == 1);
-        assertTrue(spf == 1);
-        assertTrue(bdc == 1);
+        assertEquals(1, bco);
+        assertEquals(1, buo);
+        assertEquals(1, spf);
+        assertEquals(1, bdc);
     }
 
     @Test
@@ -194,7 +163,7 @@ public class SmellCollectionTest {
         SmellCollection Smells = assertDoesNotThrow(() -> {
             return new SmellCollection(serFile);
         });
-        assertTrue(Smells.size() == 6);
+        assertEquals(6, Smells.size());
         int bco = 0;
         int buo = 0;
         int spf = 0;
@@ -213,21 +182,28 @@ public class SmellCollectionTest {
                 spf += 1;
             }
         }
-        assertTrue(bco == 1);
-        assertTrue(buo == 1);
-        assertTrue(spf == 1);
+        assertEquals(1, bco);
+        assertEquals(1, buo);
+        assertEquals(1, spf);
         System.out.println(bdc);
-        assertTrue(bdc == 3);
+        assertEquals(3, bdc);
     }
 
     @ParameterizedTest
     @CsvSource({
-        ".///src///test///resources///SmellCollectionTest_resources///struts-2.5.2_acdc_smells.ser" + ", " + ".///src///test///resources///SmellCollectionTest_resources///serialized///struts-2.5.2_acdc_smells_serialized.ser",
-        ".///src///test///resources///SmellCollectionTest_resources///httpd-2.4.26_acdc_smells.ser" + ", " + ".///src///test///resources///SmellCollectionTest_resources///serialized///httpd-2.4.26_acdc_smells_serialized.ser",
-        ".///src///test///resources///SmellCollectionTest_resources///httpd-2.3.8_acdc_smells.ser" + ", " + ".///src///test///resources///SmellCollectionTest_resources///serialized///httpd-2.3.8_acdc_smells_serialized.ser",
-        ".///src///test///resources///SmellCollectionTest_resources///struts-2.3.30_acdc_smells.ser" + ", " + ".///src///test///resources///SmellCollectionTest_resources///serialized///struts-2.3.30_acdc_smells_serialized.ser"
+        //TODO docs
+        ".///src///test///resources///SmellCollectionTest_resources///struts-2.5.2_acdc_smells.ser,"
+        + ".///src///test///resources///SmellCollectionTest_resources///serialized///struts-2.5.2_acdc_smells_serialized.ser",
+        //TODO docs
+        ".///src///test///resources///SmellCollectionTest_resources///httpd-2.4.26_acdc_smells.ser,"
+        + ".///src///test///resources///SmellCollectionTest_resources///serialized///httpd-2.4.26_acdc_smells_serialized.ser",
+        //TODO docs
+        ".///src///test///resources///SmellCollectionTest_resources///httpd-2.3.8_acdc_smells.ser,"
+        + ".///src///test///resources///SmellCollectionTest_resources///serialized///httpd-2.3.8_acdc_smells_serialized.ser",
+        //TODO docs
+        ".///src///test///resources///SmellCollectionTest_resources///struts-2.3.30_acdc_smells.ser,"
+        + ".///src///test///resources///SmellCollectionTest_resources///serialized///struts-2.3.30_acdc_smells_serialized.ser"
     })
-
     // part 2 serialize then deserialize
     public void smellCollectionTest_STD(String serFile, String serializedFile){       
         String serFile_final = serFile.replace("///", File.separator);  
@@ -245,6 +221,6 @@ public class SmellCollectionTest {
             return new SmellCollection(serializedFile_final);
         });
         
-        assertTrue(Smells.equals(SerializedSmells));
+        assertEquals(SerializedSmells, Smells);
     }
 }

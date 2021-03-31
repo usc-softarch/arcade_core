@@ -1,6 +1,8 @@
 package edu.usc.softarch.arcade.clustering;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
@@ -26,7 +28,7 @@ public class ConcernClusterArchitectureTest {
         assertTrue(file.exists());
         
         // make sure the file is not empty
-        assertTrue(file.length() != 0);
+        assertNotEquals(0, file.length());
 
         ConcernClusterArchitecture clusters = ConcernClusterArchitecture.loadFromRsf(rsfFile);
 
@@ -46,7 +48,7 @@ public class ConcernClusterArchitectureTest {
         ConcernClusterArchitecture clusters = ConcernClusterArchitecture.loadFromRsf(rsfFile);
 
         // empty rsf should have zero clusters
-        assertTrue(clusters.size() == 0);
+        assertEquals(0, clusters.size());
     }
 
     @Test

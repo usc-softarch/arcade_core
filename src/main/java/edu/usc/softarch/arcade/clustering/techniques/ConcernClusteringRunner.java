@@ -26,10 +26,18 @@ import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
+	// #region ATTRIBUTES --------------------------------------------------------
 	private static Logger logger =
 		LogManager.getLogger(ConcernClusteringRunner.class);
 
-	public static class PreSelectedStoppingCriterion implements StoppingCriterion {
+	private String language;
+	// Initial fastClusters state before any clustering
+	private FastClusterArchitecture initialFastClusters;
+	// fastClusters state after initializing docTopics
+	private FastClusterArchitecture fastClustersWithDocTopics;
+
+	public static class PreSelectedStoppingCriterion
+			implements StoppingCriterion {
 		private int numClusters;
 
 		public PreSelectedStoppingCriterion(int numClusters) {
@@ -40,9 +48,9 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				&& ClusteringAlgoRunner.fastClusters.size() != numClusters;
 		}
 	}
-
-	private String language;
+	// #endregion ATTRIBUTES -----------------------------------------------------
 	
+	// #region CONSTRUCTORS ------------------------------------------------------
 	/**
 	 * @param vecs feature vectors (dependencies) of entities
 	 * @param srcDir directories with java or c files
@@ -52,86 +60,25 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			String srcDir, String artifactsDir, String language) {
 		this.language = language;
 		setFastFeatureVectors(vecs);
-		initializeClusters(srcDir, language); // Initially, every node gets a cluster
-		initializeDocTopicsForEachFastCluster(srcDir, artifactsDir);
-	}
 
-	// Cloned method for serialization/testing purposes
-	public ConcernClusteringRunner(FastFeatureVectors vecs,
-	String srcDir, String artifactsDir, String language, String versionName) {
-		this.language = language;
-		setFastFeatureVectors(vecs);
-		initializeClusters(srcDir, language); // Initially, every node gets a cluster
-
-		/*** BEGIN SERIALIZATION CODE ***/
-		char fs = File.separatorChar;
-		// Serialize fastClusters before initializeDocTopicsForEachFastCluster() call (wherein every node gets a cluster)
-		try (ObjectOutputStream oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "target" + fs + "test_results"
-				+ fs +"ConcernClusteringRunnerTest" + fs + "ds_serialized" + fs + versionName + "_fastClusters_before_init.txt"))) {
-			oosfastClusters.writeObject(fastClusters);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		/*** END SERIALIZATION CODE ***/
+		// Initially, every node gets a cluster
+		initializeClusters(srcDir, language);
+		this.initialFastClusters = new FastClusterArchitecture(fastClusters);
 
 		initializeDocTopicsForEachFastCluster(srcDir, artifactsDir);
-
-		/*** BEGIN SERIALIZATION CODE ***/
-		// Serialize fastFeatureVectors
-		try (ObjectOutputStream oosfastFeatureVectors = new ObjectOutputStream(new FileOutputStream("." + fs + "target" + fs + "test_results"
-				+ fs +"ConcernClusteringRunnerTest" + fs + "ds_serialized" + fs + versionName + "_fastFeatureVectors_init.txt"))) {
-			oosfastFeatureVectors.writeObject(fastFeatureVectors);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		// Serialize fastClusters after initializeDocTopicsForEachFastCluster() call
-		try (ObjectOutputStream oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "target" + fs + "test_results"
-				+ fs +"ConcernClusteringRunnerTest" + fs + "ds_serialized" + fs + versionName + "_fastClusters_after_init.txt"))) {
-			oosfastClusters.writeObject(fastClusters);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		/*** END SERIALIZATION CODE ***/
-
-
+		this.fastClustersWithDocTopics = new FastClusterArchitecture(fastClusters);
 	}
-	// Cloned method for serialization/testing purposes
-	public void computeClustersWithConcernsAndFastClusters(
-			StoppingCriterion stoppingCriterion, String stopCriterion,
-			String simMeasure, String versionName) {
-		List<List<Double>> simMatrix =
-			fastClusters.createSimilarityMatrixUsingJSDivergence(simMeasure);
+	// #endregion CONSTRUCTORS ---------------------------------------------------
 
-		while (stoppingCriterion.notReadyToStop()) {
-			if (stopCriterion.equalsIgnoreCase("clustergain")) {
-				double clusterGain = fastClusters.computeClusterGainUsingTopics();
-				checkAndUpdateClusterGain(clusterGain);
-			}
+	// #region ACCESSORS ---------------------------------------------------------
+	public FastClusterArchitecture getInitialFastClusters() {
+		return this.initialFastClusters;
+	}
 
-			MaxSimData data  = identifyMostSimClusters(simMatrix);
-			printDataForTwoMostSimilarClustersWithTopicsForConcerns(data);
-			FastCluster newCluster = mergeFastClustersUsingTopics(data);
-			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix, simMeasure); // fastClusters updated here
-
-			logger.debug("after merge, clusters size: " + fastClusters.size());
-		}
-
-		/*** BEGIN SERIALIZATION CODE ***/
-		// Serialize fastClusters after updateFastClustersAndSimMatrixToReflectMergedCluster() call (wherein 2 clusters are removed and one is added)
-		char fs = File.separatorChar;
-		try (ObjectOutputStream oosfastClusters = new ObjectOutputStream(new FileOutputStream("." + fs + "target" + fs + "test_results"
-				+ fs +"ConcernClusteringRunnerTest" + fs + "ds_serialized" + fs + versionName + "_fastClusters_after_compute.txt"))) {
-			oosfastClusters.writeObject(fastClusters);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		/*** END SERIALIZATION CODE ***/
-
-		logger.debug("max cluster gain: " + maxClusterGain);
-		logger.debug("num clusters at max cluster gain: "
-			+ numClustersAtMaxClusterGain);
-}
-	
+	public FastClusterArchitecture getFastClustersWithDocTopics() {
+		return this.fastClustersWithDocTopics;
+	}
+	// #endregion ACCESSORS ------------------------------------------------------
 
 	public void computeClustersWithConcernsAndFastClusters(
 			StoppingCriterion stoppingCriterion, String stopCriterion, String simMeasure) {
@@ -173,8 +120,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		msData.colIndex = 0;
 		double smallestJsDiv = Double.MAX_VALUE;
 
-		for (int i=0; i < length; i++) {
-			for (int j=0; j < length; j++) {
+		for (int i = 0; i < length; i++) {
+			for (int j = 0; j < length; j++) {
 				double currJsDiv = simMatrix.get(i).get(j);
 				if (currJsDiv < smallestJsDiv && i != j) {
 					smallestJsDiv = currJsDiv;
@@ -188,8 +135,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		return msData;
 	}
 
-	private void initializeDocTopicsForEachFastCluster(String srcDir,
-			String artifactsDir) {
+	private void initializeDocTopicsForEachFastCluster(
+			String srcDir, String artifactsDir) {
 		logger.debug("Initializing doc-topics for each cluster...");
 
 		try {
@@ -268,7 +215,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			new FastClusterArchitecture();
 		for (FastCluster c : fastClusters) {
 			if (c.docTopicItem == null) {
-				logger.error("Could not find doc-topic for: " + c.getName());
+				if (c.getName().contains("$"))
+					logger.debug("Could not find doc-topic for: " + c.getName());
+				else
+					logger.error("Could not find doc-topic for: " + c.getName());
 				clustersWithMissingDocTopics.add(c);
 			}
 		}

@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.clustering.acdc;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -63,6 +63,6 @@ public class ACDCTest {
 		// Use RsfCompare.compareTo to compare file contents
 		RsfCompare resultRsf = new RsfCompare(result);
 		RsfCompare oracleRsf = new RsfCompare(oracleResult);
-		assertTrue(oracleRsf.equals(resultRsf));
+		assertEquals(oracleRsf, resultRsf);
 	}
 }

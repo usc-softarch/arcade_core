@@ -494,7 +494,7 @@ public class ArchSmellDetector {
 			ConcernClusterArchitecture clusters,
 			Map<String, Set<String>> clusterSmellMap,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
-		System.out.println("Finding cycles...");
+		logger.debug("Finding cycles...");
 		CycleDetector<String, DefaultEdge> cycleDetector =
 			new CycleDetector<>(directedGraph);
 		Set<String> cycleSet = cycleDetector.findCycles();

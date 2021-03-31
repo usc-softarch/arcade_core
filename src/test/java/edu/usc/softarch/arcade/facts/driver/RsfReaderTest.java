@@ -2,6 +2,8 @@ package edu.usc.softarch.arcade.facts.driver;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
@@ -29,7 +31,7 @@ public class RsfReaderTest {
         assertTrue(file.exists());
         
         // make sure the file is not empty
-        assertTrue(file.length() != 0);
+        assertNotEquals(0, file.length());
 
         List<List<String>> list = assertDoesNotThrow( () -> {
             return RsfReader.loadRsfDataFromFile(rsfFile);
@@ -53,7 +55,7 @@ public class RsfReaderTest {
         });
 
         // empty rsf should have zero clusters
-        assertTrue(list.size() == 0);
+        assertEquals(0, list.size());
     }
 
     @Test

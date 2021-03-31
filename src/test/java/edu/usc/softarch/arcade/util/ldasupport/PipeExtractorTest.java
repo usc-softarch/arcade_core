@@ -2,13 +2,11 @@ package edu.usc.softarch.arcade.util.ldasupport;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -90,12 +88,6 @@ public class PipeExtractorTest {
 
 		// Compare sets of instances
 		assertEquals(oracle.size(), result.size()); // passes - same size
-		assertTrue(oracle.equals(result)); // fails - comparing sets of instances doesn't work?
+		assertEquals(oracle, result); // fails - comparing sets of instances doesn't work?
 	}
-
-	// @AfterEach
-	// public void cleanUp(){
-	// 	// Reset working directory to repo root
-	// 	System.setProperty("user.dir", pwd);
-	// }
 }

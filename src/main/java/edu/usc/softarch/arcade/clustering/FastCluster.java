@@ -34,7 +34,7 @@ public class FastCluster implements Serializable {
 		
 		// Map of target nodes to which this node has an edge
 		this.nonZeroFeatureMap = new HashMap<>();
-		for (int i=0; i < featuresLength; i++)
+		for (int i = 0; i < featuresLength; i++)
 			if (featureSet.get(i)) // put if not 0
 				nonZeroFeatureMap.put(i,1.0);
 
@@ -48,6 +48,14 @@ public class FastCluster implements Serializable {
 	}
 
 	public FastCluster() { super(); }
+
+	public FastCluster(FastCluster c1) {
+		this.name = c1.getName();
+		this.numEntities = c1.getNumEntities();
+		this.nonZeroFeatureMap = c1.getNonZeroFeatureMap();
+		this.featuresLength = c1.getFeaturesLength();
+		this.docTopicItem = c1.docTopicItem;
+	}
 
 	public FastCluster(FastCluster c1, FastCluster c2) {
 		Set<Integer> c1Indices = c1.getNonZeroFeatureMap().keySet();
