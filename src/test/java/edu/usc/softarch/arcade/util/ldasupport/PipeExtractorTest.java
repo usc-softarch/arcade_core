@@ -74,20 +74,20 @@ public class PipeExtractorTest {
 
 		// Read result instances into a set
 		InstanceList resultInstances = InstanceList.load(new File(resultDir + File.separatorChar + "output.pipe"));
-		Set<Instance> result = new HashSet<>();
+		Set<InstanceComparator> result = new HashSet<>();
 		for (Instance i : resultInstances) {
-			result.add(i);
+			result.add(new InstanceComparator(i));
 		}
 		
 		// Read oracle instances into a set
 		InstanceList oracleInstances = InstanceList.load(new File(oraclePath));
-		Set<Instance> oracle = new HashSet<>();
+		Set<InstanceComparator> oracle = new HashSet<>();
 		for (Instance i : oracleInstances) {
-			oracle.add(i);
+			oracle.add(new InstanceComparator(i));
 		}
 
 		// Compare sets of instances
 		assertEquals(oracle.size(), result.size()); // passes - same size
-		assertEquals(oracle, result); // fails - comparing sets of instances doesn't work?
+		assertEquals(oracle, result, "Failed argument is: " + versionDir); // fails - comparing sets of instances doesn't work?
 	}
 }

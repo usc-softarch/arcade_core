@@ -111,7 +111,7 @@ public class ConcernClusteringRunnerTest {
 		 * initializeDocTopicsForEachFastCluster */
 		FastFeatureVectors ffvInit = runner.fastFeatureVectors;
 		// Should not be null
-		assertNotNull(ffvInit);
+		assertFalse(ffvInit.getFeatureVectorNames().isEmpty());
 	}
 
 	@ParameterizedTest
