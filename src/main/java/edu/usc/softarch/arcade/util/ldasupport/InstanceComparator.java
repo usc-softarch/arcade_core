@@ -9,7 +9,12 @@ public class InstanceComparator {
 
   public InstanceComparator(Instance instance) {
     this.data = ((FeatureSequence) instance.getData()).toString();
-    this.name = (String) instance.getName();
+
+    String[] nameSplit = ((String) instance.getName()).split("\\\\\\\\");
+    if (nameSplit.length == 1)
+      this.name = (String) instance.getName();
+    else
+      this.name = nameSplit[1];
   }
 
   public String getName() {
