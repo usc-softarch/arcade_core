@@ -1,0 +1,11 @@
+Comparison distance is: 1
+MoJoFM from struts2-core-2.0.1_deps_pkgs.rsf to struts-1.3.10_deps_pkgs.rsf: 100.0
+DescriptiveStatistics:
+n: 1
+min: 100.0
+max: 100.0
+mean: 100.0
+std dev: 0.0
+median: 100.0
+skewness: NaN
+kurtosis: NaN

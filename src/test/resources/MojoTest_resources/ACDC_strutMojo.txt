@@ -1,0 +1,54 @@
+Comparison distance is: 1
+MoJoFM from struts-2.3.32_acdc_clustered.rsf to struts-2.3.30_acdc_clustered.rsf: 99.77
+MoJoFM from struts-2.5.2_acdc_clustered.rsf to struts-2.3.32_acdc_clustered.rsf: 88.28
+MoJoFM from struts-2.5.8_acdc_clustered.rsf to struts-2.5.2_acdc_clustered.rsf: 97.49
+MoJoFM from struts-2.5.10.1_acdc_clustered.rsf to struts-2.5.8_acdc_clustered.rsf: 98.0
+DescriptiveStatistics:
+n: 4
+min: 88.28
+max: 99.77
+mean: 95.88499999999999
+std dev: 5.163283838798714
+median: 97.745
+skewness: -1.7804038734529561
+kurtosis: 3.381526704758457
+
+
+Comparison distance is: 2
+MoJoFM from struts-2.5.2_acdc_clustered.rsf to struts-2.3.30_acdc_clustered.rsf: 88.33
+MoJoFM from struts-2.5.10.1_acdc_clustered.rsf to struts-2.5.2_acdc_clustered.rsf: 95.55
+DescriptiveStatistics:
+n: 2
+min: 88.33
+max: 95.55
+mean: 91.94
+std dev: 5.1053109601668725
+median: 91.94
+skewness: NaN
+kurtosis: NaN
+
+
+Comparison distance is: 3
+MoJoFM from struts-2.5.8_acdc_clustered.rsf to struts-2.3.30_acdc_clustered.rsf: 87.8
+DescriptiveStatistics:
+n: 1
+min: 87.8
+max: 87.8
+mean: 87.8
+std dev: 0.0
+median: 87.8
+skewness: NaN
+kurtosis: NaN
+
+
+Comparison distance is: 4
+MoJoFM from struts-2.5.10.1_acdc_clustered.rsf to struts-2.3.30_acdc_clustered.rsf: 87.51
+DescriptiveStatistics:
+n: 1
+min: 87.51
+max: 87.51
+mean: 87.51
+std dev: 0.0
+median: 87.51
+skewness: NaN
+kurtosis: NaN

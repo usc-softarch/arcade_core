@@ -1,0 +1,54 @@
+Comparison distance is: 1
+MoJoFM from httpd-2.4.7_acdc_clustered.rsf to httpd-2.3.8_acdc_clustered.rsf: 93.59
+MoJoFM from httpd-2.4.10_acdc_clustered.rsf to httpd-2.4.7_acdc_clustered.rsf: 99.42
+MoJoFM from httpd-2.4.16_acdc_clustered.rsf to httpd-2.4.10_acdc_clustered.rsf: 99.71
+MoJoFM from httpd-2.4.26_acdc_clustered.rsf to httpd-2.4.16_acdc_clustered.rsf: 99.71
+DescriptiveStatistics:
+n: 4
+min: 93.59
+max: 99.71
+mean: 98.1075
+std dev: 3.0147678185890165
+median: 99.565
+skewness: -1.9878038873928734
+kurtosis: 3.9576317186094556
+
+
+Comparison distance is: 2
+MoJoFM from httpd-2.4.10_acdc_clustered.rsf to httpd-2.3.8_acdc_clustered.rsf: 92.95
+MoJoFM from httpd-2.4.26_acdc_clustered.rsf to httpd-2.4.10_acdc_clustered.rsf: 99.42
+DescriptiveStatistics:
+n: 2
+min: 92.95
+max: 99.42
+mean: 96.185
+std dev: 4.574980874276962
+median: 96.185
+skewness: NaN
+kurtosis: NaN
+
+
+Comparison distance is: 3
+MoJoFM from httpd-2.4.16_acdc_clustered.rsf to httpd-2.3.8_acdc_clustered.rsf: 92.63
+DescriptiveStatistics:
+n: 1
+min: 92.63
+max: 92.63
+mean: 92.63
+std dev: 0.0
+median: 92.63
+skewness: NaN
+kurtosis: NaN
+
+
+Comparison distance is: 4
+MoJoFM from httpd-2.4.26_acdc_clustered.rsf to httpd-2.3.8_acdc_clustered.rsf: 92.6
+DescriptiveStatistics:
+n: 1
+min: 92.6
+max: 92.6
+mean: 92.6
+std dev: 0.0
+median: 92.6
+skewness: NaN
+kurtosis: NaN
