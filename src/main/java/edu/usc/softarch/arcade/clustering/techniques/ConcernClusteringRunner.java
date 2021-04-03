@@ -1,5 +1,9 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -140,6 +144,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		for (FastCluster c : fastClusters)
 			TopicUtil.setDocTopicForFastClusterForMalletApi(c, this.language);
 		

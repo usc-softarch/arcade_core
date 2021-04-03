@@ -51,13 +51,8 @@ public class ConcernClusterArchitecture extends HashSet<ConcernCluster> {
 
 	// #region IO ----------------------------------------------------------------
 	public static ConcernClusterArchitecture loadFromRsf(String rsfFilename) {
-		Iterable<List<String>> clusterFacts = null;
-
-		try {
-			clusterFacts = RsfReader.loadRsfDataFromFile(rsfFilename);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+		RsfReader.loadRsfDataFromFile(rsfFilename);
+		Iterable<List<String>> clusterFacts = RsfReader.filteredRoutineFacts;
 
 		ConcernClusterArchitecture clusters = new ConcernClusterArchitecture();
 		for (List<String> fact : clusterFacts) {
@@ -162,33 +157,6 @@ public class ConcernClusterArchitecture extends HashSet<ConcernCluster> {
 		}
 
 		return cg;
-	}
-
-	public SimpleDirectedGraph<String, DefaultEdge> buildConcernClustersDiGraph(
-			String depsRsfFilename) {
-		SimpleDirectedGraph<String, DefaultEdge> directedGraph =
-			new SimpleDirectedGraph<>(DefaultEdge.class);
-		
-		for (ConcernCluster cluster : this)
-			directedGraph.addVertex(cluster.getName());
-		logger.debug("No. of vertices: " + directedGraph.vertexSet().size());
-
-		Iterable<List<String>> depFacts = null;
-		
-		try {
-			depFacts = RsfReader.loadRsfDataFromFile(depsRsfFilename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		for (List<String> fact : depFacts) {
-			String source = fact.get(1).trim();
-			String target = fact.get(2).trim();
-			directedGraph.addEdge(source, target);
-    }
-		logger.debug("No. of edges: " + directedGraph.edgeSet().size());
-		
-		return directedGraph;
 	}
 
 	public SimpleDirectedGraph<String, DefaultEdge>	buildSimpleDirectedGraph(

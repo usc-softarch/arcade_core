@@ -171,15 +171,10 @@ public class ReverseAnalysisOverTopics {
 	public static void main(String[] args) {
 		String depsFile = args[0];
 		String gtFile = args[1];
-		List<List<String>> depFacts = null;
-		List<List<String>> clusterFacts = null;
-
-		try {
-			depFacts = RsfReader.loadRsfDataFromFile(depsFile);
-			clusterFacts = RsfReader.loadRsfDataFromFile(gtFile);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+		RsfReader.loadRsfDataFromFile(depsFile);
+		List<List<String>> depFacts = RsfReader.unfilteredFaCtS;
+		RsfReader.loadRsfDataFromFile(gtFile);
+		List<List<String>> clusterFacts = RsfReader.unfilteredFaCtS;
 
 		System.out.println("Finished loading data from both files");
 

@@ -1,34 +1,38 @@
 package edu.usc.softarch.arcade.facts.driver;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.PropertyConfigurator;
 
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
+import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class CSourceToDepsBuilder extends SourceToDepsBuilder {
+	public static FastFeatureVectors ffVecs = null;
+	public static int numSourceEntities = 0;
+	
 	@Override
-	public void build(String classesDirPath, String depsRsfFilename)
-			throws IOException {
+	public Set<Pair<String,String>> getEdges() {
+		return this.edges;
+	}
+
+	public static void main(String[] args) throws IOException {
+		(new CSourceToDepsBuilder()).build(args[0], args[1]);
+	}
+
+	@Override
+	public void build(String classesDirPath, String depsRsfFilename) throws IOException {
 		String inputDir = FileUtil.tildeExpandPath(classesDirPath);
 		String depsRsfFilepath = FileUtil.tildeExpandPath(depsRsfFilename);
 		
@@ -36,100 +40,63 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		String mkFilesCmd = "perl " + pwd + File.separator + "mkfiles.pl";
 		String mkDepCmd = "perl " + pwd + File.separator + "mkdep.pl";
 		
+		
 		String[] cmds = { mkFilesCmd, mkDepCmd };
-		for (String cmd : cmds)	execCmd(cmd, inputDir);
+		for (String cmd : cmds) {
+			execCmd(cmd,inputDir);
+		}
 		
 		String makeDepFileLocation = inputDir + File.separator + "make.dep";
-		Map<String, List<String>> depMap = buildDeps(makeDepFileLocation);
-		serializeResults(depsRsfFilepath, depMap);
+		String[] makeDepReaderArgs = {makeDepFileLocation,depsRsfFilepath};
 		
-		List<List<String>> unfilteredFacts =
-			RsfReader.loadRsfDataFromFile(depsRsfFilepath);
+		MakeDepReader.main(makeDepReaderArgs);
 		
-		this.numSourceEntities = unfilteredFacts.size();
+		RsfReader.loadRsfDataFromFile(depsRsfFilepath);
+				
+		numSourceEntities = RsfReader.unfilteredFaCtS.size();
 		
 		TypedEdgeGraph typedEdgeGraph = new TypedEdgeGraph();
-		this.edges = new LinkedHashSet<Pair<String, String>>();
-		for (List<String> fact : unfilteredFacts) {
+		edges = new LinkedHashSet<Pair<String,String>>();
+		for (List<String> fact : RsfReader.unfilteredFaCtS) {
 			String source = fact.get(1);
 			String target = fact.get(2);
 			
-			typedEdgeGraph.addEdge("depends", source, target);
+			typedEdgeGraph.addEdge("depends",source,target);
 			
-			Pair<String,String> edge = new ImmutablePair<>(source, target);
-			this.edges.add(edge);
+			Pair<String,String> edge = new ImmutablePair<>(source,target);
+			edges.add(edge);
 		}
 		
 		Set<String> sources = new HashSet<>();
-		for (Pair<String,String> edge : this.edges)
+		for (Pair<String,String> edge : edges) {
 			sources.add(edge.getLeft());
-		this.numSourceEntities = sources.size();
-
-		this.ffVecs = new FastFeatureVectors(typedEdgeGraph);
-		/*** BEGIN SERIALIZATION CODE ***/
-		// char fs = File.separatorChar;
-		// ObjectOutputStream oosffVecs = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ffVecs_serialized" + fs + 
-		// 	"httpd-2.3.8_ffVecs_builder.txt"));
-		// oosffVecs.writeObject(ffVecs);
-		// oosffVecs.close();
-		/*** END SERIALIZATION CODE ***/
-	}
-
-	private Map<String, List<String>> buildDeps(String filename)
-			throws IOException {
-		Map<String, List<String>> depMap = new HashMap<>();
-
-		try (Scanner scanner = new Scanner(new FileInputStream(filename))) {
-			String currDotCFile = "";
-			
-			while (scanner.hasNextLine()) {
-				String line = scanner.nextLine();
-				String[] tokens = line.split("\\s");
-				
-				for (String token : tokens) {
-					String trimmedToken = token.trim();
-					
-					if (trimmedToken.endsWith(".c") || trimmedToken.endsWith(".h")) {
-						List<String> deps = null;
-						deps = depMap.containsKey(currDotCFile)
-							? depMap.get(currDotCFile)
-							: new ArrayList<>();
-						deps.add(trimmedToken);
-						depMap.put(currDotCFile, deps);
-					}
-					if (trimmedToken.endsWith(".o:")) {
-						trimmedToken = trimmedToken.substring(0, trimmedToken.length() - 1);
-						currDotCFile = trimmedToken.replace(".o", ".c");
-					}
-				}
-			}
 		}
-
-		return depMap;
+		numSourceEntities = sources.size();
+		
+		FeatureVectorMap fvMap = new FeatureVectorMap(typedEdgeGraph);
+		ffVecs = fvMap.convertToFastFeatureVectors();
 	}
 
-	private void serializeResults(String outRsfFile,
-			Map<String, List<String>> depMap) throws IOException {
-		Set<String> cFiles = depMap.keySet();
-		try (BufferedWriter out = new BufferedWriter(new FileWriter(outRsfFile))) {
-			for (String cFile : cFiles) {
-				List<String> deps = depMap.get(cFile);
-				for (String dep : deps)
-					out.write("depends " + cFile + " " + dep + "\n");
-			}
-		}
-	}
-
-	private void execCmd(String cmd, String inputDir) throws IOException {
+	private static void execCmd(String cmd, String inputDir) throws IOException {
 		System.out.println("Executing command: " + cmd);
 		Process process = Runtime.getRuntime().exec(cmd,null,new File(inputDir));
 
 		String line;
 		BufferedReader in = new BufferedReader(new InputStreamReader(
-			process.getInputStream()));
-		while ((line = in.readLine()) != null)
+				process.getInputStream()));
+		while ((line = in.readLine()) != null) {
 			System.out.println(line);
+		}
 		in.close();		
+	}
+
+	@Override
+	public int getNumSourceEntities() {
+		return numSourceEntities;
+	}
+
+	@Override
+	public FastFeatureVectors getFfVecs() {
+		return ffVecs;
 	}
 }

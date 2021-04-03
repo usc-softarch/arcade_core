@@ -33,9 +33,8 @@ public class RsfReaderTest {
         // make sure the file is not empty
         assertNotEquals(0, file.length());
 
-        List<List<String>> list = assertDoesNotThrow( () -> {
-            return RsfReader.loadRsfDataFromFile(rsfFile);
-        });
+        RsfReader.loadRsfDataFromFile(rsfFile);
+        List<List<String>> list = RsfReader.unfilteredFaCtS;
 
         // make sure list is populated
         assertTrue(list.size() > 0);
@@ -50,9 +49,8 @@ public class RsfReaderTest {
         File file = new File(fileName);
         assertTrue(file.exists());
 
-        List<List<String>> list = assertDoesNotThrow( () -> {
-            return RsfReader.loadRsfDataFromFile(rsfFile);
-        });
+        RsfReader.loadRsfDataFromFile(rsfFile);
+        List<List<String>> list = RsfReader.unfilteredFaCtS;
 
         // empty rsf should have zero clusters
         assertEquals(0, list.size());

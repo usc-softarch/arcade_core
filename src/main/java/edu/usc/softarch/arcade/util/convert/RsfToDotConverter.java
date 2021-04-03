@@ -11,13 +11,8 @@ public class RsfToDotConverter {
 	public static void main(String[] args) {
 		String rsfFilename = args[0];
 		String dotFilename = args[1];
-		List<List<String>> facts = null;
-
-		try {
-			facts = RsfReader.loadRsfDataFromFile(rsfFilename);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+		RsfReader.loadRsfDataFromFile(rsfFilename);
+		List<List<String>> facts = RsfReader.unfilteredFaCtS;
 		
 		try (FileWriter out = new FileWriter(dotFilename)) {
 			out.write("digraph G {\n");

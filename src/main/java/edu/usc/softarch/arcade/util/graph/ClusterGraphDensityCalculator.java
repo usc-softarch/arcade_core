@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.util.graph;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,15 +17,10 @@ public class ClusterGraphDensityCalculator {
 		String depsFilename = args[0];
 		String clustersFilename = args[1];
 		
-		List<List<String>> depFacts = null;
-		List<List<String>> clusterFacts = null;
-
-		try {
-			depFacts = RsfReader.loadRsfDataFromFile(depsFilename);
-			clusterFacts = RsfReader.loadRsfDataFromFile(clustersFilename);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+		RsfReader.loadRsfDataFromFile(depsFilename);
+		List<List<String>> depFacts = RsfReader.unfilteredFaCtS;
+		RsfReader.loadRsfDataFromFile(clustersFilename);
+		List<List<String>> clusterFacts = RsfReader.unfilteredFaCtS;
 		
 		Map<String,Set<String>> clusterMap = ClusterUtil.buildClusterMap(clusterFacts);
 		
