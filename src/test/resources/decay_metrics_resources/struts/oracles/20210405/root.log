@@ -1,0 +1,160 @@
+INFO  - Reading in clusters file: C:\Users\Sylvia\git\old-arcade\subject_systems\decay_metrics_resources\struts\acdc_cluster\struts-2.5.10.1_acdc_clustered.rsf
+DEBUG - Elapsed time in milliseconds: 31
+DEBUG - Found and built clusters:
+DEBUG - org.apache.struts2.views.freemarker.tags.ss
+DEBUG - org.apache.struts2.interceptor.ss
+DEBUG - org.apache.struts2.osgi.loaders.ss
+DEBUG - org.apache.struts2.jasper.ss
+DEBUG - org.apache.struts2.views.velocity.components.ss
+DEBUG - org.apache.struts2.oval.interceptor.ss
+DEBUG - org.apache.struts2.views.jsp.ui.ss
+DEBUG - org.apache.struts2.dispatcher.multipart.ss
+DEBUG - com.opensymphony.xwork2.util.finder.ss
+DEBUG - com.opensymphony.xwork2.util.location.ss
+DEBUG - com.opensymphony.xwork2.util.logging.log4j2.ss
+DEBUG - org.apache.struts2.views.java.ss
+DEBUG - org.apache.struts2.rest.ss
+DEBUG - org.apache.struts2.jasper.xmlparser.ss
+DEBUG - org.apache.struts2.views.gxp.ss
+DEBUG - org.apache.struts2.views.tiles.ss
+DEBUG - com.opensymphony.xwork2.config.entities.ss
+DEBUG - org.apache.struts2.sitegraph.ss
+DEBUG - com.opensymphony.xwork2.util.logging.jdk.ss
+DEBUG - org.apache.struts2.views.ss
+DEBUG - com.opensymphony.xwork2.util.logging.commons.ss
+DEBUG - org.apache.struts2.config_browser.ss
+DEBUG - org.apache.struts2.el.parser.ss
+DEBUG - org.apache.struts2.osgi.host.ss
+DEBUG - com.opensymphony.xwork2.inject.util.ss
+DEBUG - org.apache.struts2.result.ss
+DEBUG - org.apache.struts2.views.jsp.ss
+DEBUG - org.apache.struts2.views.xslt.ss
+DEBUG - com.opensymphony.xwork2.config.impl.ss
+DEBUG - com.opensymphony.xwork2.util.logging.ss
+DEBUG - org.apache.struts2.spring.ss
+DEBUG - com.opensymphony.xwork2.config.providers.ss
+DEBUG - org.apache.struts2.dispatcher.filter.ss
+DEBUG - org.apache.struts2.osgi.interceptor.ss
+DEBUG - org.apache.struts2.el.lang.ss
+DEBUG - org.apache.struts2.portlet.ss
+DEBUG - org.apache.struts2.dispatcher.mapper.ss
+DEBUG - org.apache.struts2.dispatcher.servlet.ss
+DEBUG - org.apache.struts2.jasper.servlet.ss
+DEBUG - org.apache.struts2.portlet.servlet.ss
+DEBUG - org.apache.struts2.views.java.simple.ss
+DEBUG - actions.osgi.ss
+DEBUG - org.apache.struts2.views.jasperreports.ss
+DEBUG - com.opensymphony.xwork2.config.ss
+DEBUG - com.opensymphony.xwork2.util.ss
+DEBUG - org.apache.struts2.jasper.tagplugins.jstl.ss
+DEBUG - org.apache.struts2.dispatcher.ss
+DEBUG - org.apache.struts2.osgi.ss
+DEBUG - org.apache.struts2.components.template.ss
+DEBUG - com.opensymphony.xwork2.validator.validators.ss
+DEBUG - com.opensymphony.xwork2.ss
+DEBUG - org.apache.struts.beanvalidation.constraints.impl.ss
+DEBUG - org.apache.struts2.views.velocity.ss
+DEBUG - org.apache.struts2.el.ss
+DEBUG - org.apache.struts2.config.ss
+DEBUG - org.apache.struts2.components.ss
+DEBUG - org.apache.struts2.portlet.util.ss
+DEBUG - org.apache.struts.beanvalidation.constraints.ss
+DEBUG - com.opensymphony.xwork2.ognl.ss
+DEBUG - com.opensymphony.xwork2.spring.ss
+DEBUG - org.apache.struts2.validators.ss
+DEBUG - org.apache.struts2.osgi.admin.actions.ss
+DEBUG - com.opensymphony.xwork2.util.profiling.ss
+DEBUG - org.apache.struts2.ss
+DEBUG - com.opensymphony.xwork2.interceptor.annotations.ss
+DEBUG - org.apache.struts2.factory.ss
+DEBUG - org.apache.struts2.interceptor.debugging.ss
+DEBUG - org.apache.struts2.tiles.ss
+DEBUG - com.opensymphony.xwork2.inject.ss
+DEBUG - org.apache.struts2.json.annotations.ss
+DEBUG - org.apache.struts2.jasper.el.ss
+DEBUG - org.apache.struts2.convention.ss
+DEBUG - org.apache.struts2.rest.handler.ss
+DEBUG - org.apache.struts2.portlet.dispatcher.ss
+DEBUG - com.opensymphony.xwork2.ognl.accessor.ss
+DEBUG - org.apache.struts2.dispatcher.listener.ss
+DEBUG - org.apache.struts2.views.jsp.iterator.ss
+DEBUG - org.apache.struts2.json.smd.ss
+DEBUG - org.apache.struts2.sitegraph.renderers.ss
+DEBUG - org.apache.struts2.util.tomcat.buf.ss
+DEBUG - com.opensymphony.xwork2.conversion.impl.ss
+DEBUG - com.opensymphony.xwork2.util.classloader.ss
+DEBUG - org.apache.struts2.plexus.ss
+DEBUG - org.apache.struts2.portlet.interceptor.ss
+DEBUG - org.apache.struts2.jasper.compiler.ss
+DEBUG - org.apache.struts2.cdi.ss
+DEBUG - com.opensymphony.xwork2.util.logging.slf4j.ss
+DEBUG - org.apache.struts2.el.util.ss
+DEBUG - org.apache.struts2.views.freemarker.ss
+DEBUG - org.apache.struts2.jasper.runtime.ss
+DEBUG - org.apache.struts2.json.ss
+DEBUG - com.opensymphony.xwork2.interceptor.ss
+DEBUG - org.apache.struts.beanvalidation.validation.interceptor.ss
+DEBUG - org.apache.struts2.util.ss
+DEBUG - org.apache.struts2.portlet.result.ss
+DEBUG - com.opensymphony.xwork2.validator.ss
+DEBUG - org.apache.struts2.sitemesh.ss
+INFO  - Reading in deps file: C:\Users\Sylvia\git\old-arcade\subject_systems\decay_metrics_resources\struts\acdc_dep\struts-2.5.10.1_deps.rsf
+DEBUG - Elapsed time in milliseconds: 247
+DEBUG - No. of vertices: 97
+DEBUG - No. of edges: 1945
+DEBUG - # actual edges: 1945
+DEBUG - # potential edges: 9312
+INFO  - rci: 0.20887027491408935
+INFO  - no. of two-way pairs: 440
+INFO  - no. of two-way pairs / all possible pairs: 0.09450171821305842
+INFO  - avg stability: 0.363197531117908
+DEBUG - Elapsed time in milliseconds: 313
+DEBUG - Elapsed time in milliseconds: 46
+INFO  - MQ: 26.79188791296311
+INFO  - # of clusters: 97
+INFO  - MQ ratio: 0.2762050300305475
+INFO  - 
+INFO  - stats for rci
+INFO  - DescriptiveStatistics:
+n: 5
+min: 0.20786871449610772
+max: 0.22100313479623823
+mean: 0.21492669564028308
+std dev: 0.006276237340043215
+median: 0.21628006872852235
+skewness: -0.2750663707217651
+kurtosis: -2.9748392537336716
+
+INFO  - stats for twoway
+INFO  - DescriptiveStatistics:
+n: 5
+min: 0.09450171821305842
+max: 0.10579937304075235
+mean: 0.1007963265130245
+std dev: 0.004964733348377146
+median: 0.10073024054982818
+skewness: -0.19174863330089048
+kurtosis: -2.1709498307258794
+
+INFO  - stats for stability
+INFO  - DescriptiveStatistics:
+n: 5
+min: 0.363197531117908
+max: 0.3722268675140756
+mean: 0.36750347820073337
+std dev: 0.004426211701524966
+median: 0.3666289893572232
+skewness: 0.2403501340252685
+kurtosis: -3.0334376984319
+
+INFO  - stats for mq
+INFO  - DescriptiveStatistics:
+n: 5
+min: 0.27547384111458806
+max: 0.28804323414411637
+mean: 0.2814412600761175
+std dev: 0.006141351982121618
+median: 0.27963948528007515
+skewness: 0.33891392536393666
+kurtosis: -3.0690606039504242
+

@@ -1,0 +1,141 @@
+INFO  - Reading in clusters file: C:\Users\Sylvia\git\old-arcade\subject_systems\decay_metrics_resources\httpd\acdc_cluster\httpd-2.4.26_acdc_clustered.rsf
+DEBUG - Elapsed time in milliseconds: 5
+DEBUG - Found and built clusters:
+DEBUG - modules/http2/h2_conn_io.ch
+DEBUG - modules/http2/h2_from_h1.ch
+DEBUG - modules/test/mod_optional_fn_export.ch
+DEBUG - modules/http2/mod_http2.ch
+DEBUG - modules/mappers/mod_rewrite.ch
+DEBUG - support/suexec.ch
+DEBUG - support/passwd_common.ch
+DEBUG - modules/http2/h2_ctx.ch
+DEBUG - modules/http2/h2_proxy_util.ch
+DEBUG - modules/http2/h2_alt_svc.ch
+DEBUG - modules/cache/mod_cache.ch
+DEBUG - modules/proxy/mod_proxy.ch
+DEBUG - modules/database/mod_dbd.ch
+DEBUG - modules/http2/h2_request.ch
+DEBUG - modules/cache/mod_cache_socache.ss
+DEBUG - modules/proxy/ajp_header.ch
+DEBUG - modules/http2/h2_mplx.ch
+DEBUG - modules/dav/lock/locks.ch
+DEBUG - modules/test/mod_optional_hook_export.ch
+DEBUG - modules/filters/mod_include.ch
+DEBUG - modules/lua/lua_config.ch
+DEBUG - modules/filters/mod_ratelimit.ch
+DEBUG - modules/generators/mod_status.ch
+DEBUG - modules/http2/h2_ngn_shed.ch
+DEBUG - modules/cache/cache_storage.ch
+DEBUG - os/unix/unixd.ch
+DEBUG - server/mpm/event/fdqueue.ch
+DEBUG - modules/filters/mod_xml2enc.ch
+DEBUG - modules/lua/lua_vmprep.ch
+DEBUG - modules/http2/h2_h2.ch
+DEBUG - server/util_expr_parse.ch
+DEBUG - modules/http2/h2_workers.ch
+DEBUG - modules/dav/main/mod_dav.ch
+DEBUG - modules/session/mod_session.ch
+DEBUG - modules/http2/h2_proxy_session.ch
+DEBUG - modules/core/mod_so.ch
+DEBUG - modules/http2/h2_push.ch
+DEBUG - server/mpm/winnt/mpm_winnt.ch
+DEBUG - modules/http2/h2_bucket_beam.ch
+DEBUG - modules/cache/mod_cache_disk.ch
+DEBUG - orphanContainer.ss
+DEBUG - modules/lua/mod_lua.ch
+DEBUG - modules/arch/unix/mod_unixd.ch
+DEBUG - modules/http2/h2_switch.ch
+DEBUG - modules/http2/mod_proxy_http2.ch
+DEBUG - modules/proxy/mod_proxy_scgi.ss
+DEBUG - modules/proxy/mod_proxy_fdpass.ch
+DEBUG - modules/ssl/ssl_util_ssl.ch
+DEBUG - modules/http2/h2_conn.ch
+DEBUG - modules/http2/h2_stream.ch
+DEBUG - modules/http2/h2_session.ch
+DEBUG - modules/arch/win32/mod_isapi.ch
+DEBUG - modules/http2/h2_bucket_eos.ch
+DEBUG - modules/aaa/mod_authz_dbd.ch
+DEBUG - modules/lua/lua_apr.ch
+DEBUG - modules/generators/mod_cgi.ch
+DEBUG - modules/lua/lua_request.ch
+DEBUG - modules/generators/mod_suexec.ch
+DEBUG - modules/core/mod_watchdog.ch
+DEBUG - os/bs2000/os.ch
+DEBUG - modules/http2/h2_task.ch
+DEBUG - modules/http2/h2_headers.ch
+DEBUG - modules/proxy/proxy_util.ch
+DEBUG - os/bs2000/ebcdic.ch
+DEBUG - modules/dav/fs/repos.ch
+DEBUG - modules/aaa/mod_authz_owner.ch
+DEBUG - modules/lua/lua_dbd.ch
+DEBUG - support/htcacheclean.ss
+DEBUG - modules/lua/lua_passwd.ch
+DEBUG - modules/filters/regexp.ch
+DEBUG - support/win32/ApacheMonitor.ch
+DEBUG - modules/ssl/mod_ssl.ch
+DEBUG - modules/http2/h2_filter.ch
+DEBUG - modules/cache/cache_util.ch
+DEBUG - modules/http2/h2_util.ch
+DEBUG - modules/ldap/util_ldap_cache.ch
+DEBUG - modules/loggers/mod_log_config.ch
+DEBUG - modules/http2/h2_config.ch
+INFO  - Reading in deps file: C:\Users\Sylvia\git\old-arcade\subject_systems\decay_metrics_resources\httpd\acdc_dep\httpd-2.4.26_deps.rsf
+DEBUG - Elapsed time in milliseconds: 58
+DEBUG - No. of vertices: 78
+DEBUG - No. of edges: 679
+DEBUG - # actual edges: 679
+DEBUG - # potential edges: 6006
+INFO  - rci: 0.11305361305361306
+INFO  - no. of two-way pairs: 94
+INFO  - no. of two-way pairs / all possible pairs: 0.031302031302031304
+INFO  - avg stability: 0.3247266904755705
+DEBUG - Elapsed time in milliseconds: 58
+DEBUG - Elapsed time in milliseconds: 5
+INFO  - MQ: 16.299860195125166
+INFO  - # of clusters: 78
+INFO  - MQ ratio: 0.2089725666041688
+INFO  - 
+INFO  - stats for rci
+INFO  - DescriptiveStatistics:
+n: 5
+min: 0.10667634252539913
+max: 0.12784313725490196
+mean: 0.119887423712063
+std dev: 0.00945914665614114
+median: 0.125544267053701
+skewness: -0.8242199020741235
+kurtosis: -1.8506645497795944
+
+INFO  - stats for twoway
+INFO  - DescriptiveStatistics:
+n: 5
+min: 0.031302031302031304
+max: 0.043137254901960784
+mean: 0.038283514487732026
+std dev: 0.00609909861315771
+median: 0.042232277526395176
+skewness: -0.6018314839764363
+kurtosis: -3.280161748771806
+
+INFO  - stats for stability
+INFO  - DescriptiveStatistics:
+n: 5
+min: 0.29758417302768425
+max: 0.3247266904755705
+mean: 0.3085290408270487
+std dev: 0.009941755116762464
+median: 0.30632041274452415
+skewness: 1.2313584342864656
+kurtosis: 2.655730064856094
+
+INFO  - stats for mq
+INFO  - DescriptiveStatistics:
+n: 5
+min: 0.2089725666041688
+max: 0.26003188824644907
+mean: 0.2441048514739355
+std dev: 0.02102349859359118
+median: 0.2543804054433703
+skewness: -1.6258222021068867
+kurtosis: 2.3970598780389007
+

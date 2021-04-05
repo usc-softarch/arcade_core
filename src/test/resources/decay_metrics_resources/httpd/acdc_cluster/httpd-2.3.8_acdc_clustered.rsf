@@ -336,8 +336,8 @@ contain modules/proxy/mod_proxy_fdpass.ch modules/proxy/mod_proxy_fdpass.c
 contain modules/proxy/mod_proxy_fdpass.ch modules/proxy/mod_proxy_fdpass.h
 contain support/win32/ApacheMonitor.ch support/win32/ApacheMonitor.c
 contain support/win32/ApacheMonitor.ch support/win32/ApacheMonitor.h
-contain modules/proxy/mod_proxy_fcgi.ss modules/proxy/mod_proxy_fcgi.c
 contain modules/proxy/mod_proxy_fcgi.ss modules/proxy/fcgi_protocol.h
+contain modules/proxy/mod_proxy_fcgi.ss modules/proxy/mod_proxy_fcgi.c
 contain orphanContainer.ss support/htpasswd.c
 contain orphanContainer.ss test/test_limits.c
 contain orphanContainer.ss support/logresolve.c

@@ -390,11 +390,11 @@ contain support/win32/ApacheMonitor.ch support/win32/ApacheMonitor.c
 contain support/win32/ApacheMonitor.ch support/win32/ApacheMonitor.h
 contain modules/cache/mod_cache_disk.ch modules/cache/mod_cache_disk.c
 contain modules/cache/mod_cache_disk.ch modules/cache/mod_cache_disk.h
-contain support/htcacheclean.ss support/htcacheclean.c
 contain support/htcacheclean.ss modules/cache/cache_disk_common.h
+contain support/htcacheclean.ss support/htcacheclean.c
 contain support/htcacheclean.ss modules/cache/cache_common.h
-contain modules/cache/mod_cache_socache.ss modules/cache/mod_cache_socache.c
 contain modules/cache/mod_cache_socache.ss modules/cache/cache_socache_common.h
+contain modules/cache/mod_cache_socache.ss modules/cache/mod_cache_socache.c
 contain modules/proxy/mod_proxy_scgi.ss modules/proxy/scgi.h
 contain modules/proxy/mod_proxy_scgi.ss modules/proxy/mod_proxy_scgi.c
 contain orphanContainer.ss test/test_limits.c
