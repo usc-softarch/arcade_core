@@ -2,7 +2,8 @@ package edu.usc.softarch.arcade.metrics;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,19 +69,18 @@ public class BatchSystemEvoTest {
 			DescriptiveStatistics oracle_stats = (DescriptiveStatistics) ois.readObject();
 			ois.close();
 			
-			ois = new ObjectInputStream(new FileInputStream(outputPath + fs + "BatchSystemEvoStats.txt"));
-			DescriptiveStatistics output_stats = (DescriptiveStatistics) ois.readObject();
-			ois.close();
+			DescriptiveStatistics output_stats = BatchSystemEvo.getStats();
 			
 			assertAll(
-				() -> assertTrue(oracle_stats.getN() == output_stats.getN(),"N does not match the oracle"),
-				() -> assertTrue(oracle_stats.getMin() == output_stats.getMin(),"Min does not match the oracle"),
-				() -> assertTrue(oracle_stats.getMax() == output_stats.getMax(),"Max does not match the oracle"),
-				() -> assertTrue(oracle_stats.getMean() == output_stats.getMean(),"Mean does not match the oracle"),
-				() -> assertTrue(oracle_stats.getStandardDeviation() == output_stats.getStandardDeviation(),"StandardDeviation does not match the oracle"),
-				() -> assertTrue(oracle_stats.getPercentile(50) == output_stats.getPercentile(50),"Median does not match the oracle"),
-				() -> assertTrue(oracle_stats.getSkewness() == output_stats.getSkewness(),"Skewness does not match the oracle"),
-				() -> assertTrue(oracle_stats.getKurtosis() == output_stats.getKurtosis(),"Kurtosis does not match the oracle")
+				() -> assertEquals(oracle_stats.getN(), output_stats.getN(),"N does not match the oracle"),
+				() -> assertEquals(oracle_stats.getN(), output_stats.getN(),"N does not match the oracle"),
+				() -> assertEquals(oracle_stats.getMin(), output_stats.getMin(),"Min does not match the oracle"),
+				() -> assertEquals(oracle_stats.getMax(), output_stats.getMax(),"Max does not match the oracle"),
+				() -> assertEquals(oracle_stats.getMean(), output_stats.getMean(),"Mean does not match the oracle"),
+				() -> assertEquals(oracle_stats.getStandardDeviation(), output_stats.getStandardDeviation(),"StandardDeviation does not match the oracle"),
+				() -> assertEquals(oracle_stats.getPercentile(50), output_stats.getPercentile(50),"Median does not match the oracle"),
+				() -> assertEquals(oracle_stats.getSkewness(), output_stats.getSkewness(),"Skewness does not match the oracle"),
+				() -> assertEquals(oracle_stats.getKurtosis(), output_stats.getKurtosis(),"Kurtosis does not match the oracle")
 			  );
 			
 			  

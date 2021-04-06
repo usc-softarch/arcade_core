@@ -21,6 +21,7 @@ import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchSystemEvo {
 	private static Logger logger = LogManager.getLogger(BatchSystemEvo.class);
+	private static DescriptiveStatistics stats;
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		BatchSystemEvoOptions options = new BatchSystemEvoOptions();
@@ -62,6 +63,10 @@ public class BatchSystemEvo {
 			throw new RuntimeException("Unknown value for option distopt: " + options.distopt);
 		}
 	}
+
+	public static DescriptiveStatistics getStats(){
+		return stats;
+	}
 	
 	private static void compareOverDistanceOfOne(
 			List<File> clusterFiles, String statistics_output_dir) {
@@ -83,27 +88,7 @@ public class BatchSystemEvo {
 			Double[] sysEvoArr = new Double[sysEvoValues.size()];
 			sysEvoValues.toArray(sysEvoArr);
 			
-			DescriptiveStatistics stats = new DescriptiveStatistics(ArrayUtils.toPrimitive(sysEvoArr));
-
-			try{
-				ObjectOutputStream write_stats = new ObjectOutputStream(new FileOutputStream(statistics_output_dir  + "BatchSystemEvoStats.txt"));
-				write_stats.writeObject(stats);
-				write_stats.flush();
-				write_stats.close();
-
-				/*
-				String resources_dir = ".///src///test///resources///System_evo_resources///outputs_arc///statistics_arc_Struts2.txt";
-				resources_dir = resources_dir.replace("///", File.separator);
-				write_stats = new ObjectOutputStream(new FileOutputStream(resources_dir));
-				write_stats.writeObject(stats);
-				write_stats.flush();
-				write_stats.close();
-				*/
-
-			}catch(IOException e){
-				e.printStackTrace();
-			}
-			
+			stats = new DescriptiveStatistics(ArrayUtils.toPrimitive(sysEvoArr));
 
 			System.out.println(stats);
 			System.out.println();
