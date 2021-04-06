@@ -2,7 +2,7 @@ package edu.usc.softarch.arcade.decay;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
@@ -25,7 +25,7 @@ import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class DecayMetricAnalyzerTest {
-    String resourcesDir = ".///src///test///resources////decay_metrics_resources";
+    String resourcesDir = ".///src///test///resources///decay_metrics_resources";
 
     @ParameterizedTest
     @CsvSource ({
@@ -174,56 +174,56 @@ public class DecayMetricAnalyzerTest {
 		Map<String, Double> rciVals = allStats.get("rci");
 		Map<String, Double> rciOracles = oracleStats.get("rci");
 		assertAll(
-			() -> assertTrue(rciVals.get("n").equals(rciOracles.get("n"))),
-			() -> assertTrue(rciVals.get("min").equals(rciOracles.get("min"))),
-			() -> assertTrue(rciVals.get("max").equals(rciOracles.get("max"))),
-			() -> assertTrue(rciVals.get("mean").equals(rciOracles.get("mean"))),
-			() -> assertTrue(rciVals.get("std dev").equals(rciOracles.get("std dev"))),
-			() -> assertTrue(rciVals.get("median").equals(rciOracles.get("median"))),
-			() -> assertTrue(rciVals.get("skewness").equals(rciOracles.get("skewness"))),
-			() -> assertTrue(rciVals.get("kurtosis").equals(rciOracles.get("kurtosis")))
+			() -> assertEquals(rciVals.get("n"), rciOracles.get("n")),
+			() -> assertEquals(rciVals.get("min"), rciOracles.get("min")),
+			() -> assertEquals(rciVals.get("max"), rciOracles.get("max")),
+			() -> assertEquals(rciVals.get("mean"), rciOracles.get("mean")),
+			() -> assertEquals(rciVals.get("std dev"), rciOracles.get("std dev")),
+			() -> assertEquals(rciVals.get("median"), rciOracles.get("median")),
+			() -> assertEquals(rciVals.get("skewness"), rciOracles.get("skewness")),
+			() -> assertEquals(rciVals.get("kurtosis"), rciOracles.get("kurtosis"))
      	);
 
 	  	// check twoway values
 		Map<String, Double> twowayVals = allStats.get("twoway");
 		Map<String, Double> twowayOracles = oracleStats.get("twoway");
 		assertAll(
-			() -> assertTrue(twowayVals.get("n").equals(twowayOracles.get("n"))),
-			() -> assertTrue(twowayVals.get("min").equals(twowayOracles.get("min"))),
-			() -> assertTrue(twowayVals.get("max").equals(twowayOracles.get("max"))),
-			() -> assertTrue(twowayVals.get("mean").equals(twowayOracles.get("mean"))),
-			() -> assertTrue(twowayVals.get("std dev").equals(twowayOracles.get("std dev"))),
-			() -> assertTrue(twowayVals.get("median").equals(twowayOracles.get("median"))),
-			() -> assertTrue(twowayVals.get("skewness").equals(twowayOracles.get("skewness"))),
-			() -> assertTrue(twowayVals.get("kurtosis").equals(twowayOracles.get("kurtosis")))
+			() -> assertEquals(twowayVals.get("n"), twowayOracles.get("n")),
+			() -> assertEquals(twowayVals.get("min"), twowayOracles.get("min")),
+			() -> assertEquals(twowayVals.get("max"), twowayOracles.get("max")),
+			() -> assertEquals(twowayVals.get("mean"), twowayOracles.get("mean")),
+			() -> assertEquals(twowayVals.get("std dev"), twowayOracles.get("std dev")),
+			() -> assertEquals(twowayVals.get("median"), twowayOracles.get("median")),
+			() -> assertEquals(twowayVals.get("skewness"), twowayOracles.get("skewness")),
+			() -> assertEquals(twowayVals.get("kurtosis"), twowayOracles.get("kurtosis"))
       	);
 
 		// check stability values
 		Map<String, Double> stabilityVals = allStats.get("stability");
 		Map<String, Double> stabilityOracles = oracleStats.get("stability");
 		assertAll(
-			() -> assertTrue(stabilityVals.get("n").equals(stabilityOracles.get("n"))),
-			() -> assertTrue(stabilityVals.get("min").equals(stabilityOracles.get("min"))),
-			() -> assertTrue(stabilityVals.get("max").equals(stabilityOracles.get("max"))),
-			() -> assertTrue(stabilityVals.get("mean").equals(stabilityOracles.get("mean"))),
-			() -> assertTrue(stabilityVals.get("std dev").equals(stabilityOracles.get("std dev"))),
-			() -> assertTrue(stabilityVals.get("median").equals(stabilityOracles.get("median"))),
-			() -> assertTrue(stabilityVals.get("skewness").equals(stabilityOracles.get("skewness"))),
-			() -> assertTrue(stabilityVals.get("kurtosis").equals(stabilityOracles.get("kurtosis")))
+			() -> assertEquals(stabilityVals.get("n"), stabilityOracles.get("n")),
+			() -> assertEquals(stabilityVals.get("min"), stabilityOracles.get("min")),
+			() -> assertEquals(stabilityVals.get("max"), stabilityOracles.get("max")),
+			() -> assertEquals(stabilityVals.get("mean"), stabilityOracles.get("mean")),
+			() -> assertEquals(stabilityVals.get("std dev"), stabilityOracles.get("std dev")),
+			() -> assertEquals(stabilityVals.get("median"), stabilityOracles.get("median")),
+			() -> assertEquals(stabilityVals.get("skewness"), stabilityOracles.get("skewness")),
+			() -> assertEquals(stabilityVals.get("kurtosis"), stabilityOracles.get("kurtosis"))
       	);
 
 		// check mq values
 		Map<String, Double> mqVals = allStats.get("mq");
 		Map<String, Double> mqOracles = oracleStats.get("mq");
 		assertAll(
-			() -> assertTrue(mqVals.get("n").equals(mqOracles.get("n"))),
-			() -> assertTrue(mqVals.get("min").equals(mqOracles.get("min"))),
-			() -> assertTrue(mqVals.get("max").equals(mqOracles.get("max"))),
-			() -> assertTrue(mqVals.get("mean").equals(mqOracles.get("mean"))),
-			() -> assertTrue(mqVals.get("std dev").equals(mqOracles.get("std dev"))),
-			() -> assertTrue(mqVals.get("median").equals(mqOracles.get("median"))),
-			() -> assertTrue(mqVals.get("skewness").equals(mqOracles.get("skewness"))),
-			() -> assertTrue(mqVals.get("kurtosis").equals(mqOracles.get("kurtosis")))
+			() -> assertEquals(mqVals.get("n"), mqOracles.get("n")),
+			() -> assertEquals(mqVals.get("min"), mqOracles.get("min")),
+			() -> assertEquals(mqVals.get("max"), mqOracles.get("max")),
+			() -> assertEquals(mqVals.get("mean"), mqOracles.get("mean")),
+			() -> assertEquals(mqVals.get("std dev"), mqOracles.get("std dev")),
+			() -> assertEquals(mqVals.get("median"), mqOracles.get("median")),
+			() -> assertEquals(mqVals.get("skewness"), mqOracles.get("skewness")),
+			() -> assertEquals(mqVals.get("kurtosis"), mqOracles.get("kurtosis"))
       	);
     }
 }
