@@ -2,6 +2,9 @@ package edu.usc.softarch.arcade.metrics;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +21,7 @@ import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchSystemEvo {
 	private static Logger logger = LogManager.getLogger(BatchSystemEvo.class);
+	private static DescriptiveStatistics stats;
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		BatchSystemEvoOptions options = new BatchSystemEvoOptions();
@@ -43,8 +47,11 @@ public class BatchSystemEvo {
 		// scheme found in the filename
 		clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
 
+		String statistics_output_dir = options.parameters.get(1);
+		
+
 		if (options.distopt == 1) {
-			compareOverDistanceOfOne(clusterFiles);
+			compareOverDistanceOfOne(clusterFiles,statistics_output_dir);
 		}
 		else if (options.distopt == 2) {
 			compareWithVdistGt1ForAll(clusterFiles);
@@ -56,9 +63,13 @@ public class BatchSystemEvo {
 			throw new RuntimeException("Unknown value for option distopt: " + options.distopt);
 		}
 	}
+
+	public static DescriptiveStatistics getStats(){
+		return stats;
+	}
 	
 	private static void compareOverDistanceOfOne(
-			List<File> clusterFiles) {
+			List<File> clusterFiles, String statistics_output_dir) {
 			File prevFile = null;
 			List<Double> sysEvoValues = new ArrayList<Double>();
 			int comparisonDistance = 1;
@@ -77,10 +88,11 @@ public class BatchSystemEvo {
 			Double[] sysEvoArr = new Double[sysEvoValues.size()];
 			sysEvoValues.toArray(sysEvoArr);
 			
-			DescriptiveStatistics stats = new DescriptiveStatistics(ArrayUtils.toPrimitive(sysEvoArr));
+			stats = new DescriptiveStatistics(ArrayUtils.toPrimitive(sysEvoArr));
 
 			System.out.println(stats);
 			System.out.println();
+
 	}
 
 	private static void compareWithVdistGt1ForAll(

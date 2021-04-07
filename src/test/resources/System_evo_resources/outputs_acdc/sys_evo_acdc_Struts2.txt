@@ -1,0 +1,14 @@
+Comparison distance is: 1
+SysEvo from struts-2.3.30_acdc_clustered.rsf to struts-2.3.32_acdc_clustered.rsf: 99.8373454782043
+SysEvo from struts-2.3.32_acdc_clustered.rsf to struts-2.5.2_acdc_clustered.rsf: 78.34293026231606
+SysEvo from struts-2.5.2_acdc_clustered.rsf to struts-2.5.8_acdc_clustered.rsf: 98.43342036553526
+SysEvo from struts-2.5.8_acdc_clustered.rsf to struts-2.5.10.1_acdc_clustered.rsf: 99.29431299294313
+DescriptiveStatistics:
+n: 4
+min: 78.34293026231606
+max: 99.8373454782043
+mean: 93.97700227474968
+std dev: 10.438730536259872
+median: 98.8638666792392
+skewness: -1.981715291521403
+kurtosis: 3.937929347319251

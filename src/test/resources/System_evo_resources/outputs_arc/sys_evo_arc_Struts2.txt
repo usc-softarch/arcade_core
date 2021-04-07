@@ -1,0 +1,14 @@
+Comparison distance is: 1
+SysEvo from struts-2.3.30_239_topics_234_arc_clusters.rsf to struts-2.3.32_239_topics_234_arc_clusters.rsf: 99.6620419779438
+SysEvo from struts-2.3.32_239_topics_234_arc_clusters.rsf to struts-2.5.2_284_topics_275_arc_clusters.rsf: 76.7040832926631
+SysEvo from struts-2.5.2_284_topics_275_arc_clusters.rsf to struts-2.5.8_287_topics_279_arc_clusters.rsf: 95.93265792610251
+SysEvo from struts-2.5.8_287_topics_279_arc_clusters.rsf to struts-2.5.10.1_288_topics_279_arc_clusters.rsf: 99.66016548463357
+DescriptiveStatistics:
+n: 4
+min: 76.7040832926631
+max: 99.6620419779438
+mean: 92.98973717033574
+std dev: 10.998447922925193
+median: 97.79641170536803
+skewness: -1.8540215414735428
+kurtosis: 3.4436877289065144

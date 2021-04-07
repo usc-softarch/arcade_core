@@ -1,0 +1,14 @@
+Comparison distance is 1
+SysEvo from httpd-2.3.8_acdc_clustered.rsf to httpd-2.4.7_acdc_clustered.rsf 86.72798948751644
+SysEvo from httpd-2.4.7_acdc_clustered.rsf to httpd-2.4.10_acdc_clustered.rsf 99.54038082731451
+SysEvo from httpd-2.4.10_acdc_clustered.rsf to httpd-2.4.16_acdc_clustered.rsf 99.73873285434357
+SysEvo from httpd-2.4.16_acdc_clustered.rsf to httpd-2.4.26_acdc_clustered.rsf 91.61174355901738
+DescriptiveStatistics
+n 4
+min 86.72798948751644
+max 99.73873285434357
+mean 94.40471168204797
+std dev 6.365522079254208
+median 95.57606219316594
+skewness -0.48327279045367666
+kurtosis -3.2697563784008814
