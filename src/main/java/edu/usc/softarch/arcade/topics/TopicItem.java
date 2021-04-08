@@ -30,11 +30,6 @@ public class TopicItem implements Serializable {
 	public void setTopicNum(int topicNum) { this.topicNum = topicNum; }
 	public void setProportion(double proportion) { this.proportion = proportion; }
 	public void setType(String type) { this.type = type; }
-
-	public void increaseProportion(double proportionToAdd) {
-		this.proportion += proportionToAdd; }
-	public void divideProportion(double divideBy) {
-		this.proportion /= divideBy; }
 	// #endregion ACCESSORS ------------------------------------------------------
 	
 	// #region MISC --------------------------------------------------------------

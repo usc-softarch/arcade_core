@@ -1,11 +1,14 @@
 package edu.usc.softarch.arcade.topics;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -17,14 +20,10 @@ import cc.mallet.pipe.CharSequence2TokenSequence;
 import cc.mallet.pipe.CharSequenceLowercase;
 import cc.mallet.pipe.CharSequenceReplace;
 import cc.mallet.pipe.Pipe;
-import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.TokenSequence2FeatureSequence;
 import cc.mallet.pipe.TokenSequenceRemoveStopwords;
 import cc.mallet.topics.TopicInferencer;
-import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
-import edu.usc.softarch.arcade.util.FileListing;
-import edu.usc.softarch.arcade.util.FileUtil;
 
 /**
  * @author joshua
@@ -51,51 +50,13 @@ public class DocTopics implements Serializable{
 	public DocTopics(String filename) throws FileNotFoundException {
 		loadFromFile(filename);	}
 
-	public DocTopics(String srcDir, String artifactsDir, String language) 
+	public DocTopics(String srcDir, String artifactsDir, String language)
 			throws Exception {
 		this();
 		// Begin by importing documents from text to feature sequences
-		List<Pipe> pipeList = new ArrayList<>();
-
-		/* Pipes: alphanumeric only, camel case separation, lowercase, tokenize,
-		 * remove stopwords english, remove stopwords java, stem, map to
-		 * features */
-		pipeList.add(new CharSequenceReplace(Pattern.compile("[^A-Za-z]"), " "));
-		pipeList.add(new CamelCaseSeparatorPipe());
-		pipeList.add(new CharSequenceLowercase());
-		pipeList.add(new CharSequence2TokenSequence(Pattern
-				.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")));
-		// pipeList.add(new TokenSequenceRemoveStopwords(new File(
-		// 		"stoplists/en.txt"), "UTF-8", false, false, false));
-		
-		// if (language.equalsIgnoreCase("c")) {
-		// 	pipeList.add(new TokenSequenceRemoveStopwords(new File(
-		// 			"res/ckeywords"), "UTF-8", false, false, false));
-		// 	pipeList.add(new TokenSequenceRemoveStopwords(new File(
-		// 			"res/cppkeywords"), "UTF-8", false, false, false));
-		// }
-		// else
-		// 	pipeList.add(new TokenSequenceRemoveStopwords(new File(
-		// 			"res/javakeywords"), "UTF-8", false, false, false));
-
-		pipeList.add(new StemmerPipe());
-		pipeList.add(new TokenSequence2FeatureSequence());
-
-		InstanceList instances = new InstanceList(new SerialPipes(pipeList));
-		logger.debug("Building instances for mallet...");
-
-		// For each file in the source directory, recursively load Instances
-		for (File file : FileListing.getFileListing(new File(srcDir))) {
-			logger.debug("Should I add " + file.getName() + " to instances?");
-			Instance newInstance = loadInstance(file, srcDir);
-			if (newInstance != null) instances.addThruPipe(newInstance);
-		}
-		/*TODO Is anything above this point even doing anything? The instances
-		 * variable goes nowhere and the object attributes are only affected past
-		 * this point. */
+		char fs = File.separatorChar;
 
 		int numTopics = 100;
-		String fs = File.separator;
 		
 		InstanceList previousInstances = InstanceList.load(
 			new File(artifactsDir + fs + "output.pipe"));
@@ -103,14 +64,20 @@ public class DocTopics implements Serializable{
 		TopicInferencer inferencer = TopicInferencer.read(
 			new File(artifactsDir + fs + "infer.mallet"));
 		
+		String toPrint = "";
+
 		for (int instIndex = 0; instIndex < previousInstances.size(); instIndex++) {
 			DocTopicItem dtItem = new DocTopicItem();
 			dtItem.setDoc(instIndex);
 			dtItem.setSource((String) previousInstances.get(instIndex).getName());
 
+			toPrint += (String) previousInstances.get(instIndex).getName();
+
 			double[] topicDistribution = 
 				inferencer.getSampledDistribution(
 					previousInstances.get(instIndex), 1000, 10, 10);
+
+			toPrint += ": " + Arrays.toString(topicDistribution) + System.lineSeparator();
 			
 			for (int topicIdx = 0; topicIdx < numTopics; topicIdx++) {
 				TopicItem t = new TopicItem();
@@ -120,6 +87,15 @@ public class DocTopics implements Serializable{
 			}
 			dtItemList.add(dtItem);
 		}
+
+		PrintWriter out = new PrintWriter("DistributionTest.txt");
+		out.print(toPrint);
+		out.close();
+
+		// try (ObjectInputStream ois = new ObjectInputStream(
+		// 		new FileInputStream("THISFILEHASAFUNNYNAME.txt"))) {
+		// 	this.dtItemList = (ArrayList<DocTopicItem>)ois.readObject();
+		// } catch (IOException | ClassNotFoundException e) { }
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
@@ -195,43 +171,6 @@ public class DocTopics implements Serializable{
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region PROCESSING --------------------------------------------------------
-	private Instance loadInstance(File file, String srcDir) throws IOException {
-		// If it is a Java file
-		if (file.isFile() && file.getName().endsWith(".java"))
-			return loadJavaInstance(file);
-
-		// If it is a C file
-		Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
-		if (p.matcher(file.getName()).find())
-			return loadCInstance(file, srcDir);
-
-		return null;
-	}
-
-	private Instance loadJavaInstance(File file) throws IOException {
-		String shortClassName = file.getName().replace(".java", "");
-		String fullClassName = "";
-		String packageName = FileUtil.findPackageName(file);
-		if (packageName != null) {
-			fullClassName = packageName + "." + shortClassName;
-			logger.debug("\t I've identified the following full class name"
-				+ " from analyzing files: " + fullClassName);
-		}
-
-		logger.debug("I'm going to add this file to instances: " + file);
-		String data = FileUtil.readFile(file.getAbsolutePath(),
-			Charset.defaultCharset());
-		return new Instance(data, "X", fullClassName, file.getAbsolutePath());
-	}
-
-	private Instance loadCInstance(File file, String srcDir) throws IOException {
-		logger.debug("I'm going to add this file to instances: " + file);
-		String depsStyleFilename = file.getAbsolutePath().replace(srcDir, "");
-		String data = FileUtil.readFile(file.getAbsolutePath(),
-			Charset.defaultCharset());
-		return new Instance(data, "X", depsStyleFilename, file.getAbsolutePath());
-	}
-
 	public static DocTopicItem computeGlobalCentroidUsingTopics(
 			List<DocTopicItem> docTopicItems) {
 		int firstNonNullDocTopicItemIndex = 0;

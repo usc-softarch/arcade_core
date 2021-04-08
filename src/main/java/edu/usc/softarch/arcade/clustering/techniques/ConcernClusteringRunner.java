@@ -1,9 +1,13 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -144,6 +148,13 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		// ------------------------------- TEMP ------------------------------------
+		String output =	TopicUtil.docTopics.getDocTopicItemList().toString();
+		try (PrintWriter out = new PrintWriter("DocTopicsSerialize.txt")) {
+			out.print(output);
+		} catch (FileNotFoundException e) {	}
+		// ------------------------------- TEMP ------------------------------------
 
 		for (FastCluster c : fastClusters)
 			TopicUtil.setDocTopicForFastClusterForMalletApi(c, this.language);

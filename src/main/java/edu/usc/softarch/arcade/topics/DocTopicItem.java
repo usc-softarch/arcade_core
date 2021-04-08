@@ -43,7 +43,8 @@ public class DocTopicItem implements Serializable {
 		this.source = docTopicItem.source;
 		this.topics = new HashMap<>();
 		setSortMethod(Sort.prop); //TODO Clone from argument
-		docTopicItem.getTopics().forEach(this::addTopic);
+		for (TopicItem topicItem : docTopicItem.getTopics())
+			addTopic(new TopicItem(topicItem));
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
