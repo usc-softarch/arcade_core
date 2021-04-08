@@ -3,7 +3,6 @@ package edu.usc.softarch.arcade.metrics;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,9 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-
 public class BatchSystemEvoTest {
-
 	private String outputPath;
 	private char fs; 
 
@@ -30,7 +27,7 @@ public class BatchSystemEvoTest {
 		directory.mkdirs();
 	}
 
-    @ParameterizedTest
+  @ParameterizedTest
 	@CsvSource({
 		/** Test parameters **/
 		// [oracle txt file path]
@@ -52,19 +49,15 @@ public class BatchSystemEvoTest {
 		// ARC httpd
 		".///src///test///resources///System_evo_resources///outputs_arc///statistics_arc_httpd.txt,"
 		+ ".///src///test///resources///System_evo_resources///cluster_files_arc///httpd",
-
-
-
 	})
-    public void batchSystemEvoTest(String oracle_path, String clusters_dir){
-        String oraclePath = oracle_path.replace("///", File.separator);  
+	public void batchSystemEvoTest(String oracle_path, String clusters_dir){
+		String oraclePath = oracle_path.replace("///", File.separator);  
 		String clustersDir = clusters_dir.replace("///", File.separator);
-
-        String[] args = {clustersDir,outputPath};
+		String[] args = {clustersDir,outputPath};
 
 		assertDoesNotThrow(() -> BatchSystemEvo.main(args));
 
-		try{
+		try {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(oraclePath));
 			DescriptiveStatistics oracle_stats = (DescriptiveStatistics) ois.readObject();
 			ois.close();
@@ -81,15 +74,9 @@ public class BatchSystemEvoTest {
 				() -> assertEquals(oracle_stats.getPercentile(50), output_stats.getPercentile(50),"Median does not match the oracle"),
 				() -> assertEquals(oracle_stats.getSkewness(), output_stats.getSkewness(),"Skewness does not match the oracle"),
 				() -> assertEquals(oracle_stats.getKurtosis(), output_stats.getKurtosis(),"Kurtosis does not match the oracle")
-			  );
-			
-			  
-			//assertTrue(output_stats.toString().equals(oracle_stats.toString()));
-		}catch(IOException | ClassNotFoundException e){
+				);	
+		} catch(IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-
-		
-
-    }
+	}
 }

@@ -2,9 +2,6 @@ package edu.usc.softarch.arcade.metrics;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,19 +44,13 @@ public class BatchSystemEvo {
 		// scheme found in the filename
 		clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
 
-		String statistics_output_dir = options.parameters.get(1);
-		
-
 		if (options.distopt == 1) {
-			compareOverDistanceOfOne(clusterFiles,statistics_output_dir);
-		}
-		else if (options.distopt == 2) {
+			compareOverDistanceOfOne(clusterFiles);
+		}	else if (options.distopt == 2) {
 			compareWithVdistGt1ForAll(clusterFiles);
-		}
-		else if (options.distopt == 3) {
+		}	else if (options.distopt == 3) {
 			compareWithVdistGt1ForSubset(clusterFiles);
-		}
-		else {
+		}	else {
 			throw new RuntimeException("Unknown value for option distopt: " + options.distopt);
 		}
 	}
@@ -68,10 +59,9 @@ public class BatchSystemEvo {
 		return stats;
 	}
 	
-	private static void compareOverDistanceOfOne(
-			List<File> clusterFiles, String statistics_output_dir) {
+	private static void compareOverDistanceOfOne(List<File> clusterFiles) {
 			File prevFile = null;
-			List<Double> sysEvoValues = new ArrayList<Double>();
+			List<Double> sysEvoValues = new ArrayList<>();
 			int comparisonDistance = 1;
 			System.out.println("Comparison distance is: " + comparisonDistance);
 			for (int i = 0; i < clusterFiles.size(); i += comparisonDistance) {
@@ -92,7 +82,6 @@ public class BatchSystemEvo {
 
 			System.out.println(stats);
 			System.out.println();
-
 	}
 
 	private static void compareWithVdistGt1ForAll(
