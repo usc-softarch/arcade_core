@@ -104,13 +104,14 @@ public class TopicUtil {
 			logger.debug("ti2.proportion: " + ti2.getProportion());
 			
 			mergedTopicItem.setProportion(
-				ti1.getProportion() + ti2.getProportion() / 2);
+				(ti1.getProportion() + ti2.getProportion()) / 2);
 			
 			logger.debug("mergedTopicItem.topicNum: "
 				+ mergedTopicItem.getTopicNum());
 			logger.debug("mergedTopicItem.proportion: "
 				+ mergedTopicItem.getProportion());
 		}
+
 		return mergedDocTopicItem;
 	}
 

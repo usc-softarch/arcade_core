@@ -153,10 +153,10 @@ public class DocTopicItem implements Serializable {
 	
 	// #region MISC --------------------------------------------------------------
 	public String toStringWithLeadingTabsAndLineBreaks(int numTabs) {
-		sort();
+		List<TopicItem> values = sort();
 		String dtItemStr = "[" + doc + "," + source + ",\n";
 		
-		for (TopicItem t : topics.values()) {
+		for (TopicItem t : values) {
 			dtItemStr += "\t".repeat(numTabs);
 			dtItemStr += "[" + t.getTopicNum() + "," + t.getProportion() + "]\n";
 		}
@@ -166,10 +166,10 @@ public class DocTopicItem implements Serializable {
 	}
 	
 	public String toString() {
-		sort();
+		List<TopicItem> values = sort();
 		String dtItemStr = "[" + doc + "," + source + ",";
 	
-		for (TopicItem t : topics.values())
+		for (TopicItem t : values)
 			dtItemStr += "[" + t.getTopicNum() + "," + t.getProportion() + "]";
 		
 		dtItemStr += "]";

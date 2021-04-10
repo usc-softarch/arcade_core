@@ -9,7 +9,7 @@ public class RsfCompare implements Comparable<RsfCompare> {
 	
     // Constructor passes in string (pass in path to FileUtil.readFile)
 	public RsfCompare(String rsfContents) {
-        this.rsfSet = new HashSet<>(Arrays.asList(rsfContents.split("\\r?\\n")));
+    this.rsfSet = new HashSet<>(Arrays.asList(rsfContents.split("\\r?\\n")));
 	}
 	
 	@Override

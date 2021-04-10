@@ -1,13 +1,5 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -149,13 +141,6 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			e.printStackTrace();
 		}
 
-		// ------------------------------- TEMP ------------------------------------
-		String output =	TopicUtil.docTopics.getDocTopicItemList().toString();
-		try (PrintWriter out = new PrintWriter("DocTopicsSerialize.txt")) {
-			out.print(output);
-		} catch (FileNotFoundException e) {	}
-		// ------------------------------- TEMP ------------------------------------
-
 		for (FastCluster c : fastClusters)
 			TopicUtil.setDocTopicForFastClusterForMalletApi(c, this.language);
 		
@@ -167,7 +152,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			}
 		}
 
-		logger.debug("Removing jspRemoveList from fastCluters");
+		logger.debug("Removing jspRemoveList from fastClusters");
 		for (FastCluster c : jspRemoveList)
 			fastClusters.remove(c);
 		
@@ -340,7 +325,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				+ " is not equal to fastClusters.size(): " + fastClusters.size());
 		
 		for (int i = 0; i < fastClusters.size(); i++)
-			if ( simMatrix.get(i).size() != fastClusters.size() )
+			if (simMatrix.get(i).size() != fastClusters.size())
 				throw new RuntimeException("simMatrix.get(" + i + ").size(): "
 					+ simMatrix.get(i).size() + " is not equal to fastClusters.size(): "
 					+ fastClusters.size());
@@ -361,6 +346,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(newCluster, currCluster);
 			else
 				throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
+
 			simMatrix.get(fastClusters.size()-1).set(i, currJSDivergence);
 			simMatrix.get(i).set(fastClusters.size()-1, currJSDivergence);
 		}
