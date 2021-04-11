@@ -25,31 +25,24 @@ import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class DecayMetricAnalyzerTest {
+	// Map <clusterPath, Map<metric, Map<valueType, value>>>
+	// TODO: switch the key for this map to version instead if possible/easy to do
+	private static Map<String, Map<String, Map<String, Double>>> results = new LinkedHashMap<>();
+
+	// Map <oraclePath, Map<metric, Map<valueType, value>>>
+	private static Map<String, Map<String, Map<String, Double>>> oracles = new LinkedHashMap<>();
+
 	String resourcesDir = ".///src///test///resources///decay_metrics_resources";
 
-	@ParameterizedTest
-	@CsvSource ({
-			// httpd
-			"///httpd///acdc_cluster,"
-			+ "///httpd///acdc_dep,"
-			+ "///httpd///oracles///decay_metrics_oracle_httpd_acdc.txt",
-			
-			// struts
-			"///struts///acdc_cluster,"
-			+ "///struts///acdc_dep,"
-			+ "///struts///oracles///decay_metrics_oracle_struts_acdc.txt",
-	})
-	public void mainTest(String clusters, String deps, String oracle) {
-		// Setup
-		String resDir = FileUtil.tildeExpandPath(resourcesDir.replace("///", File.separator));
-		String depsDir = FileUtil.tildeExpandPath(resDir + deps.replace("///", File.separator));
-		String clustersDir = FileUtil.tildeExpandPath((resDir + clusters.replace("///", File.separator)));
-			
+	public static Map<String, Map<String, Double>> setUp(String clusterDir, String depDir){	
+		Map<String, Map<String, Double>> resultStats = results.get(clusterDir);
+		if (resultStats != null) return resultStats;
+
 		List<File> clusterFiles = assertDoesNotThrow(() -> {
-			return FileListing.getFileListing(new File(clustersDir));
+			return FileListing.getFileListing(new File(clusterDir));
 		});
 		List<File> depsFiles = assertDoesNotThrow(() -> {
-			return FileListing.getFileListing(new File(depsDir));
+			return FileListing.getFileListing(new File(depDir));
 		});
 	
 		clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
@@ -104,14 +97,18 @@ public class DecayMetricAnalyzerTest {
 					}
 					mqRatios.add(DecayMetricAnalyzer.mqRatio);
 					decayMetrics.put("mq", mqRatios);
-					
+
 					break;
 				}
 			}
 		}
 
+		// saving the put for here since I want to guarentee we only put if cluster + dep were valid
+		// using clusterDir as the key for now
+		resultStats = new LinkedHashMap<>();
+		results.put(clusterDir, resultStats);
+
 		// construct the DescriptiveStatistics since we can't get kurtosis or skewness otherwise
-		Map<String, Map<String, Double>> allStats = new LinkedHashMap<>();
 		for (String key : decayMetrics.keySet()) {
 			List<Double> vals = decayMetrics.get(key);
 			double[] valArr = ArrayUtils.toPrimitive(vals.toArray(new Double[vals.size()]));
@@ -127,13 +124,20 @@ public class DecayMetricAnalyzerTest {
 			rawStats.put("skewness",stats.getSkewness());
 			rawStats.put("kurtosis",stats.getKurtosis());
 
-			allStats.put(key, rawStats);
+			resultStats.put(key, rawStats);
 		}
+		return resultStats;
+	}
+
+	public static Map<String, Map<String, Double>> readOracle(String oraclePath){
+		Map<String, Map<String, Double>> oracleStats = oracles.get(oraclePath);
+		if (oracleStats != null) return oracleStats;
+
+		oracleStats = new LinkedHashMap<>();
+		oracles.put(oraclePath, oracleStats);
 
 		// parse oracle
 		List<List<String>> records = new ArrayList<>();
-		String oraclePath = resourcesDir + oracle;
-		oraclePath.replace("///", File.separator);
 		try (BufferedReader br = new BufferedReader(new FileReader(oraclePath))) {
 			String line;
 			while ((line = br.readLine()) != null) {
@@ -142,10 +146,10 @@ public class DecayMetricAnalyzerTest {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			fail("Exception caught in DecayMetricAnalyzerTest mainTest");
+			fail("Exception caught in DecayMetricAnalyzerTest readOracle");
 		}
 
-		Map<String, Map<String, Double>> oracleStats = new LinkedHashMap<>();
+		
 		for (int i = 0; i < records.size(); i++) {
 			System.out.println(records.get(i).size());
 			
@@ -158,61 +162,94 @@ public class DecayMetricAnalyzerTest {
 			}
 			oracleStats.put(oracleKey, oracleRawStats);
 		}
+		return oracleStats;
+	}
+
+	@ParameterizedTest
+	@CsvSource ({
+			// httpd acdc
+			"///httpd///acdc_cluster,"
+			+ "///httpd///acdc_dep,"
+			+ "///httpd///oracles///decay_metrics_oracle_httpd_acdc.txt",
+
+			// httpd arc
+			"///httpd///arc_cluster,"
+			+ "///httpd///arc_dep,"
+			+ "///httpd///oracles///decay_metrics_oracle_httpd_arc.txt",
+				
+			// struts acdc
+			"///struts///acdc_cluster,"
+			+ "///struts///acdc_dep,"
+			+ "///struts///oracles///decay_metrics_oracle_struts_acdc.txt",
+
+			// struts arc
+			"///struts///arc_cluster,"
+			+ "///struts///arc_dep,"
+			+ "///struts///oracles///decay_metrics_oracle_struts_arc.txt",
+	})
+	public void mainTest(String clusters, String deps, String oracle) {
+		String resDir = FileUtil.tildeExpandPath(resourcesDir.replace("///", File.separator));
+		String depsDir = FileUtil.tildeExpandPath(resDir + deps.replace("///", File.separator));
+		String clustersDir = FileUtil.tildeExpandPath((resDir + clusters.replace("///", File.separator)));
+		String oraclesPath = FileUtil.tildeExpandPath((resDir + oracle.replace("///", File.separator)));
+
+		Map<String, Map<String, Double>> resultStats = setUp(clustersDir, depsDir);
+		Map<String, Map<String, Double>> oracleStats = readOracle(oraclesPath);
 
 		// check rci values
-		Map<String, Double> rciVals = allStats.get("rci");
+		Map<String, Double> rciVals = resultStats.get("rci");
 		Map<String, Double> rciOracles = oracleStats.get("rci");
 		assertAll(
-			() -> assertEquals(rciVals.get("n"), rciOracles.get("n")),
-			() -> assertEquals(rciVals.get("min"), rciOracles.get("min")),
-			() -> assertEquals(rciVals.get("max"), rciOracles.get("max")),
-			() -> assertEquals(rciVals.get("mean"), rciOracles.get("mean")),
-			() -> assertEquals(rciVals.get("std dev"), rciOracles.get("std dev")),
-			() -> assertEquals(rciVals.get("median"), rciOracles.get("median")),
-			() -> assertEquals(rciVals.get("skewness"), rciOracles.get("skewness")),
-			() -> assertEquals(rciVals.get("kurtosis"), rciOracles.get("kurtosis"))
+			() -> assertEquals(rciOracles.get("n"), rciVals.get("n"), "RCI n value does not match the oracle"),
+			() -> assertEquals(rciOracles.get("min"), rciVals.get("min"), "RCI min value does not match the oracle"),
+			() -> assertEquals(rciOracles.get("max"), rciVals.get("max"), "RCI max value does not match the oracle"),
+			() -> assertEquals(rciOracles.get("mean"), rciVals.get("mean"), "RCI mean value does not match the oracle"),
+			() -> assertEquals(rciOracles.get("std dev"), rciVals.get("std dev"), "RCI std dev value does not match the oracle"),
+			() -> assertEquals(rciOracles.get("median"), rciVals.get("median"), "RCI median value does not match the oracle"),
+			() -> assertEquals(rciOracles.get("skewness"), rciVals.get("skewness"), "RCI skewness value does not match the oracle"),
+			() -> assertEquals(rciOracles.get("kurtosis"), rciVals.get("kurtosis"), "RCI kurtosis value does not match the oracle")
 		);
 
-			// check twoway values
-		Map<String, Double> twowayVals = allStats.get("twoway");
+		// check twoway values
+		Map<String, Double> twowayVals = resultStats.get("twoway");
 		Map<String, Double> twowayOracles = oracleStats.get("twoway");
 		assertAll(
-			() -> assertEquals(twowayVals.get("n"), twowayOracles.get("n")),
-			() -> assertEquals(twowayVals.get("min"), twowayOracles.get("min")),
-			() -> assertEquals(twowayVals.get("max"), twowayOracles.get("max")),
-			() -> assertEquals(twowayVals.get("mean"), twowayOracles.get("mean")),
-			() -> assertEquals(twowayVals.get("std dev"), twowayOracles.get("std dev")),
-			() -> assertEquals(twowayVals.get("median"), twowayOracles.get("median")),
-			() -> assertEquals(twowayVals.get("skewness"), twowayOracles.get("skewness")),
-			() -> assertEquals(twowayVals.get("kurtosis"), twowayOracles.get("kurtosis"))
+			() -> assertEquals(twowayOracles.get("n"), twowayVals.get("n"), "Two-way n value does not match the oracle"),
+			() -> assertEquals(twowayOracles.get("min"), twowayVals.get("min"), "Two-way min value does not match the oracle"),
+			() -> assertEquals(twowayOracles.get("max"), twowayVals.get("max"), "Two-way max value does not match the oracle"),
+			() -> assertEquals(twowayOracles.get("mean"), twowayVals.get("mean"), "Two-way mean value does not match the oracle"),
+			() -> assertEquals(twowayOracles.get("std dev"), twowayVals.get("std dev"), "Two-way std dev value does not match the oracle"),
+			() -> assertEquals(twowayOracles.get("median"), twowayVals.get("median"), "Two-way median value does not match the oracle"),
+			() -> assertEquals(twowayOracles.get("skewness"), twowayVals.get("skewness"), "Two-way skewness value does not match the oracle"),
+			() -> assertEquals(twowayOracles.get("kurtosis"), twowayVals.get("kurtosis"), "Two-way kurtosis value does not match the oracle")
 		);
 
 		// check stability values
-		Map<String, Double> stabilityVals = allStats.get("stability");
+		Map<String, Double> stabilityVals = resultStats.get("stability");
 		Map<String, Double> stabilityOracles = oracleStats.get("stability");
 		assertAll(
-			() -> assertEquals(stabilityVals.get("n"), stabilityOracles.get("n")),
-			() -> assertEquals(stabilityVals.get("min"), stabilityOracles.get("min")),
-			() -> assertEquals(stabilityVals.get("max"), stabilityOracles.get("max")),
-			() -> assertEquals(stabilityVals.get("mean"), stabilityOracles.get("mean")),
-			() -> assertEquals(stabilityVals.get("std dev"), stabilityOracles.get("std dev")),
-			() -> assertEquals(stabilityVals.get("median"), stabilityOracles.get("median")),
-			() -> assertEquals(stabilityVals.get("skewness"), stabilityOracles.get("skewness")),
-			() -> assertEquals(stabilityVals.get("kurtosis"), stabilityOracles.get("kurtosis"))
+			() -> assertEquals(stabilityOracles.get("n"), stabilityVals.get("n"), "Stability n value does not match the oracle"),
+			() -> assertEquals(stabilityOracles.get("min"), stabilityVals.get("min"), "Stability min value does not match the oracle"),
+			() -> assertEquals(stabilityOracles.get("max"), stabilityVals.get("max"), "Stability max value does not match the oracle"),
+			() -> assertEquals(stabilityOracles.get("mean"), stabilityVals.get("mean"), "Stability mean value does not match the oracle"),
+			() -> assertEquals(stabilityOracles.get("std dev"), stabilityVals.get("std dev"), "Stability std dev value does not match the oracle"),
+			() -> assertEquals(stabilityOracles.get("median"), stabilityVals.get("median"), "Stability median value does not match the oracle"),
+			() -> assertEquals(stabilityOracles.get("skewness"), stabilityVals.get("skewness"), "Stability skewness value does not match the oracle"),
+			() -> assertEquals(stabilityOracles.get("kurtosis"), stabilityVals.get("kurtosis"), "Stability kurtosis value does not match the oracle")
 		);
 
 		// check mq values
-		Map<String, Double> mqVals = allStats.get("mq");
+		Map<String, Double> mqVals = resultStats.get("mq");
 		Map<String, Double> mqOracles = oracleStats.get("mq");
 		assertAll(
-			() -> assertEquals(mqVals.get("n"), mqOracles.get("n")),
-			() -> assertEquals(mqVals.get("min"), mqOracles.get("min")),
-			() -> assertEquals(mqVals.get("max"), mqOracles.get("max")),
-			() -> assertEquals(mqVals.get("mean"), mqOracles.get("mean")),
-			() -> assertEquals(mqVals.get("std dev"), mqOracles.get("std dev")),
-			() -> assertEquals(mqVals.get("median"), mqOracles.get("median")),
-			() -> assertEquals(mqVals.get("skewness"), mqOracles.get("skewness")),
-			() -> assertEquals(mqVals.get("kurtosis"), mqOracles.get("kurtosis"))
+			() -> assertEquals(mqOracles.get("n"), mqVals.get("n"), "MQ n value does not match the oracle"),
+			() -> assertEquals(mqOracles.get("min"), mqVals.get("min"), "MQ min value does not match the oracle"),
+			() -> assertEquals(mqOracles.get("max"), mqVals.get("max"), "MQ max value does not match the oracle"),
+			() -> assertEquals(mqOracles.get("mean"), mqVals.get("mean"), "MQ mean value does not match the oracle"),
+			() -> assertEquals(mqOracles.get("std dev"), mqVals.get("std dev"), "MQ std dev value does not match the oracle"),
+			() -> assertEquals(mqOracles.get("median"), mqVals.get("median"), "MQ median value does not match the oracle"),
+			() -> assertEquals(mqOracles.get("skewness"), mqVals.get("skewness"), "MQ skewness value does not match the oracle"),
+			() -> assertEquals(mqOracles.get("kurtosis"), mqVals.get("kurtosis"), "MQ kurtosis value does not match the oracle")
 		);
 	}
 }
