@@ -33,11 +33,21 @@ public class DecayMetricAnalyzerTest {
 			"///httpd///acdc_cluster,"
 			+ "///httpd///acdc_dep,"
 			+ "///httpd///oracles///decay_metrics_oracle_httpd_acdc.txt",
-			
+
+			// httpd arc
+			"///httpd///arc_cluster,"
+			+ "///httpd///arc_dep,"
+			+ "///httpd///oracles///decay_metrics_oracle_httpd_arc.txt",
+				
 			// struts acdc
 			"///struts///acdc_cluster,"
 			+ "///struts///acdc_dep,"
 			+ "///struts///oracles///decay_metrics_oracle_struts_acdc.txt",
+
+			// struts arc
+			"///struts///arc_cluster,"
+			+ "///struts///arc_dep,"
+			+ "///struts///oracles///decay_metrics_oracle_struts_arc.txt",
 	})
 	public void mainTest(String clusters, String deps, String oracle) {
 		// Setup
