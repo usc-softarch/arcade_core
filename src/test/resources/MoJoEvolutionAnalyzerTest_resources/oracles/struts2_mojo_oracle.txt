@@ -1,0 +1,2 @@
+mojofmvals,struts-2.3.32_acdc_clustered.rsf,struts-2.3.30_acdc_clustered.rsf,99.77,struts-2.5.2_acdc_clustered.rsf,struts-2.3.32_acdc_clustered.rsf,88.28,struts-2.5.8_acdc_clustered.rsf,struts-2.5.2_acdc_clustered.rsf,97.49,struts-2.5.10.1_acdc_clustered.rsf,struts-2.5.8_acdc_clustered.rsf,98.0
+n,4,min,88.28,max,99.77,mean,95.88499999999999,std dev,5.163283838798714,median,97.745,skewness,-1.7804038734529561,kurtosis,3.381526704758457

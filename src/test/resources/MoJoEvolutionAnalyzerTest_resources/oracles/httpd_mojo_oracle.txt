@@ -1,0 +1,14 @@
+Comparison distance is: 1
+MoJoFM from httpd-2.4.7_acdc_clustered.rsf to httpd-2.3.8_acdc_clustered.rsf: 93.59
+MoJoFM from httpd-2.4.10_acdc_clustered.rsf to httpd-2.4.7_acdc_clustered.rsf: 99.42
+MoJoFM from httpd-2.4.16_acdc_clustered.rsf to httpd-2.4.10_acdc_clustered.rsf: 99.71
+MoJoFM from httpd-2.4.26_acdc_clustered.rsf to httpd-2.4.16_acdc_clustered.rsf: 99.71
+DescriptiveStatistics:
+n: 4
+min: 93.59
+max: 99.71
+mean: 98.1075
+std dev: 3.0147678185890165
+median: 99.565
+skewness: -1.9878038873928734
+kurtosis: 3.9576317186094556
