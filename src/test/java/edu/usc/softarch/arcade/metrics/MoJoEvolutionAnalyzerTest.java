@@ -52,7 +52,7 @@ public class MoJoEvolutionAnalyzerTest {
     File prevFile = null;
     List<Double> mojoFmValues = new ArrayList<>();
     // Map to mojoFmValues and associated cluster files
-    HashMap<String, Double> mojoMap = new HashMap<>();
+    Map<String, Double> mojoMap = new HashMap<>();
     // List to store the compared versions
     List<String> mojoFiles = new ArrayList<>();
     for (int i = 0; i < clusterFiles.size(); i += comparisonDistance) {
@@ -73,17 +73,15 @@ public class MoJoEvolutionAnalyzerTest {
     DescriptiveStatistics stats = new DescriptiveStatistics(
       Arrays.stream(mojoFmArr).mapToDouble(Double::valueOf).toArray());
 
-
     // Place metrics in map
-    Map<String, Double> statsMap = new HashMap<>();
-    statsMap.put("n", (double) (stats.getN()));
-    statsMap.put("min", stats.getMin());
-    statsMap.put("max", stats.getMax());
-    statsMap.put("mean", stats.getMean());
-    statsMap.put("std dev", stats.getStandardDeviation());
-    statsMap.put("median", stats.getPercentile(50));
-    statsMap.put("skewness", stats.getSkewness());
-    statsMap.put("kurtosis", stats.getKurtosis());
+    mojoMap.put("n", (double) (stats.getN()));
+    mojoMap.put("min", stats.getMin());
+    mojoMap.put("max", stats.getMax());
+    mojoMap.put("mean", stats.getMean());
+    mojoMap.put("std dev", stats.getStandardDeviation());
+    mojoMap.put("median", stats.getPercentile(50));
+    mojoMap.put("skewness", stats.getSkewness());
+    mojoMap.put("kurtosis", stats.getKurtosis());
 
     // Read in oracle file
     List<List<String>> records = new ArrayList<>();
@@ -105,9 +103,8 @@ public class MoJoEvolutionAnalyzerTest {
       oracleMojoMap.put(records.get(0).get(i) + " " + records.get(0).get(i + 1), Double.parseDouble(records.get(0).get(i + 2)));
     }
     // records.get(1) contains the metrics
-    Map<String, Double> oracleMetricsMap = new HashMap<>();
     for (int i = 0; i < records.get(1).size(); i += 2){
-      oracleMetricsMap.put(records.get(1).get(i), Double.parseDouble(records.get(1).get(i + 1)));
+      oracleMojoMap.put(records.get(1).get(i), Double.parseDouble(records.get(1).get(i + 1)));
     }
 
     // Compare mojoFmValues to oracle
@@ -117,14 +114,14 @@ public class MoJoEvolutionAnalyzerTest {
 
     // Compare result metrics to oracle metrics
     assertAll(
-      () -> assertEquals(oracleMetricsMap.get("n"), statsMap.get("n")),
-      () -> assertEquals(oracleMetricsMap.get("min"), statsMap.get("min")),
-      () -> assertEquals(oracleMetricsMap.get("max"), statsMap.get("max")),
-      () -> assertEquals(oracleMetricsMap.get("mean"), statsMap.get("mean")),
-      () -> assertEquals(oracleMetricsMap.get("std dev"), statsMap.get("std dev")),
-      () -> assertEquals(oracleMetricsMap.get("median"), statsMap.get("median")),
-      () -> assertEquals(oracleMetricsMap.get("skewness"), statsMap.get("skewness")),
-      () -> assertEquals(oracleMetricsMap.get("kurtosis"), statsMap.get("kurtosis"))
+      () -> assertEquals(oracleMojoMap.get("n"), mojoMap.get("n")),
+      () -> assertEquals(oracleMojoMap.get("min"), mojoMap.get("min")),
+      () -> assertEquals(oracleMojoMap.get("max"), mojoMap.get("max")),
+      () -> assertEquals(oracleMojoMap.get("mean"), mojoMap.get("mean")),
+      () -> assertEquals(oracleMojoMap.get("std dev"), mojoMap.get("std dev")),
+      () -> assertEquals(oracleMojoMap.get("median"), mojoMap.get("median")),
+      () -> assertEquals(oracleMojoMap.get("skewness"), mojoMap.get("skewness")),
+      () -> assertEquals(oracleMojoMap.get("kurtosis"), mojoMap.get("kurtosis"))
     );
   }
 }
