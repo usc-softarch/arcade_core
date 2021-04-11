@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,21 +23,19 @@ import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class MoJoEvolutionAnalyzerTest {
-  String resourcesDir = ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources";
   @ParameterizedTest
   @CsvSource({
       // Struts2
-      "///Struts2///clusters,"
-      + "///oracles///struts2_mojo_oracle.txt",
+      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///Struts2///clusters,"
+      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///struts2_mojo_oracle.txt",
 
       // httpd
-      "///httpd///clusters,"
-      + "///oracles///httpd_mojo_oracle.txt",
+      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///httpd///clusters,"
+      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///httpd_mojo_oracle.txt",
   })
   public void mainTest(String clusters, String oracleFile){
-    String resDir = resourcesDir.replace("///", File.separator);
-    String oraclePath = resDir + oracleFile.replace("///", File.separator);
-    String clustersDir = resDir + clusters.replace("///", File.separator);
+    String oraclePath = oracleFile.replace("///", File.separator);
+    String clustersDir = clusters.replace("///", File.separator);
 
     // Copied from MoJoEvolutionAnalyzer.main()
     List<File> clusterFiles = null;
@@ -76,7 +75,7 @@ public class MoJoEvolutionAnalyzerTest {
 
 
     // Place metrics in map
-    HashMap<String, Double> statsMap = new HashMap<>();
+    Map<String, Double> statsMap = new HashMap<>();
     statsMap.put("n", (double) (stats.getN()));
     statsMap.put("min", stats.getMin());
     statsMap.put("max", stats.getMax());
@@ -101,12 +100,12 @@ public class MoJoEvolutionAnalyzerTest {
     }
 
     // records.get(0) contains the mojoFmValues
-    HashMap<String, Double> oracleMojoMap = new HashMap<>();
+    Map<String, Double> oracleMojoMap = new HashMap<>();
     for (int i = 1; i < records.get(0).size(); i += 3){
       oracleMojoMap.put(records.get(0).get(i) + " " + records.get(0).get(i + 1), Double.parseDouble(records.get(0).get(i + 2)));
     }
     // records.get(1) contains the metrics
-    HashMap<String, Double> oracleMetricsMap = new HashMap<>();
+    Map<String, Double> oracleMetricsMap = new HashMap<>();
     for (int i = 0; i < records.get(1).size(); i += 2){
       oracleMetricsMap.put(records.get(1).get(i), Double.parseDouble(records.get(1).get(i + 1)));
     }
