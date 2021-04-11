@@ -1,0 +1,2 @@
+mojofmvals,struts-2.3.32_239_topics_234_arc_clusters.rsf,struts-2.3.30_239_topics_234_arc_clusters.rsf,96.51,struts-2.5.2_284_topics_275_arc_clusters.rsf,struts-2.3.32_239_topics_234_arc_clusters.rsf,70.66,struts-2.5.8_287_topics_279_arc_clusters.rsf,struts-2.5.2_284_topics_275_arc_clusters.rsf,88.87,struts-2.5.10.1_288_topics_279_arc_clusters.rsf,struts-2.5.8_287_topics_279_arc_clusters.rsf,99.87
+n,4,min,70.66,max,99.87,mean,88.9775,std dev,13.050255106063384,median,92.69,skewness,-1.327691257709216,kurtosis,1.4257315936926318
