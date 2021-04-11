@@ -119,13 +119,21 @@ public class MoJoEvolutionAnalyzerTest {
 
   @ParameterizedTest
   @CsvSource({
-      // Struts2
-      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///Struts2///clusters,"
-      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///struts2_mojo_oracle.txt",
+      // Struts2 (acdc)
+      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///Struts2///acdc_clusters,"
+      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///struts2_acdc_mojo_oracle.txt",
 
-      // httpd
-      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///httpd///clusters,"
-      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///httpd_mojo_oracle.txt",
+      // httpd (acdc)
+      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///httpd///acdc_clusters,"
+      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///httpd_acdc_mojo_oracle.txt",
+
+      // Struts2 (arc)
+      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///Struts2///arc_clusters,"
+      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///struts2_arc_mojo_oracle.txt",
+
+      // httpd (arc)
+      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///httpd///arc_clusters,"
+      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///httpd_arc_mojo_oracle.txt",
   })
   public void mainTest(String clusters, String oracleFile){
     String oraclePath = oracleFile.replace("///", File.separator);

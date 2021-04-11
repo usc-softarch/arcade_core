@@ -1,0 +1,2 @@
+mojofmvals,httpd-2.4.7_46_topics_70_arc_clusters.rsf,httpd-2.3.8_46_topics_71_arc_clusters.rsf,74.52,httpd-2.4.10_46_topics_71_arc_clusters.rsf,httpd-2.4.7_46_topics_70_arc_clusters.rsf,94.2,httpd-2.4.16_46_topics_71_arc_clusters.rsf,httpd-2.4.10_46_topics_71_arc_clusters.rsf,100.0,httpd-2.4.26_50_topics_82_arc_clusters.rsf,httpd-2.4.16_46_topics_71_arc_clusters.rsf,79.13
+n,4,min,74.52,max,100.0,mean,86.9625,std dev,12.090239520649156,median,86.66499999999999,skewness,0.0710597775744064,kurtosis,-4.238390100363926
