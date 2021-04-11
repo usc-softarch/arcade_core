@@ -23,19 +23,17 @@ import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class MoJoEvolutionAnalyzerTest {
-  @ParameterizedTest
-  @CsvSource({
-      // Struts2
-      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///Struts2///clusters,"
-      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///struts2_mojo_oracle.txt",
+  private static Map<String, Map<String, Double>> results = new HashMap<>();
+  private static Map<String, Map<String, Double>> oracles = new HashMap<>();
+  private static Map<String, List<String>> files = new HashMap<>();
 
-      // httpd
-      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///httpd///clusters,"
-      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///httpd_mojo_oracle.txt",
-  })
-  public void mainTest(String clusters, String oracleFile){
-    String oraclePath = oracleFile.replace("///", File.separator);
-    String clustersDir = clusters.replace("///", File.separator);
+  public static Map<String, Double> setUp(String clustersDir) {
+    Map<String, Double> mojoMap = results.get(clustersDir);
+    if (mojoMap != null) return mojoMap;
+
+    // Map to mojoFmValues and associated cluster files
+    mojoMap = new HashMap<>();
+    results.put(clustersDir, mojoMap);
 
     // Copied from MoJoEvolutionAnalyzer.main()
     List<File> clusterFiles = null;
@@ -51,8 +49,6 @@ public class MoJoEvolutionAnalyzerTest {
     int comparisonDistance = 1;
     File prevFile = null;
     List<Double> mojoFmValues = new ArrayList<>();
-    // Map to mojoFmValues and associated cluster files
-    Map<String, Double> mojoMap = new HashMap<>();
     // List to store the compared versions
     List<String> mojoFiles = new ArrayList<>();
     for (int i = 0; i < clusterFiles.size(); i += comparisonDistance) {
@@ -68,6 +64,7 @@ public class MoJoEvolutionAnalyzerTest {
         prevFile = currFile;
       }
     }
+    files.put(clustersDir, mojoFiles);
     Double[] mojoFmArr = new Double[mojoFmValues.size()];
     mojoFmValues.toArray(mojoFmArr);
     DescriptiveStatistics stats = new DescriptiveStatistics(
@@ -82,6 +79,17 @@ public class MoJoEvolutionAnalyzerTest {
     mojoMap.put("median", stats.getPercentile(50));
     mojoMap.put("skewness", stats.getSkewness());
     mojoMap.put("kurtosis", stats.getKurtosis());
+
+    return mojoMap;
+  }
+
+  public static Map<String, Double> readOracle(String oraclePath) {
+    Map<String, Double> oracleMojoMap = oracles.get(oraclePath);
+    if (oracleMojoMap != null) return oracleMojoMap;
+
+    // Map to mojoFmValues and associated cluster files
+    oracleMojoMap = new HashMap<>();
+    oracles.put(oraclePath, oracleMojoMap);
 
     // Read in oracle file
     List<List<String>> records = new ArrayList<>();
@@ -98,7 +106,6 @@ public class MoJoEvolutionAnalyzerTest {
     }
 
     // records.get(0) contains the mojoFmValues
-    Map<String, Double> oracleMojoMap = new HashMap<>();
     for (int i = 1; i < records.get(0).size(); i += 3){
       oracleMojoMap.put(records.get(0).get(i) + " " + records.get(0).get(i + 1), Double.parseDouble(records.get(0).get(i + 2)));
     }
@@ -106,6 +113,27 @@ public class MoJoEvolutionAnalyzerTest {
     for (int i = 0; i < records.get(1).size(); i += 2){
       oracleMojoMap.put(records.get(1).get(i), Double.parseDouble(records.get(1).get(i + 1)));
     }
+
+    return oracleMojoMap;
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+      // Struts2
+      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///Struts2///clusters,"
+      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///struts2_mojo_oracle.txt",
+
+      // httpd
+      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///httpd///clusters,"
+      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///httpd_mojo_oracle.txt",
+  })
+  public void mainTest(String clusters, String oracleFile){
+    String oraclePath = oracleFile.replace("///", File.separator);
+    String clustersDir = clusters.replace("///", File.separator);
+
+    Map<String, Double> mojoMap = setUp(clustersDir);
+    List<String> mojoFiles = files.get(clustersDir);
+    Map<String, Double> oracleMojoMap = readOracle(oraclePath);
 
     // Compare mojoFmValues to oracle
     for (String file : mojoFiles){
