@@ -119,21 +119,25 @@ public class MoJoEvolutionAnalyzerTest {
 
   @ParameterizedTest
   @CsvSource({
-      // Struts2 (acdc)
-      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///Struts2///acdc_clusters,"
-      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///struts2_acdc_mojo_oracle.txt",
+    /** Test parameters **/
+    // [directory with clusters rsf files]
+    // [oracle file path]
+    
+    // Struts2 (acdc)
+    ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///Struts2///acdc_clusters,"
+    + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///struts2_acdc_mojo_oracle.txt",
 
-      // httpd (acdc)
-      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///httpd///acdc_clusters,"
-      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///httpd_acdc_mojo_oracle.txt",
+    // httpd (acdc)
+    ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///httpd///acdc_clusters,"
+    + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///httpd_acdc_mojo_oracle.txt",
 
-      // Struts2 (arc)
-      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///Struts2///arc_clusters,"
-      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///struts2_arc_mojo_oracle.txt",
+    // Struts2 (arc)
+    ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///Struts2///arc_clusters,"
+    + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///struts2_arc_mojo_oracle.txt",
 
-      // httpd (arc)
-      ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///httpd///arc_clusters,"
-      + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///httpd_arc_mojo_oracle.txt",
+    // httpd (arc)
+    ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///httpd///arc_clusters,"
+    + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///httpd_arc_mojo_oracle.txt",
   })
   public void mainTest(String clusters, String oracleFile){
     String oraclePath = oracleFile.replace("///", File.separator);
@@ -145,19 +149,19 @@ public class MoJoEvolutionAnalyzerTest {
 
     // Compare mojoFmValues to oracle
     for (String file : mojoFiles){
-      assertEquals(oracleMojoMap.get(file), mojoMap.get(file));
+      assertEquals(oracleMojoMap.get(file), mojoMap.get(file), "mojoFmValue from comparison between " + file + " does not match oracle");
     }
 
     // Compare result metrics to oracle metrics
     assertAll(
-      () -> assertEquals(oracleMojoMap.get("n"), mojoMap.get("n")),
-      () -> assertEquals(oracleMojoMap.get("min"), mojoMap.get("min")),
-      () -> assertEquals(oracleMojoMap.get("max"), mojoMap.get("max")),
-      () -> assertEquals(oracleMojoMap.get("mean"), mojoMap.get("mean")),
-      () -> assertEquals(oracleMojoMap.get("std dev"), mojoMap.get("std dev")),
-      () -> assertEquals(oracleMojoMap.get("median"), mojoMap.get("median")),
-      () -> assertEquals(oracleMojoMap.get("skewness"), mojoMap.get("skewness")),
-      () -> assertEquals(oracleMojoMap.get("kurtosis"), mojoMap.get("kurtosis"))
+      () -> assertEquals(oracleMojoMap.get("n"), mojoMap.get("n"), "n value does not match the oracle"),
+      () -> assertEquals(oracleMojoMap.get("min"), mojoMap.get("min"), "min value does not match the oracle"),
+      () -> assertEquals(oracleMojoMap.get("max"), mojoMap.get("max"), "max value does not match the oracle"),
+      () -> assertEquals(oracleMojoMap.get("mean"), mojoMap.get("mean"), "mean value does not match the oracle"),
+      () -> assertEquals(oracleMojoMap.get("std dev"), mojoMap.get("std dev"), "std dev, value does not match the oracle"),
+      () -> assertEquals(oracleMojoMap.get("median"), mojoMap.get("median"), "median value does not match the oracle"),
+      () -> assertEquals(oracleMojoMap.get("skewness"), mojoMap.get("skewness"), "skewness value does not match the oracle"),
+      () -> assertEquals(oracleMojoMap.get("kurtosis"), mojoMap.get("kurtosis"), "kurtosis value does not match the oracle")
     );
   }
 }
