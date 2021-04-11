@@ -1,5 +1,7 @@
 package edu.usc.softarch.arcade.metrics;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
@@ -27,9 +29,9 @@ public class MoJoEvolutionAnalyzerTest {
 			"///Struts2///clusters,"
 			+ "///oracles///struts2_mojo_oracle.txt",
 
-			// // httpd
-			// "///httpd///clusters,"
-			// + "///oracles///httpd_mojo_oracle.txt",
+			// httpd
+			"///httpd///clusters,"
+			+ "///oracles///httpd_mojo_oracle.txt",
 	})
 	public void mainTest(String clusters, String oracleFile){
 		String resDir = resourcesDir.replace("///", File.separator);
@@ -50,17 +52,19 @@ public class MoJoEvolutionAnalyzerTest {
 		int comparisonDistance = 1;
 		File prevFile = null;
 		List<Double> mojoFmValues = new ArrayList<>();
-		// Map for storing mojoFmValues and associated cluster files
-		HashMap<List<String>, Double> mojoMap = new HashMap<>();
-		// System.out.println("Comparison distance is: " + comparisonDistance);
+		// Map to mojoFmValues and associated cluster files
+		HashMap<String, Double> mojoMap = new HashMap<>();
+		// List to store the compared versions
+		List<String> mojoFiles = new ArrayList<>();
 		for (int i = 0; i < clusterFiles.size(); i += comparisonDistance) {
 			File currFile = clusterFiles.get(i);
 			// exclude annoying .ds_store files from OSX
 			if (!currFile.getName().equals(".DS_Store")) {
 				if (prevFile != null && currFile != null) {
 					double mojoFmValue = MoJoEvolutionAnalyzer.doMoJoFMComparison(currFile, prevFile);
-					mojoFmValues.add(mojoFmValue);
-					mojoMap.put(Arrays.asList(currFile.getName(), prevFile.getName()), mojoFmValue);
+			  	mojoFmValues.add(mojoFmValue);
+					mojoMap.put(currFile.getName() + " " + prevFile.getName(), mojoFmValue);
+					mojoFiles.add(currFile.getName() + " " + prevFile.getName());
 				}
 				prevFile = currFile;
 			}
@@ -81,7 +85,6 @@ public class MoJoEvolutionAnalyzerTest {
 		statsMap.put("median", stats.getPercentile(50));
 		statsMap.put("skewness", stats.getSkewness());
 		statsMap.put("kurtosis", stats.getKurtosis());
-		// System.out.println(stats);
 
 		// Read in oracle file
 		List<List<String>> records = new ArrayList<>();
@@ -97,7 +100,32 @@ public class MoJoEvolutionAnalyzerTest {
 			fail("failed to read in oracle metrics file");
 		}
 
+		// records.get(0) contains the mojoFmValues
+		HashMap<String, Double> oracleMojoMap = new HashMap<>();
+		for (int i = 1; i < records.get(0).size(); i += 3){
+			oracleMojoMap.put(records.get(0).get(i) + " " + records.get(0).get(i + 1), Double.parseDouble(records.get(0).get(i + 2)));
+		}
+		// records.get(1) contains the metrics
+		HashMap<String, Double> oracleMetricsMap = new HashMap<>();
+		for (int i = 0; i < records.get(1).size(); i += 2){
+			oracleMetricsMap.put(records.get(1).get(i), Double.parseDouble(records.get(1).get(i + 1)));
+		}
 
+		// Compare mojoFmValues to oracle
+		for (String file : mojoFiles){
+			assertEquals(oracleMojoMap.get(file), mojoMap.get(file));
+		}
+
+		// Compare result metrics to oracle metrics
+		assertAll(
+			() -> assertEquals(oracleMetricsMap.get("n"), statsMap.get("n")),
+			() -> assertEquals(oracleMetricsMap.get("min"), statsMap.get("min")),
+			() -> assertEquals(oracleMetricsMap.get("max"), statsMap.get("max")),
+			() -> assertEquals(oracleMetricsMap.get("mean"), statsMap.get("mean")),
+			() -> assertEquals(oracleMetricsMap.get("std dev"), statsMap.get("std dev")),
+			() -> assertEquals(oracleMetricsMap.get("median"), statsMap.get("median")),
+			() -> assertEquals(oracleMetricsMap.get("skewness"), statsMap.get("skewness")),
+			() -> assertEquals(oracleMetricsMap.get("kurtosis"), statsMap.get("kurtosis"))
+		);
 	}
-
 }
