@@ -25,8 +25,6 @@ public class CodeMaatTest {
         /** Test Parameters */
         // [project.log input file]
         // [project.csv oracle file]
-        // [output location]
-        // [output file name]
 
         // httpd
         ".///src///test///resources///CodeMaatTest_resources///httpd///cleaned_httpd_project.log,"
