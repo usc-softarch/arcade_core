@@ -57,4 +57,4 @@ target
 .settings
 .vscode
 
-src/test/resources/CleanUpCodeMaat_resources/*_clean*
+src/test/resources/CleanUpCodeMaat_resources/*/*_clean*
