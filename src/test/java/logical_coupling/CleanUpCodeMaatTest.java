@@ -24,13 +24,28 @@ public class CleanUpCodeMaatTest {
     // [oracle file path]
     // [directory of the file containing the csv]
 
-    // ACDC Struts2 
-    ".///src///test///resources///CleanUpCodeMaat_resources///oracle_project_struts_.csv,"
-    + ".///src///test///resources///CleanUpCodeMaat_resources///",
-  })
-  public void cleanUpCodeMaatTest(String oracle_path, String csv_dir){
-    String output_csv = ".///src///test///resources///CleanUpCodeMaat_resources///project_struts_clean.csv";
+    // Struts
+    ".///src///test///resources///CleanUpCodeMaat_resources///struts///oracle_project_struts_.csv,"
+    + ".///src///test///resources///CleanUpCodeMaat_resources///struts///,"
+    + ".///src///test///resources///CleanUpCodeMaat_resources///struts///project_struts_clean.csv",
 
+    // Nutch 2.2.1
+    ".///src///test///resources///CleanUpCodeMaat_resources///nutch///oracle_project_nutch-221_.csv,"
+    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///,"
+    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///project_nutch_221_clean.csv",
+
+    // Nutch 2.3
+    ".///src///test///resources///CleanUpCodeMaat_resources///nutch///oracle_project_nutch-23_.csv,"
+    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///,"
+    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///project_nutch_23_clean.csv",
+
+    // Nutch 2.3.1
+    ".///src///test///resources///CleanUpCodeMaat_resources///nutch///oracle_project_nutch-231_.csv,"
+    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///,"
+    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///project_nutch_231_clean.csv",
+  })
+  public void cleanUpCodeMaatTest(String oracle_path, String csv_dir, String output_csv){
+    
     String oraclePath = oracle_path.replace("///", File.separator);  
     String csvDir = csv_dir.replace("///", File.separator);
     String outputCsv = output_csv.replace("///", File.separator);
