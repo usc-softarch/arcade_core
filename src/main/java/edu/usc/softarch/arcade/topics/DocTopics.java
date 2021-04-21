@@ -63,21 +63,15 @@ public class DocTopics implements Serializable{
 		
 		TopicInferencer inferencer = TopicInferencer.read(
 			new File(artifactsDir + fs + "infer.mallet"));
-		
-		String toPrint = "";
 
 		for (int instIndex = 0; instIndex < previousInstances.size(); instIndex++) {
 			DocTopicItem dtItem = new DocTopicItem();
 			dtItem.setDoc(instIndex);
 			dtItem.setSource((String) previousInstances.get(instIndex).getName());
 
-			toPrint += (String) previousInstances.get(instIndex).getName();
-
 			double[] topicDistribution = 
 				inferencer.getSampledDistribution(
 					previousInstances.get(instIndex), 1000, 10, 10);
-
-			toPrint += ": " + Arrays.toString(topicDistribution) + System.lineSeparator();
 			
 			for (int topicIdx = 0; topicIdx < numTopics; topicIdx++) {
 				TopicItem t = new TopicItem();
@@ -87,15 +81,6 @@ public class DocTopics implements Serializable{
 			}
 			dtItemList.add(dtItem);
 		}
-
-		PrintWriter out = new PrintWriter("DistributionTest.txt");
-		out.print(toPrint);
-		out.close();
-
-		// try (ObjectInputStream ois = new ObjectInputStream(
-		// 		new FileInputStream("THISFILEHASAFUNNYNAME.txt"))) {
-		// 	this.dtItemList = (ArrayList<DocTopicItem>)ois.readObject();
-		// } catch (IOException | ClassNotFoundException e) { }
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 

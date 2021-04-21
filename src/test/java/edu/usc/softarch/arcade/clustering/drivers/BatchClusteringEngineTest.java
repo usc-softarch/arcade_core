@@ -25,7 +25,7 @@ public class BatchClusteringEngineTest {
 		// [path to oracle file], 
 		// [expected clusters file name]
 
-		// // struts 2.3.30
+		// struts 2.3.30
 		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.3.30,"
 		+ "java,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30///arc,"
@@ -33,7 +33,7 @@ public class BatchClusteringEngineTest {
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_239_topics_234_arc_clusters.rsf,"
 		+ "struts-2.3.30_239_topics_234_arc_clusters.rsf",
 
-		// // struts 2.5.2
+		// struts 2.5.2
 		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.5.2,"
 		+ "java,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2///arc,"
