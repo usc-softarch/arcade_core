@@ -1,519 +1,759 @@
---41e9fa5e6--2013-06-27--Lewis John McGibbney
-4	4	pom.xml
+--2677d68c1--2014-03-11--Lewis John McGibbney
+6	6	build.xml
+3	9	pom.xml
 
---adfb32122--2013-06-27--Lewis John McGibbney
-2	3	CHANGES.txt
+--62680afe5--2014-03-11--Lewis John McGibbney
+2	1	CHANGES.txt
+1	1	NOTICE.txt
+2	1	conf/nutch-default.xml
+2	2	default.properties
+
+--cafe64193--2014-03-11--Lewis John McGibbney
+--304093511--2014-03-11--Sebastian Nagel
+1	1	build.xml
+
+--d04f2c711--2014-03-07--Sebastian Nagel
+2	0	CHANGES.txt
+23	26	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+
+--e332b0ba5--2014-03-07--Sebastian Nagel
+0	4	CHANGES.txt
+1	2	src/java/org/apache/nutch/crawl/NutchWritable.java
+
+--23e28c105--2014-03-07--Markus Jelsma
+0	6	src/bin/nutch
+0	162	src/java/org/apache/nutch/util/hostdb/DumpHostDb.java
+0	258	src/java/org/apache/nutch/util/hostdb/HostDatum.java
+0	672	src/java/org/apache/nutch/util/hostdb/HostDb.java
+
+--f0feff1ac--2014-03-07--Markus Jelsma
+42	19	src/test/org/apache/nutch/segment/TestSegmentMergerCrawlDatums.java
+
+--832e6d6e1--2014-03-01--Lewis John McGibbney
+3	3	build.xml
+3	9	pom.xml
+
+--f647d42d9--2014-03-01--Lewis John McGibbney
+52	52	KEYS
+
+--315eaf91f--2014-03-01--Lewis John McGibbney
+2	1	CHANGES.txt
+1	1	NOTICE.txt
+2	1	conf/nutch-default.xml
+2	2	default.properties
+
+--e8a75bfeb--2014-03-01--Lewis John McGibbney
+--6e5f94f8b--2014-02-28--Markus Jelsma
+2	0	CHANGES.txt
+10	8	src/java/org/apache/nutch/segment/SegmentMerger.java
+356	0	src/test/org/apache/nutch/segment/TestSegmentMergerCrawlDatums.java
+
+--a387c4cf4--2014-02-21--Markus Jelsma
+2	0	CHANGES.txt
+
+--7120c9323--2014-02-21--Julien Nioche
+2	0	CHANGES.txt
+1	1	ivy/ivy.xml
+1	1	src/plugin/parse-tika/ivy.xml
+10	9	src/plugin/parse-tika/plugin.xml
+
+--3e466e9a6--2014-02-10--Markus Jelsma
+2	0	src/plugin/build.xml
+22	0	src/plugin/indexer-dummy/build.xml
+41	0	src/plugin/indexer-dummy/ivy.xml
+38	0	src/plugin/indexer-dummy/plugin.xml
+100	0	src/plugin/indexer-dummy/src/java/org/apache/nutch/indexwriter/dummy/DummyIndexWriter.java
+
+--9e2c20d81--2014-02-09--Tejas Patil
+2	0	CHANGES.txt
+1	1	ivy/ivy.xml
+
+--432e20eff--2014-01-29--Lewis John McGibbney
+2	0	CHANGES.txt
+1	1	src/plugin/lib-nekohtml/ivy.xml
+8	7	src/plugin/lib-nekohtml/plugin.xml
+2	0	src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HtmlParser.java
+5	0	src/plugin/parse-html/src/test/org/apache/nutch/parse/html/TestDOMContentUtils.java
+3	0	src/plugin/parse-tika/src/test/org/apache/nutch/tika/TestDOMContentUtils.java
+
+--4c3d84a18--2014-01-28--Markus Jelsma
+2	0	CHANGES.txt
+2	2	src/java/org/apache/nutch/util/hostdb/HostDb.java
+
+--d7fb07559--2014-01-24--Tejas Patil
+2	0	CHANGES.txt
+0	2	src/java/org/apache/nutch/protocol/RobotRulesParser.java
+
+--141e56cc0--2014-01-24--Markus Jelsma
+2	0	CHANGES.txt
+5	6	src/java/org/apache/nutch/plugin/Extension.java
+36	0	src/java/org/apache/nutch/plugin/PluginClassLoader.java
+24	6	src/java/org/apache/nutch/plugin/PluginRepository.java
+
+--e8fbd2427--2014-01-22--Sebastian Nagel
+2	0	CHANGES.txt
+10	0	conf/nutch-default.xml
+17	1	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
+
+--a63caa717--2014-01-22--Tejas Patil
+0	2	src/java/org/apache/nutch/util/hostdb/HostDb.java
+
+--617bebd53--2014-01-22--Markus Jelsma
+2	2	conf/log4j.properties
+
+--3099a2d43--2014-01-22--Tejas Patil
+2	0	CHANGES.txt
+2	0	conf/log4j.properties
+6	0	src/bin/nutch
+1	0	src/java/org/apache/nutch/crawl/NutchWritable.java
+162	0	src/java/org/apache/nutch/util/hostdb/DumpHostDb.java
+258	0	src/java/org/apache/nutch/util/hostdb/HostDatum.java
+674	0	src/java/org/apache/nutch/util/hostdb/HostDb.java
+
+--53d2b7fa4--2014-01-20--Markus Jelsma
+2	0	CHANGES.txt
+19	3	src/java/org/apache/nutch/crawl/CrawlDbReader.java
+
+--360093708--2014-01-16--Lewis John McGibbney
+16	0	conf/elasticsearch.conf
+
+--6f4df5827--2014-01-15--Lewis John McGibbney
+2	0	CHANGES.txt
+1	0	src/plugin/parse-tika/build.xml
+-	-	src/plugin/parse-tika/sample/nutch_logo_tm.gif
+1	0	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/TikaParser.java
+72	0	src/plugin/parse-tika/src/test/org/apache/nutch/tika/TestImageMetadata.java
+
+--cebf17c02--2014-01-08--Markus Jelsma
+2	0	CHANGES.txt
+14	0	src/java/org/apache/nutch/indexer/NutchDocument.java
+
+--f656c836b--2014-01-07--Markus Jelsma
+2	0	CHANGES.txt
+2	0	src/java/org/apache/nutch/indexer/NutchField.java
+
+--756b3527d--2014-01-02--Tejas Patil
+2	0	CHANGES.txt
+2	0	src/java/org/apache/nutch/crawl/CrawlDbMerger.java
+
+--bd6659390--2014-01-02--Tejas Patil
+2	0	CHANGES.txt
+10	12	src/plugin/feed/src/java/org/apache/nutch/parse/feed/FeedParser.java
+1	1	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpAuthentication.java
+45	91	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpAuthenticationFactory.java
+4	4	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpBasicAuthentication.java
+2	2	src/plugin/scoring-opic/src/java/org/apache/nutch/scoring/opic/OPICScoringFilter.java
+1	1	src/plugin/subcollection/src/java/org/apache/nutch/collection/CollectionManager.java
+9	9	src/plugin/subcollection/src/java/org/apache/nutch/collection/Subcollection.java
+1	1	src/plugin/urlmeta/src/java/org/apache/nutch/scoring/urlmeta/URLMetaScoringFilter.java
+5	26	src/plugin/urlnormalizer-regex/src/test/org/apache/nutch/net/urlnormalizer/regex/TestRegexURLNormalizer.java
+
+--17ce055ad--2014-01-02--Markus Jelsma
+1	1	conf/nutch-default.xml
+
+--8411dba07--2013-12-23--Lewis John McGibbney
+2	0	CHANGES.txt
+12	0	conf/nutch-default.xml
+21	5	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/FileResponse.java
+38	8	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/Client.java
+4	4	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/FtpResponse.java
+8	0	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/Http.java
+25	2	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
+
+--9d3edd77e--2013-12-23--Markus Jelsma
+2	0	CHANGES.txt
+19	9	src/java/org/apache/nutch/util/URLUtil.java
+17	0	src/test/org/apache/nutch/util/TestURLUtil.java
+
+--059e7bfc2--2013-12-15--Tejas Patil
+2	2	build.xml
+
+--6e002c534--2013-11-21--Sebastian Nagel
+1	1	src/test/log4j.properties
+
+--d9963f230--2013-11-18--Julien Nioche
+2	0	CHANGES.txt
+4	6	ivy/ivy.xml
+7	5	src/bin/nutch
+0	9	src/java/org/apache/nutch/indexer/IndexingJob.java
+0	48	src/java/org/apache/nutch/indexer/solr/SolrConstants.java
+0	402	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+0	76	src/java/org/apache/nutch/indexer/solr/SolrUtils.java
+
+--a37b92514--2013-11-14--Julien Nioche
+2	0	src/java/org/apache/nutch/crawl/DeduplicationJob.java
+2	0	src/java/org/apache/nutch/indexer/CleaningJob.java
+
+--d3f2dd1bb--2013-11-14--Julien Nioche
+2	0	CHANGES.txt
+2	2	src/bin/nutch
+0	171	src/java/org/apache/nutch/crawl/Crawl.java
+
+--3d1af7bf8--2013-11-14--Julien Nioche
+2	0	CHANGES.txt
+10	3	src/bin/crawl
+2	0	src/bin/nutch
+2	0	src/java/org/apache/nutch/crawl/CrawlDatum.java
+296	0	src/java/org/apache/nutch/crawl/DeduplicationJob.java
+6	4	src/java/org/apache/nutch/indexer/CleaningJob.java
+8	0	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+
+--7e6498c9d--2013-11-11--Julien Nioche
+2	0	CHANGES.txt
+4	2	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+
+--b614838f1--2013-11-11--Julien Nioche
+2	0	CHANGES.txt
+6	0	src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java
+
+--33b59be91--2013-10-23--Julien Nioche
+2	2	src/java/org/apache/nutch/parse/ParseSegment.java
+
+--6136d94dc--2013-10-16--Markus Jelsma
+2	0	CHANGES.txt
+8	5	src/java/org/apache/nutch/crawl/CrawlDbReducer.java
+
+--57f95568e--2013-10-14--Julien Nioche
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/crawl/FetchScheduleFactory.java
+1	1	src/java/org/apache/nutch/crawl/SignatureFactory.java
+3	3	src/java/org/apache/nutch/util/ObjectCache.java
+
+--5575591ee--2013-10-10--Julien Nioche
+2	0	CHANGES.txt
+68	0	src/java/org/apache/nutch/scoring/AbstractScoringFilter.java
+
+--0f89d7601--2013-10-07--Julien Nioche
+2	0	CHANGES.txt
+4	5	conf/nutch-default.xml
+5	64	src/java/org/apache/nutch/indexer/IndexingFilters.java
+4	52	src/java/org/apache/nutch/net/URLFilters.java
+5	58	src/java/org/apache/nutch/parse/HtmlParseFilters.java
+78	0	src/java/org/apache/nutch/plugin/PluginRepository.java
+6	46	src/java/org/apache/nutch/scoring/ScoringFilters.java
+
+--222149781--2013-10-07--Julien Nioche
+2	0	CHANGES.txt
+5	1	src/java/org/apache/nutch/parse/ParseSegment.java
+
+--ad6f95150--2013-10-03--Julien Nioche
+2	0	CHANGES.txt
+1	1	src/bin/crawl
+
+--aa3b90afe--2013-10-01--Markus Jelsma
+2	0	CHANGES.txt
+6	2	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+
+--5798509f5--2013-09-20--Sebastian Nagel
+3	1	CHANGES.txt
+9	2	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+
+--b3070eb14--2013-09-12--Markus Jelsma
+2	0	CHANGES.txt
+12	0	src/java/org/apache/nutch/util/URLUtil.java
+
+--d87dbc1be--2013-08-29--Julien Nioche
+2	0	CHANGES.txt
+105	54	src/java/org/apache/nutch/parse/Outlink.java
+9	0	src/java/org/apache/nutch/parse/ParseOutputFormat.java
+
+--a2ae871f8--2013-08-23--Julien Nioche
+2	0	CHANGES.txt
+2	2	src/java/org/apache/nutch/crawl/Injector.java
+
+--04228aeb3--2013-08-07--Sebastian Nagel
+2	0	CHANGES.txt
+9	0	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/File.java
+
+--063bd271f--2013-07-29--Julien Nioche
+2	0	CHANGES.txt
+0	190	src/java/org/apache/nutch/tools/CrawlDBScanner.java
+
+--754c45c5a--2013-07-25--Sebastian Nagel
+2	0	CHANGES.txt
+1	1	conf/log4j.properties
+
+--5bfd1952e--2013-07-08--Julien Nioche
+2	0	CHANGES.txt
+22	22	src/java/org/apache/nutch/protocol/ProtocolFactory.java
+
+--d3388ef2e--2013-07-05--Markus Jelsma
+2	0	CHANGES.txt
+1	1	ivy/ivy.xml
+8	0	src/plugin/parse-tika/howto_upgrade_tika.txt
+1	1	src/plugin/parse-tika/ivy.xml
+11	11	src/plugin/parse-tika/plugin.xml
+
+--4b148915c--2013-07-05--Markus Jelsma
+2	0	CHANGES.txt
+2	0	conf/elasticsearch.conf
+24	2	src/plugin/indexer-elastic/src/java/org/apache/nutch/indexwriter/elastic/ElasticIndexWriter.java
+
+--4fe88bf1f--2013-07-05--Markus Jelsma
+2	0	CHANGES.txt
+9	5	src/java/org/apache/nutch/segment/SegmentMerger.java
+
+--5782f5ac4--2013-07-04--lufeng
+2	0	CHANGES.txt
+4	3	src/java/org/apache/nutch/crawl/CrawlDatum.java
+
+--9f873a309--2013-07-04--Markus Jelsma
+3	1	CHANGES.txt
+2	5	src/plugin/headings/src/java/org/apache/nutch/parse/headings/HeadingsParseFilter.java
+
+--bfbf44d4d--2013-07-04--Markus Jelsma
+2	0	CHANGES.txt
+9	1	src/plugin/headings/src/java/org/apache/nutch/parse/headings/HeadingsParseFilter.java
+
+--722f0a325--2013-07-04--Markus Jelsma
+2	0	CHANGES.txt
+2	0	src/plugin/indexer-elastic/src/java/org/apache/nutch/indexwriter/elastic/ElasticIndexWriter.java
+
+--9a2a3aa52--2013-07-04--Markus Jelsma
+2	0	CHANGES.txt
+12	14	src/java/org/apache/nutch/crawl/Injector.java
+
+--45a924f65--2013-07-02--Markus Jelsma
+2	0	CHANGES.txt
+3	0	src/plugin/build.xml
+22	0	src/plugin/urlnormalizer-querystring/build.xml
+41	0	src/plugin/urlnormalizer-querystring/ivy.xml
+42	0	src/plugin/urlnormalizer-querystring/plugin.xml
+88	0	src/plugin/urlnormalizer-querystring/src/java/org/apache/nutch/net/urlnormalizer/querystring/QuerystringURLNormalizer.java
+42	0	src/plugin/urlnormalizer-querystring/src/test/org/apache/nutch/net/urlnormalizer/querystring/TestQuerystringURLNormalizer.java
+
+--8e5775b10--2013-07-02--Markus Jelsma
+2	0	CHANGES.txt
+36	23	src/java/org/apache/nutch/crawl/CrawlDbReader.java
+
+--964e821d8--2013-07-01--Markus Jelsma
+2	0	CHANGES.txt
+1	0	src/java/org/apache/nutch/segment/SegmentMerger.java
+
+--350088d30--2013-06-27--Sebastian Nagel
+2	0	CHANGES.txt
+5	3	conf/nutch-default.xml
+3	1	src/plugin/index-static/src/java/org/apache/nutch/indexer/staticfield/StaticFieldIndexer.java
+6	6	src/plugin/index-static/src/test/org/apache/nutch/indexer/staticfield/TestStaticFieldIndexerTest.java
+
+--ecdf1fa49--2013-06-24--Markus Jelsma
+1	1	CHANGES.txt
+1	0	src/plugin/build.xml
+79	0	src/plugin/urlfilter-prefix/src/test/org/apache/nutch/urlfilter/prefix/TestPrefixURLFilter.java
+
+--51698e969--2013-06-21--Lewis John McGibbney
+4	0	CHANGES.txt
+1	2	conf/nutch-default.xml
+1	1	default.properties
+196	270	pom.xml
+
+--ec1e523e4--2013-06-20--Lewis John McGibbney
+2	1	CHANGES.txt
 1	1	conf/nutch-default.xml
 1	1	default.properties
 
---bcef4fa63--2013-06-27--Lewis John McGibbney
---3a59f1605--2013-06-27--Lewis John McGibbney
+--5812f0ea0--2013-06-20--Lewis John McGibbney
 2	0	CHANGES.txt
-4	4	src/java/org/apache/nutch/api/DbReader.java
-1	1	src/java/org/apache/nutch/crawl/DbUpdateReducer.java
-25	3	src/java/org/apache/nutch/crawl/MD5Signature.java
-12	2	src/java/org/apache/nutch/crawl/SignatureComparator.java
-4	4	src/java/org/apache/nutch/crawl/WebTableReader.java
-1	1	src/java/org/apache/nutch/indexer/IndexUtil.java
-1	1	src/java/org/apache/nutch/parse/ParserChecker.java
-2	11	src/java/org/apache/nutch/storage/Host.java
-31	2	src/java/org/apache/nutch/util/Bytes.java
-6	6	src/java/org/apache/nutch/util/EncodingDetector.java
-44	5	src/java/org/apache/nutch/util/StringUtil.java
-4	3	src/plugin/creativecommons/src/java/org/creativecommons/nutch/CCIndexingFilter.java
-4	6	src/plugin/creativecommons/src/test/org/creativecommons/nutch/TestCCParseFilter.java
-1	2	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
-1	1	src/plugin/language-identifier/src/java/org/apache/nutch/analysis/lang/HTMLLanguageParser.java
-1	4	src/plugin/language-identifier/src/java/org/apache/nutch/analysis/lang/LanguageIndexingFilter.java
-1	3	src/plugin/language-identifier/src/test/org/apache/nutch/analysis/lang/TestHTMLLanguageParser.java
-2	1	src/plugin/microformats-reltag/src/java/org/apache/nutch/microformats/reltag/RelTagIndexingFilter.java
-9	9	src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HtmlParser.java
-2	1	src/plugin/parse-js/src/java/org/apache/nutch/parse/js/JSParseFilter.java
-3	3	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/TikaParser.java
-2	2	src/plugin/scoring-opic/src/java/org/apache/nutch/scoring/opic/OPICScoringFilter.java
-2	2	src/test/org/apache/nutch/crawl/TestInjector.java
-2	1	src/test/org/apache/nutch/fetcher/TestFetcher.java
 
---72c3df7f0--2013-06-25--Lewis John McGibbney
+--7fb65b540--2013-06-20--Lewis John McGibbney
+4	1	src/plugin/microformats-reltag/src/java/org/apache/nutch/microformats/reltag/RelTagParser.java
+
+--2d3f09422--2013-06-20--Markus Jelsma
 2	0	CHANGES.txt
-2	2	src/bin/crawl
-13	1	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+14	0	conf/nutch-default.xml
 
---5bf90bcc3--2013-06-24--Markus Jelsma
+--4cef8ebe3--2013-06-20--Markus Jelsma
+23	14	src/plugin/headings/src/java/org/apache/nutch/parse/headings/HeadingsParseFilter.java
+
+--bb64594db--2013-06-20--Markus Jelsma
+3	0	ivy/ivy.xml
+
+--5674c219d--2013-06-19--Sebastian Nagel
+1	1	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+
+--ba781d0b1--2013-06-19--Sebastian Nagel
 2	0	CHANGES.txt
-2	1	src/plugin/build.xml
-79	0	src/plugin/urlfilter-prefix/src/test/org/apache/nutch/urlfilter/prefix/TestPrefixURLFilter.java
+6	5	src/java/org/apache/nutch/crawl/AbstractFetchSchedule.java
 
---2f61a67a5--2013-06-20--Lewis John McGibbney
+--c51edf373--2013-06-19--Markus Jelsma
 2	0	CHANGES.txt
-4	2	src/plugin/microformats-reltag/src/java/org/apache/nutch/microformats/reltag/RelTagParser.java
+1	0	conf/log4j.properties
+40	0	conf/nutch-default.xml
+2	0	src/plugin/build.xml
+22	0	src/plugin/indexer-elastic/build.xml
+43	0	src/plugin/indexer-elastic/ivy.xml
+55	0	src/plugin/indexer-elastic/plugin.xml
+28	0	src/plugin/indexer-elastic/src/java/org/apache/nutch/indexwriter/elastic/ElasticConstants.java
+242	0	src/plugin/indexer-elastic/src/java/org/apache/nutch/indexwriter/elastic/ElasticIndexWriter.java
 
---07da51525--2013-06-20--Lewis John McGibbney
-18	18	src/plugin/creativecommons/src/java/org/creativecommons/nutch/CCParseFilter.java
-
---b9e131648--2013-06-20--Lewis John McGibbney
-46	44	src/plugin/creativecommons/src/java/org/creativecommons/nutch/CCParseFilter.java
-
---977ab98df--2013-06-20--Lewis John McGibbney
-250	268	src/plugin/creativecommons/src/java/org/creativecommons/nutch/CCParseFilter.java
-
---628f74ae2--2013-06-19--Lewis John McGibbney
-55	56	src/plugin/microformats-reltag/src/java/org/apache/nutch/microformats/reltag/RelTagParser.java
-
---28f5f789e--2013-06-17--Lewis John McGibbney
+--9616a1ff2--2013-06-18--Lewis John McGibbney
 2	0	CHANGES.txt
-3	3	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+5	2	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
 
---2d2f478c3--2013-06-17--Lewis John McGibbney
+--f9227f363--2013-06-13--Sebastian Nagel
+4	0	CHANGES.txt
+9	6	src/java/org/apache/nutch/parse/HTMLMetaTags.java
+8	6	src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataIndexer.java
+1	1	src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HTMLMetaProcessor.java
+5	1	src/plugin/parse-metatags/build.xml
+12	0	src/plugin/parse-metatags/sample/testMultivalueMetatags.html
+9	8	src/plugin/parse-metatags/src/java/org/apache/nutch/parse/MetaTagsParser.java
+47	12	src/plugin/parse-metatags/src/test/org/apache/nutch/parse/html/TestMetatagParser.java
+3	3	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/HTMLMetaProcessor.java
+
+--e2598d637--2013-06-13--Markus Jelsma
 2	0	CHANGES.txt
-10	0	src/java/org/apache/nutch/util/StringUtil.java
-4	2	src/java/org/apache/nutch/util/TableUtil.java
+3	0	src/java/org/apache/nutch/crawl/AdaptiveFetchSchedule.java
+7	3	src/java/org/apache/nutch/tools/FreeGenerator.java
 
---4c12c26a5--2013-06-12--Markus Jelsma
+--0e3f0993e--2013-06-10--Julien Nioche
+2	2	CHANGES.txt
+1	1	ivy/ivy.xml
+2	1	src/plugin/parse-tika/ivy.xml
+8	6	src/plugin/parse-tika/plugin.xml
+
+--20aa28e75--2013-06-03--Markus Jelsma
 2	0	CHANGES.txt
 2	2	ivy/ivy.xml
 
---ff30b9dc4--2013-06-10--Julien Nioche
-1	1	CHANGES.txt
-1	1	ivy/ivy.xml
-1	1	src/plugin/parse-tika/ivy.xml
-8	6	src/plugin/parse-tika/plugin.xml
+--5e91c82e7--2013-06-02--Tejas Patil
+58	58	build.xml
 
---3fee94c32--2013-06-08--Lewis John McGibbney
-4	0	CHANGES.txt
-3	3	build.xml
-1	1	conf/nutch-default.xml
-1	1	default.properties
+--6c11c4816--2013-05-31--Tejas Patil
+3	1	CHANGES.txt
+141	1	build.xml
 
---635064e27--2013-06-02--Tejas Patil
-51	51	build.xml
+--e68025c0b--2013-05-21--Sebastian Nagel
+0	1	src/plugin/parse-swf/src/test/org/apache/nutch/parse/swf/TestSWFParser.java
 
---a0e4b5dea--2013-05-31--Lewis John McGibbney
-25	28	pom.xml
-
---7ac517a33--2013-05-31--Lewis John McGibbney
-2	1	CHANGES.txt
-147	55	KEYS
-5	3	conf/nutch-default.xml
-1	1	default.properties
-
---cd02a2ddf--2013-05-31--Lewis John McGibbney
+--d9a57b5ec--2013-05-21--Tejas Patil
 2	0	CHANGES.txt
-5	1	src/java/org/apache/nutch/host/HostDb.java
+0	2	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
+5	8	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/Ftp.java
+99	0	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/FtpRobotRulesParser.java
 
---2c2e0f82d--2013-05-31--Lewis John McGibbney
-2	0	CHANGES.txt
-132	0	build.xml
-
---9af2a233d--2013-05-30--lufeng
-2	0	CHANGES.txt
-9	7	src/bin/crawl
-20	14	src/java/org/apache/nutch/crawl/GeneratorJob.java
-
---cefa41936--2013-05-29--lufeng
-2	0	CHANGES.txt
-10	0	conf/nutch-default.xml
-6	0	src/java/org/apache/nutch/indexer/solr/SolrConstants.java
-3	3	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
-2	1	src/java/org/apache/nutch/indexer/solr/SolrIndexerJob.java
-61	0	src/java/org/apache/nutch/indexer/solr/SolrUtils.java
-2	24	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
-
---7972dd473--2013-05-23--Lewis John McGibbney
-2	0	CHANGES.txt
-1	1	build.xml
-9	4	ivy/ivy.xml
-10	2	src/java/org/apache/nutch/api/DbReader.java
-14	10	src/java/org/apache/nutch/crawl/WebTableReader.java
-3	6	src/java/org/apache/nutch/host/HostDb.java
-9	5	src/java/org/apache/nutch/host/HostDbReader.java
-6	0	src/test/org/apache/nutch/crawl/TestGenerator.java
-2	1	src/test/org/apache/nutch/crawl/TestInjector.java
-2	0	src/test/org/apache/nutch/fetcher/TestFetcher.java
-11	5	src/test/org/apache/nutch/storage/TestGoraStorage.java
-1	1	src/test/org/apache/nutch/util/AbstractNutchTest.java
-13	10	src/test/org/apache/nutch/util/CrawlTestUtil.java
-
---4486b7d82--2013-05-23--Lewis John McGibbney
-2	0	CHANGES.txt
-1	1	ivy/ivy.xml
-
---d9fcc771a--2013-05-22--Lewis John McGibbney
-0	2	CHANGES.txt
-1	1	build.xml
-4	9	ivy/ivy.xml
-2	10	src/java/org/apache/nutch/api/DbReader.java
-10	14	src/java/org/apache/nutch/crawl/WebTableReader.java
-6	3	src/java/org/apache/nutch/host/HostDb.java
-5	9	src/java/org/apache/nutch/host/HostDbReader.java
-0	6	src/test/org/apache/nutch/crawl/TestGenerator.java
-1	2	src/test/org/apache/nutch/crawl/TestInjector.java
-0	2	src/test/org/apache/nutch/fetcher/TestFetcher.java
-5	11	src/test/org/apache/nutch/storage/TestGoraStorage.java
-1	1	src/test/org/apache/nutch/util/AbstractNutchTest.java
-10	13	src/test/org/apache/nutch/util/CrawlTestUtil.java
-
---fc5678815--2013-05-22--Tejas Patil
+--c12c2ce01--2013-05-21--Tejas Patil
 2	0	CHANGES.txt
 6	2	build.xml
-6	2	src/java/org/apache/nutch/api/ConfResource.java
-3	2	src/java/org/apache/nutch/api/DbReader.java
-6	2	src/java/org/apache/nutch/api/JobResource.java
-5	4	src/java/org/apache/nutch/api/impl/RAMJobManager.java
+1	1	src/java/org/apache/nutch/crawl/FetchScheduleFactory.java
+1	0	src/java/org/apache/nutch/crawl/Generator.java
+2	2	src/java/org/apache/nutch/crawl/Injector.java
+1	1	src/java/org/apache/nutch/crawl/LinkDbReader.java
+12	12	src/java/org/apache/nutch/crawl/MapWritable.java
 2	1	src/java/org/apache/nutch/crawl/NutchWritable.java
-1	1	src/java/org/apache/nutch/metadata/Metadata.java
+1	1	src/java/org/apache/nutch/crawl/SignatureComparator.java
+1	1	src/java/org/apache/nutch/crawl/SignatureFactory.java
+4	5	src/java/org/apache/nutch/fetcher/OldFetcher.java
+3	3	src/java/org/apache/nutch/indexer/NutchField.java
+0	3	src/java/org/apache/nutch/metadata/HttpHeaders.java
+1	6	src/java/org/apache/nutch/metadata/Metadata.java
 2	2	src/java/org/apache/nutch/metadata/SpellCheckedMetadata.java
 2	1	src/java/org/apache/nutch/net/URLNormalizers.java
+1	1	src/java/org/apache/nutch/parse/HTMLMetaTags.java
+2	2	src/java/org/apache/nutch/parse/ParseSegment.java
+6	6	src/java/org/apache/nutch/parse/ParserFactory.java
 1	3	src/java/org/apache/nutch/plugin/Extension.java
 2	5	src/java/org/apache/nutch/plugin/PluginDescriptor.java
 4	6	src/java/org/apache/nutch/plugin/PluginRepository.java
-3	4	src/java/org/apache/nutch/storage/Host.java
-1	0	src/java/org/apache/nutch/storage/ParseStatus.java
-1	0	src/java/org/apache/nutch/storage/ProtocolStatus.java
-5	0	src/java/org/apache/nutch/storage/WebPage.java
-15	8	src/java/org/apache/nutch/tools/ResolveUrls.java
+9	4	src/java/org/apache/nutch/scoring/webgraph/LinkDumper.java
+8	6	src/java/org/apache/nutch/scoring/webgraph/LinkRank.java
+14	9	src/java/org/apache/nutch/scoring/webgraph/LoopReader.java
+8	4	src/java/org/apache/nutch/scoring/webgraph/Loops.java
+42	22	src/java/org/apache/nutch/scoring/webgraph/NodeDumper.java
+13	6	src/java/org/apache/nutch/scoring/webgraph/NodeReader.java
+13	6	src/java/org/apache/nutch/scoring/webgraph/ScoreUpdater.java
+28	47	src/java/org/apache/nutch/scoring/webgraph/WebGraph.java
+2	2	src/java/org/apache/nutch/segment/SegmentMergeFilter.java
+3	5	src/java/org/apache/nutch/segment/SegmentMergeFilters.java
+3	2	src/java/org/apache/nutch/segment/SegmentMerger.java
+10	10	src/java/org/apache/nutch/segment/SegmentReader.java
+2	4	src/java/org/apache/nutch/tools/FreeGenerator.java
+14	9	src/java/org/apache/nutch/tools/ResolveUrls.java
+1	5	src/java/org/apache/nutch/tools/proxy/SegmentHandler.java
 1	1	src/java/org/apache/nutch/util/GenericWritableConfigurable.java
 3	3	src/java/org/apache/nutch/util/PrefixStringMatcher.java
 3	3	src/java/org/apache/nutch/util/SuffixStringMatcher.java
-1	0	src/java/org/apache/nutch/util/ToolUtil.java
-1	3	src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexURLFilterBase.java
-1	4	src/plugin/lib-regex-filter/src/test/org/apache/nutch/urlfilter/api/RegexURLFilterBaseTest.java
+4	13	src/plugin/creativecommons/src/java/org/creativecommons/nutch/CCParseFilter.java
+1	1	src/plugin/lib-regex-filter/src/test/org/apache/nutch/urlfilter/api/RegexURLFilterBaseTest.java
+8	24	src/plugin/microformats-reltag/src/java/org/apache/nutch/microformats/reltag/RelTagParser.java
+1	5	src/plugin/parse-ext/src/java/org/apache/nutch/parse/ext/ExtParser.java
+1	1	src/plugin/parse-html/src/java/org/apache/nutch/parse/html/DOMBuilder.java
+10	11	src/plugin/parse-js/src/java/org/apache/nutch/parse/js/JSParseFilter.java
+18	65	src/plugin/parse-swf/src/java/org/apache/nutch/parse/swf/SWFParser.java
+1	4	src/plugin/parse-swf/src/test/org/apache/nutch/parse/swf/TestSWFParser.java
 1	1	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/DOMBuilder.java
-2	4	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/DOMContentUtils.java
+2	1	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/TikaParser.java
+1	10	src/plugin/parse-zip/src/java/org/apache/nutch/parse/zip/ZipParser.java
 12	12	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/Client.java
-8	8	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/FtpResponse.java
-0	3	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/DummyX509TrustManager.java
-2	2	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpAuthenticationException.java
-6	5	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpAuthenticationFactory.java
-4	6	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpBasicAuthentication.java
-1	0	src/plugin/protocol-sftp/src/java/org/apache/nutch/protocol/sftp/Sftp.java
-6	6	src/plugin/subcollection/src/java/org/apache/nutch/collection/CollectionManager.java
-8	8	src/plugin/subcollection/src/java/org/apache/nutch/collection/Subcollection.java
-1	2	src/plugin/urlfilter-prefix/src/java/org/apache/nutch/urlfilter/prefix/PrefixURLFilter.java
+5	1	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/Ftp.java
+10	15	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/FtpResponse.java
+6	4	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/Http.java
+0	3	src/plugin/protocol-httpclient/src/test/org/apache/nutch/protocol/httpclient/TestProtocolHttpClient.java
+1	4	src/plugin/urlfilter-prefix/src/java/org/apache/nutch/urlfilter/prefix/PrefixURLFilter.java
 1	1	src/plugin/urlfilter-suffix/src/java/org/apache/nutch/urlfilter/suffix/SuffixURLFilter.java
-7	4	src/plugin/urlnormalizer-regex/src/test/org/apache/nutch/net/urlnormalizer/regex/TestRegexURLNormalizer.java
+11	9	src/test/org/apache/nutch/crawl/TestCrawlDbMerger.java
+12	12	src/test/org/apache/nutch/crawl/TestLinkDbMerger.java
+2	5	src/test/org/apache/nutch/plugin/TestPluginSystem.java
+4	1	src/test/org/apache/nutch/segment/TestSegmentMerger.java
 
---4eebc0332--2013-05-22--Lewis John McGibbney
-2	0	CHANGES.txt
-1	1	build.xml
-9	4	ivy/ivy.xml
-10	2	src/java/org/apache/nutch/api/DbReader.java
-14	10	src/java/org/apache/nutch/crawl/WebTableReader.java
-3	6	src/java/org/apache/nutch/host/HostDb.java
-9	5	src/java/org/apache/nutch/host/HostDbReader.java
-6	0	src/test/org/apache/nutch/crawl/TestGenerator.java
-2	1	src/test/org/apache/nutch/crawl/TestInjector.java
-2	0	src/test/org/apache/nutch/fetcher/TestFetcher.java
-11	5	src/test/org/apache/nutch/storage/TestGoraStorage.java
-1	1	src/test/org/apache/nutch/util/AbstractNutchTest.java
-13	10	src/test/org/apache/nutch/util/CrawlTestUtil.java
-
---8fb39713c--2013-05-21--Tejas Patil
-2	0	CHANGES.txt
-6	7	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/Ftp.java
-100	0	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/FtpRobotRulesParser.java
-
---f414a95b6--2013-05-21--Tejas Patil
+--bba335ef8--2013-05-21--Tejas Patil
 2	0	CHANGES.txt
 1	0	src/plugin/feed/ivy.xml
 
---f1d774ffe--2013-05-20--lufeng
-2	0	CHANGES.txt
-10	1	src/java/org/apache/nutch/crawl/GeneratorJob.java
-
---3cfd7271e--2013-05-19--Lewis John McGibbney
-2	0	CHANGES.txt
-1	1	ivy/ivy.xml
-4	10	src/plugin/creativecommons/src/test/org/creativecommons/nutch/TestCCParseFilter.java
-4	4	src/plugin/feed/src/test/org/apache/nutch/parse/feed/TestFeedParser.java
-2	3	src/plugin/index-anchor/src/test/org/apache/nutch/indexer/anchor/TestAnchorIndexingFilter.java
-2	3	src/plugin/index-basic/src/test/org/apache/nutch/indexer/basic/TestBasicIndexingFilter.java
-5	2	src/plugin/index-more/src/test/org/apache/nutch/indexer/more/TestMoreIndexingFilter.java
-6	2	src/plugin/language-identifier/src/test/org/apache/nutch/analysis/lang/TestHTMLLanguageParser.java
-10	4	src/plugin/lib-http/src/test/org/apache/nutch/protocol/http/api/TestRobotRulesParser.java
-11	8	src/plugin/lib-regex-filter/src/test/org/apache/nutch/urlfilter/api/RegexURLFilterBaseTest.java
-2	3	src/plugin/microformats-reltag/src/test/org/apache/nutch/microformats/reltag/TestRelTagIndexingFilter.java
-28	33	src/plugin/microformats-reltag/src/test/org/apache/nutch/microformats/reltag/TestRelTagParser.java
-4	3	src/plugin/parse-ext/src/test/org/apache/nutch/parse/ext/TestExtParser.java
-10	8	src/plugin/parse-html/src/test/org/apache/nutch/parse/html/TestDOMContentUtils.java
-5	6	src/plugin/parse-html/src/test/org/apache/nutch/parse/html/TestRobotsMetaProcessor.java
-31	38	src/plugin/parse-js/src/test/org/apache/nutch/parse/js/TestJSParseFilter.java
-5	5	src/plugin/parse-swf/src/test/org/apache/nutch/parse/swf/TestSWFParser.java
-6	3	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/DOMContentUtilsTest.java
-8	11	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestMSWordParser.java
-63	71	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestOOParser.java
-4	13	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestPdfParser.java
-4	20	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestRSSParser.java
-4	13	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestRTFParser.java
-4	3	src/plugin/parse-zip/src/test/org/apache/nutch/parse/zip/TestZipParser.java
-7	4	src/plugin/protocol-file/src/test/org/apache/nutch/protocol/file/TestProtocolFile.java
-16	4	src/plugin/protocol-httpclient/src/test/org/apache/nutch/protocol/httpclient/TestProtocolHttpClient.java
-5	2	src/plugin/subcollection/src/test/org/apache/nutch/collection/TestSubcollection.java
-3	16	src/plugin/urlfilter-automaton/src/test/org/apache/nutch/urlfilter/automaton/TestAutomatonURLFilter.java
-4	7	src/plugin/urlfilter-domain/src/test/org/apache/nutch/urlfilter/domain/TestDomainURLFilter.java
-3	18	src/plugin/urlfilter-regex/src/test/org/apache/nutch/urlfilter/regex/TestRegexURLFilter.java
-11	17	src/plugin/urlfilter-suffix/src/test/org/apache/nutch/urlfilter/suffix/TestSuffixURLFilter.java
-7	11	src/plugin/urlnormalizer-basic/src/test/org/apache/nutch/net/urlnormalizer/basic/TestBasicURLNormalizer.java
-4	2	src/plugin/urlnormalizer-pass/src/test/org/apache/nutch/net/urlnormalizer/pass/TestPassURLNormalizer.java
-8	45	src/plugin/urlnormalizer-regex/src/test/org/apache/nutch/net/urlnormalizer/regex/TestRegexURLNormalizer.java
-20	3	src/test/org/apache/nutch/crawl/TestGenerator.java
-3	0	src/test/org/apache/nutch/crawl/TestInjector.java
-4	2	src/test/org/apache/nutch/crawl/TestSignatureFactory.java
-10	3	src/test/org/apache/nutch/crawl/TestURLPartitioner.java
-7	2	src/test/org/apache/nutch/crawl/TestUrlWithScore.java
-9	1	src/test/org/apache/nutch/fetcher/TestFetcher.java
-35	32	src/test/org/apache/nutch/indexer/TestIndexingFilters.java
-13	17	src/test/org/apache/nutch/metadata/TestMetadata.java
-15	17	src/test/org/apache/nutch/metadata/TestSpellCheckedMetadata.java
-10	3	src/test/org/apache/nutch/net/TestURLFilters.java
-4	2	src/test/org/apache/nutch/net/TestURLNormalizers.java
-7	2	src/test/org/apache/nutch/parse/TestOutlinkExtractor.java
-8	7	src/test/org/apache/nutch/parse/TestParserFactory.java
-17	11	src/test/org/apache/nutch/plugin/TestPluginSystem.java
-5	4	src/test/org/apache/nutch/protocol/TestContent.java
-8	3	src/test/org/apache/nutch/protocol/TestProtocolFactory.java
-20	0	src/test/org/apache/nutch/storage/TestGoraStorage.java
-1	7	src/test/org/apache/nutch/util/AbstractNutchTest.java
-4	6	src/test/org/apache/nutch/util/TestEncodingDetector.java
-7	5	src/test/org/apache/nutch/util/TestGZIPUtils.java
-8	9	src/test/org/apache/nutch/util/TestNodeWalker.java
-4	5	src/test/org/apache/nutch/util/TestPrefixStringMatcher.java
-5	5	src/test/org/apache/nutch/util/TestStringUtil.java
-4	5	src/test/org/apache/nutch/util/TestSuffixStringMatcher.java
-5	2	src/test/org/apache/nutch/util/TestTableUtil.java
-7	9	src/test/org/apache/nutch/util/TestURLUtil.java
-
---dc4d64ac7--2013-05-09--Tejas Patil
-4	2	CHANGES.txt
+--6a2e867a2--2013-05-09--Tejas Patil
+8	6	CHANGES.txt
 1	1	default.properties
-21	6	pom.xml
+21	0	pom.xml
 
---154b94de9--2013-05-08--Sebastian Nagel
+--52cbec347--2013-05-08--Sebastian Nagel
 2	0	CHANGES.txt
 3	0	conf/schema-solr4.xml
 3	0	conf/schema.xml
-10	8	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+7	6	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
 
---5cb3e12dc--2013-05-07--Tejas Patil
+--d2c858a90--2013-05-07--Tejas Patil
 2	0	CHANGES.txt
-1	0	src/java/org/apache/nutch/api/impl/RAMJobManager.java
-1	0	src/java/org/apache/nutch/fetcher/FetcherReducer.java
+1	0	src/java/org/apache/nutch/fetcher/Fetcher.java
+1	0	src/java/org/apache/nutch/fetcher/OldFetcher.java
 
---6197d9a07--2013-05-03--Tejas Patil
-0	7	conf/nutch-default.xml
-
---f33a23092--2013-05-03--Tejas Patil
+--4ab47fbe1--2013-05-03--Tejas Patil
 2	0	CHANGES.txt
-1	1	src/java/org/apache/nutch/crawl/GeneratorJob.java
-1	1	src/test/org/apache/nutch/crawl/TestGenerator.java
+2	19	conf/nutch-default.xml
+0	4	src/java/org/apache/nutch/crawl/AbstractFetchSchedule.java
+1	5	src/java/org/apache/nutch/crawl/Generator.java
 
---4ad91a003--2013-04-30--Tejas Patil
+--40c3971f4--2013-04-30--Tejas Patil
 2	0	CHANGES.txt
-1	0	ivy/ivy.xml
-3	3	src/java/org/apache/nutch/plugin/PluginDescriptor.java
-1	1	src/java/org/apache/nutch/plugin/PluginManifestParser.java
-14	7	src/java/org/apache/nutch/util/MimeUtil.java
-3	1	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/TikaParser.java
-3	3	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/DOMContentUtilsTest.java
+2	2	src/java/org/apache/nutch/fetcher/FetcherOutputFormat.java
+
+--2e13c9467--2013-04-30--Tejas Patil
+2	0	CHANGES.txt
+12	4	src/java/org/apache/nutch/util/MimeUtil.java
+4	12	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+5	15	src/plugin/parse-zip/src/java/org/apache/nutch/parse/zip/ZipTextExtractor.java
 1	1	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/FileResponse.java
-7	5	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/Http.java
 
---6a8dd5b50--2013-04-29--Tejas Patil
-2	0	CHANGES.txt
-1	0	ivy/ivy.xml
-4	5	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-0	41	src/java/org/apache/nutch/protocol/EmptyRobotRules.java
-5	2	src/java/org/apache/nutch/protocol/Protocol.java
-195	0	src/java/org/apache/nutch/protocol/RobotRulesParser.java
-6	21	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
-126	0	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpRobotRulesParser.java
-0	592	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/RobotRulesParser.java
-75	267	src/plugin/lib-http/src/test/org/apache/nutch/protocol/http/api/TestRobotRulesParser.java
-56	42	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/File.java
-35	15	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/Ftp.java
-11	29	src/plugin/protocol-sftp/src/java/org/apache/nutch/protocol/sftp/Sftp.java
-
---e105ddc13--2013-04-28--Tejas Patil
+--5dec09181--2013-04-28--Tejas Patil
 2	0	CHANGES.txt
 1	0	conf/log4j.properties
 
---e306983e5--2013-04-18--Julien Nioche
+--ca8a2fdbd--2013-04-28--Tejas Patil
+2	0	CHANGES.txt
+2	2	src/java/org/apache/nutch/crawl/Generator.java
+
+--5903a6b9b--2013-04-18--Julien Nioche
 1	1	src/bin/crawl
 
---65265ec95--2013-04-17--Lewis John McGibbney
+--0a7aa7a1f--2013-04-17--Lewis John McGibbney
 2	0	CHANGES.txt
-2	0	conf/log4j.properties
-2	1	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
-43	14	src/java/org/apache/nutch/parse/ParserChecker.java
-38	1	src/java/org/apache/nutch/util/URLUtil.java
+1	1	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
+35	11	src/java/org/apache/nutch/parse/ParserChecker.java
 
---eb924b14c--2013-04-08--Lewis John McGibbney
+--c530a20ea--2013-04-08--Lewis John McGibbney
 0	2	CHANGES.txt
 1	1	src/java/org/apache/nutch/net/protocols/HttpDateFormat.java
 
---b514d99d2--2013-04-08--Lewis John McGibbney
+--3b7e30521--2013-04-08--Lewis John McGibbney
 2	0	CHANGES.txt
 1	1	src/java/org/apache/nutch/net/protocols/HttpDateFormat.java
 
---fa271dcaa--2013-04-08--Lewis John McGibbney
-1	1	CHANGES.txt
-3	1	src/java/org/apache/nutch/indexer/IndexUtil.java
-
---94fd18e20--2013-04-08--Lewis John McGibbney
+--9bade8055--2013-04-05--Tejas Patil
 2	0	CHANGES.txt
-17	7	src/java/org/apache/nutch/crawl/WebTableReader.java
+1	0	ivy/ivy.xml
+3	2	src/java/org/apache/nutch/fetcher/Fetcher.java
+0	41	src/java/org/apache/nutch/protocol/EmptyRobotRules.java
+4	1	src/java/org/apache/nutch/protocol/Protocol.java
+196	0	src/java/org/apache/nutch/protocol/RobotRulesParser.java
+8	10	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
+126	0	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpRobotRulesParser.java
+0	581	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/RobotRulesParser.java
+75	267	src/plugin/lib-http/src/test/org/apache/nutch/protocol/http/api/TestRobotRulesParser.java
+54	36	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/File.java
+35	13	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/Ftp.java
 
---77f2d93bc--2013-04-03--Lewis John McGibbney
-2	0	CHANGES.txt
-1	1	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
-
---4bb01d6b9--2013-03-28--lufeng
+--2f1ca3e7a--2013-03-28--lufeng
 2	0	CHANGES.txt
 1	1	conf/nutch-default.xml
 1	1	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
 
---a922f441e--2013-03-27--Sebastian Nagel
+--6e429746c--2013-03-27--Sebastian Nagel
 2	0	CHANGES.txt
 5	0	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
 4	0	src/java/org/apache/nutch/parse/ParserChecker.java
 
---5e4fc3b0c--2013-03-26--Lewis John McGibbney
+--af1c2f46c--2013-03-26--Lewis John McGibbney
 2	0	CHANGES.txt
-4	4	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
-17	1	src/java/org/apache/nutch/parse/ParserChecker.java
-9	0	src/java/org/apache/nutch/storage/ProtocolStatus.java
+9	2	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
+10	3	src/java/org/apache/nutch/parse/ParserChecker.java
 
---3b75af932--2013-03-26--Lewis John McGibbney
+--d66ee8f69--2013-03-07--Julien Nioche
 2	0	CHANGES.txt
-3	0	src/bin/nutch
-160	0	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
+5	1	build.xml
+1	1	conf/nutch-default.xml
+6	0	default.properties
+21	12	ivy/ivy.xml
+10	2	src/bin/nutch
+11	4	src/java/org/apache/nutch/crawl/Crawl.java
+209	0	src/java/org/apache/nutch/indexer/CleaningJob.java
+45	0	src/java/org/apache/nutch/indexer/IndexWriter.java
+148	0	src/java/org/apache/nutch/indexer/IndexWriters.java
+1	0	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+24	31	src/java/org/apache/nutch/indexer/IndexerOutputFormat.java
+199	0	src/java/org/apache/nutch/indexer/IndexingJob.java
+0	32	src/java/org/apache/nutch/indexer/NutchIndexWriter.java
+0	52	src/java/org/apache/nutch/indexer/NutchIndexWriterFactory.java
+0	198	src/java/org/apache/nutch/indexer/solr/SolrClean.java
+0	187	src/java/org/apache/nutch/indexer/solr/SolrIndexer.java
+0	143	src/java/org/apache/nutch/indexer/solr/SolrMappingReader.java
+1	1	src/java/org/apache/nutch/indexer/solr/SolrUtils.java
+0	156	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
+2	0	src/plugin/build.xml
+22	0	src/plugin/indexer-solr/build.xml
+43	0	src/plugin/indexer-solr/ivy.xml
+54	0	src/plugin/indexer-solr/plugin.xml
+40	0	src/plugin/indexer-solr/src/java/org/apache/nutch/indexwriter/solr/SolrConstants.java
+208	0	src/plugin/indexer-solr/src/java/org/apache/nutch/indexwriter/solr/SolrIndexWriter.java
+143	0	src/plugin/indexer-solr/src/java/org/apache/nutch/indexwriter/solr/SolrMappingReader.java
+78	0	src/plugin/indexer-solr/src/java/org/apache/nutch/indexwriter/solr/SolrUtils.java
+4	0	src/plugin/nutch-extensionpoints/plugin.xml
 
---4b1cd064e--2013-03-26--lufeng
-2	0	CHANGES.txt
-1	1	conf/schema-solr4.xml
-1	1	conf/schema.xml
-1	1	conf/solrindex-mapping.xml
-2	2	src/bin/nutch
-1	1	src/java/org/apache/nutch/crawl/AbstractFetchSchedule.java
-14	3	src/java/org/apache/nutch/indexer/IndexUtil.java
-1	1	src/java/org/apache/nutch/metadata/Nutch.java
-8	9	src/java/org/apache/nutch/protocol/Content.java
-4	4	src/java/org/apache/nutch/tools/Benchmark.java
-1	10	src/java/org/apache/nutch/tools/proxy/TestbedProxy.java
-3	3	src/java/org/apache/nutch/util/URLUtil.java
-2	2	src/test/org/apache/nutch/crawl/TestGenerator.java
-1	1	src/test/org/apache/nutch/metadata/TestSpellCheckedMetadata.java
-19	19	src/test/org/apache/nutch/util/TestURLUtil.java
-
---da06e1808--2013-03-24--Lewis John McGibbney
-1	1	conf/gora-sql-mapping.xml
-
---e97eaaf9c--2013-03-24--lufeng
-2	0	CHANGES.txt
-2	0	conf/gora-accumulo-mapping.xml
-2	0	conf/gora-cassandra-mapping.xml
-3	1	conf/gora-hbase-mapping.xml
-2	0	conf/gora-sql-mapping.xml
-3	1	src/gora/webpage.avsc
-1	0	src/java/org/apache/nutch/crawl/AdaptiveFetchSchedule.java
-4	3	src/java/org/apache/nutch/crawl/DbUpdateReducer.java
-1	0	src/java/org/apache/nutch/crawl/DefaultFetchSchedule.java
-1	0	src/java/org/apache/nutch/crawl/GeneratorReducer.java
-2	0	src/java/org/apache/nutch/storage/ParseStatus.java
-2	0	src/java/org/apache/nutch/storage/ProtocolStatus.java
-104	82	src/java/org/apache/nutch/storage/WebPage.java
-
---00e5efc72--2013-03-11--Lewis John McGibbney
-2	0	CHANGES.txt
-6	10	ivy/ivy.xml
-
---8f95d03fc--2013-03-11--Tejas Patil
-2	0	CHANGES.txt
-5	1	src/bin/crawl
-6	2	src/java/org/apache/nutch/crawl/GeneratorJob.java
-
---8287297ba--2013-03-08--Lewis John McGibbney
-2	0	CHANGES.txt
-20	1	src/java/org/apache/nutch/crawl/GeneratorJob.java
-
---2fa2c2742--2013-03-06--Lewis John McGibbney
-2	0	CHANGES.txt
-21	4	conf/nutch-default.xml
-
---4bdb54ed6--2013-03-06--Lewis John McGibbney
-2	0	CHANGES.txt
-12	0	build.xml
-
---01d14ef62--2013-02-26--Lewis John McGibbney
+--8ec80fa99--2013-02-26--Lewis John McGibbney
 2	0	CHANGES.txt
 1	1	build.xml
 
---07eb79dc0--2013-02-22--Lewis John McGibbney
-0	2	CHANGES.txt
-0	7	src/java/org/apache/nutch/util/StringUtil.java
-2	4	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
-
---44b363587--2013-02-19--Lewis John McGibbney
+--6c8854d6e--2013-02-19--Lewis John McGibbney
 2	0	CHANGES.txt
 7	0	src/java/org/apache/nutch/util/StringUtil.java
-4	2	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
+3	2	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
 
---f02dcf625--2013-02-06--Lewis John McGibbney
+--a7a1b416e--2013-01-30--Lewis John McGibbney
 2	0	CHANGES.txt
-0	9	conf/nutch-default.xml
+1	1	src/java/org/apache/nutch/crawl/CrawlDbFilter.java
+136	0	src/test/org/apache/nutch/crawl/TestCrawlDbFilter.java
 
---c9228bbb5--2013-01-28--Tejas Patil
+--24069ccaa--2013-01-28--Tejas Patil
 2	0	CHANGES.txt
-7	2	src/java/org/apache/nutch/fetcher/FetcherReducer.java
+8	2	src/java/org/apache/nutch/fetcher/Fetcher.java
 
---f80299e4b--2013-01-18--Lewis John McGibbney
-3	1	CHANGES.txt
-56	3	src/test/org/apache/nutch/indexer/TestIndexingFilters.java
-
---1373e5e3c--2013-01-12--Lewis John McGibbney
+--7564e7d22--2013-01-18--Lewis John McGibbney
 2	0	CHANGES.txt
-1	1	src/java/org/apache/nutch/api/DbReader.java
-4	4	src/java/org/apache/nutch/crawl/WebTableReader.java
-1	1	src/java/org/apache/nutch/fetcher/FetcherReducer.java
+56	2	src/test/org/apache/nutch/indexer/TestIndexingFilters.java
+
+--272c0d09f--2013-01-18--Julien Nioche
+2	0	CHANGES.txt
+1	1	src/plugin/parse-html/src/test/org/apache/nutch/parse/html/TestDOMContentUtils.java
+13	0	src/plugin/parse-tika/build.xml
+1	1	src/plugin/parse-tika/plugin.xml
+6	6	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/DOMContentUtils.java
+2	2	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/HTMLMetaProcessor.java
+333	0	src/plugin/parse-tika/src/test/org/apache/nutch/tika/TestDOMContentUtils.java
+183	0	src/plugin/parse-tika/src/test/org/apache/nutch/tika/TestRobotsMetaProcessor.java
+
+--2cf785eef--2013-01-16--Markus Jelsma
+0	2	src/java/org/apache/nutch/crawl/MapWritable.java
+
+--789a174bd--2013-01-16--Markus Jelsma
+2	0	CHANGES.txt
+57	4	src/java/org/apache/nutch/indexer/NutchField.java
+
+--251d2be58--2013-01-16--Markus Jelsma
+2	0	CHANGES.txt
+0	1	src/java/org/apache/nutch/crawl/NutchWritable.java
+0	81	src/java/org/apache/nutch/fetcher/FetcherOutput.java
+
+--581238896--2013-01-16--Markus Jelsma
+2	0	CHANGES.txt
+4	3	src/java/org/apache/nutch/crawl/NutchWritable.java
+4	3	src/java/org/apache/nutch/indexer/NutchIndexAction.java
+
+--578a41800--2013-01-15--Sebastian Nagel
+2	0	CHANGES.txt
+1	1	src/bin/crawl
+
+--b4a849bf5--2013-01-12--Lewis John McGibbney
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/crawl/CrawlDatum.java
+11	11	src/java/org/apache/nutch/crawl/CrawlDbReader.java
+8	8	src/java/org/apache/nutch/crawl/CrawlDbReducer.java
+3	3	src/java/org/apache/nutch/crawl/Generator.java
+1	1	src/java/org/apache/nutch/fetcher/Fetcher.java
 3	3	src/java/org/apache/nutch/indexer/solr/SolrMappingReader.java
-1	1	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
+1	1	src/java/org/apache/nutch/parse/ParseOutputFormat.java
+1	1	src/java/org/apache/nutch/parse/ParseSegment.java
+2	2	src/java/org/apache/nutch/scoring/webgraph/LinkDumper.java
+3	3	src/java/org/apache/nutch/scoring/webgraph/LinkRank.java
+1	1	src/java/org/apache/nutch/scoring/webgraph/Loops.java
+1	1	src/java/org/apache/nutch/scoring/webgraph/WebGraph.java
+2	2	src/java/org/apache/nutch/segment/ContentAsTextInputFormat.java
+1	1	src/java/org/apache/nutch/segment/SegmentMerger.java
+1	1	src/java/org/apache/nutch/segment/SegmentReader.java
+1	1	src/java/org/apache/nutch/tools/FreeGenerator.java
 4	4	src/java/org/apache/nutch/tools/arc/ArcRecordReader.java
 3	3	src/test/org/apache/nutch/parse/TestParserFactory.java
 
---02c8baa26--2013-01-10--Lewis John McGibbney
-2	0	CHANGES.txt
-12	6	pom.xml
+--ac32b1fd4--2013-01-09--Lewis John McGibbney
+1	1	src/plugin/feed/ivy.xml
+1	1	src/plugin/feed/plugin.xml
 
---7d3b0cc67--2012-12-27--Markus Jelsma
+--47bae8460--2013-01-09--Lewis John McGibbney
+2	0	CHANGES.txt
+1	1	src/plugin/feed/ivy.xml
+1	0	src/plugin/feed/plugin.xml
+
+--0fb4dd139--2013-01-08--Lewis John McGibbney
+2	0	CHANGES.txt
+1	0	src/plugin/build.xml
+58	0	src/plugin/urlfilter-validator/src/test/org/apache/nutch/urlfilter/validator/TestUrlValidator.java
+
+--e5760a52f--2013-01-08--Lewis John McGibbney
+2	0	CHANGES.txt
+1	0	src/plugin/build.xml
+67	43	src/plugin/index-static/src/java/org/apache/nutch/indexer/staticfield/StaticFieldIndexer.java
+110	0	src/plugin/index-static/src/test/org/apache/nutch/indexer/staticfield/TestStaticFieldIndexerTest.java
+
+--393eda4cd--2012-12-27--Markus Jelsma
 2	0	CHANGES.txt
 2	2	ivy/ivy.xml
 
---11c4cbc7e--2012-12-12--Lewis John McGibbney
-3	1	CHANGES.txt
-7	0	conf/nutch-default.xml
-
---47e07ea52--2012-12-08--Lewis John McGibbney
+--618a80c8b--2012-12-23--Lewis John McGibbney
 2	0	CHANGES.txt
-0	1	conf/schema-solr4.xml
-1	1	conf/schema.xml
-0	1	conf/solrindex-mapping.xml
-0	3	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
-1	2	src/plugin/index-basic/src/test/org/apache/nutch/indexer/basic/TestBasicIndexingFilter.java
+1	0	src/plugin/build.xml
+27	1	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
+87	0	src/plugin/index-basic/src/test/org/apache/nutch/indexer/basic/TestBasicIndexingFilter.java
 
---3a1effa22--2012-11-22--Lewis John McGibbney
-3	0	CHANGES.txt
-
---1873f6eb3--2012-11-22--Lewis John McGibbney
-11	0	conf/gora-cassandra-mapping.xml
-56	32	src/java/org/apache/nutch/crawl/InjectorJob.java
-9	2	src/java/org/apache/nutch/storage/StorageUtils.java
-
---0d350bc0f--2012-11-12--Sebastian Nagel
+--2b3fe9c83--2012-12-21--Julien Nioche
 2	0	CHANGES.txt
-2	2	src/java/org/apache/nutch/util/TableUtil.java
-4	0	src/test/org/apache/nutch/util/TestTableUtil.java
+17	0	conf/nutch-default.xml
+2	0	src/plugin/build.xml
+6	0	src/plugin/scoring-depth/build.xml
+41	0	src/plugin/scoring-depth/ivy.xml
+24	0	src/plugin/scoring-depth/plugin.xml
+200	0	src/plugin/scoring-depth/src/java/org/apache/nutch/scoring/depth/DepthScoringFilter.java
 
---37c31a62c--2012-11-12--Lewis John McGibbney
+--ac978dd38--2012-11-23--Lewis John McGibbney
+2	0	CHANGES.txt
+1	1	conf/nutch-default.xml
+1	1	default.properties
+
+--3b15a08e8--2012-11-23--Lewis John McGibbney
+1	1	CHANGES.txt
+1	1	conf/nutch-default.xml
+1	1	default.properties
+
+--eee3decba--2012-11-22--Lewis John McGibbney
+2	0	CHANGES.txt
+11	2	src/java/org/apache/nutch/crawl/Injector.java
+
+--fc785b34b--2012-11-16--Lewis John McGibbney
+0	2	src/plugin/index-anchor/src/test/org/apache/nutch/indexer/anchor/TestAnchorIndexingFilter.java
+
+--ce26610e3--2012-11-13--Lewis John McGibbney
+2	0	CHANGES.txt
+1	0	src/plugin/build.xml
+23	5	src/plugin/index-anchor/src/java/org/apache/nutch/indexer/anchor/AnchorIndexingFilter.java
+66	0	src/plugin/index-anchor/src/test/org/apache/nutch/indexer/anchor/TestAnchorIndexingFilter.java
+
+--a816e572d--2012-11-12--Lewis John McGibbney
 2	0	CHANGES.txt
 1	0	src/plugin/urlfilter-automaton/ivy.xml
 0	24	src/plugin/urlfilter-automaton/lib/automaton.COPYING.txt
@@ -521,692 +761,557 @@
 -	-	src/plugin/urlfilter-automaton/lib/automaton.jar
 1	1	src/plugin/urlfilter-automaton/plugin.xml
 
---f35d6ab52--2012-11-12--Lewis John McGibbney
-2	0	CHANGES.txt
-3	1	src/java/org/apache/nutch/parse/ParserJob.java
-
---e9b46e908--2012-11-09--Lewis John McGibbney
+--318a5cec3--2012-11-09--Lewis John McGibbney
 2	0	CHANGES.txt
 1	1	src/bin/nutch
 
---c7342c74b--2012-11-07--Lewis John McGibbney
-2	0	CHANGES.txt
-5	2	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+--7905c60bc--2012-11-08--Lewis John McGibbney
+2	1	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
 
---a722e43d2--2012-11-06--Markus Jelsma
+--e78cfc2ec--2012-11-07--Lewis John McGibbney
 2	0	CHANGES.txt
-1	1	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
+3	2	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
 
---0cffa9125--2012-10-23--Sebastian Nagel
+--dbf0b2439--2012-11-06--Markus Jelsma
+0	2	CHANGES.txt
+
+--f146015f6--2012-11-06--Markus Jelsma
+4	0	CHANGES.txt
+4	4	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
+
+--4c4e208c4--2012-10-23--Sebastian Nagel
 2	0	CHANGES.txt
 8	1	src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java
 
---244ebf668--2012-10-23--Sebastian Nagel
-1	1	CHANGES.txt
-
---39893c6e5--2012-10-20--Julien Nioche
+--a6b4acc18--2012-10-23--Markus Jelsma
 2	0	CHANGES.txt
-2	4	ivy/ivy.xml
-1	1	src/plugin/parse-tika/ivy.xml
-19	13	src/plugin/parse-tika/plugin.xml
+4	0	src/java/org/apache/nutch/crawl/CrawlDbReducer.java
 
---33e7ae5a7--2012-10-20--Julien Nioche
+--cf2b78290--2012-10-23--Markus Jelsma
 2	0	CHANGES.txt
-161	0	src/bin/crawl
+1	2	src/java/org/apache/nutch/crawl/CrawlDb.java
 
---f9d0e7685--2012-10-10--Lewis John McGibbney
+--1cd24babb--2012-10-11--Sebastian Nagel
 2	0	CHANGES.txt
-0	3	src/plugin/feed/src/java/org/apache/nutch/indexer/feed/FeedIndexingFilter.java
-0	4	src/plugin/feed/src/java/org/apache/nutch/parse/feed/FeedParser.java
-0	2	src/plugin/feed/src/test/org/apache/nutch/parse/feed/TestFeedParser.java
-0	4	src/plugin/parse-ext/src/java/org/apache/nutch/parse/ext/ExtParser.java
-0	2	src/plugin/parse-ext/src/test/org/apache/nutch/parse/ext/TestExtParser.java
-0	1	src/plugin/parse-swf/src/test/org/apache/nutch/parse/swf/TestSWFParser.java
-0	1	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/TikaParser.java
-0	4	src/plugin/parse-zip/src/java/org/apache/nutch/parse/zip/ZipParser.java
-0	2	src/plugin/parse-zip/src/java/org/apache/nutch/parse/zip/ZipTextExtractor.java
-0	2	src/plugin/parse-zip/src/test/org/apache/nutch/parse/zip/TestZipParser.java
+9	4	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
 
---8b35d734a--2012-10-10--Sebastian Nagel
+--8edb66fe1--2012-10-11--Sebastian Nagel
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/segment/SegmentReader.java
+
+--68d638d59--2012-10-11--Sebastian Nagel
+3	1	CHANGES.txt
+11	2	src/java/org/apache/nutch/segment/SegmentReader.java
+
+--f3e5a3158--2012-10-10--Sebastian Nagel
 1	1	conf/regex-normalize.xml.template
 6	1	src/plugin/urlnormalizer-regex/sample/regex-normalize-default.test
 1	1	src/plugin/urlnormalizer-regex/sample/regex-normalize-default.xml
 
---2e31b117a--2012-10-10--Sebastian Nagel
+--965ecf525--2012-10-10--Sebastian Nagel
 2	0	CHANGES.txt
 1	1	src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java
 
---bc7ef2e9c--2012-10-10--Sebastian Nagel
-1	1	CHANGES.txt
+--ddca58778--2012-10-10--Sebastian Nagel
+2	0	CHANGES.txt
 1	1	conf/regex-normalize.xml.template
 2	0	src/plugin/urlnormalizer-regex/sample/regex-normalize-default.test
 1	1	src/plugin/urlnormalizer-regex/sample/regex-normalize-default.xml
 
---2da30f3d3--2012-09-21--Lewis John McGibbney
-7	2	CHANGES.txt
-1	1	conf/nutch-default.xml
-1	1	default.properties
-1	1	ivy/ivy.xml
-
---fceecfabb--2012-09-18--Sebastian Nagel
+--582919d28--2012-09-18--Sebastian Nagel
 2	0	CHANGES.txt
-24	26	build.xml
+25	27	build.xml
 
---590ad02ae--2012-09-18--Lewis John McGibbney
+--a56783048--2012-09-18--Lewis John McGibbney
 2	0	CHANGES.txt
-11	2	conf/nutch-default.xml
+7	7	src/plugin/index-anchor/src/java/org/apache/nutch/indexer/anchor/AnchorIndexingFilter.java
 
---19e694e60--2012-09-18--Lewis John McGibbney
-1	1	conf/gora-cassandra-mapping.xml
-
---068636631--2012-09-18--Lewis John McGibbney
-1	1	src/plugin/build.xml
-316	0	src/plugin/parse-js/sample/parse_embedded_js_test.html
-
---ecb86f4de--2012-09-17--Ferdy Galema
+--d2831a8ed--2012-09-15--Lewis John McGibbney
 2	0	CHANGES.txt
-13	0	src/java/org/apache/nutch/fetcher/FetcherReducer.java
+10	0	build.xml
 
---4369dac17--2012-09-15--Lewis John McGibbney
+--b0daa6735--2012-08-23--Markus Jelsma
 2	0	CHANGES.txt
-9	0	build.xml
+24	7	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
 
---32b825c58--2012-09-15--Lewis John McGibbney
-6	0	CHANGES.txt
-2	0	conf/nutch-default.xml
-1	0	src/plugin/build.xml
-7	1	src/plugin/microformats-reltag/src/java/org/apache/nutch/microformats/reltag/RelTagParser.java
-25	29	src/plugin/microformats-reltag/src/test/org/apache/nutch/microformats/reltag/TestRelTagParser.java
-14	0	src/plugin/parse-js/build.xml
-0	6	src/plugin/parse-js/src/java/org/apache/nutch/package.html
-46	6	src/plugin/parse-js/src/java/org/apache/nutch/parse/js/JSParseFilter.java
-6	0	src/plugin/parse-js/src/java/org/apache/nutch/parse/js/package.html
-108	0	src/plugin/parse-js/src/test/org/apache/nutch/parse/js/TestJSParseFilter.java
-7	24	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestRTFParser.java
-
---e878515c2--2012-09-07--Ferdy Galema
+--e631e8e43--2012-07-31--Markus Jelsma
 2	0	CHANGES.txt
-4	3	src/java/org/apache/nutch/crawl/DbUpdateReducer.java
-
---c1b68c35e--2012-09-07--Ferdy Galema
-2	0	CHANGES.txt
-4	46	src/java/org/apache/nutch/crawl/InjectorJob.java
-
---33de245d3--2012-08-31--Ferdy Galema
-2	0	CHANGES.txt
-9	0	conf/nutch-default.xml
-5	1	src/java/org/apache/nutch/crawl/DbUpdateMapper.java
-23	0	src/java/org/apache/nutch/crawl/DbUpdateReducer.java
-3	0	src/java/org/apache/nutch/crawl/DbUpdaterJob.java
-14	0	src/java/org/apache/nutch/crawl/GeneratorMapper.java
-2	0	src/java/org/apache/nutch/crawl/InjectorJob.java
-11	3	src/java/org/apache/nutch/scoring/ScoreDatum.java
-
---c5e2236f3--2012-08-31--Ferdy Galema
-2	0	CHANGES.txt
-0	9	conf/nutch-default.xml
-34	47	src/java/org/apache/nutch/crawl/DbUpdateReducer.java
-96	119	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-35	23	src/java/org/apache/nutch/parse/ParseUtil.java
-1	5	src/java/org/apache/nutch/parse/ParserJob.java
-
---1bb03c759--2012-08-31--Ferdy Galema
-2	0	CHANGES.txt
-1	0	src/java/org/apache/nutch/indexer/elastic/ElasticWriter.java
-
---f7ef04dca--2012-08-31--Ferdy Galema
-2	0	CHANGES.txt
-3	2	src/java/org/apache/nutch/indexer/elastic/ElasticWriter.java
-
---b8643b27e--2012-08-30--Lewis John McGibbney
-2	0	CHANGES.txt
-1	1	src/java/org/apache/nutch/parse/ParserJob.java
-
---6a0f97886--2012-08-14--Ferdy Galema
-2	0	CHANGES.txt
-1	1	src/java/org/apache/nutch/host/HostInjectorJob.java
-8	11	src/java/org/apache/nutch/storage/StorageUtils.java
-7	0	src/java/org/apache/nutch/util/NutchJob.java
-
---0a0ddff8f--2012-08-13--Lewis John McGibbney
-2	0	CHANGES.txt
-7	1	src/java/org/apache/nutch/indexer/IndexingFilters.java
-
---2502315db--2012-08-13--Lewis John McGibbney
-2	0	CHANGES.txt
-4	4	ivy/ivy.xml
-
---35f0d6d46--2012-08-12--Lewis John McGibbney
-1	1	build.xml
-
---088977af5--2012-08-12--Lewis John McGibbney
-1	0	src/plugin/build.xml
-3	0	src/plugin/index-anchor/src/java/org/apache/nutch/indexer/anchor/AnchorIndexingFilter.java
-5	4	src/plugin/index-basic/src/test/org/apache/nutch/indexer/basic/TestBasicIndexingFilter.java
-9	0	src/plugin/microformats-reltag/build.xml
-470	0	src/plugin/microformats-reltag/sample/microformats_reltag_test.html
-51	33	src/plugin/microformats-reltag/src/java/org/apache/nutch/microformats/reltag/RelTagIndexingFilter.java
-117	106	src/plugin/microformats-reltag/src/java/org/apache/nutch/microformats/reltag/RelTagParser.java
-60	0	src/plugin/microformats-reltag/src/test/org/apache/nutch/microformats/reltag/TestRelTagIndexingFilter.java
-103	0	src/plugin/microformats-reltag/src/test/org/apache/nutch/microformats/reltag/TestRelTagParser.java
-
---2f8da44bb--2012-08-10--Lewis John McGibbney
-2	0	conf/schema-solr4.xml
-2	1	src/plugin/build.xml
-0	5	src/plugin/index-anchor/src/test/org/apache/nutch/indexer/anchor/TestAnchorIndexingFilter.java
-35	2	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
-95	0	src/plugin/index-basic/src/test/org/apache/nutch/indexer/basic/TestBasicIndexingFilter.java
-
---7a99d6446--2012-08-06--Lewis John McGibbney
-3	0	CHANGES.txt
-1	0	src/plugin/build.xml
-1	1	src/plugin/index-anchor/build.xml
-27	6	src/plugin/index-anchor/src/java/org/apache/nutch/indexer/anchor/AnchorIndexingFilter.java
-65	0	src/plugin/index-anchor/src/test/org/apache/nutch/indexer/anchor/TestAnchorIndexingFilter.java
-
---8bf393f51--2012-08-03--Ferdy Galema
-28	0	conf/nutch-default.xml
-
---5cfe4cb58--2012-08-01--Ferdy Galema
-3	0	src/bin/nutch
-
---13d2eb8e5--2012-08-01--Ferdy Galema
-2	0	CHANGES.txt
-3	0	ivy/ivy.xml
-12	0	ivy/ivysettings.xml
-26	0	src/java/org/apache/nutch/indexer/elastic/ElasticConstants.java
-81	0	src/java/org/apache/nutch/indexer/elastic/ElasticIndexerJob.java
-161	0	src/java/org/apache/nutch/indexer/elastic/ElasticWriter.java
-
---2a38a4b42--2012-08-01--Ferdy Galema
-1	0	CHANGES.txt
-34	4	src/java/org/apache/nutch/indexer/IndexerOutputFormat.java
-1	1	src/java/org/apache/nutch/indexer/NutchIndexWriter.java
-10	27	src/java/org/apache/nutch/indexer/solr/SolrIndexerJob.java
-2	2	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
-
---c6f6df399--2012-07-31--Markus Jelsma
-3	0	CHANGES.txt
 1	1	conf/schema-solr4.xml
 1	1	conf/schema.xml
 
---d7286c877--2012-07-30--Ferdy Galema
-1	0	CHANGES.txt
-9	11	src/plugin/index-anchor/src/java/org/apache/nutch/indexer/anchor/AnchorIndexingFilter.java
-
---891a43607--2012-07-29--Lewis John McGibbney
+--5cd59d24b--2012-07-29--Lewis John McGibbney
 2	0	CHANGES.txt
 1	1	src/java/org/apache/nutch/metadata/Metadata.java
 0	52	src/java/org/apache/nutch/metadata/Office.java
 
---8151e5e24--2012-07-29--Lewis John McGibbney
+--5e5e1e66e--2012-07-29--Lewis John McGibbney
+2	2	build.xml
+
+--f631f6508--2012-07-29--Lewis John McGibbney
 2	0	CHANGES.txt
-32	32	build.xml
+34	34	build.xml
 
---5d21ae3bd--2012-07-27--Lewis John McGibbney
-5	0	CHANGES.txt
-7	7	conf/schema-solr4.xml
-
---a14742ccf--2012-07-26--Lewis John McGibbney
-363	0	conf/schema-solr4.xml
-
---216e8d4b8--2012-07-26--Lewis John McGibbney
-0	57	doap.rdf
-
---68e6d42ac--2012-07-26--Ferdy Galema
+--d09d6b408--2012-07-27--Lewis John McGibbney
 2	0	CHANGES.txt
-4	1	src/java/org/apache/nutch/parse/ParseUtil.java
-18	12	src/java/org/apache/nutch/parse/ParserJob.java
+6	6	conf/schema-solr4.xml
 
---01dd1e05e--2012-07-25--Ferdy Galema
-1	0	CHANGES.txt
-12	6	src/java/org/apache/nutch/host/HostInjectorJob.java
-
---a6f6acd08--2012-07-23--Lewis John McGibbney
+--54202bec7--2012-07-26--Lewis John McGibbney
 2	0	CHANGES.txt
-2	2	conf/gora-cassandra-mapping.xml
-8	0	conf/gora-sql-mapping.xml
+1	1	conf/schema-solr4.xml
 
---b6a6a458d--2012-07-13--Lewis John McGibbney
-3	0	src/bin/nutch
+--decb736d9--2012-07-20--Julien Nioche
+15	13	src/plugin/parse-tika/plugin.xml
 
---741cd00c9--2012-07-10--Lewis John McGibbney
+--046027221--2012-07-20--Julien Nioche
+2	0	CHANGES.txt
+2	1	ivy/ivy.xml
+1	1	src/plugin/parse-tika/ivy.xml
+2	2	src/plugin/parse-tika/plugin.xml
+
+--3cc92733a--2012-07-20--Markus Jelsma
+4	0	CHANGES.txt
+2	2	src/java/org/apache/nutch/crawl/AdaptiveFetchSchedule.java
+27	6	src/java/org/apache/nutch/crawl/Injector.java
+2	2	src/java/org/apache/nutch/metadata/Nutch.java
+
+--25afea3cc--2012-07-10--Lewis John McGibbney
 0	2	CHANGES.txt
 0	7	conf/nutch-default.xml
 0	2	src/java/org/apache/nutch/metadata/HttpHeaders.java
-2	11	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
-3	11	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
-15	16	src/plugin/protocol-sftp/src/java/org/apache/nutch/protocol/sftp/Sftp.java
+0	9	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
+2	10	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
 
---b4e0159e7--2012-07-10--Lewis John McGibbney
-1	1	conf/nutch-default.xml
+--c42ddd7b9--2012-07-10--Lewis John McGibbney
+1	1	conf/schema-solr4.xml
 1	1	conf/schema.xml
 1	1	default.properties
 
---2f7c34abd--2012-07-10--Ferdy Galema
+--1423ca378--2012-07-10--Julien Nioche
+12	8	CHANGES.txt
+
+--39da6c128--2012-07-10--Julien Nioche
 3	0	CHANGES.txt
-7	5	src/java/org/apache/nutch/crawl/GeneratorMapper.java
+185	0	src/bin/crawl
+1	1	src/bin/nutch
 
---c2fe21190--2012-07-10--Ferdy Galema
+--9400ebe98--2012-07-09--Ferdy Galema
 1	0	CHANGES.txt
-11	0	src/java/org/apache/nutch/crawl/GeneratorJob.java
-2	1	src/java/org/apache/nutch/crawl/GeneratorMapper.java
-
---75b7b510d--2012-07-10--Julien Nioche
---21584d765--2012-07-09--Ferdy Galema
-2	0	CHANGES.txt
-7	0	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-
---47c4d448c--2012-07-09--Ferdy Galema
-2	0	CHANGES.txt
-1	1	src/java/org/apache/nutch/host/HostDb.java
-
---0efa91b87--2012-07-09--Ferdy Galema
-2	0	CHANGES.txt
-0	1	src/java/org/apache/nutch/crawl/DbUpdaterJob.java
-
---539ff3a35--2012-07-09--Ferdy Galema
-2	0	CHANGES.txt
-1	1	src/java/org/apache/nutch/fetcher/FetcherJob.java
-
---743536db4--2012-07-09--Ferdy Galema
-2	0	CHANGES.txt
-0	3	src/plugin/language-identifier/src/java/org/apache/nutch/analysis/lang/LanguageIndexingFilter.java
-
---13f5bbf2d--2012-07-09--Ferdy Galema
-4	0	CHANGES.txt
-9	1	conf/nutch-default.xml
+11	3	conf/nutch-default.xml
 2	0	src/java/org/apache/nutch/indexer/solr/SolrConstants.java
-3	1	src/java/org/apache/nutch/indexer/solr/SolrIndexerJob.java
+2	1	src/java/org/apache/nutch/indexer/solr/SolrIndexer.java
 
---181bd3bda--2012-06-25--Lewis John McGibbney
-3	3	pom.xml
-
---1f694d8b3--2012-06-20--Julien Nioche
+--9145ff0ec--2012-07-05--Markus Jelsma
 2	0	CHANGES.txt
-2	0	src/java/org/apache/nutch/crawl/WebTableReader.java
+17	0	conf/nutch-default.xml
+43	3	src/java/org/apache/nutch/crawl/Injector.java
+26	4	src/test/org/apache/nutch/crawl/CrawlDBTestUtil.java
+45	3	src/test/org/apache/nutch/crawl/TestInjector.java
 
---625d0dc0e--2012-06-20--Julien Nioche
+--eaff1a8de--2012-06-28--Markus Jelsma
 2	0	CHANGES.txt
+1	1	ivy/ivy.xml
+
+--2a424ee31--2012-06-26--Markus Jelsma
+11	3	src/test/org/apache/nutch/net/TestURLNormalizers.java
+
+--3570e739a--2012-06-26--Markus Jelsma
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+
+--cb68fbf62--2012-06-25--Markus Jelsma
+2	0	CHANGES.txt
+6	0	conf/nutch-default.xml
+8	0	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
+
+--0a446d96f--2012-06-25--Markus Jelsma
+2	0	CHANGES.txt
+8	1	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/RobotRulesParser.java
+
+--1dfc7bf2d--2012-06-23--Markus Jelsma
+3	0	src/plugin/build.xml
+
+--a4cb5eeab--2012-06-20--Julien Nioche
+2	0	CHANGES.txt
+1	1	default.properties
 1	5	src/bin/nutch
 
---3f9628c89--2012-06-19--Lewis John McGibbney
-2	0	CHANGES.txt
-7	1	src/plugin/protocol-httpclient/src/test/org/apache/nutch/protocol/httpclient/TestProtocolHttpClient.java
-
---10125bc41--2012-06-19--Julien Nioche
+--95f428040--2012-06-19--Julien Nioche
 2	0	CHANGES.txt
 2	2	src/bin/nutch
 
---6ecf202be--2012-06-19--Julien Nioche
+--18a81c30a--2012-06-15--Julien Nioche
 2	0	CHANGES.txt
 2	2	ivy/ivy.xml
 
---6bcd6e013--2012-06-15--Lewis John McGibbney
+--9206dbcac--2012-06-12--Markus Jelsma
 2	0	CHANGES.txt
-1	1	ivy/ivy.xml
-44	19	src/java/org/apache/nutch/util/MimeUtil.java
-2	2	src/plugin/creativecommons/src/test/org/creativecommons/nutch/TestCCParseFilter.java
-5	8	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
-3	3	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/TikaParser.java
-2	2	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestMSWordParser.java
-2	2	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestOOParser.java
-2	2	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestPdfParser.java
-2	2	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestRSSParser.java
-2	2	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/FileResponse.java
+82	0	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+21	6	src/java/org/apache/nutch/indexer/solr/SolrIndexer.java
+2	1	src/java/org/apache/nutch/net/URLNormalizers.java
 
---e79b6d8ec--2012-06-14--Lewis John McGibbney
+--e93d1a1da--2012-06-12--Markus Jelsma
 2	0	CHANGES.txt
-1	1	src/java/org/apache/nutch/fetcher/FetcherJob.java
-7	7	src/java/org/apache/nutch/parse/ParserJob.java
+6	1	src/java/org/apache/nutch/scoring/webgraph/WebGraph.java
 
---12cb34441--2012-06-13--Lewis John McGibbney
-1	1	README.txt
-5	2	src/java/overview.html
-
---fb3584aa0--2012-06-08--Lewis John McGibbney
-59	0	KEYS
-
---92c3da9d2--2012-06-08--Lewis John McGibbney
-2	1	CHANGES.txt
-2	10	build.xml
-1	1	conf/schema.xml
-
---7104e870f--2012-05-30--Lewis John McGibbney
-56	52	build.xml
-3	2	default.properties
-
---383dc6d6d--2012-05-30--Ferdy Galema
+--d78485a3c--2012-06-12--Markus Jelsma
 2	0	CHANGES.txt
-6	1	src/java/org/apache/nutch/parse/ParseUtil.java
+23	0	conf/host-urlnormalizer.txt
+27	0	src/plugin/urlnormalizer-host/build.xml
+8	0	src/plugin/urlnormalizer-host/data/hosts.txt
+41	0	src/plugin/urlnormalizer-host/ivy.xml
+43	0	src/plugin/urlnormalizer-host/plugin.xml
+198	0	src/plugin/urlnormalizer-host/src/java/org/apache/nutch/net/urlnormalizer/host/HostURLNormalizer.java
+50	0	src/plugin/urlnormalizer-host/src/test/org/apache/nutch/net/urlnormalizer/host/TestHostURLNormalizer.java
 
---3ff30ccb9--2012-05-23--Ferdy Galema
+--09d647a25--2012-06-12--Markus Jelsma
 2	0	CHANGES.txt
-1	1	src/java/org/apache/nutch/host/HostDb.java
+7	3	src/plugin/headings/src/java/org/apache/nutch/parse/headings/HeadingsParseFilter.java
 
---0efeb7317--2012-05-22--Lewis John McGibbney
-38	17	pom.xml
-
---dfc9482dc--2012-05-22--Lewis John McGibbney
-3	1	CHANGES.txt
-100	69	build.xml
-1	1	conf/nutch-default.xml
-2	2	default.properties
-
---a748da8ae--2012-05-22--Lewis John McGibbney
-1	1	NOTICE.txt
-109	42	build.xml
-16	0	default.properties
-15	0	ivy/mvn.template
-16	0	src/java/org/apache/nutch/storage/Host.java
-17	0	src/plugin/creativecommons/src/web/search.jsp
-16	0	src/plugin/creativecommons/src/web/web.xml
-16	1	src/plugin/protocol-httpclient/src/test/conf/httpclient-auth-test.xml
-16	0	src/plugin/protocol-httpclient/src/test/conf/nutch-site-test.xml
-
---841d7ccc1--2012-05-21--Lewis John McGibbney
+--6149682f9--2012-06-12--Markus Jelsma
 2	0	CHANGES.txt
-1	0	src/java/org/apache/nutch/crawl/GeneratorReducer.java
+2	0	ivy/ivy.xml
+15	15	src/java/org/apache/nutch/parse/ParseUtil.java
 
---7234cdf96--2012-05-21--Lewis John McGibbney
-8	3	src/java/org/apache/nutch/crawl/GeneratorMapper.java
-
---8cc25457f--2012-05-21--Lewis John McGibbney
-2	0	CHANGES.txt
-3	0	src/java/org/apache/nutch/crawl/GeneratorMapper.java
-6	1	src/java/org/apache/nutch/crawl/GeneratorReducer.java
-
---579987485--2012-05-21--Lewis John McGibbney
-3	0	CHANGES.txt
-7	0	conf/nutch-default.xml
-2	0	src/java/org/apache/nutch/metadata/HttpHeaders.java
-11	2	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
-11	3	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
-16	15	src/plugin/protocol-sftp/src/java/org/apache/nutch/protocol/sftp/Sftp.java
-
---5a1200ab1--2012-05-16--Lewis John McGibbney
-3	0	src/bin/nutch
-
---a03fb73bb--2012-05-14--Ferdy Galema
-2	0	CHANGES.txt
-89	0	src/java/org/apache/nutch/indexer/IndexUtil.java
-28	6	src/java/org/apache/nutch/indexer/IndexerJob.java
-0	108	src/java/org/apache/nutch/indexer/IndexerReducer.java
-
---2301f1493--2012-05-11--Ferdy Galema
-2	0	CHANGES.txt
-15	9	src/java/org/apache/nutch/util/TableUtil.java
-
---4f0a4e0b8--2012-05-10--Ferdy Galema
-2	0	CHANGES.txt
-1	0	conf/log4j.properties
-35	2	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
-
---ac3749c7c--2012-05-09--Ferdy Galema
-1	0	CHANGES.txt
-5	1	src/java/org/apache/nutch/crawl/DbUpdaterJob.java
-8	2	src/java/org/apache/nutch/crawl/InjectorJob.java
-2	0	src/java/org/apache/nutch/fetcher/FetcherJob.java
-
---267eb2e46--2012-05-08--Lewis John McGibbney
-21	8	conf/gora-accumulo-mapping.xml
-
---494a8a159--2012-05-08--Lewis John McGibbney
-4	1	CHANGES.txt
-3	1	conf/log4j.properties
-9	0	src/bin/nutch
-11	15	src/java/org/apache/nutch/crawl/WebTableReader.java
-7	7	src/java/org/apache/nutch/fetcher/FetcherJob.java
-1	1	src/java/org/apache/nutch/indexer/IndexerJob.java
-5	5	src/java/org/apache/nutch/parse/ParserJob.java
-
---4536555cf--2012-05-07--Ferdy Galema
+--f1659ee34--2012-06-12--Markus Jelsma
 2	0	CHANGES.txt
 1	4	src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexRule.java
 8	8	src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexURLFilterBase.java
 1	3	src/plugin/urlfilter-regex/src/java/org/apache/nutch/urlfilter/regex/RegexURLFilter.java
-10	19	src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java
+8	8	src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java
 75	68	src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java
 
---d8b66090d--2012-05-07--Ferdy Galema
+--b68e570b8--2012-06-12--Markus Jelsma
 2	0	CHANGES.txt
-29	28	src/java/org/apache/nutch/parse/ParseUtil.java
+23	0	conf/adaptive-mimetypes.txt
+7	0	conf/nutch-default.xml
+46	29	src/java/org/apache/nutch/crawl/AdaptiveFetchSchedule.java
+223	0	src/java/org/apache/nutch/crawl/MimeAdaptiveFetchSchedule.java
+3	0	src/java/org/apache/nutch/metadata/HttpHeaders.java
+5	0	src/java/org/apache/nutch/metadata/Nutch.java
 
---22ba9c3aa--2012-05-07--Ferdy Galema
+--81beec8a4--2012-06-12--Lewis John McGibbney
 2	0	CHANGES.txt
-24	0	conf/nutch-default.xml
-95	34	src/java/org/apache/nutch/fetcher/FetcherReducer.java
+1	1	src/java/org/apache/nutch/crawl/CrawlDbReducer.java
+2	1	src/java/org/apache/nutch/crawl/Generator.java
 
---b45c10205--2012-05-07--Ferdy Galema
-2	0	CHANGES.txt
-10	0	conf/nutch-default.xml
-2	1	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-
---0ef6fa7c8--2012-05-07--Ferdy Galema
-1	0	CHANGES.txt
-176	182	src/java/org/apache/nutch/util/domain/DomainStatistics.java
-
---9538868c9--2012-05-04--Ferdy Galema
-2	0	CHANGES.txt
-0	3	src/test/org/apache/nutch/util/CrawlTestUtil.java
-
---21f7f0cf2--2012-05-03--Ferdy Galema
-1	1	ivy/ivy.xml
-
---ea909879d--2012-05-03--Ferdy Galema
-4	2	ivy/ivy.xml
-
---1e294c114--2012-05-03--Ferdy Galema
-2	0	CHANGES.txt
-3	0	build.xml
-2	2	conf/gora.properties
-125	129	ivy/ivy.xml
-1	4	src/java/org/apache/nutch/storage/StorageUtils.java
-25	0	src/test/gora.properties
-9	10	src/test/org/apache/nutch/storage/TestGoraStorage.java
-1	8	src/test/org/apache/nutch/util/AbstractNutchTest.java
-25	0	src/testprocess/gora.properties
-
---3e44765b7--2012-04-26--Ferdy Galema
-27	54	conf/nutch-default.xml
-
---cd0ed80f0--2012-04-26--Ferdy Galema
-9	5	conf/gora.properties
-
---799a40310--2012-04-26--Ferdy Galema
-2	0	CHANGES.txt
-14	0	build.xml
-12	0	conf/gora-hbase-mapping.xml
-1	0	default.properties
-2	0	ivy/ivy.xml
-9	0	src/gora/host.avsc
-40	5	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-146	0	src/java/org/apache/nutch/host/HostDb.java
-88	0	src/java/org/apache/nutch/host/HostDbReader.java
-141	0	src/java/org/apache/nutch/host/HostDbUpdateJob.java
-92	0	src/java/org/apache/nutch/host/HostDbUpdateReducer.java
-178	0	src/java/org/apache/nutch/host/HostInjectorJob.java
-1	1	src/java/org/apache/nutch/indexer/IndexerReducer.java
-151	0	src/java/org/apache/nutch/storage/Host.java
-25	12	src/java/org/apache/nutch/storage/StorageUtils.java
-1	1	src/java/org/apache/nutch/storage/WebTableCreator.java
-129	0	src/java/org/apache/nutch/util/Histogram.java
-11	0	src/java/org/apache/nutch/util/TableUtil.java
-1	1	src/java/org/apache/nutch/util/domain/DomainStatistics.java
-
---6db445bf2--2012-04-26--Ferdy Galema
-2	0	CHANGES.txt
-8	5	src/java/org/apache/nutch/crawl/DbUpdateReducer.java
-12	0	src/java/org/apache/nutch/storage/Mark.java
-
---f8acfd205--2012-04-16--Ferdy Galema
---3c34bf15e--2012-04-15--Lewis John McGibbney
-2	0	CHANGES.txt
-61	0	conf/gora-accumulo-mapping.xml
-17	2	conf/gora-cassandra-mapping.xml
-17	2	conf/gora-hbase-mapping.xml
-16	1	conf/gora-sql-mapping.xml
-27	2	conf/gora.properties
-15	0	conf/log4j.properties
-35	0	conf/nutch-default.xml
-14	0	conf/suffix-urlfilter.txt.template
-7	5	ivy/ivy.xml
-
---878802b50--2012-04-08--Ferdy Galema
-196	190	src/test/org/apache/nutch/api/TestAPI.java
-
---a479257fe--2012-03-18--Lewis John McGibbney
-4	13	src/java/org/apache/nutch/plugin/PluginDescriptor.java
-1	2	src/java/org/apache/nutch/plugin/PluginManifestParser.java
-6	5	src/java/org/apache/nutch/protocol/Content.java
-1	2	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/FileResponse.java
-
---0541f4605--2012-03-18--Lewis John McGibbney
-13	4	src/java/org/apache/nutch/plugin/PluginDescriptor.java
-2	1	src/java/org/apache/nutch/plugin/PluginManifestParser.java
-5	6	src/java/org/apache/nutch/protocol/Content.java
-2	1	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/FileResponse.java
-
---347afb77c--2012-03-18--Lewis John McGibbney
-1	1	default.properties
-3	2	src/java/overview.html
-
---f69972533--2012-03-18--Lewis John McGibbney
-5	5	build.xml
-31	8	default.properties
-
---85da88497--2012-03-16--Ferdy Galema
+--2a4a1326b--2012-06-11--Lewis John McGibbney
 2	0	CHANGES.txt
 7	0	conf/nutch-default.xml
-9	0	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
-4	0	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
+2	0	src/java/org/apache/nutch/metadata/HttpHeaders.java
+12	3	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
+10	2	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
 
---0b26f0c11--2012-03-16--Ferdy Galema
+--d2306c717--2012-06-11--Markus Jelsma
 2	0	CHANGES.txt
-9	0	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpResponse.java
+10	0	conf/nutch-default.xml
+52	1	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
 
---9c9f0b674--2012-03-13--Ferdy Galema
-2	3	ivy/ivy.xml
-
---147446dda--2012-03-13--Ferdy Galema
-1	1	ivy/ivy.xml
-
---409629b6e--2012-03-09--Lewis John McGibbney
-4	4	src/test/org/apache/nutch/crawl/TestGenerator.java
-
---7337544e5--2012-03-08--Lewis John McGibbney
+--3df0d3c62--2012-06-11--Markus Jelsma
 2	0	CHANGES.txt
-1	0	src/java/org/apache/nutch/crawl/GeneratorMapper.java
+1	1	src/java/org/apache/nutch/parse/ParseSegment.java
 
---01306ff53--2012-03-08--Lewis John McGibbney
+--e26c8ad01--2012-06-11--Markus Jelsma
 2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/indexer/IndexingFilters.java
+1	1	src/java/org/apache/nutch/net/URLFilters.java
+1	1	src/java/org/apache/nutch/net/URLNormalizers.java
+1	1	src/java/org/apache/nutch/parse/HtmlParseFilters.java
+1	1	src/java/org/apache/nutch/scoring/ScoringFilters.java
+
+--564612703--2012-06-08--Lewis John McGibbney
+59	0	KEYS
+
+--86b927017--2012-06-08--Lewis John McGibbney
+1	1	conf/schema.xml
+15	0	default.properties
+
+--5adf67b0a--2012-06-08--Markus Jelsma
+2	0	CHANGES.txt
+7	0	conf/nutch-default.xml
+13	3	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+
+--f94f5725f--2012-06-08--Markus Jelsma
+2	0	CHANGES.txt
+8	0	conf/nutch-default.xml
+15	1	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--e2a84f90e--2012-06-07--Markus Jelsma
+2	0	CHANGES.txt
+21	21	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
+2	1	src/java/org/apache/nutch/parse/ParserChecker.java
+37	0	src/java/org/apache/nutch/util/URLUtil.java
+
+--a0decd20d--2012-06-07--Markus Jelsma
+2	0	CHANGES.txt
+32	2	src/java/org/apache/nutch/util/URLUtil.java
+8	1	src/java/org/apache/nutch/util/domain/DomainStatistics.java
+
+--ef3bdd044--2012-06-07--Markus Jelsma
+2	0	CHANGES.txt
+11	0	conf/nutch-default.xml
+20	2	src/plugin/subcollection/src/java/org/apache/nutch/indexer/subcollection/SubcollectionIndexingFilter.java
+
+--4351c65ff--2012-05-31--Lewis John McGibbney
+2	10	build.xml
+
+--7a39871fe--2012-05-30--Lewis John McGibbney
+57	53	build.xml
+1	1	conf/nutch-default.xml
+4	3	default.properties
+
+--3532d6b01--2012-05-22--Lewis John McGibbney
 5	5	build.xml
 
---5d358b6bb--2012-03-06--Ferdy Galema
+--e0bf5aad9--2012-05-22--Lewis John McGibbney
+4	0	CHANGES.txt
+53	22	build.xml
+
+--ee0edbc8c--2012-05-22--Lewis John McGibbney
+0	2	build.xml
+
+--68948f029--2012-05-22--Julien Nioche
+1	1	ivy/mvn.template
+
+--a78903091--2012-05-22--Julien Nioche
+40	23	ivy/mvn.template
+
+--d3e997ade--2012-05-19--Lewis John McGibbney
+58	18	build.xml
+
+--0fa7f8dc2--2012-05-19--Lewis John McGibbney
+1	1	NOTICE.txt
+17	0	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
+16	0	src/plugin/creativecommons/src/web/web.xml
+16	0	src/plugin/protocol-httpclient/src/test/conf/httpclient-auth-test.xml
+16	0	src/plugin/protocol-httpclient/src/test/conf/nutch-site-test.xml
+
+--0522b37f4--2012-04-19--Julien Nioche
+42	1	build.xml
+
+--f06859859--2012-04-16--Chris Mattmann
+4	4	pom.xml
+
+--fc8fdabfd--2012-04-16--Chris Mattmann
+4	4	pom.xml
+
+--dbe727843--2012-04-16--Chris Mattmann
+1	1	pom.xml
+
+--c84bbb199--2012-04-16--Chris Mattmann
 2	0	CHANGES.txt
-15	1	src/java/org/apache/nutch/util/NutchJob.java
+1	1	conf/nutch-default.xml
+1	1	default.properties
+1	1	pom.xml
 
---fc0f38290--2012-03-06--Ferdy Galema
-1	1	conf/gora-sql-mapping.xml
-
---733e6c1a9--2012-03-06--Ferdy Galema
+--50ba50dd7--2012-04-03--Julien Nioche
 2	0	CHANGES.txt
-9	4	src/java/org/apache/nutch/crawl/Crawler.java
+1	1	build.xml
 
---2207380d9--2012-03-05--Ferdy Galema
-2	0	CHANGES.txt
-2	5	src/java/org/apache/nutch/crawl/GeneratorJob.java
-78	24	src/java/org/apache/nutch/crawl/URLPartitioner.java
-2	3	src/java/org/apache/nutch/fetcher/FetcherJob.java
-0	39	src/java/org/apache/nutch/fetcher/PartitionUrlByHost.java
-205	0	src/test/org/apache/nutch/crawl/TestURLPartitioner.java
+--7f44cdc99--2012-04-02--Julien Nioche
+1	1	CHANGES.txt
+1	2	src/plugin/parse-tika/ivy.xml
+11	7	src/plugin/parse-tika/plugin.xml
+0	251	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/TikaConfig.java
+6	5	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/TikaParser.java
 
---9f7cbca83--2012-03-02--Ferdy Galema
-2	0	CHANGES.txt
-7	0	src/java/org/apache/nutch/fetcher/FetchEntry.java
-9	1	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-8	0	src/java/org/apache/nutch/scoring/ScoreDatum.java
+--e27a0c1d4--2012-03-28--Markus Jelsma
+1	1	src/plugin/parse-tika/ivy.xml
 
---7f0838608--2012-03-02--Ferdy Galema
-2	0	CHANGES.txt
-1	0	src/java/org/apache/nutch/fetcher/FetcherJob.java
+--c32ae9716--2012-03-28--Markus Jelsma
+1	1	src/plugin/parse-tika/ivy.xml
 
---2f84cbc19--2012-03-02--Ferdy Galema
-2	0	CHANGES.txt
-5	4	src/java/org/apache/nutch/fetcher/FetcherJob.java
+--d0d711310--2012-03-26--Markus Jelsma
+1	1	src/plugin/urlfilter-domain/src/java/org/apache/nutch/urlfilter/domain/DomainURLFilter.java
 
---fddd48871--2012-03-02--Ferdy Galema
-2	0	CHANGES.txt
-3	3	ivy/ivysettings.xml
-
---213e3ce41--2012-03-01--Ferdy Galema
-8	8	conf/gora-hbase-mapping.xml
-
---f21f68001--2012-02-24--Ferdy Galema
-2	0	CHANGES.txt
-8	0	conf/nutch-default.xml
-9	4	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-53	0	src/java/org/apache/nutch/parse/ParserJob.java
-
---141de37cd--2012-02-24--Ferdy Galema
-0	2	CHANGES.txt
-0	8	conf/nutch-default.xml
-4	9	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-0	53	src/java/org/apache/nutch/parse/ParserJob.java
-
---0bd0d6298--2012-02-23--Ferdy Galema
-11	10	src/java/org/apache/nutch/parse/ParserJob.java
-
---ef7088745--2012-02-23--Ferdy Galema
-5	7	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-
---38d1be3aa--2012-02-22--Ferdy Galema
-2	0	CHANGES.txt
-8	0	conf/nutch-default.xml
-11	4	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-52	0	src/java/org/apache/nutch/parse/ParserJob.java
-
---0d687506c--2012-02-20--Ferdy Galema
-2	0	CHANGES.txt
-1	1	ivy/ivy.xml
-
---37f3040ac--2012-02-20--Lewis John McGibbney
-1	2	src/java/org/apache/nutch/api/impl/RAMJobManager.java
-1	2	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-
---3435b5990--2012-02-20--Lewis John McGibbney
-2	1	src/java/org/apache/nutch/api/impl/RAMJobManager.java
-2	1	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-
---9d2bfc032--2012-02-20--Ferdy Galema
-2	0	CHANGES.txt
-9	0	conf/nutch-default.xml
-8	1	src/plugin/language-identifier/src/java/org/apache/nutch/analysis/lang/HTMLLanguageParser.java
-
---280912d0b--2012-02-19--Lewis John McGibbney
-1	0	src/java/org/apache/nutch/net/protocols/ProtocolException.java
-2	0	src/java/org/apache/nutch/parse/OutlinkExtractor.java
-1	0	src/test/org/apache/nutch/util/CrawlTestUtil.java
-
---e5d4c2fdf--2012-02-18--Lewis John McGibbney
-0	2	ivy/ivy.xml
-0	6	pom.xml
-
---fb2a50852--2012-02-18--Lewis John McGibbney
+--91821db3a--2012-03-26--Markus Jelsma
 2	0	CHANGES.txt
 2	2	ivy/ivy.xml
 
---833d05208--2012-02-15--Ferdy Galema
+--d18d434a7--2012-03-21--Julien Nioche
 2	0	CHANGES.txt
-3	3	src/java/org/apache/nutch/crawl/GeneratorReducer.java
+14	2	conf/nutch-default.xml
+3	0	src/plugin/build.xml
+17	0	src/plugin/parse-metatags/README.txt
+33	0	src/plugin/parse-metatags/build.xml
+41	0	src/plugin/parse-metatags/ivy.xml
+22	0	src/plugin/parse-metatags/plugin.xml
+9	0	src/plugin/parse-metatags/sample/testMetatags.html
+107	0	src/plugin/parse-metatags/src/java/org/apache/nutch/parse/MetaTagsParser.java
+68	0	src/plugin/parse-metatags/src/test/org/apache/nutch/parse/html/TestMetatagParser.java
 
---7a6ddd70c--2012-01-23--Ferdy Galema
+--4284edffb--2012-03-18--Lewis John McGibbney
+1	1	src/java/org/apache/nutch/crawl/CrawlDatum.java
+1	1	src/java/org/apache/nutch/crawl/CrawlDbReader.java
+1	0	src/java/org/apache/nutch/crawl/LinkDbReader.java
+1	1	src/java/org/apache/nutch/crawl/NutchWritable.java
+1	1	src/java/org/apache/nutch/parse/ParseSegment.java
+15	4	src/java/org/apache/nutch/plugin/PluginDescriptor.java
+2	1	src/java/org/apache/nutch/plugin/PluginManifestParser.java
+5	6	src/java/org/apache/nutch/protocol/Content.java
+4	4	src/java/org/apache/nutch/segment/SegmentReader.java
+1	1	src/java/org/apache/nutch/tools/arc/ArcSegmentCreator.java
+7	1	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/FileResponse.java
+
+--95c214054--2012-03-18--Lewis John McGibbney
+1	0	default.properties
+
+--29b2ead20--2012-03-18--Lewis John McGibbney
+10	10	build.xml
+37	6	default.properties
+3	3	src/java/overview.html
+
+--2563a054b--2012-03-16--Markus Jelsma
+2	0	CHANGES.txt
+7	0	conf/nutch-default.xml
+25	16	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
+5	2	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
+
+--2a1da0651--2012-03-15--Markus Jelsma
+2	0	CHANGES.txt
+
+--1e4090ca7--2012-03-08--Lewis John McGibbney
+2	0	CHANGES.txt
+5	5	build.xml
+
+--b70bf357f--2012-03-08--Markus Jelsma
+5	7	src/plugin/urlfilter-domainblacklist/src/java/org/apache/nutch/urlfilter/domainblacklist/DomainBlacklistURLFilter.java
+
+--1f6c25eec--2012-03-06--Markus Jelsma
+2	0	CHANGES.txt
+10	0	src/java/org/apache/nutch/scoring/webgraph/LinkRank.java
+
+--04c67ab26--2012-03-01--Markus Jelsma
+2	0	CHANGES.txt
+14	5	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+
+--78ce9a6cc--2012-03-01--Markus Jelsma
+2	0	CHANGES.txt
+6	2	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
+
+--870d866b4--2012-02-29--Markus Jelsma
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--b405e4625--2012-02-24--Ferdy Galema
+2	0	CHANGES.txt
+8	0	conf/nutch-default.xml
+9	5	src/java/org/apache/nutch/fetcher/Fetcher.java
+48	0	src/java/org/apache/nutch/parse/ParseSegment.java
+
+--04d387a5d--2012-02-24--Ferdy Galema
+0	2	CHANGES.txt
+0	8	conf/nutch-default.xml
+11	15	src/java/org/apache/nutch/fetcher/Fetcher.java
+14	78	src/java/org/apache/nutch/parse/ParseSegment.java
+
+--1dc428529--2012-02-23--Markus Jelsma
+2	1	src/plugin/build.xml
+
+--efeaf59e5--2012-02-23--Markus Jelsma
+2	0	CHANGES.txt
+16	0	conf/domainblacklist-urlfilter.txt
+2	0	src/plugin/build.xml
+28	0	src/plugin/urlfilter-domainblacklist/build.xml
+5	0	src/plugin/urlfilter-domainblacklist/data/hosts.txt
+41	0	src/plugin/urlfilter-domainblacklist/ivy.xml
+43	0	src/plugin/urlfilter-domainblacklist/plugin.xml
+203	0	src/plugin/urlfilter-domainblacklist/src/java/org/apache/nutch/urlfilter/domainblacklist/DomainBlacklistURLFilter.java
+57	0	src/plugin/urlfilter-domainblacklist/src/test/org/apache/nutch/urlfilter/domainblacklist/TestDomainBlacklistURLFilter.java
+
+--6893fd247--2012-02-23--Ferdy Galema
+3	3	src/java/org/apache/nutch/fetcher/Fetcher.java
+12	7	src/java/org/apache/nutch/parse/ParseSegment.java
+
+--12c106c6d--2012-02-23--Ferdy Galema
+1	1	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--1065a5f80--2012-02-22--Ferdy Galema
+2	0	CHANGES.txt
+8	0	conf/nutch-default.xml
+15	11	src/java/org/apache/nutch/fetcher/Fetcher.java
+73	14	src/java/org/apache/nutch/parse/ParseSegment.java
+
+--b1522f36f--2012-02-20--Lewis John McGibbney
+2	3	src/java/org/apache/nutch/fetcher/Fetcher.java
+1	2	src/java/org/apache/nutch/fetcher/OldFetcher.java
+
+--09e3cfb2f--2012-02-20--Lewis John McGibbney
+3	2	src/java/org/apache/nutch/fetcher/Fetcher.java
+2	1	src/java/org/apache/nutch/fetcher/OldFetcher.java
+
+--afe685219--2012-02-19--Lewis John McGibbney
+2	0	src/java/org/apache/nutch/crawl/MapWritable.java
+1	0	src/java/org/apache/nutch/net/protocols/ProtocolException.java
+2	0	src/java/org/apache/nutch/parse/OutlinkExtractor.java
+1	0	src/test/org/apache/nutch/crawl/CrawlDBTestUtil.java
+
+--866591ef6--2012-02-17--Lewis John McGibbney
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/crawl/Crawl.java
+
+--a9babcad4--2012-02-17--Lewis John McGibbney
+0	3	ivy/ivy.xml
+
+--37058885b--2012-02-17--Lewis John McGibbney
+3	3	conf/nutch-default.xml
+
+--9b61a5876--2012-02-14--Julien Nioche
+4	2	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--47c4a85be--2012-02-14--Julien Nioche
+2	0	CHANGES.txt
+1	1	conf/nutch-default.xml
+
+--c24f262e3--2012-02-13--Julien Nioche
+2	0	CHANGES.txt
+3	1	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--8a336cc89--2012-02-09--Markus Jelsma
+2	0	CHANGES.txt
+8	8	src/plugin/subcollection/src/java/org/apache/nutch/collection/CollectionManager.java
+29	0	src/plugin/subcollection/src/java/org/apache/nutch/collection/Subcollection.java
+7	2	src/plugin/subcollection/src/java/org/apache/nutch/indexer/subcollection/SubcollectionIndexingFilter.java
+
+--fa6bbddd8--2012-02-07--Markus Jelsma
+2	0	CHANGES.txt
+2	0	src/plugin/build.xml
+22	0	src/plugin/headings/build.xml
+41	0	src/plugin/headings/ivy.xml
+45	0	src/plugin/headings/plugin.xml
+105	0	src/plugin/headings/src/java/org/apache/nutch/parse/headings/HeadingsParseFilter.java
+
+--a56db08ec--2012-02-06--Julien Nioche
+2	0	CHANGES.txt
+29	0	conf/nutch-default.xml
+2	0	src/plugin/build.xml
+22	0	src/plugin/index-metadata/build.xml
+41	0	src/plugin/index-metadata/ivy.xml
+42	0	src/plugin/index-metadata/plugin.xml
+100	0	src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataIndexer.java
+
+--53dd30241--2012-01-31--Markus Jelsma
+2	0	CHANGES.txt
+12	0	conf/nutch-default.xml
+23	7	src/java/org/apache/nutch/parse/ParseOutputFormat.java
+15	2	src/java/org/apache/nutch/parse/ParseSegment.java
+
+--73a3c3179--2012-01-31--Markus Jelsma
+2	0	CHANGES.txt
+62	0	conf/nutch-default.xml
+158	13	src/java/org/apache/nutch/scoring/webgraph/NodeDumper.java
+
+--7ca68d4a1--2012-01-27--Markus Jelsma
+2	0	CHANGES.txt
+1	2	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--ddcbf82c1--2012-01-23--Ferdy Galema
 2	0	CHANGES.txt
 1	1	src/plugin/creativecommons/ivy.xml
 1	1	src/plugin/feed/ivy.xml
 1	1	src/plugin/index-anchor/ivy.xml
 1	1	src/plugin/index-basic/ivy.xml
 1	1	src/plugin/index-more/ivy.xml
+1	1	src/plugin/index-static/ivy.xml
 1	1	src/plugin/language-identifier/ivy.xml
 1	1	src/plugin/lib-http/ivy.xml
 1	1	src/plugin/lib-nekohtml/ivy.xml
@@ -1222,7 +1327,6 @@
 1	1	src/plugin/protocol-ftp/ivy.xml
 1	1	src/plugin/protocol-http/ivy.xml
 1	1	src/plugin/protocol-httpclient/ivy.xml
-1	1	src/plugin/protocol-sftp/ivy.xml
 1	1	src/plugin/scoring-link/ivy.xml
 1	1	src/plugin/scoring-opic/ivy.xml
 1	1	src/plugin/subcollection/ivy.xml
@@ -1233,147 +1337,410 @@
 1	1	src/plugin/urlfilter-regex/ivy.xml
 1	1	src/plugin/urlfilter-suffix/ivy.xml
 1	1	src/plugin/urlfilter-validator/ivy.xml
+1	1	src/plugin/urlmeta/ivy.xml
 1	1	src/plugin/urlnormalizer-basic/ivy.xml
 1	1	src/plugin/urlnormalizer-pass/ivy.xml
 1	1	src/plugin/urlnormalizer-regex/ivy.xml
 
---d5d9e8708--2012-01-20--Lewis John McGibbney
-4	0	conf/gora.properties
+--d0dec0295--2012-01-14--Lewis John McGibbney
+6	6	src/java/org/apache/nutch/crawl/AbstractFetchSchedule.java
+13	13	src/java/org/apache/nutch/crawl/FetchSchedule.java
+6	6	src/java/org/apache/nutch/parse/ParseResult.java
 
---6ab0d1dd1--2012-01-11--Lewis John McGibbney
+--2228658a3--2012-01-14--Lewis John McGibbney
+1	1	src/java/org/apache/nutch/util/MimeUtil.java
+
+--5623c32e1--2012-01-14--Lewis John McGibbney
+32	15	src/java/org/apache/nutch/crawl/AbstractFetchSchedule.java
+51	25	src/java/org/apache/nutch/crawl/FetchSchedule.java
+1	1	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+3	3	src/java/org/apache/nutch/tools/arc/ArcRecordReader.java
+8	3	src/java/org/apache/nutch/util/MimeUtil.java
+2	2	src/java/org/apache/nutch/util/NodeWalker.java
+1	1	src/java/org/apache/nutch/util/domain/DomainSuffix.java
+1	1	src/java/org/apache/nutch/util/domain/DomainSuffixes.java
+5	2	src/java/org/apache/nutch/util/domain/TopLevelDomain.java
+2	2	src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexURLFilterBase.java
+
+--d9ba9e916--2012-01-13--Markus Jelsma
 2	0	CHANGES.txt
-46	0	conf/gora.properties
+6	0	src/java/org/apache/nutch/crawl/Generator.java
 
---9eeb52325--2012-01-11--Lewis John McGibbney
+--a3d903731--2012-01-13--Markus Jelsma
 2	0	CHANGES.txt
-1	4	src/java/org/apache/nutch/fetcher/FetcherReducer.java
-1	3	src/java/org/apache/nutch/parse/ParserFactory.java
-2	9	src/java/org/apache/nutch/tools/DmozParser.java
-3	4	src/java/org/apache/nutch/util/DeflateUtils.java
-7	7	src/java/org/apache/nutch/util/DomUtil.java
-1	2	src/java/org/apache/nutch/util/EncodingDetector.java
-3	3	src/java/org/apache/nutch/util/GZIPUtils.java
-0	115	src/java/org/apache/nutch/util/LogUtil.java
-1	2	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
-7	3	src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HtmlParser.java
-0	2	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/FtpResponse.java
-1	2	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
-0	2	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/Http.java
-1	2	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpAuthenticationFactory.java
-1	2	src/plugin/scoring-opic/src/java/org/apache/nutch/scoring/opic/OPICScoringFilter.java
-1	3	src/plugin/subcollection/src/java/org/apache/nutch/collection/CollectionManager.java
-1	3	src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java
+15	0	conf/nutch-default.xml
+6	0	src/java/org/apache/nutch/crawl/Generator.java
 
---533ac7f94--2012-01-05--Lewis John McGibbney
-2	0	CHANGES.txt
-2	0	build.xml
-1	1	default.properties
-
---d38e6c986--2011-12-26--Lewis John McGibbney
-2	0	CHANGES.txt
-1	61	NOTICE.txt
-
---62f885553--2011-12-09--Lewis John McGibbney
-2	0	CHANGES.txt
-9	1	lib/native/README.txt
-
---95ff25501--2011-11-17--Lewis John McGibbney
-704	699	build.xml
-
---e00a3a468--2011-11-17--Ferdy Galema
-2	0	CHANGES.txt
-9	9	src/java/org/apache/nutch/parse/ParseUtil.java
-
---1cf8868ef--2011-11-16--Ferdy Galema
-2	0	CHANGES.txt
-
---fe5430037--2011-11-16--Ferdy Galema
-17	4	src/java/org/apache/nutch/crawl/DbUpdateMapper.java
-12	5	src/java/org/apache/nutch/crawl/DbUpdateReducer.java
-15	13	src/java/org/apache/nutch/crawl/DbUpdaterJob.java
-196	0	src/java/org/apache/nutch/crawl/UrlWithScore.java
-4	0	src/java/org/apache/nutch/util/WebPageWritable.java
-180	0	src/test/org/apache/nutch/crawl/TestUrlWithScore.java
-
---937177a35--2011-11-15--Lewis John McGibbney
-129	111	build.xml
-
---d7370ae82--2011-11-11--Markus Jelsma
-2	0	CHANGES.txt
-1	1	conf/nutch-default.xml
-
---e1d38c09a--2011-11-09--Lewis John McGibbney
-1	1	build.xml
-4	4	doap.rdf
-
---c06999625--2011-11-07--Lewis John McGibbney
-699	739	build.xml
-
---3e3cd0349--2011-11-02--Ferdy Galema
-2	0	CHANGES.txt
-1	14	src/test/org/apache/nutch/util/AbstractNutchTest.java
-
---659e0c48b--2011-11-02--Ferdy Galema
-2	0	CHANGES.txt
-
---89394d3f0--2011-11-02--Ferdy Galema
-1	1	src/test/org/apache/nutch/fetcher/TestFetcher.java
-
---eb196e166--2011-11-02--Ferdy Galema
-2	0	CHANGES.txt
-1	4	src/java/org/apache/nutch/crawl/Crawler.java
-4	15	src/java/org/apache/nutch/fetcher/FetcherJob.java
-0	2	src/java/org/apache/nutch/metadata/Nutch.java
-2	2	src/java/org/apache/nutch/tools/Benchmark.java
-
---947b50c51--2011-11-02--Ferdy Galema
-2	0	CHANGES.txt
-6	9	src/java/org/apache/nutch/parse/ParserJob.java
-
---af654a010--2011-10-31--Ferdy Galema
-6	5	ivy/ivy.xml
-
---6aba123fa--2011-10-31--Lewis John McGibbney
-2	0	CHANGES.txt
-1	1	build.xml
-43	0	conf/gora-cassandra-mapping.xml
-46	0	conf/gora-hbase-mapping.xml
-0	5	conf/gora-sql-mapping.xml
-5	3	conf/nutch-default.xml
-10	0	ivy/ivy.xml
-
---ccb70fb04--2011-10-20--Lewis John McGibbney
-2	2	build.xml
-
---c7f4f96ab--2011-10-20--Lewis John McGibbney
-2	0	CHANGES.txt
-164	197	src/test/org/apache/nutch/storage/TestGoraStorage.java
-
---bab68ccaf--2011-10-20--Lewis John McGibbney
+--be48024cb--2012-01-12--Julien Nioche
 2	0	CHANGES.txt
 1	1	ivy/ivy.xml
 
---715fcede9--2011-10-12--Lewis John McGibbney
+--8caa2a1a2--2012-01-10--Markus Jelsma
 2	0	CHANGES.txt
-33	1	build.xml
+33	4	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+10	5	src/java/org/apache/nutch/indexer/IndexerOutputFormat.java
+54	0	src/java/org/apache/nutch/indexer/NutchIndexAction.java
+2	0	src/java/org/apache/nutch/indexer/NutchIndexWriter.java
+18	5	src/java/org/apache/nutch/indexer/solr/SolrIndexer.java
+24	3	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
 
---e71f40e4b--2011-10-12--Lewis John McGibbney
+--f083ee633--2012-01-09--Markus Jelsma
 2	0	CHANGES.txt
-18	10	src/java/org/apache/nutch/parse/ParserFactory.java
+72	14	src/java/org/apache/nutch/crawl/CrawlDbReader.java
+
+--0feae8ecb--2012-01-05--Lewis John McGibbney
+4	0	CHANGES.txt
+2	0	build.xml
+1	1	default.properties
+
+--ec13eec98--2012-01-05--Julien Nioche
+1	1	ivy/ivy.xml
+
+--5c669c050--2012-01-05--Julien Nioche
+2	0	CHANGES.txt
+9	0	conf/nutch-default.xml
+
+--943aed79f--2012-01-02--Markus Jelsma
+2	0	CHANGES.txt
+0	1	conf/schema-solr4.xml
+2	2	conf/schema.xml
+0	1	conf/solrindex-mapping.xml
+0	1	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
+
+--ef198ffed--2012-01-02--Markus Jelsma
+2	0	CHANGES.txt
+3	1	src/java/org/apache/nutch/crawl/NutchWritable.java
+56	16	src/java/org/apache/nutch/scoring/webgraph/WebGraph.java
+
+--d6f1bc296--2011-12-29--Markus Jelsma
+2	0	CHANGES.txt
+
+--901c8e101--2011-12-29--Markus Jelsma
+6	0	conf/nutch-default.xml
+8	8	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--4b9f2fbdc--2011-12-27--Lewis John McGibbney
+0	0	src/java/org/apache/nutch/util/LogUtil.java
+
+--98d14efe8--2011-12-27--Lewis John McGibbney
+2	0	CHANGES.txt
+1	5	src/java/org/apache/nutch/fetcher/Fetcher.java
+1	6	src/java/org/apache/nutch/fetcher/OldFetcher.java
+0	1	src/java/org/apache/nutch/parse/ParseSegment.java
+0	2	src/java/org/apache/nutch/parse/ParserFactory.java
+8	9	src/java/org/apache/nutch/segment/SegmentReader.java
+1	7	src/java/org/apache/nutch/tools/DmozParser.java
+0	3	src/java/org/apache/nutch/tools/arc/ArcSegmentCreator.java
+4	5	src/java/org/apache/nutch/util/DeflateUtils.java
+8	8	src/java/org/apache/nutch/util/DomUtil.java
+1	3	src/java/org/apache/nutch/util/EncodingDetector.java
+4	4	src/java/org/apache/nutch/util/GZIPUtils.java
+0	115	src/java/org/apache/nutch/util/LogUtil.java
+2	2	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
+4	2	src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HtmlParser.java
+1	2	src/plugin/parse-swf/src/java/org/apache/nutch/parse/swf/SWFParser.java
+1	3	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/FtpResponse.java
+1	2	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
+1	3	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/Http.java
+2	3	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpAuthenticationFactory.java
+3	4	src/plugin/scoring-opic/src/java/org/apache/nutch/scoring/opic/OPICScoringFilter.java
+0	2	src/plugin/subcollection/src/java/org/apache/nutch/collection/CollectionManager.java
+2	3	src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java
+
+--7ee1bafd1--2011-12-27--Markus Jelsma
+4	0	CHANGES.txt
+1	1	ivy/ivy.xml
+38	18	src/java/org/apache/nutch/util/MimeUtil.java
+3	3	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+1	1	src/plugin/parse-zip/src/java/org/apache/nutch/parse/zip/ZipTextExtractor.java
+6	4	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/FileResponse.java
+
+--fa94bbb53--2011-12-27--Markus Jelsma
+3	0	ivy/ivy.xml
+
+--ce186416d--2011-12-27--Markus Jelsma
+2	2	CHANGES.txt
+2	4	ivy/ivy.xml
+
+--a8664eb05--2011-12-27--Markus Jelsma
+0	2	CHANGES.txt
+55	44	src/java/org/apache/nutch/tools/CrawlDBScanner.java
+
+--1dcb7bc41--2011-12-26--Lewis John McGibbney
+2	0	CHANGES.txt
+0	62	NOTICE.txt
+
+--343d4f528--2011-12-23--Markus Jelsma
+16	4	pom.xml
+
+--2501c9ebb--2011-12-20--Markus Jelsma
+2	2	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--aab55eabc--2011-12-20--Markus Jelsma
+2	0	CHANGES.txt
+3	0	conf/log4j.properties
+
+--0686a50fd--2011-12-20--Markus Jelsma
+2	0	CHANGES.txt
+42	10	conf/nutch-default.xml
+192	81	src/java/org/apache/nutch/fetcher/Fetcher.java
+4	0	src/java/org/apache/nutch/parse/ParseData.java
+47	28	src/java/org/apache/nutch/parse/ParseOutputFormat.java
+
+--75355b93d--2011-12-19--Markus Jelsma
+2	0	CHANGES.txt
+44	55	src/java/org/apache/nutch/tools/CrawlDBScanner.java
+
+--ea1c47b88--2011-12-19--Markus Jelsma
+2	0	CHANGES.txt
+4	2	ivy/ivy.xml
+
+--e367ff207--2011-12-16--Markus Jelsma
+2	0	CHANGES.txt
+96	112	src/java/org/apache/nutch/util/domain/DomainStatistics.java
+
+--54812bd84--2011-12-09--Lewis John McGibbney
+2	0	CHANGES.txt
+9	1	lib/native/README.txt
+
+--2c1a29125--2011-11-29--Markus Jelsma
+2	0	CHANGES.txt
+9	5	src/java/org/apache/nutch/util/domain/DomainStatistics.java
+
+--af62647b1--2011-11-28--Andrzej Bialecki
+2	0	CHANGES.txt
+2	0	src/java/org/apache/nutch/indexer/solr/SolrConstants.java
+15	4	src/java/org/apache/nutch/indexer/solr/SolrIndexer.java
+33	5	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
+
+--247061d2b--2011-11-25--Chris Mattmann
+1	9	src/plugin/urlfilter-regex/src/java/org/apache/nutch/urlfilter/regex/RegexURLFilter.java
+
+--17301406f--2011-11-25--Chris Mattmann
+3	0	CHANGES.txt
+2	1	src/java/org/apache/nutch/net/URLFilterChecker.java
+9	1	src/plugin/urlfilter-regex/src/java/org/apache/nutch/urlfilter/regex/RegexURLFilter.java
+
+--dcbbb147e--2011-11-24--Chris Mattmann
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/parse/ParserChecker.java
+
+--25847b0e5--2011-11-21--Markus Jelsma
+2	0	CHANGES.txt
+8	2	src/java/org/apache/nutch/parse/ParserChecker.java
+
+--658bd5181--2011-11-15--Markus Jelsma
+2	0	CHANGES.txt
+7	2	src/java/org/apache/nutch/crawl/LinkDb.java
+
+--d41c40822--2011-11-11--Markus Jelsma
+2	2	CHANGES.txt
+3	0	src/java/org/apache/nutch/parse/Outlink.java
+3	0	src/java/org/apache/nutch/parse/ParseOutputFormat.java
+
+--8874c8254--2011-11-11--Markus Jelsma
+4	0	CHANGES.txt
+6	1	src/java/org/apache/nutch/parse/ParseSegment.java
+
+--8b04a0c17--2011-11-11--Markus Jelsma
+6	6	src/test/org/apache/nutch/crawl/TestGenerator.java
+
+--db80639e4--2011-11-11--Markus Jelsma
+2	0	CHANGES.txt
+1	1	conf/nutch-default.xml
+
+--3c4204504--2011-11-11--Markus Jelsma
+2	0	CHANGES.txt
+9	0	conf/nutch-default.xml
+3	1	src/java/org/apache/nutch/crawl/CrawlDb.java
+
+--9ef439c2f--2011-11-10--Markus Jelsma
+2	0	CHANGES.txt
+4	3	src/java/org/apache/nutch/util/domain/DomainStatistics.java
+
+--5327e966d--2011-11-10--Markus Jelsma
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/crawl/Generator.java
+
+--fc484ba2b--2011-11-10--Markus Jelsma
+2	0	CHANGES.txt
+0	10	src/plugin/index-more/plugin.xml
+52	60	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+15	0	src/plugin/index-more/src/test/org/apache/nutch/indexer/more/TestMoreIndexingFilter.java
+
+--71282dbd9--2011-11-10--Markus Jelsma
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/crawl/CrawlDbReader.java
+
+--e874ce945--2011-11-10--Markus Jelsma
+2	0	CHANGES.txt
+98	8	src/java/org/apache/nutch/scoring/webgraph/WebGraph.java
+
+--1f666a327--2011-11-10--Markus Jelsma
+2	0	CHANGES.txt
+5	1	src/java/org/apache/nutch/scoring/webgraph/LinkRank.java
+
+--09fc49a48--2011-11-09--Lewis John McGibbney
+1	1	build.xml
+
+--5d682003e--2011-11-05--Chris Mattmann
+1	1	conf/nutch-default.xml
+1	1	default.properties
+
+--98b9c869c--2011-11-05--Chris Mattmann
+4	4	pom.xml
+
+--4fdac7124--2011-11-05--Chris Mattmann
+5	6	pom.xml
+
+--4e3378158--2011-11-05--Chris Mattmann
+6	5	pom.xml
+
+--011c7ec9b--2011-11-05--Chris Mattmann
+5	6	pom.xml
+
+--cbd35fffb--2011-11-05--Chris Mattmann
+3	2	pom.xml
+
+--ce27a8d4c--2011-11-05--Chris Mattmann
+4	4	pom.xml
+
+--833f31517--2011-11-05--Chris Mattmann
+5	6	pom.xml
+
+--489187ddf--2011-11-05--Chris Mattmann
+6	0	pom.xml
+
+--cc1aadb2d--2011-11-05--Chris Mattmann
+--b27f067a5--2011-11-05--Chris Mattmann
+3	2	pom.xml
+
+--1684b2c48--2011-11-05--Chris Mattmann
+4	4	pom.xml
+
+--587fa04b4--2011-11-05--Chris Mattmann
+5	6	pom.xml
+
+--18ae30738--2011-11-04--Chris Mattmann
+232	160	pom.xml
+
+--9e3b44b23--2011-11-04--Chris Mattmann
+5	0	pom.xml
+
+--0eff491d3--2011-11-04--Chris Mattmann
+1	1	CHANGES.txt
+
+--ee3d1fadd--2011-11-04--Lewis John McGibbney
+10	18	build.xml
+
+--c8d163fc1--2011-11-03--Andrzej Bialecki
+2	0	CHANGES.txt
+364	0	conf/schema-solr4.xml
+
+--e7514b231--2011-11-02--Lewis John McGibbney
+1	1	build.xml
+
+--5cb699b1c--2011-11-02--Lewis John McGibbney
+1	0	build.xml
+
+--0c18b61c4--2011-11-02--Ferdy Galema
+2	0	CHANGES.txt
+
+--f81c46bec--2011-11-02--Lewis John McGibbney
+1	1	build.xml
+
+--e7c4c2e84--2011-10-27--Chris Mattmann
+1	1	conf/nutch-default.xml
+1	1	default.properties
+
+--675e96832--2011-10-27--Chris Mattmann
+17	17	pom.xml
+
+--d06f84acb--2011-10-27--Chris Mattmann
+1	3	CHANGES.txt
+
+--ca8dd6d9d--2011-10-20--Lewis John McGibbney
+2	0	CHANGES.txt
+
+--0a8dace95--2011-10-12--Lewis John McGibbney
+2	0	CHANGES.txt
+14	7	src/java/org/apache/nutch/parse/ParserFactory.java
 1	1	src/plugin/parse-html/plugin.xml
 
---c68420fdc--2011-10-11--Lewis John McGibbney
---e1808048e--2011-10-11--Lewis John McGibbney
+--e99003169--2011-10-11--Andrzej Bialecki
+3	0	CHANGES.txt
+102	0	src/java/org/apache/nutch/util/URLUtil.java
+1	1	src/plugin/parse-html/ivy.xml
+1	1	src/plugin/parse-html/plugin.xml
+4	54	src/plugin/parse-html/src/java/org/apache/nutch/parse/html/DOMContentUtils.java
+4	3	src/plugin/parse-html/src/test/org/apache/nutch/parse/html/TestDOMContentUtils.java
+4	54	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/DOMContentUtils.java
+46	0	src/test/org/apache/nutch/util/TestURLUtil.java
+
+--b907c46a8--2011-10-11--Andrzej Bialecki
+3	0	CHANGES.txt
+1	1	ivy/ivy.xml
+1	1	src/plugin/parse-tika/ivy.xml
+12	11	src/plugin/parse-tika/plugin.xml
+2	1	src/plugin/parse-tika/src/test/org/apache/nutch/tika/TestRTFParser.java
+
+--1ecf46533--2011-10-10--Lewis John McGibbney
+3	1	CHANGES.txt
+33	0	build.xml
+
+--1a94dd0db--2011-10-07--Andrzej Bialecki
 2	0	CHANGES.txt
-5	6	src/plugin/build.xml
+2	2	ivy/ivy.xml
+
+--14b108760--2011-10-06--Lewis John McGibbney
+2	0	CHANGES.txt
+6	34	build.xml
+
+--01ca2faae--2011-10-03--Markus Jelsma
+2	0	CHANGES.txt
+2	1	conf/schema.xml
+
+--077b1cb58--2011-10-03--Markus Jelsma
+2	0	CHANGES.txt
+4	6	src/java/org/apache/nutch/crawl/LinkDb.java
+
+--55f184554--2011-10-01--Julien Nioche
+2	0	CHANGES.txt
+10	0	conf/nutch-default.xml
+3	1	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--f69cf12b8--2011-09-30--Lewis John McGibbney
+2	0	CHANGES.txt
+0	5	ivy/ivy.xml
+0	12	pom.xml
+
+--d8939b7d6--2011-09-29--Lewis John McGibbney
+1	1	CHANGES.txt
+8	8	src/java/org/apache/nutch/util/LogUtil.java
+
+--8d78bd326--2011-09-29--Lewis John McGibbney
+2	0	CHANGES.txt
+3	0	build.xml
+4	0	src/bin/nutch
+
+--961d9be9e--2011-09-28--Julien Nioche
+2	0	CHANGES.txt
+1	1	build.xml
+
+--03cfcea85--2011-09-26--Sami Siren
+2	2	build.xml
+
+--02e371c24--2011-09-24--Lewis John McGibbney
+2	0	CHANGES.txt
+3	3	src/plugin/build.xml
 38	0	src/plugin/language-identifier/build.xml
 41	0	src/plugin/language-identifier/ivy.xml
 49	0	src/plugin/language-identifier/plugin.xml
-322	0	src/plugin/language-identifier/src/java/org/apache/nutch/analysis/lang/HTMLLanguageParser.java
-97	0	src/plugin/language-identifier/src/java/org/apache/nutch/analysis/lang/LanguageIndexingFilter.java
+329	0	src/plugin/language-identifier/src/java/org/apache/nutch/analysis/lang/HTMLLanguageParser.java
+92	0	src/plugin/language-identifier/src/java/org/apache/nutch/analysis/lang/LanguageIndexingFilter.java
 188	0	src/plugin/language-identifier/src/java/org/apache/nutch/analysis/lang/langmappings.properties
 6	0	src/plugin/language-identifier/src/java/org/apache/nutch/analysis/lang/package.html
-154	0	src/plugin/language-identifier/src/test/org/apache/nutch/analysis/lang/TestHTMLLanguageParser.java
+176	0	src/plugin/language-identifier/src/test/org/apache/nutch/analysis/lang/TestHTMLLanguageParser.java
 108	0	src/plugin/language-identifier/src/test/org/apache/nutch/analysis/lang/da.test
 104	0	src/plugin/language-identifier/src/test/org/apache/nutch/analysis/lang/de.test
 109	0	src/plugin/language-identifier/src/test/org/apache/nutch/analysis/lang/el.test
@@ -1389,11 +1756,11 @@
 0	38	src/plugin/languageidentifier/build.xml
 0	41	src/plugin/languageidentifier/ivy.xml
 0	49	src/plugin/languageidentifier/plugin.xml
-0	322	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/HTMLLanguageParser.java
-0	97	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/LanguageIndexingFilter.java
+0	329	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/HTMLLanguageParser.java
+0	92	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/LanguageIndexingFilter.java
 0	188	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/langmappings.properties
 0	6	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/package.html
-0	154	src/plugin/languageidentifier/src/test/org/apache/nutch/analysis/lang/TestHTMLLanguageParser.java
+0	176	src/plugin/languageidentifier/src/test/org/apache/nutch/analysis/lang/TestHTMLLanguageParser.java
 0	108	src/plugin/languageidentifier/src/test/org/apache/nutch/analysis/lang/da.test
 0	104	src/plugin/languageidentifier/src/test/org/apache/nutch/analysis/lang/de.test
 0	109	src/plugin/languageidentifier/src/test/org/apache/nutch/analysis/lang/el.test
@@ -1407,54 +1774,202 @@
 0	108	src/plugin/languageidentifier/src/test/org/apache/nutch/analysis/lang/sv.test
 0	10	src/plugin/languageidentifier/src/test/org/apache/nutch/analysis/lang/test-referencial.txt
 
---469461c2e--2011-10-11--Lewis John McGibbney
+--0460d8918--2011-09-23--Chris Mattmann
+--caa378ba5--2011-09-23--Markus Jelsma
 2	0	CHANGES.txt
-0	11	src/test/org/apache/nutch/crawl/TestInjector.java
-1	1	src/test/org/apache/nutch/util/AbstractNutchTest.java
+13	1	src/java/org/apache/nutch/crawl/Generator.java
 
---9da17e8c6--2011-10-11--Andrzej Bialecki
-3	0	CHANGES.txt
-2	2	ivy/ivy.xml
-1	1	src/plugin/parse-tika/ivy.xml
-12	11	src/plugin/parse-tika/plugin.xml
-2	0	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestRTFParser.java
-
---8b53cc099--2011-10-11--Andrzej Bialecki
+--7da4d6e4e--2011-09-22--Markus Jelsma
 2	0	CHANGES.txt
-2	2	ivy/ivy.xml
 
---2ae9d5556--2011-10-06--Lewis John McGibbney
+--3a7f0f0cb--2011-09-22--Lewis John McGibbney
 2	0	CHANGES.txt
-7	50	build.xml
+3	3	src/java/org/apache/nutch/crawl/AbstractFetchSchedule.java
+3	3	src/java/org/apache/nutch/crawl/Crawl.java
+4	4	src/java/org/apache/nutch/crawl/CrawlDb.java
+3	3	src/java/org/apache/nutch/crawl/CrawlDbFilter.java
+4	4	src/java/org/apache/nutch/crawl/CrawlDbMerger.java
+3	3	src/java/org/apache/nutch/crawl/CrawlDbReader.java
+3	3	src/java/org/apache/nutch/crawl/CrawlDbReducer.java
+3	3	src/java/org/apache/nutch/crawl/FetchScheduleFactory.java
+4	4	src/java/org/apache/nutch/crawl/Generator.java
+4	4	src/java/org/apache/nutch/crawl/Injector.java
+4	4	src/java/org/apache/nutch/crawl/LinkDb.java
+3	3	src/java/org/apache/nutch/crawl/LinkDbFilter.java
+4	4	src/java/org/apache/nutch/crawl/LinkDbMerger.java
+4	4	src/java/org/apache/nutch/crawl/LinkDbReader.java
+3	3	src/java/org/apache/nutch/crawl/MapWritable.java
+3	3	src/java/org/apache/nutch/crawl/SignatureFactory.java
+3	3	src/java/org/apache/nutch/crawl/URLPartitioner.java
+14	14	src/java/org/apache/nutch/fetcher/Fetcher.java
+13	13	src/java/org/apache/nutch/fetcher/OldFetcher.java
+3	3	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+3	3	src/java/org/apache/nutch/indexer/IndexingFilters.java
+3	3	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
+4	4	src/java/org/apache/nutch/indexer/solr/SolrClean.java
+3	3	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+5	5	src/java/org/apache/nutch/indexer/solr/SolrIndexer.java
+3	3	src/java/org/apache/nutch/indexer/solr/SolrMappingReader.java
+4	4	src/java/org/apache/nutch/indexer/solr/SolrUtils.java
+3	3	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
+3	3	src/java/org/apache/nutch/net/URLNormalizers.java
+3	3	src/java/org/apache/nutch/parse/OutlinkExtractor.java
+3	3	src/java/org/apache/nutch/parse/ParseOutputFormat.java
+3	3	src/java/org/apache/nutch/parse/ParsePluginsReader.java
+3	3	src/java/org/apache/nutch/parse/ParseResult.java
+3	3	src/java/org/apache/nutch/parse/ParseSegment.java
+3	3	src/java/org/apache/nutch/parse/ParseUtil.java
+3	3	src/java/org/apache/nutch/parse/ParserChecker.java
+3	3	src/java/org/apache/nutch/parse/ParserFactory.java
+3	3	src/java/org/apache/nutch/plugin/PluginDescriptor.java
+2	2	src/java/org/apache/nutch/plugin/PluginManifestParser.java
+5	5	src/java/org/apache/nutch/plugin/PluginRepository.java
+3	3	src/java/org/apache/nutch/protocol/ProtocolFactory.java
+4	4	src/java/org/apache/nutch/scoring/webgraph/LinkDumper.java
+4	4	src/java/org/apache/nutch/scoring/webgraph/LinkRank.java
+4	4	src/java/org/apache/nutch/scoring/webgraph/Loops.java
+4	4	src/java/org/apache/nutch/scoring/webgraph/NodeDumper.java
+4	4	src/java/org/apache/nutch/scoring/webgraph/ScoreUpdater.java
+4	4	src/java/org/apache/nutch/scoring/webgraph/WebGraph.java
+3	3	src/java/org/apache/nutch/segment/SegmentMergeFilters.java
+3	3	src/java/org/apache/nutch/segment/SegmentMerger.java
+3	3	src/java/org/apache/nutch/segment/SegmentReader.java
+4	4	src/java/org/apache/nutch/tools/CrawlDBScanner.java
+17	17	src/java/org/apache/nutch/tools/DmozParser.java
+5	5	src/java/org/apache/nutch/tools/FreeGenerator.java
+4	4	src/java/org/apache/nutch/tools/ResolveUrls.java
+3	3	src/java/org/apache/nutch/tools/arc/ArcRecordReader.java
+6	6	src/java/org/apache/nutch/tools/arc/ArcSegmentCreator.java
+3	3	src/java/org/apache/nutch/tools/proxy/LogDebugHandler.java
+3	3	src/java/org/apache/nutch/tools/proxy/SegmentHandler.java
+4	4	src/java/org/apache/nutch/tools/proxy/TestbedProxy.java
+3	3	src/java/org/apache/nutch/util/DeflateUtils.java
+3	3	src/java/org/apache/nutch/util/DomUtil.java
+3	3	src/java/org/apache/nutch/util/EncodingDetector.java
+3	3	src/java/org/apache/nutch/util/GZIPUtils.java
+18	18	src/java/org/apache/nutch/util/LogUtil.java
+3	3	src/java/org/apache/nutch/util/ObjectCache.java
+3	3	src/java/org/apache/nutch/util/domain/DomainStatistics.java
+3	3	src/java/org/apache/nutch/util/domain/DomainSuffixes.java
+3	3	src/java/org/apache/nutch/util/domain/DomainSuffixesReader.java
+3	3	src/plugin/creativecommons/src/java/org/creativecommons/nutch/CCIndexingFilter.java
+3	3	src/plugin/creativecommons/src/java/org/creativecommons/nutch/CCParseFilter.java
+4	4	src/plugin/feed/src/java/org/apache/nutch/parse/feed/FeedParser.java
+3	3	src/plugin/feed/src/test/org/apache/nutch/parse/feed/TestFeedParser.java
+3	3	src/plugin/index-anchor/src/java/org/apache/nutch/indexer/anchor/AnchorIndexingFilter.java
+3	3	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
+3	3	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+2	0	src/plugin/index-static/src/java/org/apache/nutch/indexer/staticfield/StaticFieldIndexer.java
+7	7	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
+3	3	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/RobotRulesParser.java
+3	3	src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexURLFilterBase.java
+3	3	src/plugin/lib-regex-filter/src/test/org/apache/nutch/urlfilter/api/RegexURLFilterBaseTest.java
+3	3	src/plugin/microformats-reltag/src/java/org/apache/nutch/microformats/reltag/RelTagParser.java
+3	3	src/plugin/parse-ext/src/java/org/apache/nutch/parse/ext/ExtParser.java
+3	3	src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HtmlParser.java
+3	3	src/plugin/parse-js/src/java/org/apache/nutch/parse/js/JSParseFilter.java
+3	3	src/plugin/parse-swf/src/java/org/apache/nutch/parse/swf/SWFParser.java
+3	3	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/TikaParser.java
+3	3	src/plugin/parse-tika/src/test/org/apache/nutch/tika/TestFeedParser.java
+3	3	src/plugin/parse-zip/src/java/org/apache/nutch/parse/zip/ZipParser.java
+3	3	src/plugin/parse-zip/src/java/org/apache/nutch/parse/zip/ZipTextExtractor.java
+3	3	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/File.java
+3	3	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/Ftp.java
+3	3	src/plugin/protocol-ftp/src/java/org/apache/nutch/protocol/ftp/PrintCommandListener.java
+3	3	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/Http.java
+1	1	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
+4	4	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/DummySSLProtocolSocketFactory.java
+4	4	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/DummyX509TrustManager.java
+5	5	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/Http.java
+3	3	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpAuthenticationFactory.java
+3	3	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpBasicAuthentication.java
+2	2	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpResponse.java
+3	3	src/plugin/scoring-opic/src/java/org/apache/nutch/scoring/opic/OPICScoringFilter.java
+3	3	src/plugin/subcollection/src/java/org/apache/nutch/collection/CollectionManager.java
+3	3	src/plugin/subcollection/src/java/org/apache/nutch/indexer/subcollection/SubcollectionIndexingFilter.java
+4	4	src/plugin/tld/src/java/org/apache/nutch/indexer/tld/TLDIndexingFilter.java
+3	3	src/plugin/urlfilter-domain/src/java/org/apache/nutch/urlfilter/domain/DomainURLFilter.java
+3	3	src/plugin/urlfilter-domain/src/test/org/apache/nutch/urlfilter/domain/TestDomainURLFilter.java
+4	4	src/plugin/urlfilter-prefix/src/java/org/apache/nutch/urlfilter/prefix/PrefixURLFilter.java
+4	4	src/plugin/urlfilter-suffix/src/java/org/apache/nutch/urlfilter/suffix/SuffixURLFilter.java
+5	5	src/plugin/urlmeta/src/java/org/apache/nutch/indexer/urlmeta/URLMetaIndexingFilter.java
+3	3	src/plugin/urlmeta/src/java/org/apache/nutch/scoring/urlmeta/URLMetaScoringFilter.java
+3	3	src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java
+7	7	src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java
+3	3	src/plugin/urlnormalizer-regex/src/test/org/apache/nutch/net/urlnormalizer/regex/TestRegexURLNormalizer.java
+3	3	src/test/org/apache/nutch/crawl/CrawlDBTestUtil.java
 
---a4566c0a5--2011-10-03--Markus Jelsma
+--ae2c38d56--2011-09-22--Markus Jelsma
+7	1	conf/nutch-default.xml
+6	1	src/plugin/parse-html/src/java/org/apache/nutch/parse/html/DOMContentUtils.java
+8	3	src/plugin/parse-tika/src/java/org/apache/nutch/parse/tika/DOMContentUtils.java
+
+--addea9cae--2011-09-19--Markus Jelsma
 2	0	CHANGES.txt
-3	2	conf/schema.xml
+1	1	src/plugin/urlfilter-domain/plugin.xml
 
---b179d2042--2011-09-29--Lewis John McGibbney
-4	2	CHANGES.txt
-3	0	build.xml
-14	10	src/bin/nutch
+--7ea9bd77e--2011-09-19--Markus Jelsma
+18	0	conf/nutch-default.xml
 
---a4e1fcec2--2011-09-28--Julien Nioche
+--4d75bfecd--2011-09-14--Markus Jelsma
+1	1	src/java/org/apache/nutch/crawl/Crawl.java
+268	268	src/java/org/apache/nutch/tools/Benchmark.java
+7	3	src/test/org/apache/nutch/fetcher/TestFetcher.java
+
+--2c8e6e80f--2011-09-14--Markus Jelsma
+4	0	CHANGES.txt
+86	24	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--b500242cc--2011-09-13--Markus Jelsma
 2	0	CHANGES.txt
-1	1	build.xml
+3	0	src/java/org/apache/nutch/crawl/CrawlDb.java
 
---c2433d301--2011-09-25--Julien Nioche
+--fef914ad4--2011-09-12--Markus Jelsma
 2	0	CHANGES.txt
-2	2	ivy/ivy.xml
-0	1	ivy/ivysettings.xml
+8	0	conf/nutch-default.xml
+11	3	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
 
---b9c41ebcc--2011-09-23--Chris Mattmann
+--59665eb0a--2011-09-11--Lewis John McGibbney
+5	0	src/plugin/index-static/src/java/org/apache/nutch/indexer/staticfield/StaticFieldIndexer.java
+5	0	src/plugin/index-static/src/java/org/apache/nutch/indexer/staticfield/package.html
+
 --f81ea3e3f--2011-09-11--Lewis John McGibbney
 2	0	CHANGES.txt
 16	0	conf/nutch-default.xml
+
+--76d2227ef--2011-09-10--Lewis John McGibbney
+6	0	CHANGES.txt
+13	0	conf/nutch-default.xml
+2	0	src/plugin/build.xml
+22	0	src/plugin/index-static/build.xml
+41	0	src/plugin/index-static/ivy.xml
+42	0	src/plugin/index-static/plugin.xml
+75	0	src/plugin/index-static/src/java/org/apache/nutch/indexer/staticfield/StaticFieldIndexer.java
+
+--c0e6212d7--2011-09-09--Markus Jelsma
+2	0	CHANGES.txt
+8	0	conf/nutch-default.xml
+14	5	src/java/org/apache/nutch/crawl/CrawlDb.java
+9	0	src/java/org/apache/nutch/crawl/CrawlDbFilter.java
+
+--477d6bc7f--2011-09-01--Julien Nioche
+2	0	CHANGES.txt
+2	1	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
 
 --5d76ed382--2011-09-01--Julien Nioche
 2	0	CHANGES.txt
 2	1	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
 
+--0e948a52a--2011-09-01--Julien Nioche
+2	0	CHANGES.txt
+10	9	conf/nutch-default.xml
+53	27	src/java/org/apache/nutch/fetcher/Fetcher.java
+
 --cb6dcf43d--2011-08-23--Julien Nioche
+2	0	CHANGES.txt
+1	1	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpResponse.java
+
+--bf37c9d5b--2011-08-23--Julien Nioche
 2	0	CHANGES.txt
 1	1	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpResponse.java
 
@@ -1462,15 +1977,76 @@
 2	0	CHANGES.txt
 4	9	src/bin/nutch
 
+--78292c907--2011-08-23--Julien Nioche
+2	0	CHANGES.txt
+4	9	src/bin/nutch
+
+--ecb869304--2011-08-22--Julien Nioche
+1	1	src/java/org/apache/nutch/crawl/Generator.java
+
+--b45a9aaf8--2011-08-19--Julien Nioche
+2	0	CHANGES.txt
+24	20	conf/nutch-default.xml
+276	185	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/HTMLLanguageParser.java
+0	462	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/LanguageIdentifier.java
+0	14	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/LanguageIndexingFilter.java
+0	739	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/NGramProfile.java
+0	2985	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/da.ngp
+0	2994	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/de.ngp
+0	3088	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/ee.ngp
+0	3063	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/el.ngp
+0	2852	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/en.ngp
+0	2994	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/es.ngp
+0	2878	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/fi.ngp
+0	2981	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/fr.ngp
+0	3085	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/hu.ngp
+0	3043	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/is.ngp
+0	2888	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/it.ngp
+0	2954	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/nl.ngp
+0	3021	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/no.ngp
+0	3064	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/pl.ngp
+0	3056	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/pt.ngp
+0	3102	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/ru.ngp
+0	2918	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/sv.ngp
+0	3082	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/th.ngp
+49	0	src/plugin/languageidentifier/src/test/org/apache/nutch/analysis/lang/TestHTMLLanguageParser.java
+0	237	src/plugin/languageidentifier/src/test/org/apache/nutch/analysis/lang/TestLanguageIdentifier.java
+0	142	src/plugin/languageidentifier/src/test/org/apache/nutch/analysis/lang/TestNGramProfile.java
+
+--2a007dac5--2011-08-18--Markus Jelsma
+2	0	CHANGES.txt
+21	0	src/bin/nutch
+
+--45f8c542a--2011-08-16--Markus Jelsma
+2	0	CHANGES.txt
+13	2	src/java/org/apache/nutch/scoring/webgraph/NodeDumper.java
+
 --8b5130339--2011-08-16--Julien Nioche
 2	0	CHANGES.txt
 30	12	src/java/org/apache/nutch/parse/ParserChecker.java
+
+--637424c7b--2011-08-16--Julien Nioche
+2	0	CHANGES.txt
+44	20	src/java/org/apache/nutch/parse/ParserChecker.java
+
+--9470803a7--2011-08-16--Markus Jelsma
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
 
 --9669a558e--2011-08-16--Markus Jelsma
 2	0	CHANGES.txt
 4	2	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
 
+--11db90881--2011-08-16--Markus Jelsma
+2	0	CHANGES.txt
+5	1	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
+
 --b2b8cebc9--2011-08-11--Lewis John McGibbney
+0	2	CHANGES.txt
+1	1	src/plugin/languageidentifier/build.xml
+1	1	src/plugin/languageidentifier/plugin.xml
+
+--e3e5194d6--2011-08-11--Lewis John McGibbney
 0	2	CHANGES.txt
 1	1	src/plugin/languageidentifier/build.xml
 1	1	src/plugin/languageidentifier/plugin.xml
@@ -1480,6 +2056,24 @@
 1	1	src/plugin/languageidentifier/build.xml
 1	1	src/plugin/languageidentifier/plugin.xml
 
+--60896556d--2011-08-11--Lewis John McGibbney
+4	0	CHANGES.txt
+1	1	src/plugin/languageidentifier/build.xml
+1	1	src/plugin/languageidentifier/plugin.xml
+
+--95b449506--2011-08-11--Markus Jelsma
+2	0	CHANGES.txt
+3	0	src/java/org/apache/nutch/crawl/LinkDbMerger.java
+
+--0d4049e17--2011-08-10--Julien Nioche
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/crawl/CrawlDatum.java
+1	1	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--33fbd5592--2011-08-10--Markus Jelsma
+2	0	CHANGES.txt
+3	2	src/java/org/apache/nutch/parse/ParseSegment.java
+
 --3ba4c6b9d--2011-08-10--Lewis John McGibbney
 57	0	doap.rdf
 
@@ -1488,48 +2082,196 @@
 1	1	conf/domain-urlfilter.txt
 5	5	ivy/mvn.template
 
+--d4be397ad--2011-08-04--Lewis John McGibbney
+2	0	CHANGES.txt
+5	5	ivy/mvn.template
+
+--9e009d4e1--2011-07-29--Julien Nioche
+1	1	src/java/org/apache/nutch/crawl/CrawlDbReducer.java
+
+--f0374bb41--2011-07-28--Julien Nioche
+2	0	CHANGES.txt
+2	0	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--060ebd4d7--2011-07-28--Julien Nioche
+2	0	CHANGES.txt
+2	0	src/java/org/apache/nutch/crawl/CrawlDbReducer.java
+
 --859abb713--2011-07-25--Julien Nioche
 2	0	CHANGES.txt
 5	1	conf/nutch-default.xml
 0	4147	conf/tika-mimetypes.xml
 17	8	src/java/org/apache/nutch/util/MimeUtil.java
 
+--792f3e845--2011-07-25--Julien Nioche
+2	0	CHANGES.txt
+5	1	conf/nutch-default.xml
+0	4147	conf/tika-mimetypes.xml
+17	8	src/java/org/apache/nutch/util/MimeUtil.java
+
+--b541d6efc--2011-07-22--Lewis John McGibbney
+1	1	conf/domain-urlfilter.txt
+
+--266678bc5--2011-07-19--Markus Jelsma
+2	0	CHANGES.txt
+9	0	conf/nutch-default.xml
+4	1	src/java/org/apache/nutch/fetcher/Fetcher.java
+
 --a9a52d710--2011-07-19--Markus Jelsma
 2	0	CHANGES.txt
 10	1	conf/nutch-default.xml
 23	1	src/plugin/index-anchor/src/java/org/apache/nutch/indexer/anchor/AnchorIndexingFilter.java
 
+--4d7851378--2011-07-19--Markus Jelsma
+4	0	CHANGES.txt
+11	0	conf/nutch-default.xml
+23	1	src/plugin/index-anchor/src/java/org/apache/nutch/indexer/anchor/AnchorIndexingFilter.java
+
+--d2d884617--2011-07-19--Markus Jelsma
+5	0	conf/log4j.properties
+1	1	src/java/org/apache/nutch/scoring/webgraph/LinkRank.java
+25	5	src/java/org/apache/nutch/scoring/webgraph/WebGraph.java
+
 --496a9721d--2011-07-18--Lewis John McGibbney
 2	0	CHANGES.txt
 1	1	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/package.html
+
+--759f5a227--2011-07-18--Lewis John McGibbney
+2	0	CHANGES.txt
+1	1	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/package.html
+
+--66aa8ab45--2011-07-18--Lewis John McGibbney
+6	0	CHANGES.txt
+0	3	src/bin/nutch
 
 --6ea0ba827--2011-07-18--Julien Nioche
 2	0	CHANGES.txt
 2	1	conf/automaton-urlfilter.txt.template
 2	1	conf/regex-urlfilter.txt.template
 
+--1b2c46f85--2011-07-18--Julien Nioche
+2	0	CHANGES.txt
+2	1	conf/automaton-urlfilter.txt.template
+2	1	conf/regex-urlfilter.txt.template
+
+--7e9726f05--2011-07-18--Julien Nioche
+2	0	CHANGES.txt
+8	2	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+8	5	src/java/org/apache/nutch/indexer/solr/SolrIndexer.java
+
+--04db6ec14--2011-07-17--Chris Mattmann
+0	13	src/java/org/apache/nutch/crawl/NUTCH-1023-LinkDbReader-trivial.patch
+
+--7a3b71a6f--2011-07-17--Chris Mattmann
+0	14	src/java/org/apache/nutch/crawl/NUTCH-1019-crawl-comment.patch
+
+--c6154c6ce--2011-07-17--Lewis John McGibbney
+1	1	src/java/org/apache/nutch/crawl/LinkDbReader.java
+13	0	src/java/org/apache/nutch/crawl/NUTCH-1023-LinkDbReader-trivial.patch
+
+--e25742de0--2011-07-17--Lewis John McGibbney
+2	1	src/java/org/apache/nutch/crawl/Crawl.java
+14	0	src/java/org/apache/nutch/crawl/NUTCH-1019-crawl-comment.patch
+
+--6f3c6e5da--2011-07-17--Markus Jelsma
+2	0	CHANGES.txt
+4	1	src/java/org/apache/nutch/crawl/CrawlDbReader.java
+
+--1e2d53117--2011-07-13--Markus Jelsma
+6	0	src/java/org/apache/nutch/indexer/solr/SolrConstants.java
+
+--8ed07ed01--2011-07-13--Markus Jelsma
+4	0	CHANGES.txt
+9	0	conf/nutch-default.xml
+7	1	src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+2	2	src/java/org/apache/nutch/indexer/solr/SolrClean.java
+4	4	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+1	2	src/java/org/apache/nutch/indexer/solr/SolrIndexer.java
+76	0	src/java/org/apache/nutch/indexer/solr/SolrUtils.java
+2	25	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
+
 --de0207124--2011-07-11--Markus Jelsma
 2	0	CHANGES.txt
 1	1	src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java
+
+--2e614d9f3--2011-07-11--Markus Jelsma
+2	0	CHANGES.txt
+1	1	src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java
+
+--0c3d3bfa8--2011-07-11--Markus Jelsma
+2	0	CHANGES.txt
+127	0	src/java/org/apache/nutch/indexer/IndexingFiltersChecker.java
+
+--a502692fe--2011-07-11--Markus Jelsma
+1	0	conf/log4j.properties
+
+--6483e3e4f--2011-07-11--Markus Jelsma
+2	0	CHANGES.txt
+10	11	src/java/org/apache/nutch/scoring/webgraph/WebGraph.java
 
 --116da8692--2011-07-06--Markus Jelsma
 2	0	CHANGES.txt
 6	0	conf/regex-normalize.xml.template
 9	0	src/test/org/apache/nutch/net/TestURLNormalizers.java
 
+--60f0dbff4--2011-07-06--Markus Jelsma
+2	0	CHANGES.txt
+6	0	conf/regex-normalize.xml.template
+9	0	src/test/org/apache/nutch/net/TestURLNormalizers.java
+
+--32f7cafad--2011-07-06--Julien Nioche
+2	0	CHANGES.txt
+9	1	src/java/org/apache/nutch/fetcher/FetcherOutputFormat.java
+10	3	src/java/org/apache/nutch/parse/ParseOutputFormat.java
+
 --5663efb90--2011-07-04--Markus Jelsma
 4	0	CHANGES.txt
 12	13	src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java
+
+--c21feba8d--2011-07-04--Markus Jelsma
+2	0	CHANGES.txt
+12	13	src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java
+
+--b49d01901--2011-06-30--Markus Jelsma
+2	0	CHANGES.txt
+2	1	conf/log4j.properties
+33	0	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
 
 --97e27ff93--2011-06-28--Markus Jelsma
 2	0	CHANGES.txt
 9	4	src/java/org/apache/nutch/util/EncodingDetector.java
 
+--73bb9f252--2011-06-28--Markus Jelsma
+2	0	CHANGES.txt
+9	4	src/java/org/apache/nutch/util/EncodingDetector.java
+
+--98345c96e--2011-06-28--Markus Jelsma
+4	0	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+5	0	src/java/org/apache/nutch/indexer/solr/SolrIndexer.java
+
+--0a613b769--2011-06-28--Markus Jelsma
+2	0	CHANGES.txt
+1	1	conf/nutch-default.xml
+
 --5f09601cb--2011-06-27--Markus Jelsma
 2	0	CHANGES.txt
 5	2	conf/nutch-default.xml
 
+--532d4b0ab--2011-06-27--Markus Jelsma
+2	0	CHANGES.txt
+5	2	conf/nutch-default.xml
+
+--c738668fd--2011-06-24--Markus Jelsma
+2	0	CHANGES.txt
+13	5	src/java/org/apache/nutch/indexer/solr/SolrClean.java
+17	5	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+12	5	src/java/org/apache/nutch/indexer/solr/SolrIndexer.java
+
 --edb7faa2e--2011-06-24--Markus Jelsma
+2	0	CHANGES.txt
+3	1	src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HtmlParser.java
+
+--c6e6042ea--2011-06-24--Markus Jelsma
 2	0	CHANGES.txt
 3	1	src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HtmlParser.java
 
@@ -1537,6 +2279,14 @@
 2	0	CHANGES.txt
 2	1	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
 
+--c11e5338b--2011-06-24--Markus Jelsma
+4	0	CHANGES.txt
+2	1	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+
+--f968e096a--2011-06-13--Julien Nioche
+1	1	default.properties
+
+--073e52f7f--2011-06-13--Julien Nioche
 --8ea9f2226--2011-06-04--Julien Nioche
 2	0	CHANGES.txt
 7	0	build.xml
@@ -1547,9 +2297,50 @@
 97	0	ivy/mvn.template
 200	267	pom.xml
 
+--86187abd5--2011-06-04--Chris Mattmann
+2	0	CHANGES.txt
+
+--955ca31b6--2011-06-04--Chris Mattmann
+7	0	build.xml
+1	2	default.properties
+5	5	ivy/ivy.xml
+156	242	pom.xml
+
+--5a2916e34--2011-06-04--Chris Mattmann
+-	-	ivy/ivy-2.1.0.jar
+-	-	ivy/ivy-2.2.0.jar
+
+--e779b1cb0--2011-06-04--Chris Mattmann
+97	0	ivy/mvn.template
+
 --f1d5b5d42--2011-06-04--Julien Nioche
 2	0	CHANGES.txt
 6	9	build.xml
+
+--9901f132d--2011-06-04--Julien Nioche
+3	1	CHANGES.txt
+6	9	build.xml
+
+--d9ba6a271--2011-05-31--Julien Nioche
+44	27	CHANGES.txt
+
+--5ba9a5e5d--2011-05-31--Julien Nioche
+27	44	CHANGES.txt
+694	649	build.xml
+2	1	default.properties
+-	-	ivy/ivy-2.1.0.jar
+5	5	ivy/ivy.xml
+0	88	ivy/mvn.template
+304	0	pom.xml
+
+--a14c6ea41--2011-05-31--Julien Nioche
+44	27	CHANGES.txt
+649	694	build.xml
+1	2	default.properties
+-	-	ivy/ivy-2.1.0.jar
+5	5	ivy/ivy.xml
+88	0	ivy/mvn.template
+0	304	pom.xml
 
 --d7f5088bc--2011-05-23--Markus Jelsma
 2	0	CHANGES.txt
@@ -1561,9 +2352,30 @@
 3	4	src/plugin/feed/src/java/org/apache/nutch/indexer/feed/FeedIndexingFilter.java
 4	6	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
 
+--54cd07edf--2011-05-23--Markus Jelsma
+2	0	CHANGES.txt
+25	15	conf/schema.xml
+
+--f5031bd83--2011-05-18--Julien Nioche
+2	0	CHANGES.txt
+4	4	conf/schema.xml
+8	1	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
+2	8	src/plugin/feed/src/java/org/apache/nutch/indexer/feed/FeedIndexingFilter.java
+1	3	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
+2	9	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+
+--85f295ffe--2011-05-10--Markus Jelsma
+2	0	CHANGES.txt
+1	1	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
+
 --54d3f4ee0--2011-05-10--Markus Jelsma
 2	0	CHANGES.txt
 1	1	src/java/org/apache/nutch/indexer/solr/SolrWriter.java
+
+--764319aa8--2011-05-07--Julien Nioche
+1	7	LICENSE.txt
+0	2	build.xml
+0	1	default.properties
 
 --68960b0ea--2011-05-07--Julien Nioche
 1	7	LICENSE.txt
@@ -1573,11 +2385,22 @@
 --1cdb6b740--2011-05-05--Julien Nioche
 1	1	src/test/org/apache/nutch/parse/TestParserFactory.java
 
+--2d2322b63--2011-05-05--Julien Nioche
+1	1	src/test/org/apache/nutch/parse/TestParserFactory.java
+
 --87e0769c8--2011-05-05--Julien Nioche
 2	0	CHANGES.txt
 8	27	ivy/ivy.xml
 
+--e436a260d--2011-05-05--Julien Nioche
+2	0	CHANGES.txt
+7	2	ivy/ivy.xml
+
 --f1bc8de8f--2011-05-05--Markus Jelsma
+2	0	CHANGES.txt
+3	1	conf/schema.xml
+
+--7156531aa--2011-05-05--Markus Jelsma
 2	0	CHANGES.txt
 3	1	conf/schema.xml
 
@@ -1599,16 +2422,55 @@
 37	0	src/plugin/parse-tika/sample/rsstest.rss
 140	0	src/plugin/parse-tika/src/test/org/apache/nutch/parse/tika/TestRSSParser.java
 
+--341fba280--2011-05-04--Julien Nioche
+2	0	CHANGES.txt
+2	5	conf/parse-plugins.xml
+0	3	src/plugin/build.xml
+0	46	src/plugin/parse-rss/build.xml
+0	42	src/plugin/parse-rss/ivy.xml
+-	-	src/plugin/parse-rss/lib/commons-feedparser-0.6-fork.jar
+0	49	src/plugin/parse-rss/plugin.xml
+0	21	src/plugin/parse-rss/sample/rsstest.rss
+0	128	src/plugin/parse-rss/src/java/org/apache/nutch/parse/rss/FeedParserListenerImpl.java
+0	227	src/plugin/parse-rss/src/java/org/apache/nutch/parse/rss/RSSParser.java
+0	189	src/plugin/parse-rss/src/java/org/apache/nutch/parse/rss/structs/RSSChannel.java
+0	151	src/plugin/parse-rss/src/java/org/apache/nutch/parse/rss/structs/RSSItem.java
+0	130	src/plugin/parse-rss/src/test/org/apache/nutch/parse/rss/TestRSSParser.java
+1	0	src/plugin/parse-tika/build.xml
+37	0	src/plugin/parse-tika/sample/rsstest.rss
+130	0	src/plugin/parse-tika/src/test/org/apache/nutch/tika/TestFeedParser.java
+
 --7ca1e610b--2011-04-28--Markus Jelsma
 2	0	CHANGES.txt
 2	0	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
 
+--2150e90ab--2011-04-28--Markus Jelsma
+2	0	CHANGES.txt
+1	0	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+
 --4bf34ef26--2011-04-28--Markus Jelsma
 2	10	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+
+--e47f7ada8--2011-04-28--Markus Jelsma
+2	9	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
 
 --8a7ef2ed8--2011-04-28--Markus Jelsma
 2	0	CHANGES.txt
 12	1	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+
+--40b69ee8e--2011-04-28--Markus Jelsma
+2	0	CHANGES.txt
+11	1	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+
+--6a7965ebc--2011-04-22--Chris Mattmann
+1	1	CHANGES.txt
+1	1	conf/nutch-default.xml
+2	2	default.properties
+15	5	pom.xml
+
+--ae0608d14--2011-04-14--Markus Jelsma
+2	0	CHANGES.txt
+2	4	src/java/org/apache/nutch/indexer/solr/SolrMappingReader.java
 
 --ce77da2b6--2011-04-14--Markus Jelsma
 2	0	CHANGES.txt
@@ -1616,6 +2478,11 @@
 --42c56bcb0--2011-04-14--Markus Jelsma
 2	0	CHANGES.txt
 12	1	conf/nutch-default.xml
+
+--17315263f--2011-04-14--Markus Jelsma
+2	0	CHANGES.txt
+12	1	conf/nutch-default.xml
+2	0	src/java/org/apache/nutch/indexer/solr/SolrConstants.java
 
 --1028f2853--2011-04-14--Markus Jelsma
 2	0	CHANGES.txt
@@ -1694,9 +2561,28 @@
 2	0	CHANGES.txt
 0	2	conf/solrindex-mapping.xml
 
+--a657ab07d--2011-04-12--Markus Jelsma
+2	0	CHANGES.txt
+1	1	ivy/ivy.xml
+
+--9b10e6818--2011-04-12--Markus Jelsma
+2	0	CHANGES.txt
+8	3	src/plugin/subcollection/src/java/org/apache/nutch/collection/Subcollection.java
+
 --fb065090f--2011-04-12--Markus Jelsma
 2	0	CHANGES.txt
 8	3	src/plugin/subcollection/src/java/org/apache/nutch/collection/Subcollection.java
+
+--6e81e6f6f--2011-04-08--Julien Nioche
+2	0	CHANGES.txt
+5	1	src/java/org/apache/nutch/crawl/CrawlDbMerger.java
+
+--870d868f0--2011-04-08--Julien Nioche
+2	0	CHANGES.txt
+210	103	conf/tika-mimetypes.xml
+1	1	ivy/ivy.xml
+4	3	src/plugin/parse-tika/ivy.xml
+17	12	src/plugin/parse-tika/plugin.xml
 
 --c8f5c4d40--2011-04-08--Julien Nioche
 2	0	CHANGES.txt
@@ -1705,8 +2591,31 @@
 4	3	src/plugin/parse-tika/ivy.xml
 17	12	src/plugin/parse-tika/plugin.xml
 
+--337843d6e--2011-04-07--Markus Jelsma
+15	0	src/bin/nutch
+
+--107bf5a2a--2011-04-05--Markus Jelsma
+2	0	CHANGES.txt
+17	0	src/java/org/apache/nutch/indexer/NutchField.java
+17	0	src/java/org/apache/nutch/parse/ParseCallable.java
+17	0	src/java/org/apache/nutch/tools/Benchmark.java
+17	0	src/plugin/urlnormalizer-regex/src/test/org/apache/nutch/net/urlnormalizer/regex/TestRegexURLNormalizer.java
+
 --a6d110169--2011-03-18--Markus Jelsma
 16	0	src/java/org/apache/nutch/indexer/solr/SolrDeleteDuplicates.java
+
+--7acb6c879--2011-03-18--Markus Jelsma
+190	0	src/java/org/apache/nutch/indexer/solr/SolrClean.java
+
+--eed2fc844--2011-03-18--Markus Jelsma
+2	0	CHANGES.txt
+1	0	conf/log4j.properties
+3	0	src/bin/nutch
+
+--9272fc6b4--2011-03-10--Julien Nioche
+2	0	CHANGES.txt
+133	2	build.xml
+294	0	pom.xml
 
 --136f4a6f0--2011-03-09--Andrzej Bialecki
 1	1	src/plugin/protocol-sftp/ivy.xml
@@ -1716,14 +2625,66 @@
 26	3	ivy/ivy.xml
 1	1	src/plugin/protocol-sftp/ivy.xml
 
+--bb8625642--2011-03-09--Andrzej Bialecki
+2	0	CHANGES.txt
+2	2	src/java/org/apache/nutch/fetcher/Fetcher.java
+
 --7d32b16ae--2011-03-09--Andrzej Bialecki
 2	0	CHANGES.txt
 2	2	src/java/org/apache/nutch/fetcher/FetcherReducer.java
+
+--488aba5cc--2011-03-09--Andrzej Bialecki
+2	0	CHANGES.txt
+30	17	src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexURLFilterBase.java
+14	3	src/plugin/urlfilter-automaton/src/java/org/apache/nutch/urlfilter/automaton/AutomatonURLFilter.java
+10	6	src/plugin/urlfilter-domain/src/java/org/apache/nutch/urlfilter/domain/DomainURLFilter.java
+12	5	src/plugin/urlfilter-prefix/src/java/org/apache/nutch/urlfilter/prefix/PrefixURLFilter.java
+15	3	src/plugin/urlfilter-regex/src/java/org/apache/nutch/urlfilter/regex/RegexURLFilter.java
+11	4	src/plugin/urlfilter-suffix/src/java/org/apache/nutch/urlfilter/suffix/SuffixURLFilter.java
+27	18	src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java
+3	2	src/plugin/urlnormalizer-regex/src/test/org/apache/nutch/net/urlnormalizer/regex/TestRegexURLNormalizer.java
+
+--c3b52bb27--2011-03-09--Andrzej Bialecki
+2	0	CHANGES.txt
+1	196	src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
+0	5	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/Http.java
+
+--2ed2d7b81--2011-03-09--Andrzej Bialecki
+2	0	CHANGES.txt
+3	2	conf/nutch-default.xml
+1	1	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--c4c5b2914--2011-01-31--Julien Nioche
+2	0	CHANGES.txt
+4	0	src/plugin/parse-ext/plugin.xml
+11	4	src/plugin/parse-ext/src/java/org/apache/nutch/parse/ext/ExtParser.java
 
 --5b8b53a86--2011-01-27--Markus Jelsma
 3	1	CHANGES.txt
 1	1	ivy/ivy.xml
 1	1	src/plugin/lib-xml/ivy.xml
+
+--e48d97242--2011-01-27--Markus Jelsma
+3	1	CHANGES.txt
+1	1	ivy/ivy.xml
+1	1	src/plugin/lib-xml/ivy.xml
+
+--a082800e2--2011-01-24--Julien Nioche
+0	9	index.html
+
+--66454e404--2011-01-21--Julien Nioche
+2	0	CHANGES.txt
+3	3	src/java/org/apache/nutch/fetcher/Fetcher.java
+
+--17fdc2919--2011-01-07--Julien Nioche
+2	0	CHANGES.txt
+1	0	src/plugin/build.xml
+8	1	src/plugin/protocol-file/build.xml
+1	0	src/plugin/protocol-file/sample/testprotocolfile.txt
+1	0	src/plugin/protocol-file/sample/testprotocolfile_(encoded).txt
+65	58	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/FileResponse.java
+31	17	src/plugin/protocol-file/src/test/org/apache/nutch/protocol/file/TestProtocolFile.java
+0	1	src/plugin/protocol-file/src/test/org/apache/nutch/protocol/file/testprotocolfile.txt
 
 --171e58436--2011-01-07--Julien Nioche
 2	0	CHANGES.txt
@@ -1737,6 +2698,11 @@
 1	3	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
 1	1	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpResponse.java
 
+--3e9601803--2011-01-07--Julien Nioche
+2	0	CHANGES.txt
+1	3	src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
+1	1	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpResponse.java
+
 --284ae01b5--2011-01-06--Julien Nioche
 2	0	CHANGES.txt
 1	1	src/bin/nutch
@@ -1745,6 +2711,13 @@
 --8168861dd--2011-01-05--Julien Nioche
 2	0	CHANGES.txt
 7	1	src/plugin/urlfilter-domain/src/java/org/apache/nutch/urlfilter/domain/DomainURLFilter.java
+
+--8b2327358--2011-01-05--Julien Nioche
+2	0	CHANGES.txt
+7	1	src/plugin/urlfilter-domain/src/java/org/apache/nutch/urlfilter/domain/DomainURLFilter.java
+
+--372dfb29d--2011-01-05--Julien Nioche
+2	0	CHANGES.txt
 
 --02e18a5f7--2011-01-05--Julien Nioche
 2	0	CHANGES.txt
@@ -1755,6 +2728,58 @@
 2	0	CHANGES.txt
 1	1	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
 
+--7344ba935--2011-01-05--Julien Nioche
+2	0	CHANGES.txt
+
+--d6d1e2e0f--2011-01-05--Julien Nioche
+7	0	.gitignore
+2	0	CHANGES.txt
+
+--366bea359--2011-01-05--Julien Nioche
+2	0	CHANGES.txt
+
+--4412ca47d--2011-01-05--Julien Nioche
+2	0	CHANGES.txt
+18	80	conf/nutch-default.xml
+
+--44f313da9--2011-01-05--Julien Nioche
+2	0	CHANGES.txt
+
+--8f7c7fffb--2011-01-05--Julien Nioche
+41	0	src/plugin/urlmeta/ivy.xml
+71	91	src/plugin/urlmeta/src/java/org/apache/nutch/indexer/urlmeta/URLMetaIndexingFilter.java
+
+--f73648c4e--2011-01-05--Julien Nioche
+2	1	CHANGES.txt
+13	0	conf/nutch-default.xml
+2	0	src/plugin/build.xml
+22	0	src/plugin/urlmeta/build.xml
+47	0	src/plugin/urlmeta/plugin.xml
+138	0	src/plugin/urlmeta/src/java/org/apache/nutch/indexer/urlmeta/URLMetaIndexingFilter.java
+12	0	src/plugin/urlmeta/src/java/org/apache/nutch/indexer/urlmeta/package.html
+174	0	src/plugin/urlmeta/src/java/org/apache/nutch/scoring/urlmeta/URLMetaScoringFilter.java
+11	0	src/plugin/urlmeta/src/java/org/apache/nutch/scoring/urlmeta/package.html
+
+--d0f099b96--2011-01-04--Julien Nioche
+3	0	CHANGES.txt
+
+--f93d56476--2011-01-04--Julien Nioche
+2	0	CHANGES.txt
+1	1	conf/schema.xml
+12	10	src/plugin/subcollection/src/java/org/apache/nutch/collection/CollectionManager.java
+3	2	src/plugin/subcollection/src/java/org/apache/nutch/indexer/subcollection/SubcollectionIndexingFilter.java
+
+--dbdd0723e--2011-01-04--Julien Nioche
+2	0	CHANGES.txt
+9	0	conf/nutch-default.xml
+2	0	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/File.java
+4	1	src/plugin/protocol-file/src/java/org/apache/nutch/protocol/file/FileResponse.java
+
+--e27288664--2011-01-04--Julien Nioche
+2	0	CHANGES.txt
+0	3	src/plugin/scoring-link/src/java/org/apache/nutch/scoring/link/LinkAnalysisScoringFilter.java
+0	3	src/plugin/scoring-opic/src/java/org/apache/nutch/scoring/opic/OPICScoringFilter.java
+
 --a9f5debdc--2010-12-22--Julien Nioche
 2	0	CHANGES.txt
 1	1	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/LanguageIndexingFilter.java
@@ -1762,6 +2787,19 @@
 --54c693721--2010-12-22--Julien Nioche
 2	0	CHANGES.txt
 4	6	ivy/ivy.xml
+
+--f2fd4152b--2010-12-22--Julien Nioche
+2	0	CHANGES.txt
+1	5	ivy/ivy.xml
+
+--107508477--2010-12-21--Andrzej Bialecki
+2	0	CHANGES.txt
+0	2	ivy/ivy.xml
+5	5	src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
+
+--224c1cffa--2010-12-21--Andrzej Bialecki
+2	0	CHANGES.txt
+15	2	src/java/org/apache/nutch/indexer/solr/SolrIndexer.java
 
 --7679b42fe--2010-12-17--Andrzej Bialecki
 1	0	src/java/org/apache/nutch/fetcher/FetcherJob.java
@@ -1794,6 +2832,16 @@
 70	10	src/java/org/apache/nutch/util/NutchTool.java
 62	0	src/java/org/apache/nutch/util/ToolUtil.java
 116	10	src/test/org/apache/nutch/api/TestAPI.java
+
+--cb6e4d045--2010-11-22--Markus Jelsma
+13	0	src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java
+5	1	src/plugin/urlnormalizer-basic/src/test/org/apache/nutch/net/urlnormalizer/basic/TestBasicURLNormalizer.java
+
+--985ab8f59--2010-11-22--Markus Jelsma
+2	1	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+
+--771df1660--2010-11-22--Markus Jelsma
+1	1	src/plugin/languageidentifier/src/java/org/apache/nutch/analysis/lang/LanguageIndexingFilter.java
 
 --d1ae84769--2010-11-06--Andrzej Bialecki
 4	0	src/plugin/protocol-sftp/src/java/org/apache/nutch/protocol/sftp/Sftp.java
@@ -1850,6 +2898,17 @@
 1	1	src/java/org/apache/nutch/util/LogUtil.java
 20	0	src/java/org/apache/nutch/util/NutchTool.java
 94	0	src/test/org/apache/nutch/api/TestAPI.java
+
+--14e43b4a7--2010-10-27--Markus Jelsma
+19	17	src/plugin/index-more/src/test/org/apache/nutch/indexer/more/TestMoreIndexingFilter.java
+
+--9adea98e9--2010-10-27--Markus Jelsma
+8	6	conf/nutch-default.xml
+
+--c4acc8e06--2010-10-27--Markus Jelsma
+11	0	conf/nutch-default.xml
+6	3	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
+22	0	src/plugin/index-more/src/test/org/apache/nutch/indexer/more/TestMoreIndexingFilter.java
 
 --0032314ce--2010-10-26--Tacettin Guney
 2	0	CHANGES.txt
@@ -1965,6 +3024,10 @@
 6	3	src/plugin/index-more/src/java/org/apache/nutch/indexer/more/MoreIndexingFilter.java
 
 --ca94b10fe--2010-09-17--Andrzej Bialecki
+2	0	CHANGES.txt
+3	1	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpResponse.java
+
+--08b38ce79--2010-09-17--Andrzej Bialecki
 2	0	CHANGES.txt
 3	1	src/plugin/protocol-httpclient/src/java/org/apache/nutch/protocol/httpclient/HttpResponse.java
 
@@ -2192,6 +3255,7 @@
 6	0	ivy/ivy.xml
 1	0	ivy/ivysettings.xml
 
+--a67c67038--2010-08-07--Chris Mattmann
 --746c40d93--2010-08-07--Chris Mattmann
 --fec778d7c--2010-08-07--Chris Mattmann
 1	1	CHANGES.txt

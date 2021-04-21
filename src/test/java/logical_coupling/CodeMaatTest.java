@@ -34,17 +34,17 @@ public class CodeMaatTest {
         ".///src///test///resources///CodeMaatTest_resources///struts///cleaned_struts_project.log,"
         + ".///src///test///resources///CodeMaatTest_resources///struts///struts_oracle_project.csv,",
 
-        // nutch 2.2.1
-        ".///src///test///resources///CodeMaatTest_resources///nutch///cleaned_nutch_221.log,"
-        + ".///src///test///resources///CodeMaatTest_resources///nutch///nutch_221_oracle.csv,",
+        // nutch 1.7
+        ".///src///test///resources///CodeMaatTest_resources///nutch///cleaned_nutch_17.log,"
+        + ".///src///test///resources///CodeMaatTest_resources///nutch///nutch_17_oracle.csv,",
 
-        // nutch 2.3
-        ".///src///test///resources///CodeMaatTest_resources///nutch///cleaned_nutch_23.log,"
-        + ".///src///test///resources///CodeMaatTest_resources///nutch///nutch_23_oracle.csv,",
+        // nutch 1.8
+        ".///src///test///resources///CodeMaatTest_resources///nutch///cleaned_nutch_18.log,"
+        + ".///src///test///resources///CodeMaatTest_resources///nutch///nutch_18_oracle.csv,",
 
-        // nutch 2.3.1
-        ".///src///test///resources///CodeMaatTest_resources///nutch///cleaned_nutch_231.log,"
-        + ".///src///test///resources///CodeMaatTest_resources///nutch///nutch_231_oracle.csv,",
+        // nutch 1.9
+        ".///src///test///resources///CodeMaatTest_resources///nutch///cleaned_nutch_19.log,"
+        + ".///src///test///resources///CodeMaatTest_resources///nutch///nutch_19_oracle.csv,",
     })
     public void codeMaatTest(String logDir, String oracleDir){
         String logPath = FileUtil.tildeExpandPath(logDir.replace("///", File.separator));
