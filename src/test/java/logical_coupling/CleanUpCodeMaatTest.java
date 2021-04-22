@@ -29,20 +29,20 @@ public class CleanUpCodeMaatTest {
     + ".///src///test///resources///CleanUpCodeMaat_resources///struts///,"
     + ".///src///test///resources///CleanUpCodeMaat_resources///struts///project_struts_clean.csv",
 
-    // Nutch 2.2.1
-    ".///src///test///resources///CleanUpCodeMaat_resources///nutch///oracle_project_nutch-221_.csv,"
+    // Nutch 1.7
+    ".///src///test///resources///CleanUpCodeMaat_resources///nutch///oracle_project_nutch_17_.csv,"
     + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///,"
-    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///project_nutch_221_clean.csv",
+    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///project_nutch_17_clean.csv",
 
-    // Nutch 2.3
-    ".///src///test///resources///CleanUpCodeMaat_resources///nutch///oracle_project_nutch-23_.csv,"
+    // Nutch 1.8
+    ".///src///test///resources///CleanUpCodeMaat_resources///nutch///oracle_project_nutch_18_.csv,"
     + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///,"
-    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///project_nutch_23_clean.csv",
+    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///project_nutch_18_clean.csv",
 
-    // Nutch 2.3.1
-    ".///src///test///resources///CleanUpCodeMaat_resources///nutch///oracle_project_nutch-231_.csv,"
+    // Nutch 1.9
+    ".///src///test///resources///CleanUpCodeMaat_resources///nutch///oracle_project_nutch_19_.csv,"
     + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///,"
-    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///project_nutch_231_clean.csv",
+    + ".///src///test///resources///CleanUpCodeMaat_resources///nutch///project_nutch_19_clean.csv",
   })
   public void cleanUpCodeMaatTest(String oracle_path, String csv_dir, String output_csv){
     
