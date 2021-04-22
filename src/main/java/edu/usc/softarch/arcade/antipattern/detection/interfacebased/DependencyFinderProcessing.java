@@ -86,12 +86,12 @@ public class DependencyFinderProcessing {
 	/**
 	 * Parameters are
 	 * 0 - Root system directory
-	 * 1 - Relative path of clustered RSF files directory
-	 * 2 - Relative path of DepFinder XML files directory
-	 * 3 - Relative path of clones XML files directory
-	 * 4 - Relative path of _cleaned.csv file
+	 * 1 - Path to clustered RSF files directory
+	 * 2 - Path to DepFinder XML files directory
+	 * 3 - Path to clones XML files directory
+	 * 4 - Path to cleaned csv file (from)
 	 * 5 - Fully qualified name of the package under analysis
-	 * 6 - Relative path of the output file
+	 * 6 - Path to the output file
 	 */
 	public static void main(String[] args)
 			throws IOException, ParserConfigurationException, SAXException {
@@ -100,12 +100,12 @@ public class DependencyFinderProcessing {
 
 		// Parsing arguments
 		String rootDir = args[0];
-		String rsfDir = rootDir + args[1];
-		String depFinderDir = rootDir + args[2];
-		String clonesDir = rootDir + args[3];
-		String logicalDep = rootDir + args[4];
-		String outputDest = args[5];
-		String packageName = rootDir + args[6];
+		String rsfDir = args[1];
+		String depFinderDir = args[2];
+		String clonesDir = args[3];
+		String logicalDep = args[4];
+		String packageName = args[5];
+		String outputDest = args[6];
 
 		// Execution
 		DependencyFinderProcessing dfp = new DependencyFinderProcessing(
