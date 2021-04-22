@@ -24,7 +24,7 @@ public class BatchCloneFinderTest {
     command.add("ext-tools" + fs + "pmd-bin-5.3.2"  + fs + "cpd.xml");
     command.add("cpd");
     command.add("-Din=" + System.getProperty("user.dir") + fs + "src" + fs + "test" + fs + "resources" 
-      + fs + "subject_systems_resources" + fs + "Struts2" + fs + "src" + fs + version);
+      + fs + "subject_systems_resources" + fs + "nutch" + fs + "src" + fs + version);
     command.add("-Dout="+ System.getProperty("user.dir") + fs + "target" + fs + "test_results" 
       + fs + "BatchCloneFinderTest" + fs + version + "_clone.xml");
     return command;
@@ -48,12 +48,21 @@ public class BatchCloneFinderTest {
   }
   @ParameterizedTest
   @CsvSource({
-    // struts-2.3.30
-    "struts-2.3.30,"
-    + ".///src///test///resources///BatchCloneFinderTest_resources///struts-2.3.30_clone.xml",
-    // struts-2.5.2
-    "struts-2.5.2,"
-    + ".///src///test///resources///BatchCloneFinderTest_resources///struts-2.5.2_clone.xml",
+    // // struts-2.3.30
+    // "struts-2.3.30,"
+    // + ".///src///test///resources///BatchCloneFinderTest_resources///struts-2.3.30_clone.xml",
+    // // struts-2.5.2
+    // "struts-2.5.2,"
+    // + ".///src///test///resources///BatchCloneFinderTest_resources///struts-2.5.2_clone.xml",
+    // nutch-1.7
+    "nutch-1.7,"
+    + ".///src///test///resources///BatchCloneFinderTest_resources///nutch-1.7_clone.xml",
+    // nutch-1.8
+    "nutch-1.8,"
+    + ".///src///test///resources///BatchCloneFinderTest_resources///nutch-1.8_clone.xml",
+    // nutch-1.8
+    "nutch-1.9,"
+    + ".///src///test///resources///BatchCloneFinderTest_resources///nutch-1.9_clone.xml",
   })
   public void singleTest(String version, String oracle){
     // Constructs ProcessBuilder

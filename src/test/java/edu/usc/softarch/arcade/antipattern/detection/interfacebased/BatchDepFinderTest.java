@@ -25,7 +25,7 @@ public class BatchDepFinderTest {
     command.add(System.getProperty("user.dir") + fs + "target" + fs + "test_results" 
       + fs + "BatchDepFinderTest" + fs + version + "_deps.xml");
     command.add(System.getProperty("user.dir") + fs + "src" + fs + "test" + fs + "resources" 
-      + fs + "subject_systems_resources" + fs + "Struts2" + fs + "src" + fs + version + fs + "lib_struts");
+      + fs + "subject_systems_resources" + fs + "nutch" + fs + "src" + fs + version + fs + "lib_nutch");
     return command;
   }
   public void setUp(String version){
@@ -47,12 +47,21 @@ public class BatchDepFinderTest {
   }
   @ParameterizedTest
   @CsvSource({
-    // struts-2.3.30
-    "struts-2.3.30,"
-    + ".///src///test///resources///BatchDepFinderTest_resources///struts-2.3.30_deps.xml",
-    // struts-2.5.2
-    "struts-2.5.2,"
-    + ".///src///test///resources///BatchDepFinderTest_resources///struts-2.5.2_deps.xml",
+    // // struts-2.3.30
+    // "struts-2.3.30,"
+    // + ".///src///test///resources///BatchDepFinderTest_resources///struts-2.3.30_deps.xml",
+    // // struts-2.5.2
+    // "struts-2.5.2,"
+    // + ".///src///test///resources///BatchDepFinderTest_resources///struts-2.5.2_deps.xml",
+    // nutch-1.7
+    "nutch-1.7,"
+    + ".///src///test///resources///BatchDepFinderTest_resources///nutch-1.7_deps.xml",
+    // nutch-1.8
+    "nutch-1.8,"
+    + ".///src///test///resources///BatchDepFinderTest_resources///nutch-1.8_deps.xml",
+    // nutch-1.8
+    "nutch-1.9,"
+    + ".///src///test///resources///BatchDepFinderTest_resources///nutch-1.9_deps.xml",
   })
   public void singleTest(String version, String oracle){
     // Constructs ProcessBuilder
