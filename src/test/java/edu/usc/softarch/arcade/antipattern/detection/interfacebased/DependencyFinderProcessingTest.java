@@ -3,6 +3,12 @@ package edu.usc.softarch.arcade.antipattern.detection.interfacebased;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -69,9 +75,53 @@ public class DependencyFinderProcessingTest {
 		});
 
 		// Read in oracle json (oraclePath)
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			//Read json here
+			Map<String, Object> map = objectMapper.readValue(new File(oraclePath),
+			new TypeReference<Map<String,Object>>(){});
 
+			for (Entry<String, Object> mapElement  : map.entrySet()){
+				Map<String,Object> entries = (Map<String,Object>)mapElement.getValue();		//This map is just to rip off the version key/value pair
+
+				//This map includes the actual entries, which key: org.apache.nutch.... 
+				//and value: Another map which has key: overload/Logical_Dependency/etc and some int value
+				for(Entry<String,Object> entriesElement : entries.entrySet()){		
+					Map<String,Integer> entry = (Map<String,Integer>)entriesElement.getValue();
+					for(Entry<String,Integer> entryElement : entry.entrySet()){
+						//Compare values here
+					}
+				}
+            }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		// Read in result json (outputFile + ".json")
+		try {
+			//Read json here
+			Map<String, Object> map = objectMapper.readValue(new File(outputFile + ".json"),
+			new TypeReference<Map<String,Object>>(){});
 
+			for (Entry<String, Object> mapElement  : map.entrySet()){
+				//This map is just to rip off the version key/value pair
+				Map<String,Object> entries = (Map<String,Object>)mapElement.getValue();		
+
+				//This map includes the actual entries, which key: org.apache.nutch.... 
+				//and value: Another map which has key: overload/Logical_Dependency/etc and some int value
+				for(Entry<String,Object> entriesElement : entries.entrySet()){		
+					System.out.println("In entry: " + entriesElement.getKey());
+					Map<String,Integer> entry = (Map<String,Integer>)entriesElement.getValue();
+					for(Entry<String,Integer> entryElement : entry.entrySet()){
+						//Compare values here
+					}
+				}
+            }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// Compare oracle to result (assertions)
 	}
 }
