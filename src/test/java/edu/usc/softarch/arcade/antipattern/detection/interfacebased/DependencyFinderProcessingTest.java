@@ -71,6 +71,8 @@ public class DependencyFinderProcessingTest {
 		// Create output directory if does not exist
 		(new File("target" + File.separatorChar + "test_results" + File.separatorChar + "DependencyFinderProcessingTest")).mkdirs();
 
+		// Flush JSON Object because it is static
+		DependencyFinderProcessing.flushJSONObject();
 		// Call DependencyFinderProcessing.main()
 		// Output json file will have path outputFile + ".json"
 		assertDoesNotThrow( ()-> {

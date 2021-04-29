@@ -114,6 +114,10 @@ public class DependencyFinderProcessing {
 		
 	}
 
+	public static void flushJSONObject(){
+		details_json = new JSONObject();
+	}
+
 	private Set<File> loadDirFilterExtension(File dir, String extension) 
 			throws FileNotFoundException {
 		List<File> fileList = FileListing.getFileListing(dir);
