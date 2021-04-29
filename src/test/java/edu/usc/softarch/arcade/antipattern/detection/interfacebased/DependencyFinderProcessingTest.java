@@ -1,8 +1,16 @@
 package edu.usc.softarch.arcade.antipattern.detection.interfacebased;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -18,6 +26,7 @@ public class DependencyFinderProcessingTest {
 		// Path to _clean.csv file
 		// Fully qualified name of the package under analysis
 		// Path to the output file
+		// Path to oracle
 		
 		// nutch 1.7
 		".///src///test///resources///subject_systems_resources///nutch///src///nutch-1.7,"
@@ -68,10 +77,44 @@ public class DependencyFinderProcessingTest {
 			DependencyFinderProcessing.main(new String[] {sysDir, clusterDir, depfinderDir, cloneDir, cleanedCsv, pkgName, outputFile});
 		});
 
-		// Read in oracle json (oraclePath)
+		ObjectMapper objectMapper = new ObjectMapper();
 
 		// Read in result json (outputFile + ".json")
+		Map<String, Map<String, Map<String, Integer>>> outputMap = new HashMap<>();
+		try {
+			//Read json here
+			outputMap = objectMapper.readValue(new File(outputFile + ".json"), new TypeReference<Map<String, Map<String, Map<String, Integer>>>>(){});
 
-		// Compare oracle to result (assertions)
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("DependencyFinderProcessingTest.java: Failed to read in output json");
+		}
+
+		// Read in oracle json (oraclePath)
+		try {
+			//Read json here
+			Map<String, Map<String, Map<String, Integer>>> oracleMap = objectMapper.readValue(new File(oraclePath), new TypeReference<Map<String, Map<String, Map<String, Integer>>>>(){});
+
+			// check sizes
+			assertEquals(oracleMap.size(), outputMap.size(), "DependencyFinderProcessingTest.java: Failed due to mismatched map sizes");
+
+			for (String versionKey : oracleMap.keySet()){
+				// check sizes
+				assertEquals(oracleMap.get(versionKey).size(), outputMap.get(versionKey).size(), "DependencyFinderProcessingTest.java: Failed due to mismatched map sizes");
+				//This map includes the actual entries, which key: org.apache.nutch.... 
+				//and value: Another map which has key: overload/Logical_Dependency/etc and some int value
+				for(String classKey : oracleMap.get(versionKey).keySet()){		
+					// check sizes
+					assertEquals(oracleMap.get(versionKey).get(classKey).size(), outputMap.get(versionKey).get(classKey).size(), "DependencyFinderProcessingTest.java: Failed due to mismatched map sizes");
+
+					for(String valueKey : oracleMap.get(versionKey).get(classKey).keySet()){
+						assertEquals(oracleMap.get(versionKey).get(classKey).get(valueKey), outputMap.get(versionKey).get(classKey).get(valueKey));
+					}
+				}
+            }
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("DependencyFinderProcessingTest.java: Failed to read in oracle json");
+		}
 	}
 }
