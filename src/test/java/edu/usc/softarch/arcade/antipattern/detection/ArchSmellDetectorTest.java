@@ -200,9 +200,9 @@ public class ArchSmellDetectorTest {
 
   @CsvSource({
     //Input for asd constructor to run on struts-2.3.30
-    "///output///struts-2.3.30_deps.rsf,"
-    + "///output///struts-2.3.30_acdc_clustered.rsf,"
-    + "///output///struts-2.3.30_acdc_smells.ser,"
+    "///input_files///struts-2.3.30_deps.rsf,"
+    + "ORACLE - ARC CLUSTER FILE,"
+    + "ORACLE - ARC SMELLS FILE,"
     + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusterSmellMap_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusters_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_detectedSmells_after.txt,"
@@ -211,9 +211,9 @@ public class ArchSmellDetectorTest {
     + "struts-2.3.30",
 
     //Input for asd constructor to run on struts-2.5.2
-    "///output///struts-2.5.2_deps.rsf,"
-    + "///output///struts-2.5.2_acdc_clustered.rsf,"
-    + "///output///struts-2.5.2_acdc_smells.ser,"
+    "///input_files///struts-2.5.2_deps.rsf,"
+    + "ORACLE - ARC CLUSTER FILE,"
+    + "ORACLE - ARC SMELLS FILE,"
     + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusterSmellMap_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusters_after.txt,"
     + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_detectedSmells_after.txt,"
@@ -225,71 +225,75 @@ public class ArchSmellDetectorTest {
   public void runConcernDetectionAlgsTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
                                              String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile,
                                              String clusterObjectFileBefore, String topics, String version) {
-    String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
-    resources_dir = resources_dir.replace("///", File.separator);
-
-    depsRsfFilename = resources_dir + depsRsfFilename.replace("///", File.separator);
-    clustersRsfFilename = resources_dir + clustersRsfFilename.replace("///", File.separator);
-    detectedSmellsFilename = detectedSmellsFilename.replace("///", File.separator);
-
-    clusterSmellMapObjectFile = clusterSmellMapObjectFile.replace("///", File.separator);
-    clusterObjectFile = clusterObjectFile.replace("///", File.separator);
-    smellsObjectFile = smellsObjectFile.replace("///", File.separator);
-    clusterObjectFileBefore = clusterObjectFileBefore.replace("///", File.separator);
-    topics = topics.replace("///", File.separator);
-
-    // Initialize variables
-		SmellCollection detectedSmells = new SmellCollection();
-		ConcernClusterArchitecture clusters = ConcernClusterArchitecture.loadFromRsf(clustersRsfFilename);
-		Map<String, Set<String>> clusterSmellMap = new HashMap<>();
     
-    DocTopics docTopic;
-    ArchSmellDetector asd;
-    try{
-      ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + topics));
-      docTopic = (DocTopics) ois.readObject();
+    
+    throw new UnsupportedOperationException();
+    
+    // String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
+    // resources_dir = resources_dir.replace("///", File.separator);
 
-      asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename,"java",
-                        TopicModelExtractionMethod.MALLET_API, docTopic, version);
+    // depsRsfFilename = resources_dir + depsRsfFilename.replace("///", File.separator);
+    // clustersRsfFilename = resources_dir + clustersRsfFilename.replace("///", File.separator);
+    // detectedSmellsFilename = detectedSmellsFilename.replace("///", File.separator);
 
-      ois.close();
-      asd.runConcernDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
-    } catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-      fail("Exception caught in runConcernDetectionAlgsTest"); // if we get here, we done goofed
-    }
+    // clusterSmellMapObjectFile = clusterSmellMapObjectFile.replace("///", File.separator);
+    // clusterObjectFile = clusterObjectFile.replace("///", File.separator);
+    // smellsObjectFile = smellsObjectFile.replace("///", File.separator);
+    // clusterObjectFileBefore = clusterObjectFileBefore.replace("///", File.separator);
+    // topics = topics.replace("///", File.separator);
 
-    //check that the data structures are not empty after running runConcernDetectionAlgs
-    assertAll(
-        () -> assertTrue(clusters.size() > 0),
-        () -> assertTrue(detectedSmells.size() > 0),
-        () -> assertTrue(clusterSmellMap.size() > 0)
-      );
+    // // Initialize variables
+		// SmellCollection detectedSmells = new SmellCollection();
+		// ConcernClusterArchitecture clusters = ConcernClusterArchitecture.loadFromRsf(clustersRsfFilename);
+		// Map<String, Set<String>> clusterSmellMap = new HashMap<>();
+    
+    // DocTopics docTopic;
+    // ArchSmellDetector asd;
+    // try{
+    //   ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + topics));
+    //   docTopic = (DocTopics) ois.readObject();
 
-    try {
-      ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterSmellMapObjectFile));
-      Map<String, Set<String>> oracle_clusterSmellMap = (Map<String, Set<String>>) ois.readObject();
-			ois.close();
+    //   asd = new ArchSmellDetector(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename,"java",
+    //                     TopicModelExtractionMethod.MALLET_API, docTopic, version);
 
-			ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterObjectFile));
-      ConcernClusterArchitecture oracle_clusters = (ConcernClusterArchitecture) ois.readObject();
-			ois.close();
+    //   ois.close();
+    //   asd.runConcernDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
+    // } catch (IOException | ClassNotFoundException e) {
+		// 	e.printStackTrace();
+    //   fail("Exception caught in runConcernDetectionAlgsTest"); // if we get here, we done goofed
+    // }
 
-			ois = new ObjectInputStream(new FileInputStream(resources_dir + smellsObjectFile));
-      SmellCollection oracle_detectedSmells = (SmellCollection) ois.readObject();
-			ois.close();
+    // //check that the data structures are not empty after running runConcernDetectionAlgs
+    // assertAll(
+    //     () -> assertTrue(clusters.size() > 0),
+    //     () -> assertTrue(detectedSmells.size() > 0),
+    //     () -> assertTrue(clusterSmellMap.size() > 0)
+    //   );
+
+    // try {
+    //   ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterSmellMapObjectFile));
+    //   Map<String, Set<String>> oracle_clusterSmellMap = (Map<String, Set<String>>) ois.readObject();
+		// 	ois.close();
+
+		// 	ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterObjectFile));
+    //   ConcernClusterArchitecture oracle_clusters = (ConcernClusterArchitecture) ois.readObject();
+		// 	ois.close();
+
+		// 	ois = new ObjectInputStream(new FileInputStream(resources_dir + smellsObjectFile));
+    //   SmellCollection oracle_detectedSmells = (SmellCollection) ois.readObject();
+		// 	ois.close();
 
       
-      assertAll(
-        () -> assertEquals(oracle_clusterSmellMap, clusterSmellMap),
-        () -> assertEquals(oracle_clusters, clusters),
-        () -> assertEquals(oracle_detectedSmells, detectedSmells)
-      );
+    //   assertAll(
+    //     () -> assertEquals(oracle_clusterSmellMap, clusterSmellMap),
+    //     () -> assertEquals(oracle_clusters, clusters),
+    //     () -> assertEquals(oracle_detectedSmells, detectedSmells)
+    //   );
       
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-      fail("Exception caught in runConcernDetectionAlgsTest");
-		}
+		// } catch (IOException | ClassNotFoundException e) {
+		// 	e.printStackTrace();
+    //   fail("Exception caught in runConcernDetectionAlgsTest");
+		// }
   }
 
   @CsvSource({
