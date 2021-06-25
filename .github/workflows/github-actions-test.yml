@@ -16,7 +16,8 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-
+      - name: Setup with Maven
+        run: mvn clean
       - name: Build with Maven
         run: mvn test
       - run: echo "🍏 This job's status is ${{ job.status }}."
