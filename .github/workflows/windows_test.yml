@@ -1,5 +1,6 @@
 name: GitHub Actions Test
 on: [push]
+on: workflow_dispatch
 jobs:
   Explore-GitHub-Actions:
     runs-on: windows-latest
