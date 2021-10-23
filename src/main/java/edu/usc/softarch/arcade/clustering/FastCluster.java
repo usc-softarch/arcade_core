@@ -167,4 +167,30 @@ public class FastCluster implements Serializable {
 	public String toString() {
 		return name;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) return false;
+		if (o == this) return true;
+		if (!(o instanceof FastCluster)) return false;
+
+		FastCluster toCompare = (FastCluster) o;
+
+		boolean condition1 = this.name != null
+			? this.name.equals(toCompare.name)
+			: toCompare.name == null;
+
+		boolean condition2 = this.numEntities == toCompare.numEntities;
+		boolean condition3 = this.featuresLength == toCompare.featuresLength;
+
+		boolean condition4 = this.docTopicItem != null
+			? this.docTopicItem.equals(toCompare.docTopicItem)
+			: toCompare.docTopicItem == null;
+
+		boolean condition5 = this.nonZeroFeatureMap != null
+			? this.nonZeroFeatureMap.equals(toCompare.nonZeroFeatureMap)
+			: toCompare.nonZeroFeatureMap == null;
+
+		return condition1 && condition2	&& condition3 && condition4	&& condition5;
+	}
 }

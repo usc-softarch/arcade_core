@@ -192,6 +192,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		FastClusterArchitecture updatedFastClusters =
 			new FastClusterArchitecture(fastClusters);
 		for (String key : parentClassMap.keySet()) {
+			
 			for (FastCluster nestedCluster : fastClusters) {
 				if (nestedCluster.getName().equals(key)) {
 					for (FastCluster parentCluster : fastClusters) {
