@@ -16,7 +16,7 @@ public abstract class SourceToDepsBuilder {
 	protected int numSourceEntities;
 	protected FastFeatureVectors ffVecs;
 
-	public abstract void build(String classesDirPath, String depsRsfFilename)
+	public abstract void build(String classesDirPath, String depsRsfFilename, String ffVecsFilename)
 		throws IOException;
 	public Set<Pair<String,String>> getEdges() { return this.edges; }
 	public int getNumSourceEntities() { return numSourceEntities; }

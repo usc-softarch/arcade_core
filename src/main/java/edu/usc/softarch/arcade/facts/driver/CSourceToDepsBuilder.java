@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.PropertyConfigurator;
 
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
@@ -28,11 +27,11 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 	}
 
 	public static void main(String[] args) throws IOException {
-		(new CSourceToDepsBuilder()).build(args[0], args[1]);
+		(new CSourceToDepsBuilder()).build(args[0], args[1], args[2]);
 	}
 
 	@Override
-	public void build(String classesDirPath, String depsRsfFilename) throws IOException {
+	public void build(String classesDirPath, String depsRsfFilename, String ffVecsFilename) throws IOException {
 		String inputDir = FileUtil.tildeExpandPath(classesDirPath);
 		String depsRsfFilepath = FileUtil.tildeExpandPath(depsRsfFilename);
 		
@@ -75,6 +74,8 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		
 		FeatureVectorMap fvMap = new FeatureVectorMap(typedEdgeGraph);
 		ffVecs = fvMap.convertToFastFeatureVectors();
+
+		ffVecs.serializeFFVectors(ffVecsFilename);
 	}
 
 	private static void execCmd(String cmd, String inputDir) throws IOException {

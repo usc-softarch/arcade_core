@@ -88,11 +88,15 @@ public class BatchClusteringEngine {
 		File depsRsfFile = new File(depsRsfFilename);
 		depsRsfFile.getParentFile().mkdirs();
 
+		String ffVecsFilename = outputDirName + fs + revisionNumber + "_ffVecs.json";
+		File ffVecsFile = new File(ffVecsFilename);
+		ffVecsFile.getParentFile().mkdirs();
+
 		// Fact extraction
 		logger.debug("Get deps for revision " + revisionNumber);
 		SourceToDepsBuilder builder = new JavaSourceToDepsBuilder();
 		if (language.equals("c"))	builder = new CSourceToDepsBuilder();
-		builder.build(fullClassesDir, depsRsfFilename);
+		builder.build(fullClassesDir, depsRsfFilename, ffVecsFilename);
 		if (builder.getEdges().isEmpty()) return;
 
 		// Set the number of topics to be used in clustering

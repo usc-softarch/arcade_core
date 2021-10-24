@@ -86,6 +86,12 @@ public class AcdcWithSmellDetection {
 		File depsRsfFile = new File(depsRsfFilename);
 		if (!depsRsfFile.getParentFile().exists())
 			depsRsfFile.getParentFile().mkdirs();
+
+		String ffVecsFilename = outputDir.getAbsolutePath() + fs
+			+ versionFolderName + "_ffVecs.json";
+		File ffVecsFile = new File(ffVecsFilename);
+		if (!ffVecsFile.getParentFile().exists())
+			ffVecsFile.getParentFile().mkdirs();
 		
 		logger.debug("Get deps for revision " + versionFolderName);
 		
@@ -101,7 +107,7 @@ public class AcdcWithSmellDetection {
 				throw new IllegalArgumentException("Error parsing arguments.");
 		}
 		
-		builder.build(classesDirPath, depsRsfFilename);
+		builder.build(classesDirPath, depsRsfFilename, ffVecsFilename);
 		if (builder.getEdges().isEmpty()) return; //TODO Throw appropriate error
 		
 		// acdcClusteredfile is the recovered architecture for acdc, one per
