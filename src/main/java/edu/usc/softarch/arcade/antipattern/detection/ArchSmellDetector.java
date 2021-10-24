@@ -1,10 +1,6 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -715,9 +711,9 @@ public class ArchSmellDetector {
 			smellyTopicItems.removeIf((TopicItem ti) -> 
 				ti.getProportion() < scatteredConcernThreshold);
 
-			for (TopicItem ti : dti.getTopics()) {
+			for (TopicItem ti : smellyTopicItems) {
 				// count the number of times the topic appears
-				topicNumCountMap.compute(ti.getTopicNum(), (k, v) ->	(v == null) ? 1 : v++);
+				topicNumCountMap.compute(ti.getTopicNum(), (k, v) -> (v == null) ? 1 : ++v);
 				
 				// map cluster to the related topicItem
 				scatteredTopicToClustersMap.putIfAbsent(

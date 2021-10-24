@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.clustering;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;

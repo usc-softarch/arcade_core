@@ -20,8 +20,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import edu.usc.softarch.arcade.clustering.acdc.ACDC;
-import edu.usc.softarch.arcade.topics.DocTopics;
-import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 

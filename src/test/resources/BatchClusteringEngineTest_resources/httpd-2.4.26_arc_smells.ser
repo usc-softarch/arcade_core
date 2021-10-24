@@ -1,6 +1,21 @@
-<linked-hash-set>
-  <edu.usc.softarch.arcade.antipattern.detection.BdcSmell>
-    <clusters>
+<edu.usc.softarch.arcade.antipattern.SmellCollection serialization="custom">
+  <unserializable-parents/>
+  <set>
+    <default/>
+    <int>16</int>
+    <float>0.75</float>
+    <int>10</int>
+
+  <edu.usc.softarch.arcade.antipattern.Smell>
+    <clusters serialization="custom">
+      <unserializable-parents/>
+      <set>
+        <default/>
+        <int>16</int>
+        <float>0.75</float>
+        <int>11</int>
+
+    
       <edu.usc.softarch.arcade.facts.ConcernCluster>
         <name>77</name>
         <entities>
@@ -381,6 +396,208 @@
           <string>modules/dav/main/std_liveprop.c</string>
         </entities>
       </edu.usc.softarch.arcade.facts.ConcernCluster>
+    </set>
     </clusters>
-  </edu.usc.softarch.arcade.antipattern.detection.BdcSmell>
-</linked-hash-set>
+    <smellType>bdc</smellType>
+    <topicNum>-1</topicNum>
+  </edu.usc.softarch.arcade.antipattern.Smell>
+
+
+  <edu.usc.softarch.arcade.antipattern.Smell>
+    <clusters serialization="custom">
+      <unserializable-parents/>
+      <set>
+        <default/>
+        <int>16</int>
+        <float>0.75</float>
+        <int>1</int>
+
+    
+      <edu.usc.softarch.arcade.facts.ConcernCluster>
+        <name>46</name>
+        <entities>
+          <string>include/ap_config.h</string>
+        </entities>
+      </edu.usc.softarch.arcade.facts.ConcernCluster>
+    </set>
+    </clusters>
+    <smellType>buo</smellType>
+    <topicNum>-1</topicNum>
+  </edu.usc.softarch.arcade.antipattern.Smell>
+
+
+  <edu.usc.softarch.arcade.antipattern.Smell>
+    <clusters serialization="custom">
+      <unserializable-parents/>
+      <set>
+        <default/>
+        <int>16</int>
+        <float>0.75</float>
+        <int>1</int>
+
+    
+      <edu.usc.softarch.arcade.facts.ConcernCluster>
+        <name>14</name>
+        <entities>
+          <string>include/util_cfgtree.h</string>
+        </entities>
+      </edu.usc.softarch.arcade.facts.ConcernCluster>
+    </set>
+    </clusters>
+    <smellType>buo</smellType>
+    <topicNum>-1</topicNum>
+  </edu.usc.softarch.arcade.antipattern.Smell>
+
+
+  <edu.usc.softarch.arcade.antipattern.Smell>
+    <clusters serialization="custom">
+      <unserializable-parents/>
+      <set>
+        <default/>
+        <int>16</int>
+        <float>0.75</float>
+        <int>1</int>
+
+    
+      <edu.usc.softarch.arcade.facts.ConcernCluster>
+        <name>8</name>
+        <entities>
+          <string>include/ap_mmn.h</string>
+        </entities>
+      </edu.usc.softarch.arcade.facts.ConcernCluster>
+    </set>
+    </clusters>
+    <smellType>buo</smellType>
+    <topicNum>-1</topicNum>
+  </edu.usc.softarch.arcade.antipattern.Smell>
+
+
+  <edu.usc.softarch.arcade.antipattern.Smell>
+    <clusters serialization="custom">
+      <unserializable-parents/>
+      <set>
+        <default/>
+        <int>16</int>
+        <float>0.75</float>
+        <int>1</int>
+
+    
+      <edu.usc.softarch.arcade.facts.ConcernCluster>
+        <name>27</name>
+        <entities>
+          <string>include/ap_hooks.h</string>
+        </entities>
+      </edu.usc.softarch.arcade.facts.ConcernCluster>
+    </set>
+    </clusters>
+    <smellType>buo</smellType>
+    <topicNum>-1</topicNum>
+  </edu.usc.softarch.arcade.antipattern.Smell>
+
+
+  <edu.usc.softarch.arcade.antipattern.Smell>
+    <clusters serialization="custom">
+      <unserializable-parents/>
+      <set>
+        <default/>
+        <int>16</int>
+        <float>0.75</float>
+        <int>1</int>
+
+    
+      <edu.usc.softarch.arcade.facts.ConcernCluster>
+        <name>29</name>
+        <entities>
+          <string>include/http_log.h</string>
+        </entities>
+      </edu.usc.softarch.arcade.facts.ConcernCluster>
+    </set>
+    </clusters>
+    <smellType>buo</smellType>
+    <topicNum>-1</topicNum>
+  </edu.usc.softarch.arcade.antipattern.Smell>
+
+
+  <edu.usc.softarch.arcade.antipattern.Smell>
+    <clusters serialization="custom">
+      <unserializable-parents/>
+      <set>
+        <default/>
+        <int>16</int>
+        <float>0.75</float>
+        <int>1</int>
+
+    
+      <edu.usc.softarch.arcade.facts.ConcernCluster reference="../../../../edu.usc.softarch.arcade.antipattern.Smell/clusters/set/edu.usc.softarch.arcade.facts.ConcernCluster[7]"/>
+    </set>
+    </clusters>
+    <smellType>buo</smellType>
+    <topicNum>-1</topicNum>
+  </edu.usc.softarch.arcade.antipattern.Smell>
+
+
+  <edu.usc.softarch.arcade.antipattern.Smell>
+    <clusters serialization="custom">
+      <unserializable-parents/>
+      <set>
+        <default/>
+        <int>16</int>
+        <float>0.75</float>
+        <int>1</int>
+
+    
+      <edu.usc.softarch.arcade.facts.ConcernCluster>
+        <name>30</name>
+        <entities>
+          <string>include/apache_noprobes.h</string>
+        </entities>
+      </edu.usc.softarch.arcade.facts.ConcernCluster>
+    </set>
+    </clusters>
+    <smellType>buo</smellType>
+    <topicNum>-1</topicNum>
+  </edu.usc.softarch.arcade.antipattern.Smell>
+
+
+  <edu.usc.softarch.arcade.antipattern.Smell>
+    <clusters serialization="custom">
+      <unserializable-parents/>
+      <set>
+        <default/>
+        <int>16</int>
+        <float>0.75</float>
+        <int>1</int>
+
+    
+      <edu.usc.softarch.arcade.facts.ConcernCluster reference="../../../../edu.usc.softarch.arcade.antipattern.Smell/clusters/set/edu.usc.softarch.arcade.facts.ConcernCluster[8]"/>
+    </set>
+    </clusters>
+    <smellType>buo</smellType>
+    <topicNum>-1</topicNum>
+  </edu.usc.softarch.arcade.antipattern.Smell>
+
+
+  <edu.usc.softarch.arcade.antipattern.Smell>
+    <clusters serialization="custom">
+      <unserializable-parents/>
+      <set>
+        <default/>
+        <int>16</int>
+        <float>0.75</float>
+        <int>1</int>
+
+    
+      <edu.usc.softarch.arcade.facts.ConcernCluster>
+        <name>40</name>
+        <entities>
+          <string>include/ap_release.h</string>
+        </entities>
+      </edu.usc.softarch.arcade.facts.ConcernCluster>
+    </set>
+    </clusters>
+    <smellType>buo</smellType>
+    <topicNum>-1</topicNum>
+  </edu.usc.softarch.arcade.antipattern.Smell>
+
+  </set>
+</edu.usc.softarch.arcade.antipattern.SmellCollection>
