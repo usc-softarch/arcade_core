@@ -24,10 +24,11 @@ public class BatchCloneFinderTest {
 	/**
 	 * Sets up the CLI command to run PMD.
 	 * 
-	 * @param version The name and version of the sample system.
+	 * @param system The name of the sample system.
+	 * @param version The version of the sample system.
 	 * @return The command and arguments needed to run PMD.
 	 */
-	private List<String> buildArguments(String version) {
+	private List<String> buildArguments(String system, String version) {
 		List<String> command = new ArrayList<>();
 
 		// The actual system being run is ANT. PMD is run through it.
@@ -42,7 +43,7 @@ public class BatchCloneFinderTest {
 		// This is the input for PMD
 		command.add("-Din=" + System.getProperty("user.dir") + fs + "src" + fs
 			+ "test" + fs + "resources" + fs + "subject_systems_resources" + fs
-			+ "nutch" + fs + "src" + fs + version);
+			+ system + fs + "src" + fs + version);
 		// This is the path for an output file.
 		command.add("-Dout="+ System.getProperty("user.dir") + fs + "target" + fs
 			+ "test_results" + fs + "BatchCloneFinderTest" + fs + version 
@@ -54,12 +55,13 @@ public class BatchCloneFinderTest {
 	/**
 	 * Sets up and runs the Process object responsible for PMD.
 	 * 
-	 * @param version The name and version of the sample system.
+	 * @param system The name of the sample system.
+	 * @param version The version of the sample system.
 	 */
-	public void setUp(String version) {
+	private void setUp(String system, String version) {
 		(new File("target" + fs + "test_results" + fs + "BatchCloneFinderTest"))
 			.mkdirs();
-		List<String> command = buildArguments(version);
+		List<String> command = buildArguments(system, version);
 		ProcessBuilder pb = new ProcessBuilder(command);
 		pb.inheritIO();
 
@@ -74,6 +76,18 @@ public class BatchCloneFinderTest {
 			fail("Failed to wait for Process.");
 		}
 	}
+
+	/**
+	 * Cleans up any absolute paths in the result of PMD, so the test will be able
+	 * to compare the strings.
+	 * 
+	 * @param toClean The String to clean.
+	 * @return A new String with relative paths.
+	 */
+	private String cleanAbsolutePaths(String toClean) {
+		return toClean.replaceAll("\\r\\n?", "\n")
+			.replaceAll("path=\\\".*\\\\subject_systems(_resources)?", " ");
+	}
 	
 	/**
 	 * Test for PMD's CPD module, used as a clone detector in ARCADE. The goal of
@@ -81,35 +95,41 @@ public class BatchCloneFinderTest {
 	 * ARCADE, both as a sanity check and as a gatekeeping mechanism if we ever
 	 * opt to use a newer version of PMD, or a different clone detector.
 	 * 
-	 * @param version The name and version of the sample system.
+	 * @param system The name of the sample system.
+	 * @param version The version of the sample system.
 	 * @param oracle The path to the test oracle file.
 	 */
 	@ParameterizedTest
 	@CsvSource({
 		// struts-2.3.30
-		"struts-2.3.30,"
+		"Struts2,"
+		+ "struts-2.3.30,"
 		+ ".///src///test///resources///BatchCloneFinderTest_resources"
 			+ "///struts-2.3.30_clone.xml",
 		// struts-2.5.2
-		"struts-2.5.2,"
+		"Struts2,"
+		+ "struts-2.5.2,"
 		+ ".///src///test///resources///BatchCloneFinderTest_resources"
 			+ "///struts-2.5.2_clone.xml",
 		// nutch-1.7
-		"nutch-1.7,"
+		"nutch,"
+		+ "nutch1.7,"
 		+ ".///src///test///resources///BatchCloneFinderTest_resources"
 			+ "///nutch-1.7_clone.xml",
 		// nutch-1.8
-		"nutch-1.8,"
+		"nutch,"
+		+ "nutch1.8,"
 		+ ".///src///test///resources///BatchCloneFinderTest_resources"
 			+ "///nutch-1.8_clone.xml",
 		// nutch-1.8
-		"nutch-1.9,"
+		"nutch,"
+		+ "nutch1.9,"
 		+ ".///src///test///resources///BatchCloneFinderTest_resources"
 			+ "///nutch-1.9_clone.xml",
 	})
-	public void singleTest(String version, String oracle) {
+	public void singleTest(String system, String version, String oracle) {
 		// Constructs ProcessBuilder
-		setUp(version);
+		setUp(system, version);
 
 		String oraclePath = oracle.replace("///", File.separator);
 		String resultPath = "target" + fs + "test_results" + fs
@@ -123,6 +143,7 @@ public class BatchCloneFinderTest {
 		  return FileUtil.readFile(oraclePath, StandardCharsets.UTF_8);
 		});
 
-		assertEquals(oracleString, resultString);
+		assertEquals(cleanAbsolutePaths(oracleString),
+			cleanAbsolutePaths(resultString));
 	}
 }
