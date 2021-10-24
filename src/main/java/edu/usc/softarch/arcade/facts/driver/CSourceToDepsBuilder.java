@@ -13,7 +13,6 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
-import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -71,9 +70,7 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 			sources.add(edge.getLeft());
 		}
 		numSourceEntities = sources.size();
-		
-		FeatureVectorMap fvMap = new FeatureVectorMap(typedEdgeGraph);
-		ffVecs = fvMap.convertToFastFeatureVectors();
+		ffVecs = new FastFeatureVectors(typedEdgeGraph);
 
 		ffVecs.serializeFFVectors(ffVecsFilename);
 	}
