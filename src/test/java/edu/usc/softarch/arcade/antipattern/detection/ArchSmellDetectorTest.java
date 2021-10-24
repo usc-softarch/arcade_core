@@ -23,149 +23,198 @@ import edu.usc.softarch.arcade.clustering.acdc.ACDC;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 
+/**
+ * Tests related to the basic smell detection components of ARCADE:
+ * BUO (Brick Use Overload), BDC (Brick Dependency Cycle),
+ * BCO (Brick Concern Overload) and SPF (Scattered Parasitic Functionality).
+ */
 public class ArchSmellDetectorTest {
+  private String fs = File.separator;
+
   @BeforeEach
-	public void setUp(){
-		char fs = File.separatorChar;
-		String outputPath = "." + fs + "target" + fs + "test_results" + fs + "ArchSmellDetectorTest";
+	public void setUp() {
+		String outputPath = "." + fs + "target" + fs + "test_results"
+      + fs + "ArchSmellDetectorTest";
 		File directory = new File(outputPath);
 		directory.mkdirs();
 	}
 
+  /**
+   * Tests for structural smell detection algorithms: BDC and BUO.
+   * 
+   * @param oracle Oracle ser file path
+   * @param deps Deps rsf file path
+   * @param output Output directory
+   * @param clusters Output file path for clusters file
+   * @param ser Desired filename of result ser
+   */
 	@ParameterizedTest
 	@CsvSource({
-		/** Test parameters **/
-		// [oracle ser file path]
-		// [deps rsf file path]
-		// [output directory]
-		// [output file path for clusters file]
-		// [desired filename of result ser]
-
 		// struts 2.3.30
-		".///src///test///resources///ArchSmellDetectorTest_resources///edited_struts-2.3.30_acdc_smells.ser,"
-		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.3.30_deps.rsf,"
+		".///src///test///resources///ArchSmellDetectorTest_resources"
+      + "///edited_struts-2.3.30_acdc_smells.ser,"
+		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources"
+      + "///struts-2.3.30_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
-		+ ".///target///test_results///ArchSmellDetectorTest///struts-2.3.30_acdc_clusters.rsf,"
+		+ ".///target///test_results///ArchSmellDetectorTest"
+      + "///struts-2.3.30_acdc_clusters.rsf,"
 		+ "struts-2.3.30_acdc_smells.ser",
 
 		// struts 2.5.2
-		".///src///test///resources///ArchSmellDetectorTest_resources///edited_struts-2.5.2_acdc_smells.ser,"
-		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources///struts-2.5.2_deps.rsf,"
+		".///src///test///resources///ArchSmellDetectorTest_resources"
+      + "///edited_struts-2.5.2_acdc_smells.ser,"
+		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources"
+      + "///struts-2.5.2_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
-		+ ".///target///test_results///ArchSmellDetectorTest///struts-2.5.2_acdc_clusters.rsf,"
+		+ ".///target///test_results///ArchSmellDetectorTest"
+      + "///struts-2.5.2_acdc_clusters.rsf,"
 		+ "struts-2.5.2_acdc_smells.ser",
 
 		// httpd 2.3.8
-		".///src///test///resources///ArchSmellDetectorTest_resources///edited_httpd-2.3.8_acdc_smells.ser,"
-		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.3.8_deps.rsf,"
+		".///src///test///resources///ArchSmellDetectorTest_resources"
+      + "///edited_httpd-2.3.8_acdc_smells.ser,"
+		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources"
+      + "///httpd-2.3.8_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
-		+ ".///target///test_results///ArchSmellDetectorTest///httpd-2.3.8_acdc_clusters.rsf,"
+		+ ".///target///test_results///ArchSmellDetectorTest"
+      + "///httpd-2.3.8_acdc_clusters.rsf,"
 		+ "httpd-2.3.8_acdc_smells.ser",
 
 		// httpd 2.4.26
-		".///src///test///resources///ArchSmellDetectorTest_resources///edited_httpd-2.4.26_acdc_smells.ser,"
-		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.4.26_deps.rsf,"
+		".///src///test///resources///ArchSmellDetectorTest_resources"
+      + "///edited_httpd-2.4.26_acdc_smells.ser,"
+		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources"
+      + "///httpd-2.4.26_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
-		+ ".///target///test_results///ArchSmellDetectorTest///httpd-2.4.26_acdc_clusters.rsf,"
+		+ ".///target///test_results///ArchSmellDetectorTest"
+      + "///httpd-2.4.26_acdc_clusters.rsf,"
 		+ "httpd-2.4.26_acdc_smells.ser",
 	})
-	public void asdWithoutConcernsTest(String oracle, String deps, String output, String clusters, String ser){    
+	public void asdWithoutConcernsTest(String oracle, String deps,
+      String output, String clusters, String ser) {    
 		/** ACDC - smell analyzer integration test **/
-		String oraclePath = oracle.replace("///", File.separator);  
-		String depsPath = deps.replace("///", File.separator);
-		String outputPath = output.replace("///", File.separator);
-		String outputClustersPath = clusters.replace ("///", File.separator);
+		String oraclePath = oracle.replace("///", fs);  
+		String depsPath = deps.replace("///", fs);
+		String outputPath = output.replace("///", fs);
+		String outputClustersPath = clusters.replace ("///", fs);
 		
 		// Get clusters
 		ACDC.run(depsPath, outputClustersPath);
-		String resultSerFilename = outputPath + File.separator + ser;
-		ArchSmellDetector asd = new ArchSmellDetector(depsPath, outputClustersPath, resultSerFilename);
+		String resultSerFilename = outputPath + fs + ser;
+		ArchSmellDetector asd =
+      new ArchSmellDetector(depsPath, outputClustersPath, resultSerFilename);
 		
 		// Call ArchSmellDetector.run() (with runConcern=false)
-		SmellCollection resultSmells = assertDoesNotThrow(() -> asd.run(true, false, true)); 
+		SmellCollection resultSmells = assertDoesNotThrow(
+      () -> asd.run(true, false, true)); 
 
 		// Construct SmellCollection objects out of the result and oracle files
 		SmellCollection oracleSmells = assertDoesNotThrow(() -> {
 			return new SmellCollection(oraclePath);
 		});
 
-		// SmellCollection extends HashSet, so we can use equals() to compare the result to the oracle
+		/* SmellCollection extends HashSet, so we can use equals() to compare the 
+     * result to the oracle */
 		assertEquals(oracleSmells, resultSmells);
 	}
 
+  /**
+   * Sanity checks of the structural smell detection algorithms
+   * 
+   * @param depsRsfFilename Input deps rsf file path
+   * @param clustersRsfFilename Input file path for clusters file
+   * @param detectedSmellsFilename Output ser file path
+   * @param clusterSmellMapObjectFile Oracle clustermap serialized object
+   * @param clusterObjectFile Oracle clusters serialized object
+   * @param smellsObjectFile Oracle detected smells serialized object
+   * @param version Version
+   */
   @CsvSource({
-    /** Test parameters **/
-		// [input deps rsf file path]
-		// [input file path for clusters file]
-    // [output ser file path]
-    // [oracle clustermap serialized object]
-    // [oracle clusters serialized object]
-    // [oracle detected smells serialized object]
-		// [version]
-
     //Input for asd constructor to run on struts-2.3.30
     "///input_files///struts-2.3.30_deps.rsf,"
     + "///input_files///struts-2.3.30_acdc_clustered.rsf,"
-    + "///target///test_results///ArchSmellDetectorTest///struts-2.3.30_acdc_smells.ser,"
-    + "///runStructuralDetectionAlgs_resources///struts-2.3.30_output_run_clusterSmellMap.txt,"
-    + "///runStructuralDetectionAlgs_resources///struts-2.3.30_output_run_clusters.txt,"
-    + "///runStructuralDetectionAlgs_resources///struts-2.3.30_output_run_detected_smells.txt,"
+    + "///target///test_results///ArchSmellDetectorTest"
+      + "///struts-2.3.30_acdc_smells.ser,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///struts-2.3.30_output_run_clusterSmellMap.txt,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///struts-2.3.30_output_run_clusters.txt,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///struts-2.3.30_output_run_detected_smells.txt,"
     + "struts-2.3.30",
 
     //Input for asd constructor to run on struts-2.5.2
     "///input_files///struts-2.5.2_deps.rsf,"
     + "///input_files///struts-2.5.2_acdc_clustered.rsf,"
-    + "///target///test_results///ArchSmellDetectorTest///struts-2.5.2_acdc_smells.ser,"
-    + "///runStructuralDetectionAlgs_resources///struts-2.5.2_output_run_clusterSmellMap.txt,"
-    + "///runStructuralDetectionAlgs_resources///struts-2.5.2_output_run_clusters.txt,"
-    + "///runStructuralDetectionAlgs_resources///struts-2.5.2_output_run_detected_smells.txt,"
+    + "///target///test_results///ArchSmellDetectorTest"
+      + "///struts-2.5.2_acdc_smells.ser,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///struts-2.5.2_output_run_clusterSmellMap.txt,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///struts-2.5.2_output_run_clusters.txt,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///struts-2.5.2_output_run_detected_smells.txt,"
     + "struts-2.5.2",
 
     //Input for asd constructor to run on httpd 2.3.8
     //TODO RESOURCES ARE PLACEHOLDERS REPLACE LATER
     "///input_files///httpd-2.3.8_deps.rsf,"
     + "///input_files///httpd-2.3.8_acdc_clustered.rsf,"
-    + "///target///test_results///ArchSmellDetectorTest///httpd-2.3.8_acdc_smells.ser,"
-    + "///runStructuralDetectionAlgs_resources///httpd-2.3.8_output_run_clusterSmellMap.txt,"
-    + "///runStructuralDetectionAlgs_resources///httpd-2.3.8_output_run_clusters.txt,"
-    + "///runStructuralDetectionAlgs_resources///httpd-2.3.8_output_run_detected_smells.txt,"
+    + "///target///test_results///ArchSmellDetectorTest"
+      + "///httpd-2.3.8_acdc_smells.ser,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///httpd-2.3.8_output_run_clusterSmellMap.txt,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///httpd-2.3.8_output_run_clusters.txt,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///httpd-2.3.8_output_run_detected_smells.txt,"
     + "httpd-2.3.8",
 
     //Input for asd constructor to run on httpd 2.4.26
     //TODO RESOURCES ARE PLACEHOLDERS REPLACE LATER
     "///input_files///httpd-2.4.26_deps.rsf,"
     + "///input_files///httpd-2.4.26_acdc_clustered.rsf,"
-    + "///target///test_results///ArchSmellDetectorTest///httpd-2.4.26_acdc_smells.ser,"
-    + "///runStructuralDetectionAlgs_resources///httpd-2.4.26_output_run_clusterSmellMap.txt,"
-    + "///runStructuralDetectionAlgs_resources///httpd-2.4.26_output_run_clusters.txt,"
-    + "///runStructuralDetectionAlgs_resources///httpd-2.4.26_output_run_detected_smells.txt,"
+    + "///target///test_results///ArchSmellDetectorTest"
+      + "///httpd-2.4.26_acdc_smells.ser,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///httpd-2.4.26_output_run_clusterSmellMap.txt,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///httpd-2.4.26_output_run_clusters.txt,"
+    + "///runStructuralDetectionAlgs_resources"
+      + "///httpd-2.4.26_output_run_detected_smells.txt,"
     + "httpd-2.4.26",
   })
   @ParameterizedTest
-  public void runStructuralDetectionAlgsTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
-                                             String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile, String version) {
-    String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
-    resources_dir = resources_dir.replace("///", File.separator);
+  public void runStructuralDetectionAlgsTest(String depsRsfFilename,
+      String clustersRsfFilename, String detectedSmellsFilename, 
+      String clusterSmellMapObjectFile, String clusterObjectFile,
+      String smellsObjectFile, String version) {
+    String resources_dir =
+      "src///test///resources///ArchSmellDetectorTest_resources///";
+    resources_dir = resources_dir.replace("///", fs);
 
-    depsRsfFilename = resources_dir + depsRsfFilename.replace("///", File.separator);
-    clustersRsfFilename = resources_dir + clustersRsfFilename.replace("///", File.separator);
-    detectedSmellsFilename = detectedSmellsFilename.replace("///", File.separator);
+    depsRsfFilename = resources_dir + depsRsfFilename.replace("///", fs);
+    clustersRsfFilename =
+      resources_dir + clustersRsfFilename.replace("///", fs);
+    detectedSmellsFilename = detectedSmellsFilename.replace("///", fs);
 
-    clusterSmellMapObjectFile = clusterSmellMapObjectFile.replace("///", File.separator);
-    clusterObjectFile = clusterObjectFile.replace("///", File.separator);
-    smellsObjectFile = smellsObjectFile.replace("///", File.separator);
+    clusterSmellMapObjectFile = clusterSmellMapObjectFile.replace("///", fs);
+    clusterObjectFile = clusterObjectFile.replace("///", fs);
+    smellsObjectFile = smellsObjectFile.replace("///", fs);
 
     ArchSmellDetector asd = new ArchSmellDetector(
       depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, version);
     
     // Initialize variables
 		SmellCollection detectedSmells = new SmellCollection();
-		ConcernClusterArchitecture clusters = ConcernClusterArchitecture.loadFromRsf(clustersRsfFilename);
+		ConcernClusterArchitecture clusters =
+      ConcernClusterArchitecture.loadFromRsf(clustersRsfFilename);
 		Map<String, Set<String>> clusterSmellMap = new HashMap<>();
 
     asd.runStructuralDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
 
-    // check that the data structures are not empty after running runStructuralDetectionAlgs
+    /* check that the data structures are not empty after running
+     * runStructuralDetectionAlgs */
     assertAll(
         () -> assertTrue(clusters.size() > 0),
         () -> assertTrue(detectedSmells.size() > 0),
@@ -173,16 +222,22 @@ public class ArchSmellDetectorTest {
       );
     
 		try {
-      ObjectInputStream ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterSmellMapObjectFile));
-      Map<String, Set<String>> oracle_clusterSmellMap = (Map<String, Set<String>>) ois.readObject();
+      ObjectInputStream ois = new ObjectInputStream(
+        new FileInputStream(resources_dir + clusterSmellMapObjectFile));
+      Map<String, Set<String>> oracle_clusterSmellMap =
+        (Map<String, Set<String>>) ois.readObject();
 			ois.close();
 
-			ois = new ObjectInputStream(new FileInputStream(resources_dir + clusterObjectFile));
-      ConcernClusterArchitecture oracle_clusters = (ConcernClusterArchitecture) ois.readObject();
+			ois = new ObjectInputStream(
+        new FileInputStream(resources_dir + clusterObjectFile));
+      ConcernClusterArchitecture oracle_clusters =
+        (ConcernClusterArchitecture) ois.readObject();
 			ois.close();
 
-			ois = new ObjectInputStream(new FileInputStream(resources_dir + smellsObjectFile));
-      SmellCollection oracle_detectedSmells = (SmellCollection) ois.readObject();
+			ois = new ObjectInputStream(
+        new FileInputStream(resources_dir + smellsObjectFile));
+      SmellCollection oracle_detectedSmells =
+        (SmellCollection) ois.readObject();
 			ois.close();
 
       assertAll(
@@ -192,7 +247,8 @@ public class ArchSmellDetectorTest {
       );
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
-      fail("Exception caught in runStructuralDetectionAlgsTest"); // if we get here, we done goofed
+      // if we get here, we done goofed
+      fail("Exception caught in runStructuralDetectionAlgsTest");
 		}
   }
 
@@ -220,10 +276,11 @@ public class ArchSmellDetectorTest {
     + "struts-2.5.2",
   })
   @ParameterizedTest
-  public void runConcernDetectionAlgsTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
-                                             String clusterSmellMapObjectFile, String clusterObjectFile, String smellsObjectFile,
-                                             String clusterObjectFileBefore, String topics, String version) {
-    
+  public void runConcernDetectionAlgsTest(String depsRsfFilename,
+      String clustersRsfFilename, String detectedSmellsFilename, 
+      String clusterSmellMapObjectFile, String clusterObjectFile,
+      String smellsObjectFile, String clusterObjectFileBefore,
+      String topics, String version) {
     //TODO Fix this so it runs correctly
     //throw new UnsupportedOperationException();
     
