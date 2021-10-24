@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="Cp1252"?>
 <pmd-cpd>
 <duplication lines="615" tokens="1188">
-<file line="126" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMBuilder.java"/>
-<file line="126" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMBuilder.java"/>
+<file line="126" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMBuilder.java"/>
+<file line="126" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMBuilder.java"/>
 <codefragment>
 <![CDATA[
   java.io.Writer getWriter()
@@ -624,8 +624,8 @@
 </codefragment>
 </duplication>
 <duplication lines="183" tokens="829">
-<file line="31" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\HTMLMetaProcessor.java"/>
-<file line="31" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\HTMLMetaProcessor.java"/>
+<file line="31" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\HTMLMetaProcessor.java"/>
+<file line="31" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\HTMLMetaProcessor.java"/>
 <codefragment>
 <![CDATA[
 public class HTMLMetaProcessor {
@@ -815,8 +815,8 @@ public class HTMLMetaProcessor {
 </codefragment>
 </duplication>
 <duplication lines="134" tokens="678">
-<file line="204" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
-<file line="204" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
+<file line="204" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
+<file line="204" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
 <codefragment>
 <![CDATA[
   URL getBase(Node node) {
@@ -957,8 +957,8 @@ public class HTMLMetaProcessor {
 </codefragment>
 </duplication>
 <duplication lines="148" tokens="577">
-<file line="33" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestRobotsMetaProcessor.java"/>
-<file line="34" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestRobotsMetaProcessor.java"/>
+<file line="33" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestRobotsMetaProcessor.java"/>
+<file line="34" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestRobotsMetaProcessor.java"/>
 <codefragment>
 <![CDATA[
 public class TestRobotsMetaProcessor {
@@ -1113,8 +1113,8 @@ public class TestRobotsMetaProcessor {
 </codefragment>
 </duplication>
 <duplication lines="94" tokens="360">
-<file line="108" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
-<file line="108" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
+<file line="108" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
+<file line="108" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
 <codefragment>
 <![CDATA[
   private boolean getText(StringBuffer sb, Node node, 
@@ -1215,8 +1215,8 @@ public class TestRobotsMetaProcessor {
 </codefragment>
 </duplication>
 <duplication lines="44" tokens="329">
-<file line="382" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
-<file line="294" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
+<file line="382" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
+<file line="294" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
 <codefragment>
 <![CDATA[
       outlinkArr = outlinks.toArray(outlinkArr);
@@ -1267,8 +1267,8 @@ public class TestRobotsMetaProcessor {
 </codefragment>
 </duplication>
 <duplication lines="44" tokens="327">
-<file line="48" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
-<file line="48" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
+<file line="48" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
+<file line="48" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
 <codefragment>
 <![CDATA[
 	private LinkParams(String elName, String attrName, int childLen) {
@@ -1319,8 +1319,8 @@ public class TestRobotsMetaProcessor {
 </codefragment>
 </duplication>
 <duplication lines="43" tokens="299">
-<file line="356" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
-<file line="192" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\tools\arc\ArcSegmentCreator.java"/>
+<file line="356" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
+<file line="192" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\tools\arc\ArcSegmentCreator.java"/>
 <codefragment>
 <![CDATA[
         output.collect(key, new NutchWritable(datum));
@@ -1370,8 +1370,8 @@ public class TestRobotsMetaProcessor {
 </codefragment>
 </duplication>
 <duplication lines="33" tokens="258">
-<file line="254" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
-<file line="196" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
+<file line="254" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
+<file line="196" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
 <codefragment>
 <![CDATA[
     answerOutlinks = new Outlink[][] {
@@ -1411,8 +1411,8 @@ public class TestRobotsMetaProcessor {
 </codefragment>
 </duplication>
 <duplication lines="93" tokens="247">
-<file line="41" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
-<file line="41" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
+<file line="41" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
+<file line="41" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
 <codefragment>
 <![CDATA[
 public class TestDOMContentUtils {
@@ -1512,8 +1512,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="34" tokens="235">
-<file line="187" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\HtmlParser.java"/>
-<file line="114" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\TikaParser.java"/>
+<file line="187" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\HtmlParser.java"/>
+<file line="114" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\TikaParser.java"/>
 <codefragment>
 <![CDATA[
 		HTMLMetaProcessor.getMetaTags(metaTags, root, base);
@@ -1554,8 +1554,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="42" tokens="235">
-<file line="151" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\crawl\AdaptiveFetchSchedule.java"/>
-<file line="182" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\crawl\MimeAdaptiveFetchSchedule.java"/>
+<file line="151" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\crawl\AdaptiveFetchSchedule.java"/>
+<file line="182" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\crawl\MimeAdaptiveFetchSchedule.java"/>
 <codefragment>
 <![CDATA[
     p.setMetaData(x);
@@ -1604,8 +1604,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="44" tokens="203">
-<file line="144" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
-<file line="144" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\urlfilter-domainblacklist\src\java\org\apache\nutch\urlfilter\domainblacklist\DomainBlacklistURLFilter.java"/>
+<file line="144" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
+<file line="144" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\urlfilter-domainblacklist\src\java\org\apache\nutch\urlfilter\domainblacklist\DomainBlacklistURLFilter.java"/>
 <codefragment>
 <![CDATA[
     String stringRules = conf.get("urlfilter.domainblacklist.rules");
@@ -1656,8 +1656,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="35" tokens="199">
-<file line="368" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
-<file line="339" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
+<file line="368" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
+<file line="339" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
 <codefragment>
 <![CDATA[
             NamedNodeMap attrs = currentNode.getAttributes();
@@ -1699,8 +1699,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="25" tokens="196">
-<file line="224" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\test\org\apache\nutch\metadata\TestMetadata.java"/>
-<file line="208" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\test\org\apache\nutch\metadata\TestSpellCheckedMetadata.java"/>
+<file line="224" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\test\org\apache\nutch\metadata\TestMetadata.java"/>
+<file line="208" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\test\org\apache\nutch\metadata\TestSpellCheckedMetadata.java"/>
 <codefragment>
 <![CDATA[
     SpellCheckedMetadata meta2 = new SpellCheckedMetadata();
@@ -1732,8 +1732,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="44" tokens="194">
-<file line="84" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\scoring\webgraph\LoopReader.java"/>
-<file line="81" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\scoring\webgraph\NodeReader.java"/>
+<file line="84" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\scoring\webgraph\LoopReader.java"/>
+<file line="81" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\scoring\webgraph\NodeReader.java"/>
 <codefragment>
 <![CDATA[
     FSUtils.closeReaders(nodeReaders);
@@ -1784,8 +1784,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="27" tokens="175">
-<file line="135" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\test\org\apache\nutch\metadata\TestMetadata.java"/>
-<file line="118" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\test\org\apache\nutch\metadata\TestSpellCheckedMetadata.java"/>
+<file line="135" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\test\org\apache\nutch\metadata\TestMetadata.java"/>
+<file line="118" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\test\org\apache\nutch\metadata\TestSpellCheckedMetadata.java"/>
 <codefragment>
 <![CDATA[
     SpellCheckedMetadata meta = new SpellCheckedMetadata();
@@ -1819,8 +1819,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="22" tokens="167">
-<file line="201" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\test\org\apache\nutch\metadata\TestMetadata.java"/>
-<file line="185" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\test\org\apache\nutch\metadata\TestSpellCheckedMetadata.java"/>
+<file line="201" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\test\org\apache\nutch\metadata\TestMetadata.java"/>
+<file line="185" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\test\org\apache\nutch\metadata\TestSpellCheckedMetadata.java"/>
 <codefragment>
 <![CDATA[
     SpellCheckedMetadata meta = new SpellCheckedMetadata();
@@ -1849,8 +1849,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="30" tokens="157">
-<file line="114" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
-<file line="114" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\urlfilter-domainblacklist\src\java\org\apache\nutch\urlfilter\domainblacklist\DomainBlacklistURLFilter.java"/>
+<file line="114" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
+<file line="114" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\urlfilter-domainblacklist\src\java\org\apache\nutch\urlfilter\domainblacklist\DomainBlacklistURLFilter.java"/>
 <codefragment>
 <![CDATA[
     Extension[] extensions = PluginRepository.get(conf).getExtensionPoint(
@@ -1887,8 +1887,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="25" tokens="146">
-<file line="965" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\fetcher\Fetcher.java"/>
-<file line="338" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
+<file line="965" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\fetcher\Fetcher.java"/>
+<file line="338" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
 <codefragment>
 <![CDATA[
           }
@@ -1920,8 +1920,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="29" tokens="142">
-<file line="115" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
-<file line="96" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\urlnormalizer-host\src\java\org\apache\nutch\net\urlnormalizer\host\HostURLNormalizer.java"/>
+<file line="115" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
+<file line="96" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\urlnormalizer-host\src\java\org\apache\nutch\net\urlnormalizer\host\HostURLNormalizer.java"/>
 <codefragment>
 <![CDATA[
       URLNormalizer.class.getName()).getExtensions();
@@ -1957,8 +1957,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="29" tokens="139">
-<file line="423" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\scoring\webgraph\LinkDumper.java"/>
-<file line="575" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\scoring\webgraph\Loops.java"/>
+<file line="423" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\scoring\webgraph\LinkDumper.java"/>
+<file line="575" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\scoring\webgraph\Loops.java"/>
 <codefragment>
 <![CDATA[
     int res = ToolRunner.run(NutchConfiguration.create(), new Loops(), args);
@@ -1994,8 +1994,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="21" tokens="137">
-<file line="121" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\urlfilter-prefix\src\java\org\apache\nutch\urlfilter\prefix\PrefixURLFilter.java"/>
-<file line="252" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\urlfilter-suffix\src\java\org\apache\nutch\urlfilter\suffix\SuffixURLFilter.java"/>
+<file line="121" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\urlfilter-prefix\src\java\org\apache\nutch\urlfilter\prefix\PrefixURLFilter.java"/>
+<file line="252" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\urlfilter-suffix\src\java\org\apache\nutch\urlfilter\suffix\SuffixURLFilter.java"/>
 <codefragment>
 <![CDATA[
     Extension[] extensions = PluginRepository.get(conf).getExtensionPoint(URLFilter.class.getName()).getExtensions();
@@ -2023,8 +2023,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="26" tokens="127">
-<file line="29" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\test\org\apache\nutch\util\TestPrefixStringMatcher.java"/>
-<file line="28" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\test\org\apache\nutch\util\TestSuffixStringMatcher.java"/>
+<file line="29" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\test\org\apache\nutch\util\TestPrefixStringMatcher.java"/>
+<file line="28" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\test\org\apache\nutch\util\TestSuffixStringMatcher.java"/>
 <codefragment>
 <![CDATA[
   private final static int MAX_SUFFIX_LEN= 10;
@@ -2057,8 +2057,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="23" tokens="125">
-<file line="311" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
-<file line="150" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\tools\arc\ArcSegmentCreator.java"/>
+<file line="311" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
+<file line="150" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\tools\arc\ArcSegmentCreator.java"/>
 <codefragment>
 <![CDATA[
     Text key, CrawlDatum datum, Content content, ProtocolStatus pstatus,
@@ -2088,8 +2088,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="22" tokens="118">
-<file line="252" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\scoring\webgraph\LinkDumper.java"/>
-<file line="382" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\scoring\webgraph\LinkRank.java"/>
+<file line="252" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\scoring\webgraph\LinkDumper.java"/>
+<file line="382" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\scoring\webgraph\LinkRank.java"/>
 <codefragment>
 <![CDATA[
       OutputCollector<Text, LinkDatum> output, Reporter reporter)
@@ -2118,8 +2118,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="15" tokens="112">
-<file line="368" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
-<file line="280" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
+<file line="368" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
+<file line="280" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
 <codefragment>
 <![CDATA[
   public void testGetOutlinks() throws Exception {
@@ -2141,8 +2141,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="14" tokens="111">
-<file line="47" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestImageMetadata.java"/>
-<file line="54" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestPdfParser.java"/>
+<file line="47" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestImageMetadata.java"/>
+<file line="54" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestPdfParser.java"/>
 <codefragment>
 <![CDATA[
   @Test
@@ -2163,8 +2163,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="21" tokens="111">
-<file line="210" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\parse\ParseData.java"/>
-<file line="255" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\protocol\Content.java"/>
+<file line="210" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\parse\ParseData.java"/>
+<file line="255" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\protocol\Content.java"/>
 <codefragment>
 <![CDATA[
     if (argv.length < 3) {
@@ -2192,8 +2192,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="12" tokens="109">
-<file line="110" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\util\PrefixStringMatcher.java"/>
-<file line="107" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\util\SuffixStringMatcher.java"/>
+<file line="110" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\util\PrefixStringMatcher.java"/>
+<file line="107" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\util\SuffixStringMatcher.java"/>
 <codefragment>
 <![CDATA[
     String[] tests= {"a", "ac", "abcd", "abcdefg", "apple", "aa", "aac",
@@ -2212,8 +2212,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="29" tokens="107">
-<file line="114" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\test\org\apache\nutch\crawl\TestCrawlDbFilter.java"/>
-<file line="278" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\test\org\apache\nutch\crawl\TestGenerator.java"/>
+<file line="114" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\test\org\apache\nutch\crawl\TestCrawlDbFilter.java"/>
+<file line="278" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\test\org\apache\nutch\crawl\TestGenerator.java"/>
 <codefragment>
 <![CDATA[
     Assert.assertEquals(list.size(), fetchList.size());
@@ -2249,8 +2249,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="21" tokens="106">
-<file line="877" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\fetcher\Fetcher.java"/>
-<file line="282" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
+<file line="877" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\fetcher\Fetcher.java"/>
+<file line="282" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
 <codefragment>
 <![CDATA[
           if (reprUrl != null) {
@@ -2278,8 +2278,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="26" tokens="105">
-<file line="66" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
-<file line="66" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\urlfilter-domainblacklist\src\java\org\apache\nutch\urlfilter\domainblacklist\DomainBlacklistURLFilter.java"/>
+<file line="66" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
+<file line="66" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\urlfilter-domainblacklist\src\java\org\apache\nutch\urlfilter\domainblacklist\DomainBlacklistURLFilter.java"/>
 <codefragment>
 <![CDATA[
   private static final Logger LOG = LoggerFactory.getLogger(DomainBlacklistURLFilter.class);
@@ -2312,8 +2312,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="17" tokens="102">
-<file line="352" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
-<file line="264" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
+<file line="352" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
+<file line="264" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
 <codefragment>
 <![CDATA[
   public void testGetTitle() throws Exception {
@@ -2337,8 +2337,8 @@ public class TestDOMContentUtils {
 </codefragment>
 </duplication>
 <duplication lines="17" tokens="102">
-<file line="336" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
-<file line="248" path="C:\Users\ginay\git\arcade\subject_systems\nutch\nutch-1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
+<file line="336" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
+<file line="248" path="C:\Users\ginay\git\arcade\subject_systems\nutch\src\nutch1.9\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
 <codefragment>
 <![CDATA[
   public void testGetText() throws Exception {
