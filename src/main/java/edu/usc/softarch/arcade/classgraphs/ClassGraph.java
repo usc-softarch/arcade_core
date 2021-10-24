@@ -14,11 +14,11 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,10 +28,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import edu.usc.softarch.arcade.config.Config;
 
 import soot.SootClass;
 
@@ -39,224 +39,158 @@ import soot.SootClass;
  * @author joshua
  */
 public class ClassGraph implements Serializable {
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -4718039019698373111L;
-	private Set<SootClassEdge> edges = new HashSet<>();
+	private static final Logger logger = LogManager.getLogger(ClassGraph.class);
+
+	private Set<SootClassEdge> edges;
+	// #endregion FIELDS ---------------------------------------------------------
 	
-	public ClassGraph() { super(); }
+	// #region CONSTRUCTORS ------------------------------------------------------
+	public ClassGraph() {
+		super();
+		this.edges = new HashSet<>();
+	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
+
+	// #region ACCESSORS ---------------------------------------------------------
+	public Set<SootClassEdge> getEdges() { return edges; }
+
+	/**
+	 * @return All SootClasses in this ClassGraph.
+	 */
+	public List<SootClass> getNodes() {
+		Set<SootClass> cgNodes = new HashSet<>();
+
+		for (SootClassEdge e : edges) {
+			cgNodes.add(e.getTgt());
+			cgNodes.add(e.getSrc());
+		}
+
+		return new ArrayList<>(cgNodes);
+	}
+
+	/**
+	 * Gets all SootClasses that serve as the source node for edges where the
+	 * target is the provided SootClass argument.
+	 * 
+	 * @param c Target SootClass.
+	 * @return All sources of c.
+	 */
+	public List<SootClass> getCallerClasses(SootClass c) {
+		List<SootClass> callerClasses = new ArrayList<>();
+
+		for (SootClassEdge e : edges)
+			//TODO make this a proper object comparison rather than String
+			if (e.getTgt().toString().equals(c.toString()))
+				callerClasses.add(e.getSrc());
+		
+		return callerClasses;
+	}
 	
-	public void generateRsf() {
-		try (Writer out = new BufferedWriter(new FileWriter(Config.getClassGraphRsfFilename()))) {
-			for (SootClassEdge edge : edges) {
+	/**
+	 * Gets all SootClasses that serve as the target node for edges where the
+	 * source is the provided SootClass argument.
+	 * 
+	 * @param c Source SootClass.
+	 * @return All targets of c.
+	 */
+	public List<SootClass> getCalleeClasses(SootClass c) {
+		List<SootClass> calleeClasses = new ArrayList<>();
+
+		for (SootClassEdge e : edges)
+			//TODO make this a proper object comparison rather than String
+			if (e.getSrc().toString().equals(c.toString()))
+				calleeClasses.add(e.getTgt());
+		
+		return calleeClasses;
+	}
+
+	public boolean containsEdge(SootClass src, SootClass tgt, String type) {
+		return edges.contains(new SootClassEdge(src,tgt,type)); }
+	public boolean containsEdge(SootClassEdge e) { return edges.contains(e); }
+	public int size() { return edges.size(); }
+	
+	public void addEdge(SootClass src, SootClass tgt, String type) {
+		edges.add(new SootClassEdge(src,tgt,type)); }
+	public void addEdge(SootClassEdge e) { edges.add(e); }
+	public void removeEdge(SootClass src, SootClass tgt,String type) {
+		edges.remove(new SootClassEdge(src,tgt,type)); }
+	public void removeEdge(SootClassEdge e) { edges.remove(e); }
+
+	public void addElementTypes(Map<String,String> map) {
+		logger.debug("Current Map: " + map);
+		logger.debug("Printing class edges with arch element type...");
+
+		for (SootClassEdge e : edges) {
+			String srcStr = e.getSrcStr();
+			String tgtStr = e.getTgtStr();
+			String srcType = map.get(srcStr);
+			String tgtType = map.get(tgtStr);
+			
+			//TODO do this with logger instead
+			System.out.print("(" + srcStr + ":" + srcType +  ",");
+			System.out.print(tgtStr + ":" + tgtType + ")");
+		}
+
+		System.out.println();
+	}
+	// #endregion ACCESSORS ------------------------------------------------------
+	
+	// #region MISC --------------------------------------------------------------
+	public String toString() {
+		String str = "";
+		
+		for (SootClassEdge e : edges)
+			str += e.toString() + ",";
+		
+		// Remove the last comma before returning
+		return str.substring(0, str.length() - 1);
+	}
+	// #endregion MISC -----------------------------------------------------------
+
+	// #region IO ----------------------------------------------------------------
+	public void generateRsf(String rsfFilePath) {
+		try (Writer out = new BufferedWriter(new FileWriter(rsfFilePath))) {
+			for (SootClassEdge edge : edges)
 				out.write(edge.toRsf() + "\n");
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public void serialize(String filename) throws IOException {
-		// Write to disk with FileOutputStream
-		FileOutputStream f_out = new FileOutputStream(filename);
-
-		// Write object with ObjectOutputStream
-		ObjectOutputStream obj_out = new ObjectOutputStream (f_out);
-
-		// Write object out to disk
-		obj_out.writeObject ( this );
-	}
-	
-	public List<SootClass> getNodes() {
-		List<SootClass> cgNodes = new ArrayList<>();
-		for (SootClassEdge e : edges) {
-			if (!cgNodes.contains(e.getTgt())) {
-				cgNodes.add(e.getTgt());
-			}
-			if (!cgNodes.contains(e.getSrc())) {
-				cgNodes.add(e.getSrc());
-			}
+		try (ObjectOutputStream obj_out =
+				new ObjectOutputStream(
+				new FileOutputStream(filename))) {
+			obj_out.writeObject(this);
 		}
-		return cgNodes;
-		
-	}
-	
-	protected boolean hasClass(List<SootClass> cgNodes, SootClass inClass) {
-		boolean hasClass = false;
-		for (SootClass c : cgNodes) {
-			if (inClass.toString().equals(c.toString())) {
-				hasClass = true;
-			}
-		}
-		return hasClass;
-	}
-	
-	public List<SootClass> getCallerClasses(SootClass c) {
-		List<SootClass> callerClasses = new ArrayList<>();
-		for (SootClassEdge e : edges) {
-			if (e.getTgt().toString().equals(c.toString())) {
-				callerClasses.add(e.getSrc());
-			}
-		}
-		
-		return callerClasses;
-	}
-	
-	public List<SootClass> getCalleeClasses(SootClass c) {
-		List<SootClass> calleeClasses = new ArrayList<>();
-		for (SootClassEdge e : edges) {
-			if (e.getSrc().toString().equals(c.toString())) {
-				calleeClasses.add(e.getTgt());
-			}
-		}
-		
-		return calleeClasses;
-	}
-	
-	public void addEdge(SootClass src, SootClass tgt, String type) {
-		edges.add(new SootClassEdge(src,tgt,type));
-	}
-	
-	public void addEdge(SootClassEdge e) {
-		edges.add(e);
-	}
-	
-	public void removeEdge(SootClassEdge e) {
-		edges.remove(e);
-	}
-	
-	public void removeEdge(SootClass src, SootClass tgt,String type) {
-		edges.remove(new SootClassEdge(src,tgt,type));
-	}
-	
-	public boolean containsEdge(SootClass src, SootClass tgt, String type) {
-		return edges.contains(new SootClassEdge(src,tgt,type));
-	}
-	
-	public boolean containsEdge(SootClassEdge e) {
-		return edges.contains(e);
-	}
-	
-	public String toString() {
-		Iterator<SootClassEdge> iter = edges.iterator();
-		String str = "";
-		
-		while(iter.hasNext()) {
-			SootClassEdge e = iter.next();
-			str += e.toString();
-			if(iter.hasNext()) {
-				str+=",";
-			}
-		}
-		
-		return str;
-	}
-	
-	public String toStringWithArchElemType() {
-		Iterator<SootClassEdge> iter = edges.iterator();
-		String str = "";
-		
-		while(iter.hasNext()) {
-			SootClassEdge e = iter.next();
-			str += e.toStringWithArchElemType();
-			if(iter.hasNext()) {
-				str+=",";
-			}
-		}
-		
-		return str;
 	}
 
-	public int size() {
-		return edges.size();
-	}
-	
 	public void writeDotFile(String filename) throws FileNotFoundException {
 		File f = new File(filename);
-		if (f.getParentFile() != null && !f.getParentFile().exists()) {
+		if (f.getParentFile() != null && !f.getParentFile().exists())
 			f.getParentFile().mkdirs();
-		}
-		FileOutputStream fos = new FileOutputStream(f);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8); 
-		PrintWriter out = new PrintWriter(osw);
-		
-		Iterator<SootClassEdge> iter = edges.iterator();
-		
-		out.println("digraph G {");
-		
-		while(iter.hasNext()) {
-			SootClassEdge e = iter.next();
-			out.println(e.toDotString());
-		}
-		
-		out.println("}");
-		
-		out.close();
-	}
-	
-	public void writeDotFileWithArchElementType(String filename) throws FileNotFoundException {
-		File f = new File(filename);
-		if (!f.getParentFile().exists()) {
-			f.getParentFile().mkdirs();
-		}
-		FileOutputStream fos = new FileOutputStream(f);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8); 
-		PrintWriter out = new PrintWriter(osw);
-		
-		Iterator<SootClassEdge> iter = edges.iterator();
-		
-		out.println("digraph G {");
-		
-		while(iter.hasNext()) {
-			SootClassEdge e = iter.next();
-			out.println(e.toDotStringWithArchElemType());
-		}
-		
-		out.println("}");
-		
-		out.close();
-	}
-	
-	public void addElementTypes(Map<String,String> map) {
-		Iterator<SootClassEdge> iter = edges.iterator();
-		
-		System.out.println("Current Map: " + map);
-		System.out.println("Printing class edges with arch element type...");
-		while(iter.hasNext()) {
-			
-			SootClassEdge e = iter.next();
-			
-			String srcStr = e.getSrc().getName();
-			String tgtStr = e.getTgt().getName();
-			String srcType = map.get(srcStr);
-			String tgtType = map.get(tgtStr);
-			
-			if (srcType.equals("p")) {
-				e.srcType = ArchElemType.proc;
-			}
-			else if (srcType.equals("d")) {
-				e.srcType = ArchElemType.data;
-			}
-			else if (srcType.equals("c")) {
-				e.srcType = ArchElemType.conn;
-			}
-			
-			if (tgtType.equals("p")) {
-				e.tgtType = ArchElemType.proc;
-			}
-			else if (tgtType.equals("d")) {
-				e.tgtType = ArchElemType.data;
-			}
-			else if (tgtType.equals("c")) {
-				e.tgtType = ArchElemType.conn;
-			}
-			
-			System.out.print("(" + srcStr + ":" + srcType +  ",");
-			System.out.print(tgtStr + ":" + tgtType + ")");
-		}
-		System.out.println();
-	}
 
-	public void writeXMLClassGraph() throws ParserConfigurationException, TransformerException {
+		FileOutputStream fos = new FileOutputStream(f);
+		OutputStreamWriter osw =
+			new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+
+		try(PrintWriter out = new PrintWriter(osw)) {
+			out.println("digraph G {");
+			
+			for(SootClassEdge e : edges)
+				out.println(e.toDotString());
+			
+			out.println("}");
+		}
+	}
+	
+	public void writeXMLClassGraph(String xmlFilePath) 
+			throws ParserConfigurationException, TransformerException {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 	
 		//classgraph elements
@@ -269,26 +203,27 @@ public class ClassGraph implements Serializable {
 			Element ce = doc.createElement("ClassEdge");
 			rootElement.appendChild(ce);
 			Element src = doc.createElement("src");
-			src.appendChild(doc.createTextNode(e.src.toString()));
+			src.appendChild(doc.createTextNode(e.getSrcStr()));
 			Element tgt = doc.createElement("tgt");
-			tgt.appendChild(doc.createTextNode(e.tgt.toString()));
+			tgt.appendChild(doc.createTextNode(e.getTgtStr()));
 			ce.appendChild(src);
 			ce.appendChild(tgt);
 		}
 	
 		//write the content into xml file
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET,"");
 		Transformer transformer = transformerFactory.newTransformer();
+
 		DOMSource source = new DOMSource(doc);
-		StreamResult result =  new StreamResult(new File(Config.getXMLClassGraphFilename()));
+		StreamResult result = new StreamResult(new File(xmlFilePath));
 		transformer.transform(source, result);
 	
-		System.out.println("In " + Thread.currentThread().getStackTrace()[1].getClassName() 
+		System.out.println("In "
+			+ Thread.currentThread().getStackTrace()[1].getClassName() 
 			+ ". " + Thread.currentThread().getStackTrace()[1].getMethodName() 
-			+ ", Wrote " + Config.getXMLClassGraphFilename());
+			+ ", Wrote " + xmlFilePath);
 	}
-
-	public Set<SootClassEdge> getEdges() {
-		return edges;
-	}
+	// #endregion IO -------------------------------------------------------------
 }

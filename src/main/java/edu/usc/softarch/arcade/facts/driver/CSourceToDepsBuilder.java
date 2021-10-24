@@ -33,8 +33,6 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 
 	@Override
 	public void build(String classesDirPath, String depsRsfFilename) throws IOException {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		
 		String inputDir = FileUtil.tildeExpandPath(classesDirPath);
 		String depsRsfFilepath = FileUtil.tildeExpandPath(depsRsfFilename);
 		
@@ -55,11 +53,11 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		
 		RsfReader.loadRsfDataFromFile(depsRsfFilepath);
 				
-		numSourceEntities = RsfReader.unfilteredFacts.size();
+		numSourceEntities = RsfReader.unfilteredFaCtS.size();
 		
 		TypedEdgeGraph typedEdgeGraph = new TypedEdgeGraph();
 		edges = new LinkedHashSet<Pair<String,String>>();
-		for (List<String> fact : RsfReader.unfilteredFacts) {
+		for (List<String> fact : RsfReader.unfilteredFaCtS) {
 			String source = fact.get(1);
 			String target = fact.get(2);
 			

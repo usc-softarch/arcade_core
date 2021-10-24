@@ -22,387 +22,434 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
+import edu.usc.softarch.arcade.antipattern.Smell;
+import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.util.FileUtil;
 
+/**
+ * Calculates the total number of smells in a ground-truth architecture, the
+ * number of ground-truth smells that were matched by an analysis result, the
+ * ratio of detected ground-truth smells.
+ */
 public class SmellDetectionEvaluator {
-	private static Logger logger = Logger.getLogger(SmellDetectionEvaluator.class);
-	
-	// the key is a pair consisting of a smell type and technique filename
-	// the value is the ratio of the matched smell count for that type over the number of ground truth smells for that type for the technique
-	// this is essentially the coverage ratio for the technique over a smell type
-	public static Map<Pair<Class,String>,Double> smellTypeTechRatioMap =
-		new TreeMap<>((Pair<Class, String> o1, Pair<Class, String> o2) ->
-			o1.getLeft().getName().compareTo(o2.getLeft().getName()));
-	public static boolean configureLogging = true;
-	
-	public static void resetData() {
-		smellTypeTechRatioMap = new HashMap<>();
-	}
-	
-	public static class FileScorePairAscending implements Comparator<Pair<String,Double>>{
-	    public int compare(Pair<String,Double> p1, Pair<String,Double> p2) {
-	        return p1.getRight().compareTo(p2.getRight()); // ascending order
-	    }
-	}
-	
-	public static class FileScorePairDescending implements Comparator<Pair<String,Double>>{
-	    public int compare(Pair<String,Double> p1, Pair<String,Double> p2) {
-	        return p2.getRight().compareTo(p1.getRight()); // descending order
-	    }
+	// #region ATTRIBUTES --------------------------------------------------------
+	private static Logger logger = 
+		LogManager.getLogger(SmellDetectionEvaluator.class);
+
+	/**
+	 * Comparator for ascending order sorting of <File,Score> pairings.
+	 */
+	public static class FileScorePairAscending
+			implements Comparator<Entry<String,Double>> {
+		public int compare(Entry<String,Double> p1, Entry<String,Double> p2) {
+			return p1.getValue().compareTo(p2.getValue());
+		}
 	}
 
-	public static void main(String[] args) {
-		if (configureLogging) {
-			PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
+	/**
+	 * Comparator for descending order sorting of <File,Score> pairings.
+	 */
+	public static class FileScorePairDescending
+			implements Comparator<Entry<String,Double>> {
+		public int compare(Entry<String,Double> p1, Entry<String,Double> p2) {
+			return p2.getValue().compareTo(p1.getValue());
 		}
+	}
+	
+	/**
+	 * This is a map representing the coverage ratio for a technique over a smell
+	 * type. The key is a pair consisting of a smell type and a technique
+	 * filename. The value is the ratio of the matched smell count for that type
+	 * over the number of ground truth smells for that type for the technique.
+	 */
+	private static Map<Entry<Smell.SmellType,String>,Double> smellTypeTechRatioMap
+		= new HashMap<>();
+	// #endregion ATTRIBUTES -----------------------------------------------------
+
+	public static void main(String[] args) throws IOException {
+		/**
+		 * Key: Ground-truth smell
+		 * Value: All matching smells and the technique from which the smell comes
+		 */
+		Map<Smell, Set<Entry<Smell, String>>> gtSmellToPairMap = new HashMap<>();
 		
-		resetData();
+		/**
+		 * Key: .ser filename
+		 * Value: coverage ratio
+		 */
+		Map<String, Double> fileCoverageMap = new HashMap<>();
 		
+		// Loading arguments
 		String groundTruthFile = args[0];
 		String techniquesDir = args[1];
 		String smellTechTableFilename = args[2];
 		String detectedSmellsGtFilename = args[3];
-		String smellFileToMojoFilename = null;
-		if (args.length == 5) {
-			smellFileToMojoFilename = args[4];
-		}
+		String smellFileToMojoFilename = (args.length == 5) ? args[4] : null;
 		String gtFileOutput = "ground truth file: " + groundTruthFile;
 		String techDirOutput = "techniques directory: " + techniquesDir;
-		System.out.println(gtFileOutput);
 		logger.debug(gtFileOutput);
-		System.out.println(techDirOutput);
 		logger.debug(techDirOutput);
-
 		File techDirFile = new File(techniquesDir);
-		assert techDirFile.exists() : techniquesDir + " does not exist.";
+		if (!techDirFile.exists())
+			throw new IOException(techniquesDir + " does not exist.");
 		
-		// Deserialize detected gt smells
-		Set<Smell> detectedGtSmells = SmellUtil.deserializeDetectedSmells(detectedSmellsGtFilename);
+		// Deserialize ground-truth smells
+		SmellCollection detectedGtSmells =
+			new SmellCollection(detectedSmellsGtFilename);
 		logger.debug("");
 		logger.debug("Listing detected gt smells: ");
-		for (Smell smell : detectedGtSmells) {
-			logger.debug(SmellUtil.getSmellAbbreviation(smell) + " " + smell);
-		}
+		for (Smell smell : detectedGtSmells)
+			logger.debug(smell.getSmellType() + " " + smell);
 		
-		// obtain ser files in techniques directory
+		// Obtain .ser files from the results of analysis techniques
 		File[] detectedSmellsFiles = techDirFile.listFiles(
-			(File file) -> file.getName().endsWith(".ser")
-		);
+			(File file) -> file.getName().endsWith(".ser"));
 
-		// obtain names of detected smells files in techniques directory
+		// Obtain names of detected smells files in techniques directory
 		List<File> dsFileList = Arrays.asList(detectedSmellsFiles);
-		List<String> dsFilenames = Lists.newArrayList(Iterables.transform(
-				dsFileList, (final File file) -> file.getAbsolutePath()
-				));
+		List<String> dsFilenames = dsFileList.stream() // Turn into a stream
+			.map(File::getAbsolutePath)                  // Get absolute paths
+			.collect(Collectors.toList());               // Turn back into List
 
-		logger.debug(Joiner.on(",").join(dsFilenames));
+		logger.debug(String.join(",", dsFilenames));
 		
-		Map<String,Set<Smell>> fileToSmellInstancesMap = new LinkedHashMap<>();
+		// Deserialize smell files from analysis results
+		Map<String, SmellCollection> fileToSmellInstancesMap = new LinkedHashMap<>();
 		for (String dsFilename : dsFilenames) {
-			Set<Smell> detectedSmells = SmellUtil.deserializeDetectedSmells(dsFilename);
-			fileToSmellInstancesMap.put(dsFilename,detectedSmells);
+			SmellCollection detectedSmells = new SmellCollection(dsFilename);
+			fileToSmellInstancesMap.put(dsFilename, detectedSmells);
 		}
 		
 		logger.debug("");
 		logger.debug("Listing technique filenames: ");
-		logger.debug(Joiner.on("\n").join(fileToSmellInstancesMap.keySet()));
+		logger.debug(String.join("\n", fileToSmellInstancesMap.keySet()));
 
-		// Key: Ground-truth smell, Value: All matching smell and the technique from which the smell originates
-		Map<Smell,Set<Pair<Smell,String>>> gtSmellToPairMap = new HashMap<>();
-		
-		// Key: ser filename, Value: coverage ratio
-		Map<String,Double> fileCoverageMap = new HashMap<>();
-		for (Entry<String, Set<Smell>> fsiEntry : fileToSmellInstancesMap.entrySet()) {
+		// For each .ser file from the technique analysis results
+		for (Entry<String, SmellCollection> fsiEntry
+				: fileToSmellInstancesMap.entrySet()) {
 			String currFilename = fsiEntry.getKey();
-			Set<Smell> detectedTechSmells = fsiEntry.getValue();
+			SmellCollection detectedTechSmells = fsiEntry.getValue();
 			
-			Map<Smell,Smell> maxSmellMap = new LinkedHashMap<>();
+			Map<Smell, Entry<Smell, Double>> maxSmellMap = new LinkedHashMap<>();
+
+			/**
+			 * Compares smells from the ground-truth with the smells from the results
+			 * of the analysis technique. Looks for those matches with the highest
+			 * similarity degree, so as to measure which ground-truth smells were
+			 * detected by the analysis technique.
+			 */
+			// For each smell in the ground-truth
 			for (Smell gtSmell : detectedGtSmells) {
 				double maxSim = 0;
 				Smell maxSmell = null;
+				// For each smell in the analysis result
 				for (Smell techSmell : detectedTechSmells) {
-					if (gtSmell.getClass().equals(techSmell.getClass())) {
-						double sim = calcSimOfSmellInstances(gtSmell,techSmell);
+					// If the two smells are of matching type
+					if (gtSmell.getSmellType().equals(techSmell.getSmellType())) {
+						// Calculate their similarity
+						double sim = calcSimOfSmellInstances(gtSmell, techSmell);
+						// And if it is higher than the previous max similarity, record it
 						if (sim > maxSim) {
 							maxSim = sim;
 							maxSmell = techSmell;
 						}
 					}
 				}
-				maxSmellMap.put(gtSmell, maxSmell);
+				// Finally, put the two matching smells in the result collection
+				maxSmellMap.put(gtSmell, Map.entry(maxSmell, maxSim));
 			}
 			
+			// Logging the results for this round
 			logger.debug("");
-			logger.debug("Each ground-truth smell and it's max match from " + currFilename + ": ");
+			logger.debug("Each ground-truth smell and it's max match from "
+				+ currFilename + ": ");
 			for (Smell gtSmell : maxSmellMap.keySet()) {
-				Smell techSmell = maxSmellMap.get(gtSmell);
-				if (techSmell != null) {
-					double sim = calcSimOfSmellInstances(gtSmell, techSmell);
-					logger.debug(SmellUtil.getSmellAbbreviation(gtSmell) + " " + gtSmell + ", " + techSmell + ": " + sim);
-				} else {
-					logger.debug(SmellUtil.getSmellAbbreviation(gtSmell) + " " + gtSmell + ", " + techSmell + ": 0");
+				Entry<Smell, Double> techSmell = maxSmellMap.get(gtSmell);
+				if (techSmell == null) {
+					logger.debug(gtSmell.getSmellType() + " " + gtSmell + ", "
+						+ techSmell + ": 0");
+					continue;
 				}
+				Smell smellInstance = techSmell.getKey();
+				double sim = techSmell.getValue();
+				logger.debug(gtSmell.getSmellType() + " " + gtSmell + ", "
+					+ smellInstance + ": " + sim);
 			}
 
+			// Logging the results of this round that had more than 50% similarity
 			logger.debug("");
 			logger.debug("Smells > 0.5 matching for " + currFilename + ": ");
 			int above50Count = 0;
+			// For each smell instance in the ground truth
 			for (Smell gtSmell : maxSmellMap.keySet()) {
-				Smell maxSmell = maxSmellMap.get(gtSmell);
-				if (maxSmell != null) {
-					double sim = calcSimOfSmellInstances(gtSmell, maxSmell);
-					if (sim > .5) {
-						logger.debug(SmellUtil.getSmellAbbreviation(gtSmell) + " " + gtSmell + ", " + maxSmell + ": " + sim);
-						Pair<Smell,String> smellFilePair = new ImmutablePair<>(maxSmell,currFilename);
-						if (gtSmellToPairMap.containsKey(gtSmell)) {
-							Set<Pair<Smell,String>> pairs = gtSmellToPairMap.get(gtSmell);
-							pairs.add(smellFilePair);
-						}
-						else {
-							Set<Pair<Smell,String>> pairs = new HashSet<>();
-							pairs.add(smellFilePair);
-							gtSmellToPairMap.put(gtSmell,pairs);
-						}
-						
-						above50Count++;
-					}
+				Entry<Smell, Double> maxSmell = maxSmellMap.get(gtSmell);
+
+				// If that smell instance has a match in the technique results
+				// And its similarity is higher than 50%
+				if (maxSmell != null && maxSmell.getValue() > .5) {
+					Smell smellInstance = maxSmell.getKey();
+					double sim = maxSmell.getValue();
+
+					// Log it in the list of > 50% similarity smells
+					logger.debug(gtSmell.getSmellType() + " " + gtSmell + ", " 
+						+ smellInstance + ": " + sim);
+					Entry<Smell, String> smellFilePair = Map.entry(smellInstance, currFilename);
+
+					Set<Entry<Smell, String>> pairs =
+						gtSmellToPairMap.containsKey(gtSmell) // If that gtSmell was already matched
+						? gtSmellToPairMap.get(gtSmell)       // Then get the list of matches
+						: new HashSet<>();                    // Otherwise initialize one
+
+					// Update the list of matches
+					pairs.add(smellFilePair);
+					gtSmellToPairMap.put(gtSmell, pairs);
+					
+					// And increment the count
+					above50Count++;
 				}
 			}
-			double coverageRatio = (double)above50Count/(double)maxSmellMap.keySet().size();
+
+			double coverageRatio =
+				(double) above50Count / (double) maxSmellMap.keySet().size();
 			logger.debug("Ratio of Smells above 0.5 matching: " + coverageRatio);
-			fileCoverageMap.put(currFilename,coverageRatio);
+			fileCoverageMap.put(currFilename, coverageRatio);
 		}
 
-		if (args.length == 5) {
+		// If a MojoFM scores file is available, run Pearson correlation test
+		if (smellFileToMojoFilename != null)
 			computePearsonCorrelationOfMojoFMToSmellAccuracy(
-					smellFileToMojoFilename, fileCoverageMap);
-		}
+				smellFileToMojoFilename, fileCoverageMap);
 		
-		
-		String allHighMatchedSmellsStr = Joiner.on("\n").withKeyValueSeparator("=").join(gtSmellToPairMap);
+		// Log the results
+		String allHighMatchedSmellsStr = gtSmellToPairMap.keySet().stream()
+			.map(key -> key + " = (" + gtSmellToPairMap.get(key) + ")")
+			.collect(Collectors.joining("\n"));
 		logger.debug("");
 		logger.debug("All high matched smells: ");
 		logger.debug(allHighMatchedSmellsStr);
-		
 		for (Smell gtSmell : gtSmellToPairMap.keySet()) {
-			Set<Pair<Smell,String>> pairs = gtSmellToPairMap.get(gtSmell);
-			for (Pair<Smell,String> smellFilePair : pairs) {
-				logger.debug(gtSmell + " -> " + smellFilePair.getLeft() + " from " + smellFilePair.getRight());
-			}
+			Set<Entry<Smell,String>> pairs = gtSmellToPairMap.get(gtSmell);
+			for (Entry<Smell,String> smellFilePair : pairs)
+				logger.debug(gtSmell + " -> " + smellFilePair.getKey()
+					+ " from " + smellFilePair.getValue());
 		}
-		
 		logger.debug("");
 		logger.debug("Showing matched and unmatched smells:");
 		for (Smell gtSmell : detectedGtSmells) {
 			if (gtSmellToPairMap.containsKey(gtSmell)) {
-				Set<Pair<Smell, String>> smellFilePairs = gtSmellToPairMap
-						.get(gtSmell);
-				for (Pair<Smell, String> smellFilePair : smellFilePairs) {
-					logger.debug(gtSmell + " -> " + smellFilePair.getLeft()
-							+ " from " + smellFilePair.getRight());
-				}
+				Set<Entry<Smell, String>> smellFilePairs =
+					gtSmellToPairMap.get(gtSmell);
+				for (Entry<Smell, String> smellFilePair : smellFilePairs)
+					logger.debug(gtSmell + " -> " + smellFilePair.getKey()
+						+ " from " + smellFilePair.getValue());
 			}
-			else {
-				logger.debug(gtSmell + " has no match");
-			}
+			else logger.debug(gtSmell + " has no match");
 		}
-		
-		// key: a type of smell, value: the number of instances of that type of smell in the ground truth
-		Map<Class,AtomicInteger> gtSmellTypeCountMap = new HashMap<>();
-		for (Class smellClass : SmellUtil.getSmellClasses()) {
+
+		/**
+		 * Key: A type of smell
+		 * Value: The number of instances of that type of smell in the ground truth
+		 */
+		Map<Smell.SmellType, AtomicInteger> gtSmellTypeCountMap = new HashMap<>();
+		for (Smell.SmellType smellType : Smell.SmellType.values()) {
 			for (Smell gtSmell : detectedGtSmells) {
-				if (smellClass.isInstance(gtSmell)) {
-					if (gtSmellTypeCountMap.containsKey(smellClass)) {
-						gtSmellTypeCountMap.get(smellClass).incrementAndGet();
-					}
-					else {
-						gtSmellTypeCountMap.put(smellClass, new AtomicInteger(1));
-					}
+				if (gtSmell.getSmellType() == smellType) {
+					if (gtSmellTypeCountMap.containsKey(smellType))
+						gtSmellTypeCountMap.get(smellType).incrementAndGet();
+					else gtSmellTypeCountMap.put(smellType, new AtomicInteger(1));
 				}
 			}
 		}
 		
 		logger.debug("");
 		logger.debug("Number of instances for each smell type in groud-truth smells:");
-		logger.debug(Joiner.on("\n").withKeyValueSeparator("=").join(gtSmellTypeCountMap));
+		logger.debug(gtSmellTypeCountMap.keySet().stream()
+			.map(key -> key + " = (" + gtSmellTypeCountMap.get(key) + ")")
+			.collect(Collectors.joining("\n")));
 		
-		// map containing the number of instances a technique matched a smell type
-		// key: (type of smell, technique filename), value: the number of instances a technique matched a smell type
-		Map<Pair<Class,String>,AtomicInteger> matchedSmellTypeCountMap = new HashMap<>();
+		/**
+		 * Map containing the number of instances a technique matched a smell type.
+		 * Key: [Type of smell, Technique Filename]
+		 * Value: The number of instances a technique matched a smell type
+		 */
+		Map<Entry<Smell.SmellType, String>, AtomicInteger> matchedSmellTypeCountMap
+			= new HashMap<>();
 		logger.debug("");
 		logger.debug("Populating the map counting how many times a smell type is matched by a technique:");
+		// For each smell instance in the ground-truth
 		for (Smell gtSmell : detectedGtSmells) {
-			
+			// If there were matches for that smell instance
 			if (gtSmellToPairMap.containsKey(gtSmell)) {
-				Set<Pair<Smell, String>> smellFilePairs = gtSmellToPairMap
-						.get(gtSmell);
-				for (Pair<Smell, String> smellFilePair : smellFilePairs) {
-					Smell matchedSmell = smellFilePair.getLeft();
-					String resultsFilename = smellFilePair.getRight();
-					for (Class smellClass : SmellUtil.getSmellClasses()) {
-						if (smellClass.isInstance(matchedSmell)) {
+				Set<Entry<Smell, String>> smellFilePairs =
+					gtSmellToPairMap.get(gtSmell);
+				// For each match
+				for (Entry<Smell, String> smellFilePair : smellFilePairs) {
+					Smell matchedSmell = smellFilePair.getKey();
+					String resultsFilename = smellFilePair.getValue();
+					// And for each smell type
+					for (Smell.SmellType smellType : Smell.SmellType.values()) {
+						// If the smell in that match is of the given type
+						if (matchedSmell.getSmellType() == smellType) {
 							logger.debug(resultsFilename + ":" + matchedSmell
-									+ " is an instance of "
-									+ smellClass.getSimpleName());
-							Pair<Class, String> pair = new ImmutablePair<>(
-									smellClass, resultsFilename);
-							if (matchedSmellTypeCountMap.containsKey(pair)) {
-								matchedSmellTypeCountMap.get(pair)
-										.incrementAndGet();
-							} else {
-								matchedSmellTypeCountMap.put(pair,
-										new AtomicInteger(1));
-							}
+									+ " is an instance of " + smellType);
+							Entry<Smell.SmellType, String> pair = Map.entry(
+								smellType, resultsFilename);
+							//TODO not sure what's going on here
+							if (matchedSmellTypeCountMap.containsKey(pair))
+								matchedSmellTypeCountMap.get(pair).incrementAndGet();
+							else
+								matchedSmellTypeCountMap.put(pair, new AtomicInteger(1));
 						}
 					}
 				}
-			} else {
-				logger.debug(gtSmell + " has no match");
 			}
+			else logger.debug(gtSmell + " has no match");
 		}
 		
 		logger.debug("");
 		logger.debug("Number of instances for each smell type in matched smells:");
-		logger.debug(Joiner.on("\n").withKeyValueSeparator("=").join(matchedSmellTypeCountMap));
+		logger.debug(matchedSmellTypeCountMap.keySet().stream()
+			.map(key -> key + " = (" + matchedSmellTypeCountMap.get(key) + ")")
+			.collect(Collectors.joining("\n")));
 		
-		List<String> dsShortFilenames = Lists.newArrayList(Iterables.transform(
-				dsFilenames, (final String filename) -> FileUtil.extractFilenamePrefix(filename)
-				));
+		List<String> dsShortFilenames = dsFilenames.stream()
+			.map(FileUtil::extractFilenamePrefix)
+			.collect(Collectors.toList());
+
 		String smellTechTable = "";
-		smellTechTable += "," + Joiner.on(",").join(dsShortFilenames);
+		smellTechTable += "," + String.join(",", dsShortFilenames);
 		smellTechTable += "\n";
-		for (Class smellClass : SmellUtil.getSmellClasses()) {
-			smellTechTable += smellClass.getSimpleName() + ",";
-			if (!gtSmellTypeCountMap.containsKey(smellClass)) {
-				for (String filename : dsFilenames) {
+
+		for (Smell.SmellType smellType : Smell.SmellType.values()) {
+			smellTechTable += smellType + ",";
+			if (!gtSmellTypeCountMap.containsKey(smellType))
+				for (int i = 0; i < dsFilenames.size(); i++)
 					smellTechTable += "NA,";
-				}
-			} else {
+			else {
 				for (String filename : dsFilenames) {
-					Pair<Class, String> pair = new ImmutablePair<>(
-							smellClass, filename);
+					Entry<Smell.SmellType, String> pair = Map.entry(smellType, filename);
 					if (matchedSmellTypeCountMap.containsKey(pair)) {
-						double ratio = (double) matchedSmellTypeCountMap.get(
-								pair).get()
-								/ (double) gtSmellTypeCountMap.get(
-										pair.getLeft()).get();
+						double ratio = (double) matchedSmellTypeCountMap.get(pair).get()
+							/ (double) gtSmellTypeCountMap.get(pair.getKey()).get();
 						smellTypeTechRatioMap.put(pair, ratio);
 						smellTechTable += ratio + ",";
-					} else {
-						smellTechTable += "0,";
 					}
+					else
+						smellTechTable += "0,";
 				}
 			}
 			smellTechTable += "\n";
 		}
 		logger.debug("\n" + smellTechTable);
 		
-		PrintWriter writer;
-		try {
-			writer = new PrintWriter(smellTechTableFilename, "UTF-8");
-			
+		try (PrintWriter writer = new PrintWriter(smellTechTableFilename, "UTF-8")){
 			writer.println(smellTechTable);
-			writer.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		
-		double numofMatchedGtSmells = (double)gtSmellToPairMap.keySet().size();
-		double numOfTotalGtSmells = (double)detectedGtSmells.size();
+		double numofMatchedGtSmells = (double) gtSmellToPairMap.keySet().size();
+		double numOfTotalGtSmells = (double) detectedGtSmells.size();
 		
 		logger.debug("");
 		logger.debug("number of matched gt smells: " + numofMatchedGtSmells);
 		logger.debug("number of total gt smells: " + numOfTotalGtSmells);
-		double detectedGtSmellsRatio = numofMatchedGtSmells/numOfTotalGtSmells;
+		double detectedGtSmellsRatio = numofMatchedGtSmells / numOfTotalGtSmells;
 		logger.debug("Ratio of detected gt smells: " + detectedGtSmellsRatio);
 	}
 
 	private static void computePearsonCorrelationOfMojoFMToSmellAccuracy(
 			String smellFileToMojoFilename, Map<String, Double> fileCoverageMap) {
-		// key: smell filename, value: mojofm score
-		List<Pair<String, Double>> fileScorePairs = new ArrayList<>();
+		/**
+		 * Key: Smell filename
+		 * Value: MojoFM score
+		 */
+		List<Entry<String, Double>> fileScorePairs = new ArrayList<>();
 		Path smellFileToMojoPath = Paths.get(smellFileToMojoFilename);
+
+		// Open an InputStream to read the MojoFM file
 		try (InputStream in = Files.newInputStream(smellFileToMojoPath);
 				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(in))) {
-			String line = null;
-			while ((line = reader.readLine()) != null) {
+				new InputStreamReader(in))) {
+			for (String line = reader.readLine();
+			    line != null;
+					line = reader.readLine()) {
 				String[] tokens = line.split(",");
 				String filename = tokens[0];
 				double mojoFmScore = Double.parseDouble(tokens[1]);
-				fileScorePairs.add(new ImmutablePair<>(filename,
-						mojoFmScore));
+				fileScorePairs.add(Map.entry(filename, mojoFmScore));
 			}
 		} catch (IOException x) {
-			System.err.println(x);
+			x.printStackTrace();
 		}
 
+		// Sort the results read from the MojoFM file and log them
 		Collections.sort(fileScorePairs, new FileScorePairAscending());
 		logger.debug("");
-		for (Pair<String, Double> pair : fileScorePairs) {
-			logger.debug(pair.getLeft() + "," + pair.getRight());
-		}
+		for (Entry<String, Double> pair : fileScorePairs)
+			logger.debug(pair.getKey() + "," + pair.getValue());
 	
+		/**
+		 * Set up the two distribution vectors for correlation. The first vector
+		 * (coverageArray) represents the coverage distribution of all obtained
+		 * technique results. The second vector (scoreArray) represents the
+		 * distribution drawn from the MojoFM scores file.
+		 */
 		double[] coverageArray = new double[fileCoverageMap.entrySet().size()];
 		double[] scoreArray = new double[fileScorePairs.size()];
-		int i=0;
-		for (Pair<String,Double> pair : fileScorePairs) {
-			String filename = pair.getLeft();
-			double score = pair.getRight();
+		for (int i = 0; i < fileScorePairs.size(); i++) {
+			Entry<String, Double> pair = fileScorePairs.get(i);
+			String filename = pair.getKey();
+			double score = pair.getValue();
 			double coverage = fileCoverageMap.get(filename);
 			scoreArray[i] = score;
 			coverageArray[i] = coverage;
-			i++;			
 		}
 		
 		PearsonsCorrelation pearsons = new PearsonsCorrelation();
-		double correlationCoefficient = pearsons.correlation(scoreArray, coverageArray);
-		
-		List<Double> coverageList = Arrays.asList( ArrayUtils.toObject(coverageArray) );
-		List<Double> scoreList = Arrays.asList( ArrayUtils.toObject(scoreArray) );
+		double correlationCoefficient =
+			pearsons.correlation(scoreArray, coverageArray);
+
 		logger.debug("");
 		logger.debug("MoJoFM Scores:");
-		logger.debug(scoreList);
+		logger.debug(scoreArray);
 		logger.debug("Coverage Ratios:");
-		logger.debug(coverageList);
+		logger.debug(coverageArray);
 		logger.debug("MoJoFM to Coverage correlation: " + correlationCoefficient);
 	}
 
-	private static double calcSimOfSmellInstances(Smell gtSmell, Smell techSmell) {
+	/**
+	 * Calculates the similarity between two smell instances as the ratio between
+	 * the intersection of clusters involved over the union of clusters involved.
+	 * 
+	 * @param gtSmell Instance of smell from a ground-truth result.
+	 * @param techSmell Instance of smell from an analysis technique result.
+	 * @return The resultant ratio.
+	 */
+	private static double calcSimOfSmellInstances(
+			Smell gtSmell, Smell techSmell) {
 		Set<String> gtEntities = new HashSet<>();
 		Set<String> techEntities = new HashSet<>();
 		
-		for (ConcernCluster cluster : gtSmell.clusters) {
+		for (ConcernCluster cluster : gtSmell.getClusters())
 			gtEntities.addAll(cluster.getEntities());
-		}
-		for (ConcernCluster cluster : techSmell.clusters) {
+		for (ConcernCluster cluster : techSmell.getClusters())
 			techEntities.addAll(cluster.getEntities());
-		}
 		
 		Set<String> intersection = new HashSet<>(gtEntities);
 		intersection.retainAll(techEntities);
 		
 		Set<String> union = new HashSet<>(gtEntities);
 		union.addAll(techEntities);
-		
-		// simRatio
-		return (double)intersection.size()/(double)union.size();
+
+		return (double) intersection.size() / (double) union.size();
 	}
 }

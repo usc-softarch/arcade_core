@@ -12,20 +12,24 @@ import soot.Type;
  * @author joshua
  */
 public class MyMethod implements Serializable {
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -268381565397216273L;
-	public String name;
-	Set<String> params;
-	public String retVal;
-	public MyClass declaringClass;
-	public boolean isPublic;
-	public String type;
+
+	private String name;
+	private Set<String> params;
+	private String retVal;
+	private MyClass declaringClass;
+	private boolean publicScope;
+	private String type;
+	// #endregion FIELDS ---------------------------------------------------------
 	
+	// #region CONSTRUCTORS ------------------------------------------------------
 	public MyMethod(MyMethod method) {
 		this.name = method.name;
 		this.retVal = method.retVal;
 		this.declaringClass = method.declaringClass;
 		this.params = new HashSet<>(method.params);
-		this.isPublic = method.isPublic;
+		this.publicScope = method.publicScope;
 	}
 	
 	public MyMethod(SootMethod method) {
@@ -37,39 +41,59 @@ public class MyMethod implements Serializable {
 			this.params.add(t.toString());
 		}
 		this.declaringClass = new MyClass(method.getDeclaringClass()); 
-		this.isPublic = method.isPublic();
+		this.publicScope = method.isPublic();
 	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
 
+	// #region ACCESSORS ---------------------------------------------------------
+	public String getName() { return this.name; }
+	public Set<String> getParams() { return new HashSet<>(params); }
+	public String getRetVal() { return this.retVal; }
+	public MyClass getDeclaringClass() { return new MyClass(declaringClass); }
+	public boolean isPublic() { return this.publicScope; }
+	public String getType() { return this.type; }
+
+	public void setName(String name) { this.name = name; }
+	public boolean addParam(String param) { return this.params.add(param); }
+	public boolean removeParam(String param) { return this.params.remove(param); }
+	public void setRetVal(String retVal) { this.retVal = retVal; }
+	public void setDeclaringClass(MyClass declaringClass) {
+		this.declaringClass = declaringClass; }
+	public void setPublic(boolean publicScope) { this.publicScope = publicScope; }
+	public void setType(String type) { this.type = type; }
+	// #endregion ACCESSORS ------------------------------------------------------
+
+	// #region MISC --------------------------------------------------------------
+	@Override
 	public boolean equals (Object o) {
-		MyMethod method = (MyMethod) o;
-		if (
-				this.name.equals(method.name) &&
-				this.retVal.equals(method.retVal) &&
-				this.declaringClass.equals(method.declaringClass) &&
-				this.params.equals(method.params) &&
-				this.isPublic == method.isPublic
-			)
-			return true;
-		else 
+		if(!(o instanceof MyMethod))
 			return false;
-			
+		
+		MyMethod method = (MyMethod) o;
+		
+		return this.name.equals(method.name) &&
+			this.retVal.equals(method.retVal) &&
+			this.declaringClass.equals(method.declaringClass) &&
+			this.params.equals(method.params) &&
+			this.publicScope == method.publicScope;
 	}
 	
+	@Override
 	public int hashCode() {
 		int hash = 7;
 		hash = 37 * hash + (this.name == null ? 0 : this.name.hashCode());
 		hash = 37 * hash + (this.retVal == null ? 0 : this.retVal.hashCode());
 		hash = 37 * hash + (this.declaringClass == null ? 0 : this.declaringClass.hashCode());
 		hash = 37 * hash + (this.params == null ? 0 : this.params.hashCode());
-		hash = 37 * hash + (this.isPublic ? 1 : 0);
+		hash = 37 * hash + (this.publicScope ? 1 : 0);
 		return hash;
 	}
 	
+	@Override
 	public String toString() {
-		return "(" + (this.isPublic ? "public" : "private") + "," + this.declaringClass.toString() + "." + this.name + ")";
+		String toReturn = "(" + (this.publicScope ? "public" : "private") + ",";
+		toReturn += this.declaringClass.toString() + "." + this.name + ")";
+		return toReturn;
 	}
-
-	public Set<String> getParams() {
-		return new HashSet<>(params);
-	}
+	// #endregion MISC -----------------------------------------------------------
 }

@@ -56,3 +56,5 @@ target
 .factorypath
 .settings
 .vscode
+
+src/test/resources/CleanUpCodeMaat_resources/*/*_clean*

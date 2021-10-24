@@ -4,7 +4,7 @@
   <groupId>edu.usc.softarch.arcade</groupId>
   <artifactId>arcade_core</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.6</version>
+  <version>0.0.7</version>
   <name>arcade_core</name>
   <url>https://github.com/usc-softarch/arcade_core</url>
   <properties>
@@ -18,23 +18,19 @@
       <name>weka</name>
       <url>https://clojars.org/repo/</url>
     </repository>
-    <repository>
-      <id>jgrapht-old</id>
-      <name>jgrapht-jdk1.6</name>
-      <url>http://titania.fs.uni-saarland.de/nexus/content/repositories/stchair/</url>
-    </repository>
   </repositories>
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.4.0</version>
+      <version>5.8.0-M1</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>5.8.0-M1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -53,27 +49,27 @@
       <artifactId>jakarta.xml.bind-api</artifactId>
       <version>2.3.3</version>
     </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.16</version>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>2.8.2</version>
+      <version>2.14.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>2.8.2</version>
+      <version>2.14.0</version>
     </dependency>
     <dependency>
       <groupId>cc.mallet</groupId>
       <artifactId>mallet</artifactId>
-      <version>2.0.8</version>
+      <version>local</version>
+    </dependency>
+    <dependency>
+      <groupId>gnu.trove</groupId>
+      <artifactId>trove</artifactId>
+      <version>local</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -92,29 +88,23 @@
       <artifactId>commons-math3</artifactId>
       <version>3.0</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
-    <dependency>
-      <groupId>commons-cli</groupId>
-      <artifactId>commons-cli</artifactId>
-      <version>1.2</version>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/org.json/json -->
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20141113</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-jdk1.6 -->
+    <!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
     <dependency>
       <groupId>org.jgrapht</groupId>
-      <artifactId>jgrapht-jdk1.6</artifactId>
-      <version>0.8.3</version>
+      <artifactId>jgrapht-core</artifactId>
+      <version>1.5.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.beust/jcommander -->
     <dependency>
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
-      <version>1.35</version>
+      <version>1.78</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/net.sf.jung/jung-graph-impl -->
     <dependency>
@@ -134,17 +124,6 @@
       <artifactId>jung-visualization</artifactId>
       <version>2.1.1</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/net.sf.jung/jung-samples -->
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-samples</artifactId>
-      <version>2.1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-collections4</artifactId>
-      <version>4.4</version>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/weka/weka -->
     <dependency>
       <groupId>weka</groupId>
@@ -157,6 +136,12 @@
       <artifactId>json-simple</artifactId>
       <version>1.1.1</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+    <!-- <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.12.1</version>
+    </dependency> -->
     <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
     <dependency>
       <groupId>org.apache.poi</groupId>
@@ -179,7 +164,7 @@
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
-      <version>1.4.10</version>
+      <version>1.4.16</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/xmlpull/xmlpull -->
     <dependency>
@@ -198,18 +183,6 @@
       <groupId>org.bithill</groupId>
       <artifactId>classycle</artifactId>
       <version>1.4.4</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.eclipse.tycho/org.eclipse.jdt.core -->
-    <dependency>
-      <groupId>org.eclipse.tycho</groupId>
-      <artifactId>org.eclipse.jdt.core</artifactId>
-      <version>3.9.1.v20130905-0837</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/eclipse/eclipse-runtime -->
-    <dependency>
-      <groupId>eclipse</groupId>
-      <artifactId>eclipse-runtime</artifactId>
-      <version>2.1.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.tmatesoft.svnkit/svnkit -->
     <dependency>
@@ -251,6 +224,12 @@
       <artifactId>oro</artifactId>
       <version>2.0.8</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.12.3</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -282,7 +261,7 @@
               <archive>
                 <manifest>
                   <!-- CHANGE THIS LINE TO CHANGE MAIN CLASS -->
-                  <mainClass>edu.usc.softarch.arcade.AcdcWithSmellDetection</mainClass>
+                  <mainClass>edu.usc.softarch.arcade.clustering.drivers.AcdcWithSmellDetection</mainClass>
                   <!-- CHANGE THIS LINE TO CHANGE MAIN CLASS -->
                 </manifest>
               </archive>
@@ -294,31 +273,6 @@
           </execution>
         </executions>
       </plugin>
-      <!-- <plugin>
-        <groupId>org.apache.maven.plugin</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M4</version>
-        <configuration>
-          <enableAssertions>true</enableAssertions>
-          <excludes>
-            <exclude>**/CleanUpCodeMaatWrapperTest.java</exclude>
-            <exclude>**/AcdcWrapperTest.java</exclude>
-            <exclude>**/CSourceToDepsBuilderWrapperTest.java</exclude>
-            <exclude>**/JavaSourceToDepsBuilderWrapperTest.java</exclude>
-            <exclude>**/PipeExtractorWrapperTest.java</exclude>
-            <exclude>**/BatchCloneFinderWrapperTest.java</exclude>
-            <exclude>**/InferencerTest.java</exclude>
-            <exclude>**/TopicModelGeneratorTest.java</exclude>
-            <exclude>**/BatchDecayMetricsAnalyzerWrapperTest.java</exclude>
-            <exclude>**/C2CAverageAnalyzerWrapperTest.java</exclude>
-            <exclude>**/SmellDensityAnalyzerWrapperTest.java</exclude>
-            <exclude>**/SmellEvolutionAnalyzerWrapperTest.java</exclude>
-            <exclude>**/CodemaatWrapperTest.java</exclude>
-            <exclude>**/DepFindRunnerWrapperTest.java</exclude>
-            <exclude>**/BatchSystemEvoWrapperTest.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin> -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -392,23 +346,58 @@
               <goal>install-file</goal>
             </goals>
           </execution>
+          <execution>
+            <id>hack-binary3</id>
+            <phase>clean</phase>
+            <configuration>
+              <file>${basedir}/libs/mallet.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>cc.mallet</groupId>
+              <artifactId>mallet</artifactId>
+              <version>local</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>hack-binary4</id>
+            <phase>clean</phase>
+            <configuration>
+              <file>${basedir}/libs/trove-2.0.2.jar</file>
+              <repositoryLayout>default</repositoryLayout>
+              <groupId>gnu.trove</groupId>
+              <artifactId>trove</artifactId>
+              <version>local</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M5</version>
+        <configuration>
+          <excludes>
+            <exclude>JavaSourceToDepsBuilderTest_resources_old/**/*</exclude>
+            <exclude>JavaSourceToDepsBuilderTest_resources/**/*</exclude>
+            <exclude>subject_systems_resources/**/*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
-    <!-- <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <excludes>
-          <exclude>**/*</exclude>
-        </excludes>
-      </testResource>
-    </testResources> -->
     <resources>
       <resource>
         <directory>src/main/resources</directory>
         <targetPath>${project.build.directory}</targetPath>
         <includes>
-          <include>log4j.properties</include>
           <include>cfg/*</include>
           <include>log4j2.xml</include>
 		  <include>stoplists/*</include>
@@ -416,6 +405,14 @@
         </includes>
       </resource>
     </resources>
+    <testResources>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+        <excludes>
+          <exclude>**/*</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
   </build>
   <distributionManagement>
 	<repository>

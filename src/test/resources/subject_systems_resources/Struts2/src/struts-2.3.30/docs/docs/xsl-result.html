@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- 
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License. 
+-->
+<html>
+<head>
+    <link type="text/css" rel="stylesheet" href="https://struts.apache.org/css/default.css">
+    <style type="text/css">
+        .dp-highlighter {
+            width:95% !important;
+        }
+    </style>
+    <style type="text/css">
+        .footer {
+            background-image:      url('https://cwiki.apache.org/confluence/images/border/border_bottom.gif');
+            background-repeat:     repeat-x;
+            background-position:   left top;
+            padding-top:           4px;
+            color:                 #666;
+        }
+    </style>
+    <link href='https://struts.apache.org/highlighter/style/shCoreStruts.css' rel='stylesheet' type='text/css' />
+    <link href='https://struts.apache.org/highlighter/style/shThemeStruts.css' rel='stylesheet' type='text/css' />
+    <script src='https://struts.apache.org/highlighter/js/shCore.js' type='text/javascript'></script>
+    <script src='https://struts.apache.org/highlighter/js/shBrushPlain.js' type='text/javascript'></script>
+    <script src='https://struts.apache.org/highlighter/js/shBrushXml.js' type='text/javascript'></script>
+    <script src='https://struts.apache.org/highlighter/js/shBrushJava.js' type='text/javascript'></script>
+    <script src='https://struts.apache.org/highlighter/js/shBrushJScript.js' type='text/javascript'></script>
+    <script src='https://struts.apache.org/highlighter/js/shBrushGroovy.js' type='text/javascript'></script>
+    <script src='https://struts.apache.org/highlighter/js/shBrushBash.js' type='text/javascript'></script>
+    <script type="text/javascript">
+        SyntaxHighlighter.defaults['toolbar'] = false;
+        SyntaxHighlighter.all();
+    </script>
+    <script type="text/javascript" language="javascript">
+        var hide = null;
+        var show = null;
+        var children = null;
+
+        function init() {
+            /* Search form initialization */
+            var form = document.forms['search'];
+            if (form != null) {
+                form.elements['domains'].value = location.hostname;
+                form.elements['sitesearch'].value = location.hostname;
+            }
+
+            /* Children initialization */
+            hide = document.getElementById('hide');
+            show = document.getElementById('show');
+            children = document.all != null ?
+                    document.all['children'] :
+                    document.getElementById('children');
+            if (children != null) {
+                children.style.display = 'none';
+                show.style.display = 'inline';
+                hide.style.display = 'none';
+            }
+        }
+
+        function showChildren() {
+            children.style.display = 'block';
+            show.style.display = 'none';
+            hide.style.display = 'inline';
+        }
+
+        function hideChildren() {
+            children.style.display = 'none';
+            show.style.display = 'inline';
+            hide.style.display = 'none';
+        }
+    </script>
+    <title>XSL Result</title>
+</head>
+<body onload="init()">
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+    <tr class="topBar">
+        <td align="left" valign="middle" class="topBarDiv" align="left" nowrap>
+            &nbsp;<a href="home.html">Home</a>&nbsp;&gt;&nbsp;<a href="guides.html">Guides</a>&nbsp;&gt;&nbsp;<a href="core-developers-guide.html">Core Developers Guide</a>&nbsp;&gt;&nbsp;<a href="result-types.html">Result Types</a>&nbsp;&gt;&nbsp;<a href="xsl-result.html">XSL Result</a>
+        </td>
+        <td align="right" valign="middle" nowrap>
+            <form name="search" action="https://www.google.com/search" method="get">
+                <input type="hidden" name="ie" value="UTF-8" />
+                <input type="hidden" name="oe" value="UTF-8" />
+                <input type="hidden" name="domains" value="" />
+                <input type="hidden" name="sitesearch" value="" />
+                <input type="text" name="q" maxlength="255" value="" />
+                <input type="submit" name="btnG" value="Google Search" />
+            </form>
+        </td>
+    </tr>
+</table>
+
+<div id="PageContent">
+    <div class="pageheader" style="padding: 6px 0px 0px 0px;">
+        <!-- We'll enable this once we figure out how to access (and save) the logo resource -->
+        <!--img src="/wiki/images/confluence_logo.gif" style="float: left; margin: 4px 4px 4px 10px;" border="0"-->
+        <div style="margin: 0px 10px 0px 10px" class="smalltext">Apache Struts 2 Documentation</div>
+        <div style="margin: 0px 10px 8px 10px"  class="pagetitle">XSL Result</div>
+
+        <div class="greynavbar" align="right" style="padding: 2px 10px; margin: 0px;">
+            <a href="https://cwiki.apache.org/confluence/pages/editpage.action?pageId=14003">
+                <img src="https://cwiki.apache.org/confluence/images/icons/notep_16.gif"
+                     height="16" width="16" border="0" align="absmiddle" title="Edit Page"></a>
+            <a href="https://cwiki.apache.org/confluence/pages/editpage.action?pageId=14003">Edit Page</a>
+            &nbsp;
+            <a href="https://cwiki.apache.org/confluence/pages/listpages.action?key=WW">
+                <img src="https://cwiki.apache.org/confluence/images/icons/browse_space.gif"
+                     height="16" width="16" border="0" align="absmiddle" title="Browse Space"></a>
+            <a href="https://cwiki.apache.org/confluence/pages/listpages.action?key=WW">Browse Space</a>
+            &nbsp;
+            <a href="https://cwiki.apache.org/confluence/pages/createpage.action?spaceKey=WW&fromPageId=14003">
+                <img src="https://cwiki.apache.org/confluence/images/icons/add_page_16.gif"
+                     height="16" width="16" border="0" align="absmiddle" title="Add Page"></a>
+            <a href="https://cwiki.apache.org/confluence/pages/createpage.action?spaceKey=WW&fromPageId=14003">Add Page</a>
+            &nbsp;
+            <a href="https://cwiki.apache.org/confluence/pages/createblogpost.action?spaceKey=WW&fromPageId=14003">
+                <img src="https://cwiki.apache.org/confluence/images/icons/add_blogentry_16.gif"
+                     height="16" width="16" border="0" align="absmiddle" title="Add News"></a>
+            <a href="https://cwiki.apache.org/confluence/pages/createblogpost.action?spaceKey=WW&fromPageId=14003">Add News</a>
+        </div>
+    </div>
+
+    <div class="pagecontent">
+        <div class="wiki-content">
+            <div id="ConfluenceContent">
+
+<p>XSLTResult uses XSLT to transform an action object to XML. The recent version
+has been specifically modified to deal with Xalan flaws. When using Xalan you
+may notice that even though you have a very minimal stylesheet like this one
+</p><pre>
+&lt;xsl:template match="/result"&gt;
+  &lt;result/&gt;
+&lt;/xsl:template&gt;</pre>
+
+<p></p><p>
+Xalan would still iterate through every property of your action and all
+its descendants.
+</p>
+
+<p></p><p>
+If you had double-linked objects, Xalan would work forever analysing an
+infinite object tree. Even if your stylesheet was not constructed to process
+them all. It's because the current Xalan eagerly and extensively converts
+everything to its internal DTM model before further processing.
+</p>
+
+<p></p><p>
+That's why there's a loop eliminator added that works by indexing every
+object-property combination during processing. If it notices that some
+object's property was already walked through, it doesn't go any deeper.
+Say you have two objects, x and y, with the following properties set
+(pseudocode):
+</p>
+<pre>
+x.y = y;
+and
+y.x = x;
+action.x=x;</pre>
+
+<p></p><p>
+Due to that modification, the resulting XML document based on x would be:
+</p>
+
+<p></p><pre>
+&lt;result&gt;
+  &lt;x&gt;
+    &lt;y/&gt;
+  &lt;/x&gt;
+&lt;/result&gt;</pre>
+
+<p></p><p>
+Without it there would be endless x/y/x/y/x/y/... elements.
+</p>
+
+<p></p><p>
+The XSLTResult code tries also to deal with the fact that DTM model is built
+in a manner that children are processed before siblings. The result is that if
+there is object x that is both set in action's x property, and very deeply
+under action's a property then it would only appear under a, not under x.
+That's not what we expect, and that's why XSLTResult allows objects to repeat
+in various places to some extent.
+</p>
+
+<p></p><p>
+Sometimes the object mesh is still very dense and you may notice that even
+though you have a relatively simple stylesheet, execution takes a tremendous
+amount of time. To help you to deal with that obstacle of Xalan, you may
+attach regexp filters to elements paths (xpath).
+</p>
+
+<p></p><p>
+<b>Note:</b> In your .xsl file the root match must be named <tt>result</tt>.
+<br clear="none">This example will output the username by using <tt>getUsername</tt> on your
+action class:
+</p><pre>
+&lt;xsl:template match="result"&gt;
+  &lt;html&gt;
+  &lt;body&gt;
+  Hello &lt;xsl:value-of select="username"/&gt; how are you?
+  &lt;/body&gt;
+  &lt;/html&gt;
+&lt;/xsl:template&gt;
+</pre>
+
+<p></p><p>
+In the following example the XSLT result would only walk through action's
+properties without their childs. It would also skip every property that has
+"hugeCollection" in their name. Element's path is first compared to
+excludingPattern - if it matches it's no longer processed. Then it is
+compared to matchingPattern and processed only if there's a match.
+</p>
+
+
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<script class="brush: xml; gutter: false; theme: Default" type="syntaxhighlighter"><![CDATA[
+&lt;result name=&quot;success&quot; type=&quot;xslt&quot;&gt;
+  &lt;param name=&quot;location&quot;&gt;foo.xslt&lt;/param&gt;
+  &lt;param name=&quot;matchingPattern&quot;&gt;^/result/[^/*]$&lt;/param&gt;
+  &lt;param name=&quot;excludingPattern&quot;&gt;.*(hugeCollection).*&lt;/param&gt;
+&lt;/result&gt;
+]]></script>
+</div></div>
+
+<h1 id="XSLResult-Parameters">Parameters</h1>
+
+
+<p></p><ul></ul><p></p><ul><li><b>location (default)</b> - the location to go to after execution.</li><li><b>encoding</b> - character encoding used in XML, default UTF-8.</li></ul><p></p><ul><li><b>parse</b> - true by default. If set to false, the location param will
+not be parsed for Ognl expressions.</li></ul><p></p>
+
+<p></p>
+
+<p></p><p>
+<code>struts.properties</code> related configuration:
+</p>
+<ul></ul><p></p><ul><li><b>struts.xslt.nocache</b> - Defaults to false. If set to true, disables
+stylesheet caching. Good for development, bad for production.</li></ul><p></p>
+
+
+<h1 id="XSLResult-Examples">Examples</h1>
+
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<script class="brush: xml; gutter: false; theme: Default" type="syntaxhighlighter"><![CDATA[
+&lt;result name=&quot;success&quot; type=&quot;xslt&quot;&gt;
+  &lt;param name=&quot;location&quot;&gt;foo.xslt&lt;/param&gt;
+  &lt;param name=&quot;matchingPattern&quot;&gt;^/result/[^/*]$&lt;/param&gt;
+  &lt;param name=&quot;excludingPattern&quot;&gt;.*(hugeCollection).*&lt;/param&gt;
+&lt;/result&gt;
+]]></script>
+</div></div></div>
+        </div>
+
+        
+    </div>
+</div>
+<div class="footer">
+    Generated by CXF SiteExporter
+</div>
+</body>
+</html>

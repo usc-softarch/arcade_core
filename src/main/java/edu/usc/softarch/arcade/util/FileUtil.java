@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -41,8 +42,6 @@ public class FileUtil {
 	 * @param theFile Name or path to desired file's prefix.
 	 */
 	public static String extractFilenamePrefix(final File theFile) {
-		logger.entry(theFile);
-		logger.traceExit();
 		return FilenameUtils.getBaseName(theFile.getName());
 	}
 
@@ -62,8 +61,6 @@ public class FileUtil {
 	 * @param theFile Name or path to desired file's extension.
 	 */
 	public static String extractFilenameSuffix(final File theFile) {
-		logger.entry(theFile);
-		logger.traceExit();
 		return FilenameUtils.getExtension(theFile.getName());
 	}
 
@@ -101,15 +98,34 @@ public class FileUtil {
 	}
 
 	/**
-	 * Extracts the name of a java code's package.
+	 * Extracts the name of a java code's package from a line.
 	 * 
 	 * @param entry String from which to extract the package name.
-	 * @return Code's package name.
+	 * @return Code's package name, if the line declares one.
 	 */
 	public static String findPackageName(String entry) {
 		Pattern pattern = Pattern.compile("\\s*package\\s+(.+)\\s*;\\s*");
 		Matcher matcher = pattern.matcher(entry);
 		if (matcher.find()) return matcher.group(1).trim();
+		return null;
+	}
+
+	/**
+	 * Extracts the name of a java code's package from a file.
+	 * 
+	 * @param file File from which to extract the package name.
+	 * @return Code's package name, if the file declares one.
+	 */
+	public static String findPackageName(File file) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				String packageName = findPackageName(line);
+				if (packageName != null) return packageName;
+			}
+		} catch (IOException e) { 
+			logger.error("Failure to read file " + file);
+		}
 		return null;
 	}
 
@@ -133,7 +149,7 @@ public class FileUtil {
 	 */
 	public static List<File> sortFileListByVersion(List<File> inList,
 		boolean reverse) {
-		List<File> outList = new ArrayList<File>(inList);
+		List<File> outList = new ArrayList<>(inList);
 
 		Collections.sort(
 			outList,
@@ -194,10 +210,7 @@ public class FileUtil {
 	 * @return
 	 */
 	public static File checkFile(final String fileName, final boolean create,
-		final boolean exitOnNoExist) {
-
-		logger.entry(fileName, create, exitOnNoExist);
-
+			final boolean exitOnNoExist) {
 		final File f = new File(fileName);
 
 		// Check if file exists
@@ -249,7 +262,6 @@ public class FileUtil {
 		final boolean exitOnNoExist) {
 		//TODO Check if create should have priority over exitOnNoExist
 
-		logger.entry(dirName, create, exitOnNoExist);
 		final File f = new File(dirName);
 
 		// Check if given file is a directory
@@ -320,8 +332,6 @@ public class FileUtil {
 	 */
 	public static String extractVersionPretty(final String name) {
 		//TODO Refactor to call extractVersionFromFilename()
-		logger.entry(name);
-
 		String patternString = "[0-9]+\\.[0-9]+(\\.[0-9]+)*+(-(RC|ALPHA|BETA|M" +
 			"|Rc|Alpha|Beta|rc|alpha|beta|deb|b|a|final|Final|FINAL)[0-9]+)*";
 		final Pattern p = Pattern.compile(patternString);
@@ -355,5 +365,54 @@ public class FileUtil {
 		List<E> toReturn = new ArrayList<>();
 		iterable.forEach(toReturn::add);
 		return toReturn;
+	}
+
+	public static String extractOrgSuffix(String name) {
+		Pattern p = Pattern.compile("org\\/(.*)");
+		Matcher m = p.matcher(name);
+		if (m.find())
+			return m.group(0);
+
+		return null;
+	}
+	
+	/**
+	 * convert	src/java/org/apache/hadoop/dfs/FSDataset.java
+	 * to 			org.apache.hadoop.dfs.FSDataset
+	 * @param dir
+	 * @return
+	 */
+	public static String dir2pkg(String dir) {
+		String orgSuffix = extractOrgSuffix(dir);
+		if (orgSuffix == null) return null;
+
+		String tmp = orgSuffix.substring(0, orgSuffix.lastIndexOf(".java"));
+		return tmp.replace('/', '.');
+	}
+	
+	public static String cutInnterClass(String dir) {
+		if (dir.contains("$"))
+			return dir.split("$")[0];
+		else
+			return dir;
+	}
+
+	public static boolean checkClassesDirs(File inputDir, String classesDirs) {
+		String fs = File.separator;
+		// List all files in inputDir
+		List<File> versionDirectories = Arrays.asList(inputDir.listFiles());
+		// Remove if not a directory
+		versionDirectories.removeIf((File file) -> !file.isDirectory());
+
+		for (File d : versionDirectories) {
+			File currentClassesDir = FileUtil.checkDir(d.getAbsolutePath() + fs
+				+ classesDirs, false, false);
+			if (!currentClassesDir.isDirectory()) {
+				logger.debug("Classes directory " + d.getAbsolutePath()
+					+ " does not exist!");
+				return false;
+			}
+		}
+		return true;
 	}
 }

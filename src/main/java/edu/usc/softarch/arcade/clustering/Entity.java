@@ -55,4 +55,15 @@ public class Entity
 				nonZeroFeatureMap.put(index, newFeatureValue);
 		}
 	}
+
+	public void normalizeFeatureVectorOfCluster(
+			int featuresLength, double[] firstDist) { 
+		for (int i = 0; i < featuresLength; i++) {
+			if (this.nonZeroFeatureMap.get(i) != null) {
+				double featureValue = this.nonZeroFeatureMap.get(i);
+				firstDist[i] = featureValue/this.nonZeroFeatureMap.size();
+			}	else // this feature is zero
+				firstDist[i] = 0;
+		}
+	}
 }

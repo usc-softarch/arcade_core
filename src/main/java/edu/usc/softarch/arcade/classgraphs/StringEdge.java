@@ -12,59 +12,81 @@ import org.apache.logging.log4j.Logger;
 public class StringEdge implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -4787247799445316839L;
-	public ArchElemType srcType = null;
-	public ArchElemType tgtType = null;
-	public String srcStr = "";
-	public String tgtStr = "";
-	public String type = "";
 	private static Logger logger = LogManager.getLogger(StringEdge.class);
+
+	private String srcStr = "";
+	private String tgtStr = "";
+	private String type = "";
 	// #endregion FIELDS ---------------------------------------------------------
 
 	// #region CONSTRUCTORS ------------------------------------------------------
-	public StringEdge() { super(); }
+	public StringEdge() {
+		initialize("", "", "");
+	}
 
 	public StringEdge(String srcStr, String tgtStr) {
-		this.srcStr = srcStr;
-		this.tgtStr = tgtStr;
+		initialize(srcStr, tgtStr, "");
+	}
+
+	public StringEdge(String srcStr, String tgtStr, String type) {
+		initialize(srcStr, tgtStr, type);
+	}
+
+	/**
+	 * Clone constructor.
+	 */
+	public StringEdge(StringEdge e) {
+		initialize(e.getSrcStr(), e.getTgtStr(), e.getType());
+	}
+
+	private void initialize(String srcStr, String tgtStr, String type) {
+		setSrcStr(srcStr);
+		setTgtStr(tgtStr);
+		setType(type);
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public String getType() { return type; }
+	public String getSrcStr() { return this.srcStr; }
+	public String getTgtStr() { return this.tgtStr; }
+	public String getType() { return this.type; }
 
+	public void setSrcStr(String srcStr) { this.srcStr = srcStr; }
+	public void setTgtStr(String tgtStr) { this.tgtStr = tgtStr; }
 	public void setType(String type) { this.type = type; }
 	// #endregion ACCESSORS ------------------------------------------------------
 
-	// #region PROCESSING --------------------------------------------------------
+	// #region MISC --------------------------------------------------------------
+	@Override
 	public boolean equals(Object o) {
 		if(!(o instanceof StringEdge))
 			return false;
 		
 		StringEdge e = (StringEdge) o;
 		
-		logger.info("e.srcStr: " + e.srcStr);
-		logger.info("this.srcStr: " + this.srcStr);
-		logger.info("e.tgtStr: " + e.tgtStr);
-		logger.info("this.tgtStr: " + this.tgtStr);
+		logger.trace("e.srcStr: " + e.srcStr);
+		logger.trace("this.srcStr: " + this.srcStr);
+		logger.trace("e.tgtStr: " + e.tgtStr);
+		logger.trace("this.tgtStr: " + this.tgtStr);
 
-		return (e.srcStr.equals(this.srcStr) && e.tgtStr.equals(this.tgtStr));
+		return (e.srcStr.equals(this.srcStr) &&
+			e.tgtStr.equals(this.tgtStr) &&
+			e.type.equals(this.type));
 	}
-	
-	/**
-	 * hashCode that combines two strings
-	 * Source: http://www.javapractices.com/topic/TopicAction.do?Id=28
-	 * @return a hash code value on the pair of strings.
-	 */
+
 	@Override
 	public int hashCode() {
 		int result = srcStr.hashCode();
 		result = 37 * result + tgtStr.hashCode();
+		result = 37 * result + type.hashCode();
 		return result;
 	}
 	
 	@Override
 	public String toString() {
-		return "(" + srcStr + "," + tgtStr + ")";
+		if(this.type.isEmpty())
+			return "(" + srcStr + "," + tgtStr + ")";
+		return "(" + type + "," + srcStr + "," + tgtStr + ")";
 	}
 	
 	public String toDotString() {
@@ -76,5 +98,5 @@ public class StringEdge implements Serializable {
 	public String toNumberedNodeDotString(Map<String,Integer> map) {
 		return "\t\"" + map.get(srcStr) + "\" -> \"" + map.get(tgtStr) + "\";";
 	}
-	// #endregion PROCESSING -----------------------------------------------------
+	// #endregion MISC -----------------------------------------------------------
 }

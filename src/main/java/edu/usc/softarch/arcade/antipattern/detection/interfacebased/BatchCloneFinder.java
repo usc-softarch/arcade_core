@@ -13,7 +13,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.usc.softarch.arcade.util.RecoveryParams;
+import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchCloneFinder {
 	// #region FIELDS ------------------------------------------------------------
@@ -54,54 +54,8 @@ public class BatchCloneFinder {
 	public void setAntPath(String antPath) { this.antPath = antPath; }
 	// #endregion ACCESSORS ------------------------------------------------------
 
-	public static void main(String[] args) throws IOException {
-		if (args.length != 2) {
-			System.out.println(
-				"Usage: BatchCloneFinder <inputSrcDirName> <outputDirName>");
-			System.exit(-1);
-		}
-
-		BatchCloneFinder batchCloneFinder = new BatchCloneFinder();
-		String inputDir = args[0];
-		String outputDir = args[1];
-		String classesDir = "";
-		logger.info(System.getProperty("user.dir"));
-
-		RecoveryParams recParams = null;
-		try {
-		 	recParams =	new RecoveryParams(inputDir, outputDir, classesDir);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(0);
-		}
-
-		File[] files = recParams.getInputDir().listFiles();
-		Set<File> fileSet = new TreeSet<>(Arrays.asList(files));
-
-		// Makes a list by calling "toString" on every File in fileSet
-		List<String> fileSetNames =
-			fileSet.stream().map(File::toString).collect(Collectors.toList());
-
-		logger.debug("All files in " + recParams.getInputDir() + ":");
-		logger.debug(String.join("\n", fileSetNames));
-
-		boolean nothingtodo = true;
-		for (File versionFolder : fileSet) {
-			if (versionFolder.isDirectory()) {
-				logger.debug("Identified directory: " + versionFolder.getName());
-				nothingtodo = false;
-				batchCloneFinder.single(versionFolder, recParams.getOutputDir(), 
-					recParams.getClassesDirName());
-			} else {
-				logger.debug("Not a directory: " + versionFolder.getName());
-			}
-		}
-		if (nothingtodo) {
-			System.out.println("Nothing to do!");
-		}
-	}
-
-	public void single(File versionFolder, File outputDir, 
+	// #region PROCESSING --------------------------------------------------------
+	public void run(File versionFolder, File outputDir, 
 			String classesDirName) throws IOException {
 		logger.debug("Processing directory: " + versionFolder.getName());
 		
@@ -121,8 +75,7 @@ public class BatchCloneFinder {
 		String absoluteClassesDir = versionFolder.getAbsolutePath()
 			+ fs + classesDirName;
 		File classesDirFile = new File(absoluteClassesDir);
-		if (!classesDirFile.exists())
-			return;
+		if (!classesDirFile.exists())	return;
 
 		logger.debug("Get deps for revision " + revisionNumber);
 
@@ -134,9 +87,8 @@ public class BatchCloneFinder {
 		if(SystemUtils.IS_OS_WINDOWS)
 			prepend = List.of("cmd", "/c");
 
-		command = List.of(getAntPath(), "-f",	getCpdFilePath(),	"cpd",
-			"-Din=" + versionFolder + fs + classesDirName,
-			"-Dout=" + depsXMLFilename);
+		command = List.of(getAntPath(), "-f",	getCpdFilePath(),	"cpd-Din="
+			+ versionFolder + fs + classesDirName, "-Dout=" + depsXMLFilename);
 		command.addAll(0, prepend);
 
 		ProcessBuilder pb = new ProcessBuilder(command);
@@ -145,4 +97,47 @@ public class BatchCloneFinder {
 		pb.redirectErrorStream(true);
 		pb.start();
 	}
+	// #endregion PROCESSING -----------------------------------------------------
+
+	// #region IO ----------------------------------------------------------------
+	public static void main(String[] args) throws IOException {
+		if (args.length != 2) {
+			System.out.println(
+				"Usage: BatchCloneFinder <inputSrcDirName> <outputDirName>");
+			System.exit(-1);
+		}
+
+		BatchCloneFinder batchCloneFinder = new BatchCloneFinder();
+		String inputDirPath = args[0];
+		File inputDir = FileUtil.checkDir(inputDirPath, false, false);
+		String outputDirPath = args[1];
+		File outputDir = FileUtil.checkDir(outputDirPath, true, false);
+		String classesDir = "";
+		logger.info(System.getProperty("user.dir"));
+
+		if (FileUtil.checkClassesDirs(inputDir, classesDir))
+			throw new IOException("Classes directory not found or empty");
+
+		File[] files = inputDir.listFiles();
+		Set<File> fileSet = new TreeSet<>(Arrays.asList(files));
+
+		// Makes a list by calling "toString" on every File in fileSet
+		List<String> fileSetNames =
+			fileSet.stream().map(File::toString).collect(Collectors.toList());
+
+		logger.debug("All files in " + inputDir + ":");
+		logger.debug(String.join("\n", fileSetNames));
+
+		boolean nothingtodo = true;
+		for (File versionFolder : fileSet) {
+			if (versionFolder.isDirectory()) {
+				logger.debug("Identified directory: " + versionFolder.getName());
+				nothingtodo = false;
+				batchCloneFinder.run(versionFolder, outputDir, classesDir);
+			}
+			else logger.debug("Not a directory: " + versionFolder.getName());
+		}
+		if (nothingtodo) System.out.println("Nothing to do!");
+	}
+	// #endregion IO -------------------------------------------------------------
 }

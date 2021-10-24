@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.io.File;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -13,99 +12,71 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
 import edu.usc.softarch.arcade.clustering.StringGraph;
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
-import edu.usc.softarch.arcade.config.Config;
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
 import edu.usc.softarch.extractors.cda.odem.Type;
 
 public class GroundTruthRecoveryGraphBuilder {
-	private static Logger logger = Logger.getLogger(GroundTruthRecoveryGraphBuilder.class);
+	private static Logger logger =
+		LogManager.getLogger(GroundTruthRecoveryGraphBuilder.class);
 	
+	/**
+	 * Arguments are:
+	 * ODEMFile GroundTruthFile ProjectName OutputDirectory
+	 */
 	public static void main(String[] args) {
-		Options options = new Options();
-
-		Option help = new Option("help", "print this message");
-
-		Option projFile = OptionBuilder.withArgName("file").hasArg()
-				.withDescription("project configuration file")
-				.create("projfile");
-
-		options.addOption(help);
-		options.addOption(projFile);
-
-		// create the parser
-		CommandLineParser parser = new GnuParser();
-		try {
-			// parse the command line arguments
-			CommandLine line = parser.parse(options, args);
-
-			if (line.hasOption("projfile")) {
-				Config.setProjConfigFilename(line.getOptionValue("projfile"));
-			}
-			if (line.hasOption("help")) {
-				// automatically generate the help statement
-				HelpFormatter formatter = new HelpFormatter();
-				formatter.printHelp("GroundTruthRecoveryGraphBuilder", options);
-				System.exit(0);
-			}
-		} catch (ParseException exp) {
-			// oops, something went wrong
-			System.err.println("Parsing failed.  Reason: " + exp.getMessage());
-		}
+		String odemFilePath = args[0];
+		String groundTruthFilePath = args[1];
+		String projectName = args[2];
+		String outputDirectory = args[3];
+		String nonPkgBasedGtcg = outputDirectory
+			+ projectName + "_non_pkg_based_ground_truth_cluster_graph.dot";
+		String pkgBasedGtcg = outputDirectory
+			+ projectName + "_pkg_based_ground_truth_cluster_graph.dot";
+		String fullGtcg = outputDirectory
+			+ projectName + "_full_ground_truth_cluster_graph.dot";
+		String groundTruthOutputPath =
+			outputDirectory + projectName + "_ground_truth.rsf";
 		
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
+		System.out.println("Reading in odem file " + odemFilePath  + "...");
 		
-		Config.initConfigFromFile(Config.getProjConfigFilename());
-		
-		System.out.println("Reading in odem file " + Config.getOdemFile()  + "...");
-		
-		ODEMReader.setTypesFromODEMFile(Config.getOdemFile());
+		ODEMReader.setTypesFromODEMFile(odemFilePath);
 		List<Type> allTypes = ODEMReader.getAllTypes();
 		Map<String,Type> typeMap = new HashMap<>();
-		for (Type t : allTypes) {
+		for (Type t : allTypes)
 			typeMap.put(t.getName().trim(), t);
-		}
 		
-		System.out.println("Reading in ground truth file: " + Config.getGroundTruthFile());
+		System.out.println("Reading in ground truth file: "	+ groundTruthFilePath);
 		
+		if (groundTruthFilePath.endsWith(".rsf"))
+			GroundTruthFileParser.parseRsf(groundTruthFilePath);
+		else
+			GroundTruthFileParser.parseHadoopStyle(groundTruthFilePath);
+		ConcernClusterArchitecture nonPkgBasedClusters = GroundTruthFileParser.getClusters();
 		
-		
-		if (Config.getGroundTruthFile().endsWith(".rsf")) {
-			GroundTruthFileParser.parseRsf(Config.getGroundTruthFile());
-		}
-		else {
-			GroundTruthFileParser.parseHadoopStyle(Config.getGroundTruthFile());
-		}
-		Set<ConcernCluster> nonPkgBasedClusters = GroundTruthFileParser.getClusters();
-		
-		
-		StringGraph nonPkgBasedClusterGraph = ClusterUtil.buildClusterGraphUsingOdemClasses(typeMap, nonPkgBasedClusters);
+		StringGraph nonPkgBasedClusterGraph =
+			nonPkgBasedClusters.buildClusterGraphUsingOdemClasses(typeMap);
 		logger.debug("Printing cluster graph of hdfs and mapred...");
 		logger.debug(nonPkgBasedClusterGraph);
 	
 		Set<String> allClasses = new HashSet<>();
-		for (Type type : allTypes) {
+		for (Type type : allTypes)
 			allClasses.add(type.getName().trim());
-		}
-		Set<String> nodesInClusterGraph = ClusterUtil.getNodesInClusterGraph(nonPkgBasedClusterGraph);
-		logger.debug("Number of nodes in cluster graph: " + nodesInClusterGraph.size());
+		Set<String> nodesInClusterGraph = 
+			nonPkgBasedClusterGraph.getNodesInClusterGraph();
+		logger.debug("Number of nodes in cluster graph: "
+			+ nodesInClusterGraph.size());
 		
-		Set<String> classesInClusterGraph = ClusterUtil.getClassesInClusters(nonPkgBasedClusters);
-		logger.debug("Number of classes in all clusters: " + classesInClusterGraph.size());
+		Set<String> classesInClusterGraph = 
+			nonPkgBasedClusters.getClassesInClusters();
+		logger.debug("Number of classes in all clusters: "
+			+ classesInClusterGraph.size());
 		
 		Set<String> unClusteredClasses = new HashSet<>(allClasses);
 		unClusteredClasses.removeAll(classesInClusterGraph);
@@ -118,9 +89,9 @@ public class GroundTruthRecoveryGraphBuilder {
 		}
 		
 		Set<String> packagesOfUnclusteredClasses = new HashSet<>();
-		for (String c : unClusteredClasses) {
-			packagesOfUnclusteredClasses.add(c.substring(c.indexOf("org"), c.lastIndexOf(".")));
-		}
+		for (String c : unClusteredClasses)
+			packagesOfUnclusteredClasses.add(
+				c.substring(c.indexOf("org"), c.lastIndexOf(".")));
 		
 		logger.debug("Packages of unclustered classes");
 		int pkgCount = 0;
@@ -135,9 +106,8 @@ public class GroundTruthRecoveryGraphBuilder {
 		
 		for (String pkg : packagesOfUnclusteredClasses) {
 			Matcher m = topLevelPkgPattern.matcher(pkg);
-			while(m.find()) {
+			while(m.find())
 				topLevelPackagesOfUnclusteredClasses.add(m.group(0));
-			}
 		}
 		
 		logger.debug("Top-level packages of unclustered classes");
@@ -147,25 +117,27 @@ public class GroundTruthRecoveryGraphBuilder {
 			pkgCount++;
 		}
 		
-		Set<ConcernCluster> pkgBasedClusters = ClusterUtil.buildGroundTruthClustersFromPackages(topLevelPackagesOfUnclusteredClasses,unClusteredClasses);
-		StringGraph pkgBasedClusterGraph = ClusterUtil.buildClusterGraphUsingOdemClasses(typeMap, pkgBasedClusters);
+		ConcernClusterArchitecture pkgBasedClusters =
+			ConcernClusterArchitecture.buildGroundTruthClustersFromPackages(
+			topLevelPackagesOfUnclusteredClasses,unClusteredClasses);
+		StringGraph pkgBasedClusterGraph = pkgBasedClusters.buildClusterGraphUsingOdemClasses(typeMap);
 		
-		Set<ConcernCluster> allClusters = new HashSet<>(nonPkgBasedClusters);
+		ConcernClusterArchitecture allClusters = 
+			new ConcernClusterArchitecture(nonPkgBasedClusters);
 		allClusters.addAll(pkgBasedClusters);
 		
-		StringGraph fullClusterGraph = ClusterUtil.buildClusterGraphUsingOdemClasses(typeMap, allClusters);
-		
-		
+		StringGraph fullClusterGraph =
+			allClusters.buildClusterGraphUsingOdemClasses(typeMap);
 		
 		Set<String> twoWayClusters = new HashSet<>();
 		logger.debug("Clusters that would be merged together...");
 		int mergeCount = 0;
 		for (StringEdge edge : fullClusterGraph.edges) {
-			StringEdge reversedEdge = new StringEdge(edge.tgtStr,edge.srcStr);
+			StringEdge reversedEdge = new StringEdge(edge.getTgtStr(),edge.getSrcStr());
 			if (fullClusterGraph.containsEdge(reversedEdge)) {
-				logger.debug("\t Would be merged: " + edge.srcStr + ", " + edge.tgtStr);
-				twoWayClusters.add(edge.srcStr.trim());
-				twoWayClusters.add(edge.tgtStr.trim());
+				logger.debug("\t Would be merged: " + edge.getSrcStr() + ", " + edge.getTgtStr());
+				twoWayClusters.add(edge.getSrcStr().trim());
+				twoWayClusters.add(edge.getTgtStr().trim());
 				mergeCount++;
 			}
 		}
@@ -178,29 +150,30 @@ public class GroundTruthRecoveryGraphBuilder {
 			clusterCount++;
 		}
 		
-		Set<StringGraph> internalGraphs = ClusterUtil.buildInternalGraphs(typeMap, allClusters);
+		Set<StringGraph> internalGraphs = allClusters.buildInternalGraphs(typeMap);
 	
 		String dotFileWritingMsg = "Writing out dot files for cluster graphs...";
 		System.out.println(dotFileWritingMsg);
 		logger.debug(dotFileWritingMsg);
 		try {
-			nonPkgBasedClusterGraph.writeDotFile(Config.getNonPkgBasedGroundTruthClusterGraphDotFilename());
-			pkgBasedClusterGraph.writeDotFile(Config.getPkgBasedGroundTruthClusterGraphDotFilename());
-			fullClusterGraph.writeDotFile(Config.getFullGroundTruthClusterGraphDotFilename());
+			nonPkgBasedClusterGraph.writeDotFile(nonPkgBasedGtcg);
+			pkgBasedClusterGraph.writeDotFile(pkgBasedGtcg);
+			fullClusterGraph.writeDotFile(fullGtcg);
 			
-			for (StringGraph graph : internalGraphs) {
-				graph.writeDotFile(Config.getInternalGraphDotFilename(graph.getName()));
-			}
+			for (StringGraph graph : internalGraphs)
+				graph.writeDotFile(
+					getInternalGraphDotFilename(graph.getName(), outputDirectory));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		
-		String rsfFileWritingMsg = "Writing out ground truth RSF file " + Config.getGroundTruthRsfFilename() + "...";
+		String rsfFileWritingMsg = "Writing out ground truth RSF file " +
+			groundTruthOutputPath + "...";
 		System.out.println(rsfFileWritingMsg);
 		logger.debug(rsfFileWritingMsg);
 		
-		try (FileWriter fw = new FileWriter(Config.getGroundTruthRsfFilename())) {
-			BufferedWriter out = new BufferedWriter(fw);
+		try (BufferedWriter out = new BufferedWriter(
+				new FileWriter(groundTruthOutputPath))) {
 			clusterCount = 0;
 			for (ConcernCluster cluster : nonPkgBasedClusters) {
 				for (String entity : cluster.getEntities()) {
@@ -223,9 +196,14 @@ public class GroundTruthRecoveryGraphBuilder {
 				}
 				clusterCount++;
 			}
-			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static String getInternalGraphDotFilename(
+			String clusterName, String outputDirectory) {
+		String cleanClusterName = clusterName.replaceAll("[\\/:*?\"<>|\\s]","_");
+		return outputDirectory + cleanClusterName + "_internal_cluster_graph.dot";
 	}
 }

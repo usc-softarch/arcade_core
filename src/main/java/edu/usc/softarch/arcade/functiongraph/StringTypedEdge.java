@@ -29,14 +29,14 @@ public class StringTypedEdge extends StringEdge implements Serializable {
 		logger.debug("e.arcTypeStr: " + e.arcTypeStr);
 		logger.debug("this.arcTypeStr: " + this.arcTypeStr);
 		
-		logger.debug("e.srcStr: " + e.srcStr);
-		logger.debug("this.srcStr: " + this.srcStr);
+		logger.debug("e.srcStr: " + e.getSrcStr());
+		logger.debug("this.srcStr: " + this.getSrcStr());
 		
-		logger.debug("e.tgtStr: " + e.tgtStr);
-		logger.debug("this.tgtStr: " + this.tgtStr);
+		logger.debug("e.tgtStr: " + e.getTgtStr());
+		logger.debug("this.tgtStr: " + this.getTgtStr());
 
-		return (e.srcStr.equals(this.srcStr) &&
-			e.tgtStr.equals(this.tgtStr) &&
+		return (e.getSrcStr().equals(this.getSrcStr()) &&
+			e.getTgtStr().equals(this.getTgtStr()) &&
 			e.arcTypeStr.equals(this.arcTypeStr));
 	}
 	
@@ -47,20 +47,20 @@ public class StringTypedEdge extends StringEdge implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		int result = srcStr.hashCode();
-		result = 37 * result + tgtStr.hashCode();
+		int result = getSrcStr().hashCode();
+		result = 37 * result + getTgtStr().hashCode();
 		result = 37 * result + arcTypeStr.hashCode();
 		return result;
 	}
 	
 	@Override
 	public String toString() {
-		return "(" + arcTypeStr + "," + srcStr + "," + tgtStr + ")";
+		return "(" + arcTypeStr + "," + getSrcStr() + "," + getTgtStr() + ")";
 	}
 	
 	@Override
 	public String toDotString() {
-		return "\t\"" + srcStr + "\" -> \"" + tgtStr + "\"[ label=\""
+		return "\t\"" + getSrcStr() + "\" -> \"" + getTgtStr() + "\"[ label=\""
 			+ arcTypeStr + "\" ];;";
 	}
 }

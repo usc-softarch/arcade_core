@@ -59,13 +59,12 @@ public class DepFindRunner {
 				nothingtodo = false;
 				single(versionFolder, recParams.getOutputDir(),
 					recParams.getClassesDirName());
-			} else {
-				logger.debug("Not a directory: " + versionFolder.getName());
 			}
+			else
+				logger.debug("Not a directory: " + versionFolder.getName());
 		}
-		if (nothingtodo) {
+		if (nothingtodo)
 			System.out.println("Nothing to do!");
-		}
 	}
 
 	public static void single(File versionFolder, File outputDir,

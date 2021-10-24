@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.io.File;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,17 +16,12 @@ import java.util.Set;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import edu.usc.softarch.arcade.config.Config;
 
 public class MakeDepReader {
 	private static Logger logger = Logger.getLogger(MakeDepReader.class);
 	
 	public static void main(String[] args) throws FileNotFoundException {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		logger.debug("Running from " + MakeDepReader.class.getName());
-		Config.initConfigFromFile(Config.getProjConfigFilename());
 		Enumeration enumeration = logger.getAllAppenders();
 		while (enumeration.hasMoreElements()) {
 			Appender app = (Appender) enumeration.nextElement();

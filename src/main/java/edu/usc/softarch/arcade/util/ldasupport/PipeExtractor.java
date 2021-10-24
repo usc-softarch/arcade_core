@@ -18,7 +18,6 @@ import cc.mallet.pipe.TokenSequence2FeatureSequence;
 import cc.mallet.pipe.TokenSequenceRemoveStopwords;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.topics.CamelCaseSeparatorPipe;
 import edu.usc.softarch.arcade.topics.StemmerPipe;
 import edu.usc.softarch.arcade.util.FileListing;
@@ -27,6 +26,9 @@ import edu.usc.softarch.arcade.util.FileUtil;
 public class PipeExtractor {
 	public static void main(String[] args) throws IOException {
 		List<Pipe> pipeList = new ArrayList<>();
+		String selectedLanguage = args[2];
+		char fs = File.separatorChar;
+
 		// Pipes: alphanumeric only, camel case separation, lowercase, tokenize,
 		// remove stopwords english, remove stopwords java, stem, map to
 		// features
@@ -36,17 +38,17 @@ public class PipeExtractor {
 		pipeList.add(new CharSequence2TokenSequence(Pattern
 				.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")));
 		pipeList.add(new TokenSequenceRemoveStopwords(new File(
-				"stoplists/en.txt"), "UTF-8", false, false, false));
+			"src" + fs + "main" + fs + "resources" + fs + "stoplists" + fs + "en.txt"), "UTF-8", false, false, false));
 		
-		if (Config.getSelectedLanguage().equals(Config.Language.c)) {
+		if (selectedLanguage.equalsIgnoreCase("c")) {
 			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/ckeywords"), "UTF-8", false, false, false));
+				"src" + fs + "main" + fs + "resources" + fs + "res" + fs + "ckeywords"), "UTF-8", false, false, false));
 			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/cppkeywords"), "UTF-8", false, false, false));
+				"src" + fs + "main" + fs + "resources" + fs + "res" + fs + "cppkeywords"), "UTF-8", false, false, false));
 		}
 		else {
 			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/javakeywords"), "UTF-8", false, false, false));
+				"src" + fs + "main" + fs + "resources" + fs + "res" + fs +  "javakeywords"), "UTF-8", false, false, false));
 		}
 		pipeList.add(new StemmerPipe());
 		pipeList.add(new TokenSequence2FeatureSequence());

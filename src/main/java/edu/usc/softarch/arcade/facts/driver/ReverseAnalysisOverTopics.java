@@ -18,9 +18,9 @@ import java.util.regex.Pattern;
 
 import cc.mallet.util.Maths;
 
-import edu.usc.softarch.arcade.clustering.SimCalcUtil;
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.clustering.Entity;
+import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 
 public class ReverseAnalysisOverTopics {
@@ -42,74 +42,40 @@ public class ReverseAnalysisOverTopics {
 			Map<String, Set<String>> clusterMap, List<List<String>> depFacts) {
 		Map<String, Map<String, Entity>> map = new HashMap<>();
 
-		for (String clusterName : clusterMap.keySet()) { // for each cluster
-															// name
-			Map<String, Entity> entityToFeatures = new HashMap<>(); // using
-																					// a
-																					// map<String,Entity>
-																					// instead
-																					// of
-																					// a
-																					// list
-																					// of
-																					// entities
-																					// so
-																					// that
-																					// getting
-																					// the
-																					// feature
-			// vector for an Entity name will be faster. Mapping name of entity
-			// to Entity object.
+
+		for (String clusterName : clusterMap.keySet()) {
+			// Mapping name of entity to Entity object.
+			Map<String, Entity> entityToFeatures = new HashMap<>();
 			for (List<String> depFact : depFacts) {
 				Entity entity;
 				String source = depFact.get(1);
 				String target = depFact.get(2);
 
-				if (clusterMap.get(clusterName).contains(source)) // if cluster
-																	// contains
-																	// entity
-				{
-					Set<String> featureSet; // featureSet contains a list of all
-											// featureNames for that entity
-
-					if (map.get(clusterName) != null) // if cluster already
-														// exists in map that is
-														// being built
-					{
+				if (clusterMap.get(clusterName).contains(source)) {
+					// featureSet contains a list of all featureNames for that entity
+					Set<String> featureSet;
+					// If cluster already exists in map that is being built
+					if (map.get(clusterName) != null)
 						entityToFeatures = map.get(clusterName);
-					}
 					if (entityToFeatures.get(source) != null) {
 						featureSet = entityToFeatures.get(source).featureSet;
 						entity = entityToFeatures.get(source);
-					} else // otherwise create new ones
-					{
+					} else {
 						entity = new Entity(source);
 						featureSet = new HashSet<>();
 					}
-					featureSet.add(target); // adding target to set of features
-											// for that entity
+					// Adding target to set of features for that entity
+					featureSet.add(target);
 					entity.featureSet = featureSet;
-					if (featureNameToBitsetIndex.get(target) == null) // if this
-																		// target
-																		// has
-																		// never
-																		// been
-																		// encountered
-																		// yet
-					{
-						featureNameToBitsetIndex.put(target, Integer.valueOf(
-								bitSetSize));
-						entity.featureVector.set(bitSetSize); // setting the
-																// spot for this
-																// feature as 1
-																// in the
-																// entitie's
-																// feature
-																// vector
+					// If this target has never been encountered yet
+					if (featureNameToBitsetIndex.get(target) == null)	{
+						featureNameToBitsetIndex.put(target, Integer.valueOf(bitSetSize));
+						// Setting this feature as 1 in the entity's feature vector
+						entity.featureVector.set(bitSetSize);
 						bitSetSize++;
 					} else {
-						entity.featureVector.set(featureNameToBitsetIndex
-								.get(target)); // setting that feature to true
+						// Setting that feature to true
+						entity.featureVector.set(featureNameToBitsetIndex.get(target));
 					}
 					entity.initializeNonZeroFeatureMap(bitSetSize);
 					entityToFeatures.put(source, entity);
@@ -197,37 +163,38 @@ public class ReverseAnalysisOverTopics {
 		}
 	}
 
+	/**
+	 * Arguments are:
+	 * 0 - *_deps.rsf file for a given system
+	 * 1 - *_clean_ground_truth_recovery.rsf for the same system
+	 */
 	public static void main(String[] args) {
-		System.out.println("IN MAIN");
+		String depsFile = args[0];
+		String gtFile = args[1];
+		RsfReader.loadRsfDataFromFile(depsFile);
+		List<List<String>> depFacts = RsfReader.unfilteredFaCtS;
+		RsfReader.loadRsfDataFromFile(gtFile);
+		List<List<String>> clusterFacts = RsfReader.unfilteredFaCtS;
 
-		RsfReader.loadRsfDataFromFile("archstudio4_deps (1).rsf");
-		List<List<String>> depFacts = RsfReader.unfilteredFacts;
-
-		RsfReader
-				.loadRsfDataFromFile("archstudio4_clean_ground_truth_recovery.rsf");
-		List<List<String>> clusterFacts = RsfReader.unfilteredFacts;
 		System.out.println("Finished loading data from both files");
 
 		Map<Integer, String> docTopicFilesMap = buildDocTopicFilesMap();
 
 		initializeFileIO();
 
-		Map<String, Set<String>> clusterMap = ClusterUtil
-				.buildClusterMap(clusterFacts);
-		Map<String, Map<String, Entity>> clusterNameToEntities = buildFeatureSetPerClusterEntity(
-				clusterMap, depFacts);
+		Map<String, Set<String>> clusterMap =
+			ClusterUtil.buildClusterMap(clusterFacts);
+		Map<String, Map<String, Entity>> clusterNameToEntities =
+			buildFeatureSetPerClusterEntity(clusterMap, depFacts);
 
-		Set<Integer> numTopicsSet = new TreeSet<>(
-				docTopicFilesMap.keySet());
-
-		Set<String> orderedClusterNames = new TreeSet<>(
-				clusterNameToEntities.keySet());
+		Set<Integer> numTopicsSet = new TreeSet<>(docTopicFilesMap.keySet());
+		Set<String> orderedClusterNames =
+			new TreeSet<>(clusterNameToEntities.keySet());
 
 		try {
 			out.write(",");
-			for (String clusterName : orderedClusterNames) {
+			for (String clusterName : orderedClusterNames)
 				out.write(clusterName + ",");
-			}
 			out.newLine();
 
 			for (int numTopics : numTopicsSet) {
@@ -343,8 +310,13 @@ public class ReverseAnalysisOverTopics {
 															// classes don't get
 				// included in the computation
 				{
-					double simMeasure = SimCalcUtil.getJSDivergence(entity1,
-							entity2);
+					double simMeasure = 0;
+					try {
+						simMeasure =
+							entity1.docTopicItem.getJsDivergence(entity2.docTopicItem);
+					} catch (DistributionSizeMismatchException e) {
+						e.printStackTrace(); //TODO handle it
+					}
 					sum = sum + simMeasure;
 					n++;
 				}

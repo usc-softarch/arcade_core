@@ -8,20 +8,31 @@ import java.io.Serializable;
 public class TopicItem implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = 4599518018739063447L;
-	public int topicNum;
-	public double proportion;
-	public String type;
+	private int topicNum;
+	private double proportion;
+	private String type;
 	// #endregion FIELDS ---------------------------------------------------------
 	
 	// #region CONTRUCTORS -------------------------------------------------------
 	public TopicItem() { super(); }
 	
 	public TopicItem(TopicItem topicItem) {
-		this.topicNum = topicItem.topicNum;
-		this.proportion = topicItem.proportion;
+		setTopicNum(topicItem.getTopicNum());
+		setProportion(topicItem.getProportion());
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
+
+	// #region ACCESSORS ---------------------------------------------------------
+	public int getTopicNum() { return this.topicNum; }
+	public double getProportion() { return this.proportion; }
+	public String getType() { return this.type; }
+
+	public void setTopicNum(int topicNum) { this.topicNum = topicNum; }
+	public void setProportion(double proportion) { this.proportion = proportion; }
+	public void setType(String type) { this.type = type; }
+	// #endregion ACCESSORS ------------------------------------------------------
 	
+	// #region MISC --------------------------------------------------------------
 	public boolean equals(Object o) {
 		if(!(o instanceof TopicItem))
 			return false;
@@ -40,4 +51,5 @@ public class TopicItem implements Serializable {
 
 	public String toString() {
 		return "[" + topicNum + "," + proportion + "," + type + "]"; }
+	// #endregion MISC -----------------------------------------------------------
 }

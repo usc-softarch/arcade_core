@@ -1,7 +1,17 @@
 package mojo;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 
 public class MoJoCalculator {
@@ -22,25 +32,25 @@ public class MoJoCalculator {
 	}
 
 	/* The mapping between objects and clusters in B */
-	private Map<String, String> mapObjectClusterInB = new Hashtable<String, String>();
+	private Map<String, String> mapObjectClusterInB = new HashMap<>();
 
 	/* The mappings of clusters to tags in both A and B */
-	private Map<String, Integer> mapClusterTagA = new Hashtable<String, Integer>();
+	private Map<String, Integer> mapClusterTagA = new HashMap<>();
 
-	private Map<String, Integer> mapClusterTagB = new Hashtable<String, Integer>();
+	private Map<String, Integer> mapClusterTagB = new HashMap<>();
 
 	/* Mapping between edges and their edgecost */
-	private Hashtable<String, Double> tableR = new Hashtable<String, Double>();
+	private Map<String, Double> tableR = new HashMap<>();
 
 	/* use for store the name of each items */
-	private Vector<String> clusterNamesInA = new Vector<String>();
+	private List<String> clusterNamesInA = new ArrayList<>();
 
 	// Stores the number of objects in each cluster in partition B
 	// Used in calculating the max distance from partition B
-	private Vector<Integer> cardinalitiesInB = new Vector<Integer>();
+	private List<Integer> cardinalitiesInB = new ArrayList<>();
 
 	/* This vector contains a vector for each cluster in A */
-	private Vector<Vector<String>> partitionA = new Vector<Vector<String>>();
+	private List<List<String>> partitionA = new ArrayList<>();
 
 	private int numOfClustersInA = 0; /* number of clusters in A */
 
@@ -48,7 +58,7 @@ public class MoJoCalculator {
 
 	private long numberOfObjectsInA;
 
-	private Cluster A[] = null;
+	private Cluster[] A = null;
 
 	private boolean verbose = false;
 
@@ -56,13 +66,13 @@ public class MoJoCalculator {
 	 * record the capacity of each group, if the group is empty ,the count is
 	 * zero, otherwise >= 1
 	 */
-	private int groupscount[] = null;
+	private int[] groupscount = null;
 
 	/*
 	 * after join operations, each group will have only one cluster left, we use
 	 * grouptags[i] to indicate the remain cluster in group i
 	 */
-	private Cluster grouptags[] = null; /*
+	private Cluster[] grouptags = null; /*
 										 * every none empty group have a tag
 										 * point to a cluster in A
 										 */
@@ -72,7 +82,6 @@ public class MoJoCalculator {
 	private long extraInB;
 
 	public long mojoplus() {
-
 		commonPrep();
 
 		/* tag assigment */
@@ -86,7 +95,6 @@ public class MoJoCalculator {
 	}
 
 	public double mojofm() {
-
 		commonPrep();
 
 		/* tag assigment */
@@ -96,8 +104,7 @@ public class MoJoCalculator {
 		maxbipartiteMatching();
 
 		/* Calculate MoJoFM value */
-		return mojofmValue(cardinalitiesInB, numberOfObjectsInA,
-				calculateCost());
+		return mojofmValue(cardinalitiesInB, numberOfObjectsInA, calculateCost());
 	}
 	
 	public double mojoev() {
@@ -110,12 +117,10 @@ public class MoJoCalculator {
 		maxbipartiteMatching();
 
 		/* Calculate MoJoFM value */
-		return mojoEvoValue(cardinalitiesInB, numberOfObjectsInA,
-				calculateEvoCost());
+		return mojoEvoValue(cardinalitiesInB, numberOfObjectsInA, calculateEvoCost());
 	}
 
 	public double edgemojo() {
-
 		/* In EdgeMoJo mode, we read the relationship file first */
 		if (relFile != null)
 			readRelationRSFfile();
@@ -141,7 +146,6 @@ public class MoJoCalculator {
 	}
 
 	public long mojo() {
-
 		commonPrep();
 
 		/* tag assigment */
@@ -155,7 +159,6 @@ public class MoJoCalculator {
 	}
 
 	public long mojoUsingSourceStream() {
-
 		commonPrepUsingByteArrayStreams();
 
 		/* tag assigment */
@@ -169,7 +172,6 @@ public class MoJoCalculator {
 	}
 
 	private void commonPrepUsingByteArrayStreams() {
-
 		numberOfObjectsInA = 0;
 
 		/* Read target file first to update mapObjectClusterInB */
@@ -192,33 +194,28 @@ public class MoJoCalculator {
 									 */
 
 		/* init group tags */
-		for (int j = 0; j < numOfClustersInB; j++) {
+		for (int j = 0; j < numOfClustersInB; j++)
 			grouptags[j] = null;
-		}
 
 		/* create each cluster in A */
-		for (int i = 0; i < numOfClustersInA; i++) {
+		for (int i = 0; i < numOfClustersInA; i++)
 			A[i] = new Cluster(i, numOfClustersInA, numOfClustersInB);
-		}
 	}
 
 	private void commonPrep() {
-
 		numberOfObjectsInA = 0;
 
 		/* Read target stream or file first to update mapObjectClusterInB */
-		if (targetFile == null) {
+		if (targetFile == null)
 			readTargetStream();
-		}
 		else if (isBunch(targetFile))
 			readTargetBunchFile();
 		else
 			readTargetRSFFile();
 
 		/* Read source stream or file */
-		if (sourceFile == null) {
+		if (sourceFile == null)
 			readSourceStream();
-		}
 		if (isBunch(sourceFile))
 			readSourceBunchFile();
 		else
@@ -247,65 +244,27 @@ public class MoJoCalculator {
 
 	private double edgeCost() {
 		/* Perform join operation first */
-		for (int j = 0; j < numOfClustersInB; j++) {
-			if (groupscount[j] > 1) {
-				for (int i = 0; i < numOfClustersInA; i++) {
-					if (A[i].getGroup() == j) {
-						if (grouptags[j].getNo() != i) {
-							grouptags[j].merge(A[i]);
-						}
-						;
-					}
-				}
-			}
-		}
+		for (int j = 0; j < numOfClustersInB; j++)
+			if (groupscount[j] > 1)
+				for (int i = 0; i < numOfClustersInA; i++)
+					if (A[i].getGroup() == j && grouptags[j].getNo() != i)
+						grouptags[j].merge(A[i]);
 		/* Calculate the additional edge cost */
 		double result = 0;
-		for (int j = 0; j < numOfClustersInB; j++) {
+		for (int j = 0; j < numOfClustersInB; j++)
 			if (grouptags[j] != null)
 				result += grouptags[j].edgeCost(tableR, grouptags, null);
-		}
+
 		return result;
 	}
 
-	/*
-	 * public void showSequence() {
-	 * 
-	 * commonPrep();
-	 * 
-	 * System.out.println("Join operations"); for (int j = 0; j < m; j++) { if
-	 * (groupscount[j] > 1) { for (int i = 0; i < l; i++) { if (A[i].getGroup()
-	 * == j) { if (grouptags[j].getNo() != i) { grouptags[j].merge(A[i]);
-	 * System.out.println("Join clusters " +
-	 * clusterNamesInA.elementAt(grouptags[j].getNo()) + " and " +
-	 * clusterNamesInA.elementAt(i)); } } } } }
-	 * 
-	 * System.out.println("Move operations"); int newClusterIndex = l; for (int
-	 * j = 0; j < m; j++) { if (grouptags[j] != null) { for (int i = 0; i < m;
-	 * i++) { if (i != j && grouptags[j].objectList.elementAt(i).size() > 0) {
-	 * System.out.print("Move " + grouptags[j].objectList.elementAt(i) +
-	 * " from A" + (grouptags[j].getNo() + 1));
-	 * 
-	 * if (grouptags[i] != null) // the group is not empty {
-	 * System.out.println(" to cluster A" + (grouptags[i].getNo() + 1)); } else
-	 * { grouptags[i] = new Cluster(newClusterIndex++, l, m); // create a new
-	 * group System.out.println(" to newly created cluster A" +
-	 * (grouptags[i].getNo() + 1) + "(G" + (i + 1) + ")"); }
-	 * grouptags[j].move(i, grouptags[i]); } } } }
-	 * 
-	 * }
-	 */
-
 	private void maxbipartiteMatching() {
-
 		/* Create the graph and add all the edges */
 		BipartiteGraph bgraph = new BipartiteGraph(numOfClustersInA + numOfClustersInB, numOfClustersInA, numOfClustersInB);
 
-		for (int i = 0; i < numOfClustersInA; i++) {
-			for (int j = 0; j < A[i].groupList.size(); j++) {
-				bgraph.addedge(i, numOfClustersInA + A[i].groupList.elementAt(j).intValue());
-			}
-		}
+		for (int i = 0; i < numOfClustersInA; i++)
+			for (int j = 0; j < A[i].groupList.size(); j++)
+				bgraph.addedge(i, numOfClustersInA + A[i].groupList.get(j).intValue());
 
 		/* Use maximum bipartite matching to calculate the groups */
 		bgraph.matching();
@@ -316,37 +275,34 @@ public class MoJoCalculator {
 		 */
 		for (int i = numOfClustersInA; i < numOfClustersInA + numOfClustersInB; i++) {
 			if (bgraph.vertex[i].matched) {
-				int index = bgraph.adjacentList.elementAt(i).elementAt(0)
-						.intValue();
+				int index = bgraph.adjacentList.get(i).get(0).intValue();
 				A[index].setGroup(i - numOfClustersInA);
 			}
 		}
-
 	}
 
 	/*
 	 * Calculates the MoJoFM value, using the formula MoJoFM(M) = 1 - mno(A,B)/
 	 * max(mno(any_A,B)) * 100%
 	 */
-	private double mojofmValue(Vector number_of_B, long obj_number,
-			long totalCost) {
+	private double mojofmValue(List<Integer> number_of_B, long obj_number,	long totalCost) {
 		long maxDis = maxDistanceTo(number_of_B, obj_number);
-		return Math.rint( (double)((1 - (double) totalCost / (double) maxDis) * 10000) ) / 100;
+		return Math.rint(((1 - (double) totalCost / (double) maxDis) * 10000) ) / 100;
 	}
 	
-	private double mojoEvoValue(Vector number_of_B, long obj_number,
+	private double mojoEvoValue(List<Integer> number_of_B, long obj_number,
 			long totalCost) {
 		long maxDis = evoMaxDistanceTo(number_of_B, obj_number);
-		return Math.rint( (double)((1 - (double) totalCost / (double) maxDis) * 10000) ) / 100;
+		return Math.rint(((1 - (double) totalCost / (double) maxDis) * 10000) ) / 100;
 	}
 
 	/* calculate the max(mno(B, any_A)), which is also the max(mno(any_A, B)) */
-	private long maxDistanceTo(Vector number_of_B, long obj_number) {
+	private long maxDistanceTo(List<Integer> number_of_B, long obj_number) {
 		int group_number = 0;
 		int[] B = new int[number_of_B.size()];
 
 		for (int i = 0; i < B.length; i++) {
-			B[i] = ((Integer) number_of_B.elementAt(i)).intValue();
+			B[i] = ((Integer) number_of_B.get(i)).intValue();
 		}
 		/* sort the array in ascending order */
 		java.util.Arrays.sort(B);
@@ -367,10 +323,9 @@ public class MoJoCalculator {
 	}
 	
 	/* calculate the max(mno(B, any_A)), which is also the max(mno(any_A, B)) */
-	private long evoMaxDistanceTo(Vector number_of_B, long obj_number) {
+	private long evoMaxDistanceTo(List<Integer> number_of_B, long obj_number) {
 		long baseMaxDist = maxDistanceTo(number_of_B,obj_number);
 		return baseMaxDist + extraInA + extraInB*2;
-
 	}
 
 	private long calculateCost() {
@@ -435,8 +390,8 @@ public class MoJoCalculator {
 		for (int clusterInAIndex = 0; clusterInAIndex < numOfClustersInA; clusterInAIndex++) {
 			int tag = -1;
 			String clusterName = "";
-			for (int entityInAIndex = 0; entityInAIndex < partitionA.elementAt(clusterInAIndex).size(); entityInAIndex++) {
-				String objName = partitionA.elementAt(clusterInAIndex).elementAt(entityInAIndex);
+			for (int entityInAIndex = 0; entityInAIndex < partitionA.get(clusterInAIndex).size(); entityInAIndex++) {
+				String objName = partitionA.get(clusterInAIndex).get(entityInAIndex);
 				clusterName = mapObjectClusterInB.get(objName);
 				tag = mapClusterTagB.get(clusterName).intValue();
 				A[clusterInAIndex].addobject(tag, objName, mode);
@@ -460,12 +415,12 @@ public class MoJoCalculator {
 				int objNumber = st.countTokens();
 				numberOfObjectsInA += objNumber;
 				int index = mapClusterTagA.size();
-				clusterNamesInA.addElement(strClusterA);
-				mapClusterTagA.put(strClusterA, new Integer(index));
-				partitionA.addElement(new Vector<String>());
+				clusterNamesInA.add(strClusterA);
+				mapClusterTagA.put(strClusterA, index);
+				partitionA.add(new ArrayList<>());
 				for (int i = 0; i < objNumber; i++) {
 					String obj = st.nextToken().trim();
-					partitionA.elementAt(index).addElement(obj);
+					partitionA.get(index).add(obj);
 				}
 			}
 		} catch (IOException e) {
@@ -505,13 +460,13 @@ public class MoJoCalculator {
 					Integer objectIndex = mapClusterTagA.get(clusterName);
 					if (objectIndex == null) {
 						index = mapClusterTagA.size();
-						clusterNamesInA.addElement(clusterName);
-						mapClusterTagA.put(clusterName, new Integer(index));
-						partitionA.addElement(new Vector<String>());
+						clusterNamesInA.add(clusterName);
+						mapClusterTagA.put(clusterName, index);
+						partitionA.add(new ArrayList<String>());
 					} else {
 						index = objectIndex.intValue();
 					}
-					partitionA.elementAt(index).addElement(objectName);
+					partitionA.get(index).add(objectName);
 				} else
 					extraInA++;
 			}
@@ -578,13 +533,13 @@ public class MoJoCalculator {
 					Integer objectIndex = mapClusterTagA.get(clusterName);
 					if (objectIndex == null) {
 						index = mapClusterTagA.size();
-						clusterNamesInA.addElement(clusterName);
-						mapClusterTagA.put(clusterName, new Integer(index));
-						partitionA.addElement(new Vector<String>());
+						clusterNamesInA.add(clusterName);
+						mapClusterTagA.put(clusterName, index);
+						partitionA.add(new ArrayList<String>());
 					} else {
 						index = objectIndex.intValue();
 					}
-					partitionA.elementAt(index).addElement(objectName);
+					partitionA.get(index).add(objectName);
 				} else
 					extraInA++;
 			}
@@ -638,12 +593,11 @@ public class MoJoCalculator {
 				 * obj2, we store obj1+"%@$"+obj2 with value 2
 				 */
 				if (tableR.get(obj1 + "%@$" + obj2) == null)
-					tableR.put(obj1 + "%@$" + obj2, new Double(1));
+					tableR.put(obj1 + "%@$" + obj2, 1.0);
 				else {
-					double previous_value = ((Double) (tableR.get(obj1 + "%@$"
+					double previous_value = ((tableR.get(obj1 + "%@$"
 							+ obj2))).doubleValue();
-					tableR.put(obj1 + "%@$" + obj2, new Double(
-							previous_value + 1));
+					tableR.put(obj1 + "%@$" + obj2, previous_value + 1);
 				}
 			}
 		} catch (IOException e) {
@@ -673,8 +627,8 @@ public class MoJoCalculator {
 				int objNumber = st.countTokens();
 
 				int index = mapClusterTagB.size();
-				cardinalitiesInB.addElement(new Integer(objNumber));
-				mapClusterTagB.put(strClusterB, new Integer(index));
+				cardinalitiesInB.add(objNumber);
+				mapClusterTagB.put(strClusterB, index);
 
 				for (int i = 0; i < objNumber; i++) {
 					String obj = st.nextToken().trim();
@@ -707,7 +661,7 @@ public class MoJoCalculator {
 					throw new RuntimeException(message);
 				}
 				// Ignore lines that do not start with contain
-				if (!st.nextToken().toLowerCase().equals("contain"))
+				if (!st.nextToken().equalsIgnoreCase("contain"))
 					continue;
 
 				String clusterName = st.nextToken();
@@ -729,16 +683,15 @@ public class MoJoCalculator {
 					// This cluster is not in mapClusterTagB yet
 					index = mapClusterTagB.size();
 					// Since it is a new cluster, it currently contains 1 object
-					cardinalitiesInB.addElement(new Integer(1));
-					mapClusterTagB.put(clusterName, new Integer(index));
+					cardinalitiesInB.add(1);
+					mapClusterTagB.put(clusterName, index);
 				} else {
 					index = objectIndex.intValue();
 					// Increase the cluster's cardinality in vector
 					// cardinalitiesInB
-					int newCardinality = 1 + cardinalitiesInB.elementAt(index)
+					int newCardinality = 1 + cardinalitiesInB.get(index)
 							.intValue();
-					cardinalitiesInB.setElementAt(new Integer(newCardinality),
-							index);
+					cardinalitiesInB.set(index, newCardinality);
 				}
 				mapObjectClusterInB.put(objectName, clusterName);
 			}
@@ -759,7 +712,7 @@ public class MoJoCalculator {
 		try {
 			for (String line = br_t.readLine(); line != null; line = br_t
 					.readLine()) {
-				List<String> strTokList = new ArrayList<String>();
+				List<String> strTokList = new ArrayList<>();
 
 				String regex = "(\"[^\"]*\")|(\\S+)";
 
@@ -779,7 +732,7 @@ public class MoJoCalculator {
 					throw new RuntimeException(message);
 				}
 				// Ignore lines that do not start with contain
-				if (!strTokList.get(0).toLowerCase().equals("contain"))
+				if (!strTokList.get(0).equalsIgnoreCase("contain"))
 					continue;
 
 				int index = -1;
@@ -793,16 +746,15 @@ public class MoJoCalculator {
 					// This cluster is not in mapClusterTagB yet
 					index = mapClusterTagB.size();
 					// Since it is a new cluster, it currently contains 1 object
-					cardinalitiesInB.addElement(new Integer(1));
-					mapClusterTagB.put(clusterName, new Integer(index));
+					cardinalitiesInB.add(1);
+					mapClusterTagB.put(clusterName, index);
 				} else {
 					index = objectIndex.intValue();
 					// Increase the cluster's cardinality in vector
 					// cardinalitiesInB
-					int newCardinality = 1 + cardinalitiesInB.elementAt(index)
+					int newCardinality = 1 + cardinalitiesInB.get(index)
 							.intValue();
-					cardinalitiesInB.setElementAt(new Integer(newCardinality),
-							index);
+					cardinalitiesInB.set(index, newCardinality);
 				}
 				mapObjectClusterInB.put(objectName, clusterName);
 			}

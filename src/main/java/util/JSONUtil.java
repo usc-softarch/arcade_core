@@ -17,8 +17,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 public class JSONUtil {
-	final static String inputFile = "E:\\android\\excel\\acdc_comp.xls";
-	final static String outputFile = "E:\\android\\excel\\acdc_comp.json";
+	static final String inputFile = "E:\\android\\excel\\acdc_comp.xls";
+	static final String outputFile = "E:\\android\\excel\\acdc_comp.json";
 
 	public static void main(String[] args) {
 		writeJSONArray2File(xls2JSON(inputFile), outputFile);

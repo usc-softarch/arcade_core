@@ -3,7 +3,7 @@ package edu.usc.softarch.arcade.clustering;
 import java.util.Set;
 
 import cc.mallet.util.Maths;
-
+import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
 public class FastSimCalcUtil {
 	 
@@ -126,7 +126,14 @@ public class FastSimCalcUtil {
 			jsDivergenceStruct = Double.MAX_VALUE;
 		}
 		
-		double jsDivergenceConcern = SimCalcUtil.getJSDivergence(cluster, otherCluster);
+		double jsDivergenceConcern = 0;
+		try {
+			jsDivergenceConcern =
+				cluster.docTopicItem.getJsDivergence(otherCluster.docTopicItem);
+		} catch (DistributionSizeMismatchException e) {
+			e.printStackTrace(); //TODO handle it
+		}
+		
 		if (Double.isInfinite(jsDivergenceConcern)) {
 			jsDivergenceConcern = Double.MIN_VALUE;
 		}

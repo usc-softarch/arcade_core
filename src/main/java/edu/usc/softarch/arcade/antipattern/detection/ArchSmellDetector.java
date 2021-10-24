@@ -1,386 +1,510 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.jgrapht.alg.CycleDetector;
-import org.jgrapht.alg.StrongConnectivityInspector;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector;
+import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import com.google.common.base.Joiner;
-import com.google.common.primitives.Doubles;
-import com.thoughtworks.xstream.XStream;
-
+import edu.usc.softarch.arcade.antipattern.Smell;
+import edu.usc.softarch.arcade.antipattern.SmellCollection;
+import edu.usc.softarch.arcade.clustering.ClusterUtil;
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.clustering.StringGraph;
-import edu.usc.softarch.arcade.clustering.util.ClusterUtil;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
-import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicItem;
 import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.topics.TopicUtil;
+import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ArchSmellDetector {
-	private static Logger logger = Logger.getLogger(ArchSmellDetector.class);
-	public static TopicModelExtractionMethod tmeMethod =
-		TopicModelExtractionMethod.VAR_MALLET_FILE;
-	public static DocTopics docTopics;
-	private static double scatteredConcernThreshold = .20;
-	private static double parasiticConcernThreshold = .20;
-	
+	// #region ATTRIBUTES --------------------------------------------------------
+	private static Logger logger = LogManager.getLogger(ArchSmellDetector.class);
+	private String depsRsfFilename;
+	private String clustersRsfFilename;
+	private String detectedSmellsFilename;
+	private String language;
+	private TopicModelExtractionMethod tmeMethod;
+	private DocTopics docTopics;
+	private double scatteredConcernThreshold;
+	private double parasiticConcernThreshold;
+	private String version;
+
 	static final Comparator<TopicItem> TOPIC_PROPORTION_ORDER 
 		= (TopicItem t1, TopicItem t2) -> {
-			Double prop1 = t1.proportion;
-			Double prop2 = t2.proportion;
+			Double prop1 = t1.getProportion();
+			Double prop2 = t2.getProportion();
 			return prop1.compareTo(prop2);
 		};
-	
-	public static void main(String[] args) {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-		
-		String detectedSmellsFilename = setupOld(args);
-		runAllDetectionAlgs(detectedSmellsFilename);
-	}
-	
-	public static void setupAndRunStructuralDetectionAlgs(String[] args) {
-		String depsRsfFilename = args[0];
-		String clustersRsfFilename = args[1];
-		String detectedSmellsFilename = args[2];
-		Config.setDepsRsfFilename(depsRsfFilename);
-		Config.setSmellClustersFile(clustersRsfFilename);
-		runStructuralDetectionAlgs(detectedSmellsFilename);
+	// #endregion ATTRIBUTES -----------------------------------------------------
+
+	// #region CONSTRUCTORS ------------------------------------------------------
+	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
+			String detectedSmellsFilename) {
+		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, 
+			"structural-irrelevant", .20, .20, null, null);
 	}
 
-	private static String setupOld(String[] args) {
-		String detectedSmellsFilename = "";
-		
-		Options options = new Options();
-		
-		Option help = new Option( "help", "print this message" );
-		Option projFile   = OptionBuilder.withArgName( "file" )
-                .hasArg()
-                .withDescription(  "project configuration file" )
-                .create( "projfile" );
-		Option smellClassesFile = OptionBuilder.withArgName("file")
-				.hasArg()
-				.withDescription("detected smells to affected classes file")
-				.create("smellClassesFile");
-		Option detectedSmellsFile = OptionBuilder.withArgName("file")
-				.hasArg()
-				.withDescription("serialized detected smells file")
-				.create("detectedSmellsFile");
-		
-		options.addOption(help);
-		options.addOption(projFile);
-		options.addOption(smellClassesFile);
-		options.addOption(detectedSmellsFile);		
-		
-		 // create the parser
-	    CommandLineParser parser = new GnuParser();
-	    try {
-	        // parse the command line arguments
-	        CommandLine line = parser.parse( options, args );
-	        
-	        if (line.hasOption("projfile")) {
-	        	Config.setProjConfigFilename(line.getOptionValue("projfile"));
-	        }
-	        if (line.hasOption("detectedSmellsFile")) {
-	        	detectedSmellsFilename = line.getOptionValue("detectedSmellsFile");
-	        }
-	    }
-	    catch( ParseException exp ) {
-	        // oops, something went wrong
-	        System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
-	    }
-		
-		Config.initConfigFromFile(Config.getProjConfigFilename());
-		return detectedSmellsFilename;
+	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, String version) {
+		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, "structural-irrelevant", .20, .20, null,
+				null);
+		this.version = version;
 	}
 
-	public static void runAllDetectionAlgs(String detectedSmellsFilename) {
-		Set<Smell> detectedSmells = new LinkedHashSet<>();
-		System.out.println("Reading in clusters file: "
-			+ Config.getSmellClustersFile());
-		Set<ConcernCluster> clusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(Config.getSmellClustersFile());
-		
-		boolean showBuiltClusters = true;
-		if (showBuiltClusters) {
-			logger.debug("Found and built clusters:");
-			for (ConcernCluster cluster : clusters) {
-				logger.debug(cluster.getName());
-			}
+	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
+			String detectedSmellsFilename, double scatteredConcernThreshold,
+			double parasiticConcernThreshold) {
+		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, 
+			"structural-irrelevant", scatteredConcernThreshold,
+			parasiticConcernThreshold, null, null);
+	}
+
+	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
+			String detectedSmellsFilename, String language,
+			TopicModelExtractionMethod tmeMethod,	DocTopics docTopics) {
+		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename,
+			language, .20, .20, tmeMethod, docTopics);
+	}
+
+	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
+	String detectedSmellsFilename, String language,
+	TopicModelExtractionMethod tmeMethod,	DocTopics docTopics, String version) {
+		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename,
+		language, .20, .20, tmeMethod, docTopics);
+		this.version = version;
+	}
+
+	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
+			String detectedSmellsFilename, String language,
+			double scatteredConcernThreshold, double parasiticConcernThreshold,
+			TopicModelExtractionMethod tmeMethod, DocTopics docTopics) {
+		this.depsRsfFilename = depsRsfFilename;
+		this.clustersRsfFilename = clustersRsfFilename;
+		this.detectedSmellsFilename = detectedSmellsFilename;
+		this.language = language;
+		this.scatteredConcernThreshold = scatteredConcernThreshold;
+		this.parasiticConcernThreshold = parasiticConcernThreshold;
+		this.tmeMethod = tmeMethod;
+		this.docTopics = docTopics;
+	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
+	
+	// #region PUBLIC INTERFACE --------------------------------------------------
+	public SmellCollection run(boolean runStructural, boolean runConcern, 
+			boolean runSerialize) throws IOException {
+		// Make sure at least one type of smell detection algorithms was selected
+		if(!runConcern && !runStructural)
+			throw new IllegalArgumentException(); //TODO sort this out properly
+
+		// Initialize variables
+		SmellCollection detectedSmells = new SmellCollection();
+		ConcernClusterArchitecture clusters = loadClusters();
+		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
+
+
+		// Execute detection algorithms
+		if(runConcern)
+			runConcernDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
+		if(runStructural)
+			runStructuralDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
+
+		// Invert map: instead of smells per cluster, clusters per smell
+		Map<String, Set<String>> smellClustersMap = 
+			buildSmellToClustersMap(clusterSmellMap);
+
+		// Log the results
+		for (String clusterName : clusterSmellMap.keySet()) {
+			Set<String> smellList = clusterSmellMap.get(clusterName);
+			logger.debug(clusterName + " has smells "
+				+ String.join(",", smellList));
 		}
+		for (Entry<String,Set<String>> entry : smellClustersMap.entrySet())
+			logger.debug(entry.getKey() + " : " + entry.getValue());
+		for (Smell smell : detectedSmells)
+			logger.debug(smell.getSmellType() + " " + smell);
+
+		// Serialize results
+		if(runSerialize)
+			detectedSmells.serializeSmellCollection(detectedSmellsFilename);
+
+		// Return results
+		return detectedSmells;
+	}
+
+	public void runConcernDetectionAlgs(ConcernClusterArchitecture clusters,
+			SmellCollection detectedSmells, Map<String,Set<String>> clusterSmellMap) {
+
 		
-		buildConcernClustersFromConfigTopicsFile(clusters);
+		//Added for testing
+		//Serialization for test oracles.
+		
+		/*
+		char fs = File.separatorChar;
+		try{
+			String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runConcernDetectionAlgs_resources///";
+			resources_dir = resources_dir.replace("///", File.separator);
+
+			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_detectedSmells_before.txt"));
+			oosDSmells2.writeObject(detectedSmells);
+			oosDSmells2.flush();
+			oosDSmells2.close();
+
+
+
+			ObjectOutputStream oosClusters2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusters_before.txt"));
+			oosClusters2.writeObject(clusters);
+			oosClusters2.flush();
+			oosClusters2.close();
+
+			ObjectOutputStream oosCSM2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusterSmellMap_before.txt"));
+			oosCSM2.writeObject(clusterSmellMap);
+			oosCSM2.flush();
+			oosCSM2.close();
+
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		*/
+
+		if (this.tmeMethod == TopicModelExtractionMethod.MALLET_API)
+			buildConcernClustersFromMalletAPI(clusters);
+		if (this.tmeMethod == TopicModelExtractionMethod.VAR_MALLET_FILE)
+			buildConcernClustersFromConfigTopicsFile(clusters);
 		
 		for (ConcernCluster cluster : clusters) {
 			if (cluster.getDocTopicItem() != null) {
 				logger.debug(cluster.getName() + " has topics: ");
 				DocTopicItem docTopicItem = cluster.getDocTopicItem();
-				Collections.sort(docTopicItem.topics,TOPIC_PROPORTION_ORDER);
-				for (TopicItem topicItem : docTopicItem.topics) {
+				Collections.sort(docTopicItem.getTopics(), TOPIC_PROPORTION_ORDER);
+				for (TopicItem topicItem : docTopicItem.getTopics()) {
 					logger.debug("\t" + topicItem);
 				}
 			}
 		}
-		
-		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
-		
+
 		detectBco(detectedSmells, clusters, clusterSmellMap);
 		detectSpfNew(clusters, clusterSmellMap, detectedSmells);
-		
-		Map<String, Set<String>> depMap = ClusterUtil.buildDependenciesMap(Config.getDepsRsfFilename());
-		
-		StringGraph clusterGraph = ClusterUtil.buildClusterGraphUsingDepMap(depMap,clusters);
+
+		//Added for testing
+		//Serialization for test oracles.
+		/*
+		try{
+			String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runConcernDetectionAlgs_resources///";
+			resources_dir = resources_dir.replace("///", File.separator);
+			
+			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_detectedSmells_after.txt"));
+			oosDSmells2.writeObject(detectedSmells);
+			oosDSmells2.flush();
+			oosDSmells2.close();
+			ObjectOutputStream oosClusters2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusters_after.txt"));
+			oosClusters2.writeObject(clusters);
+			oosClusters2.flush();
+			oosClusters2.close();
+			ObjectOutputStream oosCSM2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_clusterSmellMap_after.txt"));
+			oosCSM2.writeObject(clusterSmellMap);
+			oosCSM2.flush();
+			oosCSM2.close();
+			
+			
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		*/
+	}
+
+	public void runStructuralDetectionAlgs(ConcernClusterArchitecture clusters,
+			SmellCollection detectedSmells, Map<String,Set<String>> clusterSmellMap) {
+		Map<String, Set<String>> depMap = 
+		ClusterUtil.buildDependenciesMap(this.depsRsfFilename);
+	
+		StringGraph clusterGraph = clusters.buildClusterGraphUsingDepMap(depMap);
 		System.out.print("");
 		
-		SimpleDirectedGraph<String, DefaultEdge> directedGraph = ClusterUtil.buildConcernClustersDiGraph(
-				clusters, clusterGraph);
+		SimpleDirectedGraph<String, DefaultEdge> directedGraph = 
+			clusters.buildConcernClustersDiGraph(clusterGraph);
 		
 		detectBdc(detectedSmells, clusters, clusterSmellMap, directedGraph);
-        
-        detectBuo(detectedSmells, clusters, clusterSmellMap, directedGraph);
-        
-        for (String clusterName : clusterSmellMap.keySet()) {
-        	Set<String> smellList = clusterSmellMap.get(clusterName);
-        	logger.debug(clusterName + " has smells " + Joiner.on(",").join(smellList));
-        }
-        
-        Map<String, Set<String>> smellClustersMap = buildSmellToClustersMap(clusterSmellMap);
-        
-        for (Entry<String,Set<String>> entry : smellClustersMap.entrySet()) {
-        	logger.debug(entry.getKey() + " : " + entry.getValue());
-        }
-		
-		for (Smell smell : detectedSmells) {
-			logger.debug(SmellUtil.getSmellAbbreviation(smell) + " " + smell);
-		}
+		detectBuo(detectedSmells, clusters, clusterSmellMap, directedGraph);
 
-		serializeDetectedSmells(detectedSmellsFilename, detectedSmells);
+		//Added for testing
+		//Serialization for test oracles.
+		/*
+		String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runStructuralDetectionAlgs_resources///";
+      	resources_dir = resources_dir.replace("///", File.separator);
+		ObjectOutputStream oos;
+		try {
+			oos = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_run_clusterSmellMap.txt"));
+			oos.writeObject(clusterSmellMap);
+			oos.flush();
+			oos.close();
+
+			oos = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_run_clusters.txt"));
+			oos.writeObject(clusters);
+			oos.flush();
+			oos.close();
+
+			oos = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_run_detected_smells.txt"));
+			oos.writeObject(detectedSmells);
+			oos.flush();
+			oos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
 	}
-	
-	private static void runStructuralDetectionAlgs(String detectedSmellsFilename) {
-		Set<Smell> detectedSmells = new LinkedHashSet<>();
-		System.out.println("Reading in clusters file: " + Config.getSmellClustersFile());
-		Set<ConcernCluster> clusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(Config.getSmellClustersFile());
-		
-		boolean showBuiltClusters = true;
-		if (showBuiltClusters) {
-			logger.debug("Found and built clusters:");
-			for (ConcernCluster cluster : clusters) {
-				logger.debug(cluster.getName());
+	// #endregion PUBLIC INTERFACE -----------------------------------------------
+
+	// #region IO ----------------------------------------------------------------
+	/**
+	 * Loads clusters from the RSF file pointed to by this.clustersRsfFilename.
+	 */
+	private ConcernClusterArchitecture loadClusters() {
+		System.out.println("Reading in clusters file: " + this.clustersRsfFilename);
+		ConcernClusterArchitecture clusters = ConcernClusterArchitecture.
+			loadFromRsf(this.clustersRsfFilename);
+		logger.debug("Found and built clusters:");
+		for (ConcernCluster cluster : clusters)
+			logger.debug(cluster.getName());
+
+		return clusters;
+	}
+
+	private void buildConcernClustersFromConfigTopicsFile(
+			ConcernClusterArchitecture clusters) {
+		for (ConcernCluster cluster : clusters) {
+			logger.debug("Building doctopics for " + cluster.getName());
+			for (String entity : cluster.getEntities()) {
+				DocTopicItem entityDocTopicItem = null;
+				switch(this.language.toLowerCase()) {
+					case "c":
+						entityDocTopicItem = this.docTopics.getDocTopicItemForC(entity);
+						break;
+					case "java":
+					default:
+						entityDocTopicItem = setDocTopicItemForJavaFromMalletFile(entity);
+						break;
+				}
+
+				if (cluster.getDocTopicItem() == null)
+					cluster.setDocTopicItem(entityDocTopicItem);
+				else {
+					DocTopicItem mergedDocTopicItem = null;
+
+					try {
+						mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
+							cluster.getDocTopicItem(), entityDocTopicItem);
+					} catch (UnmatchingDocTopicItemsException e) {
+						e.printStackTrace(); //TODO handle it
+					}
+
+					cluster.setDocTopicItem(mergedDocTopicItem);
+				}
 			}
 		}
-		
-		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
-		
-		Map<String, Set<String>> depMap = ClusterUtil.buildDependenciesMap(Config.getDepsRsfFilename());
-		
-		StringGraph clusterGraph = ClusterUtil.buildClusterGraphUsingDepMap(depMap,clusters);
-		System.out.print("");
-		
-		SimpleDirectedGraph<String, DefaultEdge> directedGraph = ClusterUtil.buildConcernClustersDiGraph(
-				clusters, clusterGraph);
-		
-		detectBdc(detectedSmells, clusters, clusterSmellMap, directedGraph);
-        
-        detectBuo(detectedSmells, clusters, clusterSmellMap, directedGraph);
-        
-        for (String clusterName : clusterSmellMap.keySet()) {
-        	Set<String> smellList = clusterSmellMap.get(clusterName);
-        	logger.debug(clusterName + " has smells " + Joiner.on(",").join(smellList));
-        }
-        
-        Map<String, Set<String>> smellClustersMap = buildSmellToClustersMap(clusterSmellMap);
-        
-        for (Entry<String,Set<String>> entry : smellClustersMap.entrySet()) {
-        	logger.debug(entry.getKey() + " : " + entry.getValue());
-        }
-		
-		for (Smell smell : detectedSmells) {
-			logger.debug(SmellUtil.getSmellAbbreviation(smell) + " " + smell);
-		}
-
-		serializeDetectedSmells(detectedSmellsFilename, detectedSmells);
 	}
 
-	private static void serializeDetectedSmells(String detectedSmellsFilename,
-			Set<Smell> detectedSmells) {
-		try (PrintWriter writer = new PrintWriter(detectedSmellsFilename, StandardCharsets.UTF_8)) {
-			XStream xstream = new XStream();
-			String xml = xstream.toXML(detectedSmells);
-	    writer.println(xml);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	private DocTopicItem setDocTopicItemForJavaFromMalletFile(String entity) {
+		DocTopicItem newDocTopicItem;
+		String docTopicName = entity.replace("\\.", "/") + ".java";
+		newDocTopicItem = docTopics.getDocTopicItemForJava(docTopicName);
+		return newDocTopicItem;
 	}
 
-	private static Map<String, Set<String>> buildSmellToClustersMap(
+	private void buildConcernClustersFromMalletAPI(
+			ConcernClusterArchitecture clusters) {
+		for (ConcernCluster cluster : clusters) {
+			logger.debug("Building doctopics for " + cluster.getName());
+			for (String entity : cluster.getEntities()) {
+				DocTopicItem entityDocTopicItem = null;
+				if (this.language.equalsIgnoreCase("java"))
+					entityDocTopicItem = setDocTopicItemForJavaFromMalletApi(entity);
+
+				if (cluster.getDocTopicItem() == null)
+					cluster.setDocTopicItem(entityDocTopicItem);
+				else {
+					DocTopicItem mergedDocTopicItem = null;
+
+					try {
+						mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
+							cluster.getDocTopicItem(), entityDocTopicItem);
+					} catch (UnmatchingDocTopicItemsException e) {
+						e.printStackTrace(); //TODO handle it
+					}
+
+					cluster.setDocTopicItem(mergedDocTopicItem);
+				}
+			}
+		}
+	}
+	
+	private DocTopicItem setDocTopicItemForJavaFromMalletApi(String entity) {
+		DocTopicItem newDocTopicItem;
+		newDocTopicItem = docTopics.getDocTopicItemForJava(entity);
+		return newDocTopicItem;
+	}
+	// #endregion IO -------------------------------------------------------------
+
+	/**
+	 * Creates a map of clusters per smell from a map of smells per cluster.
+	 * 
+	 * @param clusterSmellMap Map of smells per cluster.
+	 * @return Map of clusters per smell.
+	 */
+
+	//Changed buildSmellToClustersMap from private to protected for testing
+	protected Map<String, Set<String>> buildSmellToClustersMap(
 			Map<String, Set<String>> clusterSmellMap) {
-		// create smell to clusters map
-        Map<String,Set<String>> smellClustersMap = new HashMap<>();
-        for (String clusterName : clusterSmellMap.keySet()) {
-        	Set<String> smellList = clusterSmellMap.get(clusterName);
-        	for (String smell : smellList) {
-        		if (smellClustersMap.containsKey(smell)) {
-        			Set<String> mClusters = smellClustersMap.get(smell);
-        			mClusters.add(clusterName);
-        		}
-        		else {
-        			Set<String> mClusters = new HashSet<>();
-        			mClusters.add(clusterName);
-        			smellClustersMap.put(smell, mClusters);
-        		}
-        	}
-        }
+		Map<String,Set<String>> smellClustersMap = new HashMap<>();
+
+		for (String clusterName : clusterSmellMap.keySet()) {
+			Set<String> smellList = clusterSmellMap.get(clusterName);
+			for (String smell : smellList) {
+				if (smellClustersMap.containsKey(smell))
+					smellClustersMap.get(smell).add(clusterName);
+				else {
+					Set<String> mClusters = new HashSet<>();
+					mClusters.add(clusterName);
+					smellClustersMap.put(smell, mClusters);
+				}
+			}
+		}
+
+		//Added for creating test oracles, uncomment to produce new test oracles
+		/*
+		char fs = File.separatorChar;
+		try{
+			String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runConcernDetectionAlgs_resources///";
+			resources_dir = resources_dir.replace("///", File.separator);
+
+			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_smellClusterMap_after.txt"));
+			oosDSmells2.writeObject(smellClustersMap);
+			oosDSmells2.flush();
+			oosDSmells2.close();
+
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		*/
+
 		return smellClustersMap;
 	}
 
-	private static void detectBuo(Set<Smell> detectedSmells,
-			Set<ConcernCluster> clusters,
+	// #region DETECTION ALGORITHMS ----------------------------------------------
+	protected void detectBuo(SmellCollection detectedSmells,
+			ConcernClusterArchitecture clusters, 
 			Map<String, Set<String>> clusterSmellMap,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
 		Set<String> vertices = directedGraph.vertexSet();
         
-        logger.debug("Computing the in and out degress of each vertex");
-        List<Double> inDegrees = new ArrayList<>();
-        List<Double> outDegrees = new ArrayList<>();
-        for (String vertex : vertices) {
-        	boolean analyzeThisVertex = true;
-        	if (Config.getClusterStartsWith() != null) {
-        		analyzeThisVertex = vertex.startsWith(Config.getClusterStartsWith());
-        	}
-        	if (analyzeThisVertex) {
-				logger.debug("\t" + vertex);
-				int inDegree = directedGraph.inDegreeOf(vertex);
-				int outDegree = directedGraph.outDegreeOf(vertex);
-				logger.debug("\t\t in degree: "
-						+ inDegree);
-				logger.debug("\t\t out degree: "
-						+ outDegree);
-				inDegrees.add((double)inDegree);
-				outDegrees.add((double)outDegree);
+		logger.debug("Computing the in and out degress of each vertex");
+		List<Double> inDegrees = new ArrayList<>();
+		List<Double> outDegrees = new ArrayList<>();
+		for (String vertex : vertices) {
+			logger.debug("\t" + vertex);
+			int inDegree = directedGraph.inDegreeOf(vertex);
+			int outDegree = directedGraph.outDegreeOf(vertex);
+			logger.debug("\t\t in degree: " + inDegree);
+			logger.debug("\t\t out degree: " + outDegree);
+			inDegrees.add((double)inDegree);
+			outDegrees.add((double)outDegree);
+		}
+        
+		double[] inAndOutDegreesArray = new double[inDegrees.size()];
+		for (int i=0; i<inDegrees.size(); i++) {
+			double inPlusOutAtI = inDegrees.get(i) + outDegrees.get(i);
+			inAndOutDegreesArray[i] = inPlusOutAtI;
+		}
+    
+		double[] inDegreesArray = inDegrees.stream()
+			.mapToDouble(Double::doubleValue).toArray();
+		double[] outDegreesArray = outDegrees.stream()
+			.mapToDouble(Double::doubleValue).toArray();
+		double meanInDegrees = StatUtils.mean(inDegreesArray);
+		double meanOutDegrees = StatUtils.mean(outDegreesArray);
+		double meanInAndOutDegrees = StatUtils.mean(inAndOutDegreesArray);
+		
+		StandardDeviation stdDev = new StandardDeviation();
+		double stdDevInDegrees = stdDev.evaluate(inDegreesArray);
+		double stdDevOutDegrees = stdDev.evaluate(outDegreesArray);
+		double stdDevInAndOutDegrees = stdDev.evaluate(inAndOutDegreesArray);
+		logger.debug("mean of in degrees: " + meanInDegrees);
+		logger.debug("mean of out degrees: " + meanOutDegrees);
+		logger.debug("mean of in plus out degrees: " + meanInAndOutDegrees);
+		logger.debug("std dev of in degrees: " + stdDevInDegrees);
+		logger.debug("std dev of out degrees: " + stdDevOutDegrees);
+		logger.debug("std dev of in plus out degrees: " + stdDevInAndOutDegrees);
+        
+		double stdDevFactor = 1.5;
+		for (String vertex : vertices) {
+			int inDegree = directedGraph.inDegreeOf(vertex);
+			int outDegree = directedGraph.outDegreeOf(vertex);
+			if (inDegree > meanInDegrees + stdDevFactor * stdDevInDegrees) {
+				logger.debug("\t\t" + vertex + " has brick use overload for in degrees");
+				logger.debug("\t\t in degree: "	+ inDegree);
+				updateSmellMap(clusterSmellMap, vertex, "buo");
+				addDetectedBuoSmell(detectedSmells, clusters, vertex);
 			}
-        }
-        
-        double[] inAndOutDegreesArray = new double[inDegrees.size()];
-        for (int i=0;i<inDegrees.size();i++) {
-        	double inPlusOutAtI = inDegrees.get(i) + outDegrees.get(i);
-        	inAndOutDegreesArray[i] = inPlusOutAtI;
-        }
-        
-        
-        double[] inDegreesArray = Doubles.toArray(inDegrees);
-        double[] outDegreesArray = Doubles.toArray(outDegrees);
-        double meanInDegrees = StatUtils.mean(inDegreesArray);
-        double meanOutDegrees = StatUtils.mean(outDegreesArray);
-        double meanInAndOutDegrees = StatUtils.mean(inAndOutDegreesArray);
-        
-        StandardDeviation stdDev = new StandardDeviation();
-        double stdDevInDegrees = stdDev.evaluate(inDegreesArray);
-        double stdDevOutDegrees = stdDev.evaluate(outDegreesArray);
-        double stdDevInAndOutDegrees = stdDev.evaluate(inAndOutDegreesArray);
-        logger.debug("mean of in degrees: " + meanInDegrees);
-        logger.debug("mean of out degrees: " + meanOutDegrees);
-        logger.debug("mean of in plus out degrees: " + meanInAndOutDegrees);
-        logger.debug("std dev of in degrees: " + stdDevInDegrees);
-        logger.debug("std dev of out degrees: " + stdDevOutDegrees);
-        logger.debug("std dev of in plus out degrees: " + stdDevInAndOutDegrees);
-        
-        double stdDevFactor = 1.5;
-        for (String vertex : vertices) {
-        	boolean analyzeThisVertex = true;
-        	if (Config.getClusterStartsWith() != null) {
-        		analyzeThisVertex = vertex.startsWith(Config.getClusterStartsWith());
-        	}
-        	if (analyzeThisVertex) {
-				int inDegree = directedGraph.inDegreeOf(vertex);
-				int outDegree = directedGraph.outDegreeOf(vertex);
-				if (inDegree > meanInDegrees + stdDevFactor*stdDevInDegrees) {
-					logger.debug("\t\t" + vertex + " has brick use overload for in degrees");
-					logger.debug("\t\t in degree: "
-							+ inDegree);
-					updateSmellMap(clusterSmellMap, vertex, "buo");
-					addDetectedBuoSmell(detectedSmells, clusters, vertex);
-				}
-				if (outDegree > meanOutDegrees + stdDevFactor*stdDevOutDegrees) {
-					logger.debug("\t\t" + vertex + " has brick use overload for out degrees");
-					logger.debug("\t\t out degree: "
-							+ outDegree);
-					updateSmellMap(clusterSmellMap, vertex, "buo");
-					addDetectedBuoSmell(detectedSmells, clusters, vertex);
-				}
-				if (inDegree + outDegree > 
-					meanInDegrees + meanOutDegrees + 
-					stdDevFactor*stdDevOutDegrees + stdDevFactor*stdDevInDegrees) {
-					logger.debug("\t\t" + vertex + " has brick use overload for both in and out degrees");
-					logger.debug("\t\t in degree: "	+ inDegree);
-					logger.debug("\t\t out degree: " + outDegree);
-					updateSmellMap(clusterSmellMap, vertex, "buo");
-					addDetectedBuoSmell(detectedSmells, clusters, vertex);
-				}
-				int inPlusOutDegree = inDegree + outDegree;
-				if ( inPlusOutDegree > meanInAndOutDegrees + stdDevFactor*stdDevInAndOutDegrees ) {
-					logger.debug("\t\t" + vertex + " has brick use overload for in plus out degrees");
-					logger.debug("\t\t in plus out degrees: "
-							+ inPlusOutDegree);
-					updateSmellMap(clusterSmellMap, vertex, "buo");
-					addDetectedBuoSmell(detectedSmells, clusters, vertex);
-				}
-				
-				
+			if (outDegree > meanOutDegrees + stdDevFactor * stdDevOutDegrees) {
+				logger.debug("\t\t" + vertex + " has brick use overload for out degrees");
+				logger.debug("\t\t out degree: " + outDegree);
+				updateSmellMap(clusterSmellMap, vertex, "buo");
+				addDetectedBuoSmell(detectedSmells, clusters, vertex);
 			}
-        }
+			if (inDegree + outDegree > meanInDegrees + meanOutDegrees + 
+				stdDevFactor * stdDevOutDegrees + stdDevFactor * stdDevInDegrees) {
+				logger.debug("\t\t" + vertex + " has brick use overload for both in and out degrees");
+				logger.debug("\t\t in degree: "	+ inDegree);
+				logger.debug("\t\t out degree: " + outDegree);
+				updateSmellMap(clusterSmellMap, vertex, "buo");
+				addDetectedBuoSmell(detectedSmells, clusters, vertex);
+			}
+			int inPlusOutDegree = inDegree + outDegree;
+			if (inPlusOutDegree > meanInAndOutDegrees + stdDevFactor * stdDevInAndOutDegrees) {
+				logger.debug("\t\t" + vertex + " has brick use overload for in plus out degrees");
+				logger.debug("\t\t in plus out degrees: " + inPlusOutDegree);
+				updateSmellMap(clusterSmellMap, vertex, "buo");
+				addDetectedBuoSmell(detectedSmells, clusters, vertex);
+			}
+		}
 	}
 
-	private static void detectBdc(Set<Smell> detectedSmells,
-			Set<ConcernCluster> clusters,
+	protected void detectBdc(SmellCollection detectedSmells,
+			ConcernClusterArchitecture clusters,
 			Map<String, Set<String>> clusterSmellMap,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
-		System.out.println("Finding cycles...");
-		CycleDetector cycleDetector = new CycleDetector(directedGraph);
+		logger.debug("Finding cycles...");
+		CycleDetector<String, DefaultEdge> cycleDetector =
+			new CycleDetector<>(directedGraph);
 		Set<String> cycleSet = cycleDetector.findCycles();
 		logger.debug("Printing the cycle set, i.e., the set of all vertices" + 
 			"which participate in at least one cycle in this graph...");
 		logger.debug(cycleSet);
 		
-		StrongConnectivityInspector inspector = new StrongConnectivityInspector(directedGraph);
+		KosarajuStrongConnectivityInspector<String, DefaultEdge> inspector =
+			new KosarajuStrongConnectivityInspector<>(directedGraph);
 		List<Set<String>> connectedSets = inspector.stronglyConnectedSets();
+		List<String> connectedSetsString =
+			connectedSets.stream().map(Set::toString).collect(Collectors.toList());
 		logger.debug("Printing the strongly connected sets of the graph....");
-		logger.debug(Joiner.on("\n").join(connectedSets));
+		logger.debug(String.join("\n", connectedSetsString));
 		
 		int relevantConnectedSetCount = 0;
 		Set<Set<String>> bdcConnectedSets = new HashSet<>();
@@ -389,34 +513,31 @@ public class ArchSmellDetector {
 				logger.debug("Counting this strongly connected component set as relevant");
 				logger.debug(connectedSet);
 				relevantConnectedSetCount++;
-				for (String clusterName : connectedSet) {
+				for (String clusterName : connectedSet)
 					updateSmellMap(clusterSmellMap, clusterName, "bdc");
-				}
 				logger.debug("scc size: " + connectedSet.size());
 				bdcConnectedSets.add(connectedSet);
 			}
 		}
 		
 		for (Set<String> bdcConnectedSet : bdcConnectedSets) {
-			Smell bdc = new BdcSmell();
-			Set<ConcernCluster> bdcClusters = new HashSet<>();
+			Smell bdc = new Smell(Smell.SmellType.bdc);
 			for (String clusterName : bdcConnectedSet) {
 				ConcernCluster cluster = getMatchingCluster(clusterName,clusters);
 				assert cluster != null : "No matching cluster found for " + clusterName;
-				bdcClusters.add(cluster);
-				
+				bdc.addCluster(cluster);
 			}
-			bdc.clusters = new HashSet<ConcernCluster>(bdcClusters);
 			detectedSmells.add(bdc);
 		}
 		
 		logger.debug("Number of strongly connected components: " + relevantConnectedSetCount);
 	}
 
-	private static StandardDeviation detectBco(Set<Smell> detectedSmells,
-			Set<ConcernCluster> clusters,
+	protected StandardDeviation detectBco(SmellCollection detectedSmells,
+			ConcernClusterArchitecture clusters,
 			Map<String, Set<String>> clusterSmellMap) {
 		System.out.println("Finding brick concern overload instances...");
+
 		double concernOverloadTopicThreshold = .10;
 		Map<ConcernCluster,Integer> concernCountMap = new HashMap<>(); 
 		for (ConcernCluster cluster : clusters) {
@@ -424,8 +545,8 @@ public class ArchSmellDetector {
 				logger.debug("Have doc-topics for " + cluster.getName());
 				DocTopicItem docTopicItem = cluster.getDocTopicItem();
 				int concernCount = 0;
-				for (TopicItem topicItem : docTopicItem.topics)  {
-					if (topicItem.proportion > concernOverloadTopicThreshold) {
+				for (TopicItem topicItem : docTopicItem.getTopics())  {
+					if (topicItem.getProportion() > concernOverloadTopicThreshold) {
 						logger.debug("\t" + cluster.getName() + " is beyond concern overload threshold for " + topicItem);
 						concernCount++;
 					}
@@ -434,14 +555,14 @@ public class ArchSmellDetector {
 			}
 		}
 		
-		
 		StandardDeviation stdDev = new StandardDeviation();
 		
-		int[] intConcernCountValues = ArrayUtils.toPrimitive(concernCountMap.values().toArray(new Integer[0]) );
+		int[] intConcernCountValues =
+			concernCountMap.values().stream().mapToInt(Integer::valueOf).toArray();
 		double[] doubleConcernCountValues = new double[intConcernCountValues.length];
-		for (int i=0;i<intConcernCountValues.length;i++) {
+		for (int i=0; i<intConcernCountValues.length; i++)
 			doubleConcernCountValues[i] = intConcernCountValues[i];
-		}
+		
 		double concernCountMean = StatUtils.mean(doubleConcernCountValues);
 		double concernCountStdDev = stdDev.evaluate(doubleConcernCountValues);
 		logger.debug("relevant concern count mean: " + concernCountMean);
@@ -453,112 +574,47 @@ public class ArchSmellDetector {
 			if (concernCount > concernCountMean + concernCountStdDev) {
 				logger.debug("\t" + cluster.getName() + " has brick concern overload.");
 				
-				Smell bco = new BcoSmell();
-				bco.clusters.add(cluster);
+				Smell bco = new Smell(Smell.SmellType.bco);
+				bco.addCluster(cluster);
 				detectedSmells.add(bco);
 				
 				updateSmellMap(clusterSmellMap, cluster.getName(), "bco");
 			}
 		}
+		
 		return stdDev;
 	}
 
-	private static void buildConcernClustersFromConfigTopicsFile(Set<ConcernCluster> clusters) {
-		try {
-			if (tmeMethod == TopicModelExtractionMethod.VAR_MALLET_FILE) {
-				docTopics = new DocTopics(Config.getMalletDocTopicsFilename());
-				for (ConcernCluster cluster : clusters) {
-					logger.debug("Building doctopics for " + cluster.getName());
-					for (String entity : cluster.getEntities()) {
-						if (cluster.getDocTopicItem() == null) {
-							DocTopicItem newDocTopicItem = null;
-							if (Config.getSelectedLanguage() == Config.Language.java) {
-								newDocTopicItem = setDocTopicItemForJavaFromMalletFile(entity);
-							} else if (Config.getSelectedLanguage() == Config.Language.c) {
-								newDocTopicItem = docTopics
-										.getDocTopicItemForC(entity);
-							} else {
-								newDocTopicItem = setDocTopicItemForJavaFromMalletFile(entity);
-							}
-							cluster.setDocTopicItem(newDocTopicItem);
-						} else {
-							DocTopicItem entityDocTopicItem = null;
-							DocTopicItem mergedDocTopicItem = null;
-							if (Config.getSelectedLanguage() == Config.Language.java) {
-								entityDocTopicItem = setDocTopicItemForJavaFromMalletFile(entity);
-							} else if (Config.getSelectedLanguage() == Config.Language.c) {
-								entityDocTopicItem = docTopics
-										.getDocTopicItemForC(entity);
-							} else {
-								entityDocTopicItem = setDocTopicItemForJavaFromMalletFile(entity);
-							}
-
-							mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
-									cluster.getDocTopicItem(),
-									entityDocTopicItem);
-							cluster.setDocTopicItem(mergedDocTopicItem);
-						}
-					}
-				}
-			}
-			else if (tmeMethod == TopicModelExtractionMethod.MALLET_API) {
-				for (ConcernCluster cluster : clusters) {
-					logger.debug("Building doctopics for " + cluster.getName());
-					for (String entity : cluster.getEntities()) {
-						if (cluster.getDocTopicItem() == null) {
-							DocTopicItem newDocTopicItem = null;
-							if (Config.getSelectedLanguage() == Config.Language.java) {
-								newDocTopicItem = setDocTopicItemForJavaFromMalletApi(entity);
-							}
-							cluster.setDocTopicItem(newDocTopicItem);
-						} else {
-							DocTopicItem entityDocTopicItem = null;
-							DocTopicItem mergedDocTopicItem = null;
-							if (Config.getSelectedLanguage() == Config.Language.java) {
-								entityDocTopicItem = setDocTopicItemForJavaFromMalletApi(entity);
-							} 
-
-							mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
-									cluster.getDocTopicItem(),
-									entityDocTopicItem);
-							cluster.setDocTopicItem(mergedDocTopicItem);
-						}
-					}
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void addDetectedBuoSmell(Set<Smell> detectedSmells,
-			Set<ConcernCluster> clusters, String vertex) {
-		Smell buo = new BuoSmell();
-		buo.clusters.add(getMatchingCluster(vertex,clusters));
+	private void addDetectedBuoSmell(SmellCollection detectedSmells,
+			ConcernClusterArchitecture clusters, String vertex) {
+		Smell buo = new Smell(Smell.SmellType.buo);
+		buo.addCluster(getMatchingCluster(vertex,clusters));
 		detectedSmells.add(buo);
 	}
 	
-	private static ConcernCluster getMatchingCluster(String clusterName,
-			Set<ConcernCluster> clusters) {
-		for (ConcernCluster cluster : clusters) {
-			if (cluster.getName().equals(clusterName)) {
+	private ConcernCluster getMatchingCluster(String clusterName,
+			ConcernClusterArchitecture clusters) {
+		for (ConcernCluster cluster : clusters)
+			if (cluster.getName().equals(clusterName))
 				return cluster;
-			}
-		}
+
 		return null;
 	}
 
-	private static DocTopicItem setDocTopicItemForJavaFromMalletFile(String entity) {
-		DocTopicItem newDocTopicItem;
-		String docTopicName = TopicUtil.convertJavaClassWithPackageNameToDocTopicName( entity );
-		newDocTopicItem = docTopics.getDocTopicItemForJava(docTopicName);
-		return newDocTopicItem;
-	}
-	
-	private static DocTopicItem setDocTopicItemForJavaFromMalletApi(String entity) {
-		DocTopicItem newDocTopicItem;
-		newDocTopicItem = docTopics.getDocTopicItemForJava(entity);
-		return newDocTopicItem;
+	/**
+	 * Adds a smell to the given cluster in clusterSmellMap.
+	 * 
+	 * @param clusterSmellMap Map of all clusters and their sets of smells.
+	 * @param clusterName Name of the cluster to add a smell to.
+	 * @param smellAbrv Abbreviation mell to add to the cluster.
+	 */
+	protected void updateSmellMap(Map<String, Set<String>> clusterSmellMap,
+			String clusterName, String smellAbrv) {
+		Set<String> smellList = clusterSmellMap.get(clusterName);
+		if(smellList == null)
+			smellList = new HashSet<>();
+		smellList.add(smellAbrv);
+		clusterSmellMap.putIfAbsent(clusterName, smellList);
 	}
 
 	// #region SCATTERED PARASITIC FUNCTIONALITY ---------------------------------
@@ -569,15 +625,16 @@ public class ArchSmellDetector {
 	 * @param clusterSmellsMap Mapping of smells per cluster. Altered.
 	 * @param detectedSmells Set of detected smells. Altered.
 	 */
-	private static void detectSpfNew(
-			Set<ConcernCluster> clusters,
+	protected void detectSpfNew(
+			ConcernClusterArchitecture clusters,
 			Map<String, Set<String>> clusterSmellsMap,
-			Set<Smell> detectedSmells) {
+			SmellCollection detectedSmells) {
 		logger.info("Finding scattered parasitic functionality instances...");
+
 
 		// Setting thresholds for detection algorithm
 		Map<Integer, Integer> topicNumCountMap = new HashMap<>();
-		Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap 
+		Map<Integer, ConcernClusterArchitecture> scatteredTopicToClustersMap 
 			= new HashMap<>();
 		
 		mapTopicItemsToCluster(
@@ -594,22 +651,23 @@ public class ArchSmellDetector {
 			topicNumCountMap.get(topicNum) <= significanceThreshold);
 
 		for (int topicNum : significantTopicNums) {
-			Set<ConcernCluster> clustersWithScatteredTopics = 
+			ConcernClusterArchitecture clustersWithScatteredTopics = 
 				scatteredTopicToClustersMap.get(topicNum);
-			Set<ConcernCluster> affectedClusters = new HashSet<>();
+			ConcernClusterArchitecture affectedClusters =
+				new ConcernClusterArchitecture();
 
 			// Filter out all clusters that don't have topics
-			Set<ConcernCluster> validScatteredClusters = 
-				new HashSet<>(clustersWithScatteredTopics);
+			ConcernClusterArchitecture validScatteredClusters = 
+				new ConcernClusterArchitecture(clustersWithScatteredTopics);
 			validScatteredClusters.removeIf((ConcernCluster cluster) -> 
 				cluster.getDocTopicItem() == null);
 
 			for (ConcernCluster cluster : validScatteredClusters) {
 				// Filter out all topic items that aren't smelly
 				DocTopicItem dti = cluster.getDocTopicItem();
-				List<TopicItem> significantTopicItems = new ArrayList<>(dti.topics);
+				List<TopicItem> significantTopicItems = new ArrayList<>(dti.getTopics());
 				significantTopicItems.removeIf((TopicItem ti) -> 
-					ti.topicNum == topicNum || ti.proportion < parasiticConcernThreshold);
+					ti.getTopicNum() == topicNum || ti.getProportion() < parasiticConcernThreshold);
 
 				for (int i = 0; i < significantTopicItems.size(); i++) {
 					logger.debug(cluster.getName()
@@ -617,15 +675,16 @@ public class ArchSmellDetector {
 
 					clusterSmellsMap.putIfAbsent(cluster.getName(), new HashSet<>());
 					clusterSmellsMap.get(cluster.getName()).add("spf");
-
 					affectedClusters.add(cluster);
 				}
 			}
 			
-			Smell spf = new SpfSmell(topicNum);
-			spf.clusters = new HashSet<>(affectedClusters);
+			Smell spf = new Smell(topicNum);
+			for (ConcernCluster affectedCluster : affectedClusters)
+				spf.addCluster(affectedCluster);
 			detectedSmells.add(spf);
 		}
+
 	}
 
 	/**
@@ -635,29 +694,31 @@ public class ArchSmellDetector {
 	 * @param topicNumCountMap Count of occurrences of each topic. Altered.
 	 * @param scatteredTopicToClustersMap Mapping of topics to clusters.
 	 */
-	private static void mapTopicItemsToCluster(
-			Set<ConcernCluster> inputClusters,
+	private void mapTopicItemsToCluster(
+			ConcernClusterArchitecture inputClusters,
 			Map<Integer, Integer> topicNumCountMap,
-			Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap) {
+			Map<Integer, ConcernClusterArchitecture> scatteredTopicToClustersMap) {
 		// Filter out all clusters that don't have topics
-		Set<ConcernCluster> validClusters = new HashSet<>(inputClusters);
+		ConcernClusterArchitecture validClusters =
+			new ConcernClusterArchitecture(inputClusters);
 		validClusters.removeIf((ConcernCluster cluster) -> 
 			cluster.getDocTopicItem() == null);
 		
 		for (ConcernCluster cluster : validClusters) {
 			// Filter out all topic items that aren't smelly
 			DocTopicItem dti = cluster.getDocTopicItem();
-			List<TopicItem> smellyTopicItems = new ArrayList<>(dti.topics);
+			List<TopicItem> smellyTopicItems = new ArrayList<>(dti.getTopics());
 			smellyTopicItems.removeIf((TopicItem ti) -> 
-				ti.proportion < scatteredConcernThreshold);
+				ti.getProportion() < scatteredConcernThreshold);
 
-			for (TopicItem ti : dti.topics) {
+			for (TopicItem ti : smellyTopicItems) {
 				// count the number of times the topic appears
-				topicNumCountMap.compute(ti.topicNum, (k, v) ->	(v == null) ? 1 : v++);
+				topicNumCountMap.compute(ti.getTopicNum(), (k, v) -> (v == null) ? 1 : ++v);
 				
 				// map cluster to the related topicItem
-				scatteredTopicToClustersMap.putIfAbsent(ti.topicNum, new HashSet<>());
-				scatteredTopicToClustersMap.get(ti.topicNum).add(cluster);
+				scatteredTopicToClustersMap.putIfAbsent(
+					ti.getTopicNum(), new ConcernClusterArchitecture());
+				scatteredTopicToClustersMap.get(ti.getTopicNum()).add(cluster);
 			}
 		}
 	}
@@ -672,12 +733,11 @@ public class ArchSmellDetector {
 	 * @param scatteredTopicToClustersMap Map of clusters per topic item.
 	 * @return
 	 */
-	private static double computeSPFSignificanceThreshold(
+	private double computeSPFSignificanceThreshold(
 			double[] topicCounts, Map<Integer, Integer> topicNumCountMap,
-			Map<Integer, Set<ConcernCluster>> scatteredTopicToClustersMap){
+			Map<Integer, ConcernClusterArchitecture> scatteredTopicToClustersMap){
 		double topicCountMean = 0;
 		double topicCountStdDev = 0;
-
 		int topicNumCounter = 0;
 
 		for (Integer topicNum : topicNumCountMap.values()) {
@@ -693,33 +753,16 @@ public class ArchSmellDetector {
 		logger.debug("topic count standard deviation: " + topicCountStdDev);
 
 		logger.debug("topic num : count");
-		for (Map.Entry<Integer, Integer> entry : topicNumCountMap.entrySet()) {
+		for (Map.Entry<Integer, Integer> entry : topicNumCountMap.entrySet())
 			logger.debug(entry.getKey() + " : " + entry.getValue() );
-		}
+
 		logger.debug("topic num : clusters with topic");
-		for (Map.Entry<Integer, Set<ConcernCluster>> entry 
-				: scatteredTopicToClustersMap.entrySet()) {
+		for (Map.Entry<Integer, ConcernClusterArchitecture> entry 
+				: scatteredTopicToClustersMap.entrySet())
 			logger.debug(entry.getKey() + " : " + entry.getValue() );
-		}
 
 		return topicCountMean + topicCountStdDev;
 	}
 	// #endregion SCATTERED PARASITIC FUNCTIONALITY ------------------------------
-
-	/**
-	 * Adds a smell to the given cluster in clusterSmellMap.
-	 * 
-	 * @param clusterSmellMap Map of all clusters and their sets of smells.
-	 * @param clusterName Name of the cluster to add a smell to.
-	 * @param smellAbrv Abbreviation mell to add to the cluster.
-	 */
-	private static void updateSmellMap(
-			Map<String, Set<String>> clusterSmellMap,
-			String clusterName, String smellAbrv) {
-		Set<String> smellList = clusterSmellMap.get(clusterName);
-		if(smellList == null)
-			smellList = new HashSet<>();
-		smellList.add(smellAbrv);
-		clusterSmellMap.putIfAbsent(clusterName, smellList);
-	}
+	// #endregion DETECTION ALGORITHMS -------------------------------------------
 }

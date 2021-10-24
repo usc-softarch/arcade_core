@@ -12,7 +12,7 @@ public class RsfToDotConverter {
 		String rsfFilename = args[0];
 		String dotFilename = args[1];
 		RsfReader.loadRsfDataFromFile(rsfFilename);
-		List<List<String>> facts = RsfReader.unfilteredFacts;
+		List<List<String>> facts = RsfReader.unfilteredFaCtS;
 		
 		try (FileWriter out = new FileWriter(dotFilename)) {
 			out.write("digraph G {\n");

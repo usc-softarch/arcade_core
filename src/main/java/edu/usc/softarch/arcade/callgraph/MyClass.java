@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.callgraph;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import soot.SootClass;
@@ -11,30 +10,15 @@ import soot.SootClass;
  * @author joshua
  */
 public class MyClass implements Serializable {
+	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = 5575671464833110817L;
-	public String packageName;
-	public String className;
-	Set<MyMethod> methods;
+
+	private String packageName;
+	private String className;
+	private Set<MyMethod> methods;
+	// #endregion FIELDS ---------------------------------------------------------
 	
-	public void addMethod(MyMethod m) {
-		methods.add(m);
-	}
-	
-	public String methodsToString(int tabCount) {
-		String methodsStr = "";
-		int methodCount = 0;
-		Iterator<MyMethod> iter = methods.iterator();
-		while (iter.hasNext()) {
-			MyMethod m = iter.next();
-			for (int i=0;i<tabCount;i++) {
-				methodsStr +='\t';
-			}
-			methodsStr += methodCount + ": " + m.toString() + "\n"; 
-			methodCount++;
-		}
-		return methodsStr;
-	}
-	
+	// #region CONSTRUCTORS ------------------------------------------------------
 	public MyClass(MyClass declaringClass) {
 		this.className = declaringClass.className;
 		this.packageName = declaringClass.packageName;
@@ -45,6 +29,31 @@ public class MyClass implements Serializable {
 		this.className = declaringClass.getShortName();
 		this.packageName = declaringClass.getPackageName();
 		this.methods = new HashSet<>();
+	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
+
+	// #region ACCESSORS ---------------------------------------------------------
+	public String getPackageName() { return this.packageName; }
+	public String getClassName() { return this.className; }
+	public Set<MyMethod> getMethods() {
+		return new HashSet<>(methods); }
+
+	public void addMethod(MyMethod m) {
+		methods.add(m);	}
+	// #endregion ACCESSORS ------------------------------------------------------
+	
+	// #region MISC --------------------------------------------------------------
+	public String methodsToString(int tabCount) {
+		String methodsStr = "";
+		int methodCount = 0;
+
+		for (MyMethod m : methods) {
+			methodsStr += "\t".repeat(tabCount);
+			methodsStr += methodCount + ": " + m.toString() + "\n"; 
+			methodCount++;
+		}
+
+		return methodsStr;
 	}
 
 	@Override
@@ -69,8 +78,5 @@ public class MyClass implements Serializable {
 	public String toString() {
 		return this.packageName + "." + this.className;
 	}
-
-	public Set<MyMethod> getMethods() {
-		return new HashSet<>(methods);
-	}
+	// #endregion MISC -----------------------------------------------------------
 }

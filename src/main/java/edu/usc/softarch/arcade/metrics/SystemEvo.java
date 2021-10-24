@@ -1,28 +1,27 @@
 package edu.usc.softarch.arcade.metrics;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import com.google.common.base.Joiner;
 
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
-import edu.usc.softarch.arcade.facts.driver.ConcernClusterRsf;
 
 public class SystemEvo {
-	private static Logger logger = Logger.getLogger(SystemEvo.class);
+	private static Logger logger = LogManager.getLogger(SystemEvo.class);
 	
 	public static double sysEvo = 0;
 	
 	public static void main(String[] args) {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		sysEvo = 0;
 		SystemEvoOptions options = new SystemEvoOptions();
 		JCommander jcmd = new JCommander(options);
@@ -42,8 +41,10 @@ public class SystemEvo {
 		String sourceRsf = options.parameters.get(0);
 		String targetRsf = options.parameters.get(1);
 		
-		Set<ConcernCluster> sourceClusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(sourceRsf);
-		Set<ConcernCluster> targetClusters = ConcernClusterRsf.extractConcernClustersFromRsfFile(targetRsf);
+		ConcernClusterArchitecture sourceClusters =
+			ConcernClusterArchitecture.loadFromRsf(sourceRsf);
+		ConcernClusterArchitecture targetClusters =
+			ConcernClusterArchitecture.loadFromRsf(targetRsf);
 		
 		logger.debug("Source clusters: ");
 		logger.debug(clustersToString(sourceClusters));
@@ -127,16 +128,36 @@ public class SystemEvo {
 			Set<String> entitiesIntersection = new HashSet<>(source.getEntities());
 			entitiesIntersection.retainAll(target.getEntities());
 			sourceClusterMatchEntities.put(source, entitiesIntersection);	
-			logger.debug("Pooyan -> "+source.getName() +" is matched to "+target.getName()+ " - the interesection size is " + entitiesIntersection.size() );
+			logger.debug(source.getName() +" is matched to "+target.getName()+ " - the interesection size is " + entitiesIntersection.size() );
 		}
 		
 		logger.debug("\n");
-		logger.debug("Pooyan -> cluster -> intersecting entities in the matched source clusters");
-		logger.debug(Joiner.on("\n").withKeyValueSeparator("->").join(sourceClusterMatchEntities));
-		logger.debug("Pooyan -> cluster -> matched clusters in target cluster for every source cluster");
-		logger.debug(Joiner.on("\n").withKeyValueSeparator("->").useForNull("null").join(matchOfSourceInTarget));
+		logger.debug("cluster -> intersecting entities in the matched source clusters");
+		Map<ConcernCluster, Set<String>> sourceClusterMatchEntitiesPrintable =
+			new HashMap<>(sourceClusterMatchEntities);
+		logger.debug(String.join("\n", sourceClusterMatchEntitiesPrintable
+			.keySet().stream()
+			.map(key -> key + "->" + sourceClusterMatchEntitiesPrintable.get(key))
+			.collect(Collectors.toList())));
+
+		logger.debug("cluster -> matched clusters in target cluster for every source cluster");
+		Map<ConcernCluster, ConcernCluster> matchOfSourceInTargetPrintable =
+			new HashMap<>(matchOfSourceInTarget);
+		logger.debug(String.join("\n", matchOfSourceInTargetPrintable
+			.keySet().stream()
+			// This one is complicated: the map will result in a list of strings
+			// of the form "key->value", but it is replacing null ConcernClusters
+			// with the string "null".
+			.map(key -> {
+				String result = "";
+				result += (key != null) ? key : "null";
+				result += "->";
+				ConcernCluster value = matchOfSourceInTargetPrintable.get(key);
+				result += (value != null) ? value : "null";
+				return result;
+			}).collect(Collectors.toList())));
 		
-		Set<ConcernCluster> removedSourceClusters = new HashSet<> () ;
+		ConcernClusterArchitecture removedSourceClusters = new ConcernClusterArchitecture() ;
 		
 		//Pooyan! unmatched clusters must be removed
 		for (ConcernCluster source:sourceClusters){
@@ -145,20 +166,23 @@ public class SystemEvo {
 				removedSourceClusters.add(source);
 			}
 		}
-		logger.debug("Pooyan -> Removed source clusters:");
-		logger.debug(Joiner.on(",").join(removedSourceClusters));
+		logger.debug("Removed source clusters:");
+		List<String> removedSourceClustersPrintable =
+			removedSourceClusters.stream().map(ConcernCluster::toString)
+			.collect(Collectors.toList());
+		logger.debug(String.join(",", removedSourceClustersPrintable));
 		
 		Set<String> entitiesToMoveInRemovedSourceClusters = new HashSet<>(); // Pooyan! These are the entities in the removed source clusters which exists in the target clusters and have to be moved 
 		logger.debug("Entities of removed clusters:");
 		for (ConcernCluster source : removedSourceClusters) {
 			Set<String> entities = source.getEntities();
 			entities.removeAll(entitiesToRemove); // Make sure we are not trying to move entities that no longer exist in the target cluster
-			logger.debug("Pooyan -> these in enitities in: "+ source.getName() + " will be moved: " + entities);
+			logger.debug("these in enitities in: "+ source.getName() + " will be moved: " + entities);
 			entitiesToMoveInRemovedSourceClusters.addAll(entities);
 		}
 		
 		// The clusters that remain after removal of clusters 
-		Set<ConcernCluster> remainingSourceClusters = new HashSet<>(sourceClusters);
+		ConcernClusterArchitecture remainingSourceClusters = new ConcernClusterArchitecture(sourceClusters);
 		remainingSourceClusters.removeAll(removedSourceClusters);
 		
 		// for each cluster, the map gives the set of entities that may be moved (not including added or
@@ -174,7 +198,7 @@ public class SystemEvo {
 			currEntitiesToMove.removeAll(entitiesToRemove);
 			entitiesToMoveInCluster.put(remainingCluster,currEntitiesToMove);
 			for (String e:currEntitiesToMove)
-				logger.debug("Pooyan -> remaining cluster " + remainingCluster.getName() + ", adn current entity to move :" +e);
+				logger.debug("remaining cluster " + remainingCluster.getName() + ", adn current entity to move :" +e);
 		}
 		
 		Set<String> allEntitiesToMove = new HashSet<>();
@@ -186,9 +210,11 @@ public class SystemEvo {
 		allEntitiesToMove.addAll(entitiesToRemove);
 		
 		for (String e:allEntitiesToMove)
-			logger.debug("Pooyan -> enitity to be moved: " +e); 
+			logger.debug("enitity to be moved: " +e); 
 		logger.debug("entities to move in each cluster: ");
-		logger.debug(Joiner.on("\n").withKeyValueSeparator("->").join(entitiesToMoveInCluster));
+		logger.debug(String.join("\n", entitiesToMoveInCluster.keySet().stream()
+			.map(key -> key + "->" + entitiesToMoveInCluster.get(key))
+			.collect(Collectors.toList())));
 		
 		int movesForAddedEntities = entitiesToAdd.size();
 		int movesForRemovedEntities = entitiesToRemove.size();
@@ -216,18 +242,20 @@ public class SystemEvo {
 			}
 		}
 		
-		logger.debug("Pooyan -> numClustersToRemove: " +numClustersToRemove);
-		logger.debug("Pooyan -> numClustersToAdd: " + numClustersToAdd);
-		logger.debug("Pooyan -> entitiesToRemove.size(): " + entitiesToRemove.size());
-		logger.debug("Pooyan -> entitiesToAdd.size(): " + entitiesToAdd.size() ) ;
-		logger.debug("Pooyan -> allEntitiesToMove.size(): " + allEntitiesToMove.size() );
+		logger.debug("numClustersToRemove: " +numClustersToRemove);
+		logger.debug("numClustersToAdd: " + numClustersToAdd);
+		logger.debug("entitiesToRemove.size(): " + entitiesToRemove.size());
+		logger.debug("entitiesToAdd.size(): " + entitiesToAdd.size() ) ;
+		logger.debug("allEntitiesToMove.size(): " + allEntitiesToMove.size() );
 		logger.debug("Show which target cluster each entity (not added or removed) belongs to");
 		
-		logger.debug(Joiner.on("\n").withKeyValueSeparator("->").join(entityToTargetCluster));
+		logger.debug(String.join("\n", entityToTargetCluster.keySet().stream()
+			.map(key -> key + "->" + entityToTargetCluster.get(key))
+			.collect(Collectors.toList())));
 			
 		double numer = numClustersToRemove + numClustersToAdd + (double)( entitiesToRemove.size() ) + (double)( entitiesToAdd.size() ) + (double)( allEntitiesToMove.size() );
 		double denom = (double)( sourceClusters.size() ) + 2*(double)( sourceEntities.size() ) + (double)( targetClusters.size() ) + 2*(double)( targetEntities.size() );
-		logger.debug("Pooyan -> denum: " + denom);
+		logger.debug("denum: " + denom);
 		
 		double localSysEvo = (1-numer/denom)*100;
 		
@@ -237,7 +265,7 @@ public class SystemEvo {
 			
 	}
 
-	private static String clustersToString(Set<ConcernCluster> sourceClusters) {
+	private static String clustersToString(ConcernClusterArchitecture sourceClusters) {
 		String output = "";
 		for (ConcernCluster cluster : sourceClusters) {
 			output += cluster.getName() +  ": ";
@@ -250,7 +278,7 @@ public class SystemEvo {
 	}
 
 	private static Set<String> getAllEntitiesInClusters(
-			Set<ConcernCluster> clusters) {
+			ConcernClusterArchitecture clusters) {
 		Set<String> entities = new HashSet<>();
 		for (ConcernCluster cluster : clusters) {
 			entities.addAll( cluster.getEntities() );

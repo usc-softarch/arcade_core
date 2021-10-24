@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -10,41 +9,33 @@ import java.util.Set;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Skewness;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
-import org.apache.log4j.PropertyConfigurator;
 
-import com.google.common.base.Joiner;
-
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.facts.GroundTruthFileParser;
 
 public class ClusterSizeCalculator {
 	public static void main(String[] args) {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
 		String rsfFilename = args[0];
 		
 		GroundTruthFileParser.parseRsf(rsfFilename);
-		Set<ConcernCluster> clusters = GroundTruthFileParser.getClusters();
+		ConcernClusterArchitecture clusters = GroundTruthFileParser.getClusters();
 		
 		for (ConcernCluster cluster : clusters) {
 			System.out.println(cluster.getName());
-			for (String entity : cluster.getEntities()) {
+			for (String entity : cluster.getEntities())
 				System.out.println("\t" + entity);
-			}
 			System.out.println();
 		}
 		
 		int entityCount = 0;
-		for (ConcernCluster cluster : clusters) {
-			for (String entity : cluster.getEntities()) {
-				entityCount++;
-			}
-		}
+		for (ConcernCluster cluster : clusters)
+			entityCount += cluster.getEntities().size();
 		
 		Map<String,Integer> clusterEntityCountMap = new HashMap<>();
 		
-		for (ConcernCluster cluster : clusters) {
+		for (ConcernCluster cluster : clusters)
 			clusterEntityCountMap.put(cluster.getName(), cluster.getEntities().size());
-		}
 		
 		double[] clusterEntityCounts = new double[clusterEntityCountMap.values().size()];
 		int i = 0;
@@ -98,15 +89,15 @@ public class ClusterSizeCalculator {
 		}
 		
 		System.out.println("Small clusters: ");
-		System.out.println("\t" + Joiner.on("\n\t").join(smallClusters));
+		System.out.println("\t" + String.join("\n\t", smallClusters));
 		System.out.println("Medium clusters: ");
-		System.out.println("\t" + Joiner.on("\n\t").join(medClusters));
+		System.out.println("\t" + String.join("\n\t", medClusters));
 		System.out.println("Large clusters: ");
-		System.out.println("\t" + Joiner.on("\n\t").join(largeClusters));
+		System.out.println("\t" + String.join("\n\t", largeClusters));
 		System.out.println("Singleton clusters: ");
-		System.out.println("\t" + Joiner.on("\n\t").join(singletonClusters));
+		System.out.println("\t" + String.join("\n\t", singletonClusters));
 		System.out.println("Below mean clusters: ");
-		System.out.println("\t" + Joiner.on("\n\t").join(belowMeanClusters));
+		System.out.println("\t" + String.join("\n\t", belowMeanClusters));
 		
 		// Determine proportion of small-large and singleton clusters
 		double smallClusterProportion = (double)smallClusters.size()/(double)clusters.size();

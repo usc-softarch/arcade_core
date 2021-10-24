@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -17,11 +17,10 @@ import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchSystemEvo {
-	private static Logger logger = Logger.getLogger(BatchSystemEvo.class);
+	private static Logger logger = LogManager.getLogger(BatchSystemEvo.class);
+	private static DescriptiveStatistics stats;
 	
 	public static void main(String[] args) throws FileNotFoundException {
-		PropertyConfigurator.configure("cfg" + File.separator + "extractor_logging.cfg");
-
 		BatchSystemEvoOptions options = new BatchSystemEvoOptions();
 		JCommander jcmd = new JCommander(options);
 
@@ -47,22 +46,22 @@ public class BatchSystemEvo {
 
 		if (options.distopt == 1) {
 			compareOverDistanceOfOne(clusterFiles);
-		}
-		else if (options.distopt == 2) {
+		}	else if (options.distopt == 2) {
 			compareWithVdistGt1ForAll(clusterFiles);
-		}
-		else if (options.distopt == 3) {
+		}	else if (options.distopt == 3) {
 			compareWithVdistGt1ForSubset(clusterFiles);
-		}
-		else {
+		}	else {
 			throw new RuntimeException("Unknown value for option distopt: " + options.distopt);
 		}
 	}
+
+	public static DescriptiveStatistics getStats(){
+		return stats;
+	}
 	
-	private static void compareOverDistanceOfOne(
-			List<File> clusterFiles) {
+	private static void compareOverDistanceOfOne(List<File> clusterFiles) {
 			File prevFile = null;
-			List<Double> sysEvoValues = new ArrayList<Double>();
+			List<Double> sysEvoValues = new ArrayList<>();
 			int comparisonDistance = 1;
 			System.out.println("Comparison distance is: " + comparisonDistance);
 			for (int i = 0; i < clusterFiles.size(); i += comparisonDistance) {
@@ -79,7 +78,7 @@ public class BatchSystemEvo {
 			Double[] sysEvoArr = new Double[sysEvoValues.size()];
 			sysEvoValues.toArray(sysEvoArr);
 			
-			DescriptiveStatistics stats = new DescriptiveStatistics(ArrayUtils.toPrimitive(sysEvoArr));
+			stats = new DescriptiveStatistics(ArrayUtils.toPrimitive(sysEvoArr));
 
 			System.out.println(stats);
 			System.out.println();

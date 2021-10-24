@@ -3,7 +3,6 @@ package edu.usc.softarch.arcade.facts;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -12,29 +11,29 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.util.Set;
-import java.util.HashSet;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
-import org.apache.log4j.Logger;
-
-import edu.usc.softarch.arcade.config.Config;
+import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
 public class GroundTruthFileParser {
-	private static Logger logger = Logger.getLogger(GroundTruthFileParser.class);
-	private static Set<ConcernCluster> clusters = new HashSet<>();
-	private static Map<String,ConcernCluster> clusterMap = new HashMap<>();
+	private static Logger logger =
+		LogManager.getLogger(GroundTruthFileParser.class);
+	private static ConcernClusterArchitecture clusters = 
+		new ConcernClusterArchitecture();
+	private static Map<String, ConcernCluster> clusterMap = new HashMap<>();
 
-	public static Map<String,ConcernCluster> getClusterMap() {
+	public static Map<String, ConcernCluster> getClusterMap() {
 		return clusterMap;
 	}
 	
-	public static Set<ConcernCluster> getClusters() {
+	public static ConcernClusterArchitecture getClusters() {
 		return clusters;
 	}
 	
 	public static void parseBashStyle(String groundTruthFile) {
-		clusters = new HashSet<>();
+		clusters = new ConcernClusterArchitecture();
 		clusterMap = new HashMap<>();
 		try (FileInputStream fstream = new FileInputStream(groundTruthFile)) {
 			DataInputStream in = new DataInputStream(fstream);
@@ -73,15 +72,13 @@ public class GroundTruthFileParser {
 				}
 			}
 			in.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void parseHadoopStyle(String groundTruthFile) {
-		clusters = new HashSet<>();
+		clusters = new ConcernClusterArchitecture();
 		try (FileInputStream fstream = new FileInputStream(groundTruthFile)) {
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -117,8 +114,6 @@ public class GroundTruthFileParser {
 				}
 			}
 			in.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -127,29 +122,28 @@ public class GroundTruthFileParser {
 	public static void parseRsf(String groundTruthFile) {
 		clusterMap = new HashMap<>();
 		RsfReader.loadRsfDataFromFile(groundTruthFile);
+		List<List<String>> unfilteredFacts = RsfReader.unfilteredFaCtS;
 		
-		for (List<String> fact : RsfReader.unfilteredFacts) {
+		for (List<String> fact : unfilteredFacts) {
 
 			String clusterName = fact.get(1).trim();
 			String containedClass = fact.get(2).trim();
-			if (Config.isClassInSelectedPackages(containedClass)) {
-				logger.debug("Found class: " + containedClass);
+			logger.debug("Found class: " + containedClass);
 
-				ConcernCluster currCluster = null;
-				if (!clusterMap.containsKey(clusterName)) { // This is a new cluster
-					logger.debug("Creating new cluster: " + clusterName);
-					currCluster = new ConcernCluster();
-					currCluster.setName(clusterName);
-					currCluster.addEntity(containedClass);
-					clusterMap.put(clusterName, currCluster);
-				} else { // This is an already added cluster
-					currCluster = clusterMap.get(clusterName);
-					currCluster.addEntity(containedClass);
-				}
+			ConcernCluster currCluster = null;
+			if (!clusterMap.containsKey(clusterName)) { // This is a new cluster
+				logger.debug("Creating new cluster: " + clusterName);
+				currCluster = new ConcernCluster();
+				currCluster.setName(clusterName);
+				currCluster.addEntity(containedClass);
+				clusterMap.put(clusterName, currCluster);
+			} else { // This is an already added cluster
+				currCluster = clusterMap.get(clusterName);
+				currCluster.addEntity(containedClass);
 			}
 		}
 		
-		clusters = new HashSet<>(clusterMap.values());
+		clusters = new ConcernClusterArchitecture(clusterMap.values());
 		
 		logger.debug("Printing out read in ground truth clusters...");
 		

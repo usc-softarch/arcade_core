@@ -1,175 +1,151 @@
 package edu.usc.softarch.arcade.topics;
 
-import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import cc.mallet.pipe.CharSequence2TokenSequence;
 import cc.mallet.pipe.CharSequenceLowercase;
 import cc.mallet.pipe.CharSequenceReplace;
 import cc.mallet.pipe.Pipe;
-import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.TokenSequence2FeatureSequence;
 import cc.mallet.pipe.TokenSequenceRemoveStopwords;
 import cc.mallet.topics.TopicInferencer;
-import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
-import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.util.FileListing;
-import edu.usc.softarch.arcade.util.FileUtil;
 
 /**
  * @author joshua
  */
-public class DocTopics {
-	List<DocTopicItem> dtItemList = new ArrayList<>();
-	private Logger logger = Logger.getLogger(DocTopics.class);
+public class DocTopics implements Serializable{
+	// #region FIELDS ------------------------------------------------------------
+	static final long serialVersionUID = 1L;
+	private static Logger logger = LogManager.getLogger(DocTopics.class);
+	private List<DocTopicItem> dtItemList;
+	// #endregion FIELDS ---------------------------------------------------------
 	
-	public DocTopics() {
-		super();
-	}
+	// #region CONSTRUCTORS ------------------------------------------------------
+	public DocTopics() { dtItemList = new ArrayList<>(); }
 	
+	/**
+	 * Clone constructor.
+	 */
 	public DocTopics(DocTopics docTopics) {
-		for (DocTopicItem docTopicItem : docTopics.dtItemList) {
+		this();
+		for (DocTopicItem docTopicItem : docTopics.dtItemList)
 			dtItemList.add(new DocTopicItem(docTopicItem));
-		}
 	}
-	
-	public DocTopics(String srcDir, String artifactsDir) throws Exception {
-		// Begin by importing documents from text to feature sequences
-		List<Pipe> pipeList = new ArrayList<>();
-		int numTopics = 100;
-		// Pipes: alphanumeric only, camel case separation, lowercase, tokenize,
-		// remove stopwords english, remove stopwords java, stem, map to
-		// features
-		pipeList.add(new CharSequenceReplace(Pattern.compile("[^A-Za-z]"), " "));
-		pipeList.add(new CamelCaseSeparatorPipe());
-		pipeList.add(new CharSequenceLowercase());
-		pipeList.add(new CharSequence2TokenSequence(Pattern
-				.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")));
-		pipeList.add(new TokenSequenceRemoveStopwords(new File(
-				"stoplists/en.txt"), "UTF-8", false, false, false));
-		
-		if (Config.getSelectedLanguage().equals(Config.Language.c)) {
-			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/ckeywords"), "UTF-8", false, false, false));
-			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/cppkeywords"), "UTF-8", false, false, false));
-		}
-		else {
-			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-					"res/javakeywords"), "UTF-8", false, false, false));
-		}
-		pipeList.add(new StemmerPipe());
-		pipeList.add(new TokenSequence2FeatureSequence());
 
-		InstanceList instances = new InstanceList(new SerialPipes(pipeList));
-		String testDir = srcDir;
-		logger.debug("Building instances for mallet...");
-		for (File file : FileListing.getFileListing(new File(testDir))) {
-			logger.debug("Should I add " + file.getName() + " to instances?");
-			if (file.isFile() && file.getName().endsWith(".java")) {
-				String shortClassName = file.getName().replace(".java", "");
-				BufferedReader reader = new BufferedReader(new FileReader(file));
-				String line = null;
-				String fullClassName = "";
-				while ((line = reader.readLine()) != null) {
-					String packageName = FileUtil.findPackageName(line);
-					if (packageName != null) {
-						fullClassName = packageName + "." + shortClassName;
-						logger.debug("\t I've identified the following full class name from analyzing files: " + fullClassName);
-					}
-				}
-				reader.close();
-				logger.debug("I'm going to add this file to instances: " + file);
-				String data = FileUtil.readFile(file.getAbsolutePath(),
-						Charset.defaultCharset());
-				Instance instance = new Instance(data, "X", fullClassName,
-						file.getAbsolutePath());
-				instances.addThruPipe(instance);
-			}
-			Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
-			// if we found a c or c++ file
-			if ( p.matcher(file.getName()).find() ) {
-				logger.debug("I'm going to add this file to instances: " + file);
-				String depsStyleFilename = file.getAbsolutePath().replace(testDir, "");
-				String data = FileUtil.readFile(file.getAbsolutePath(),
-						Charset.defaultCharset());
-				Instance instance = new Instance(data, "X", depsStyleFilename,
-						file.getAbsolutePath());
-				instances.addThruPipe(instance);
-			}
-		}
+	public DocTopics(String filename) throws FileNotFoundException {
+		loadFromFile(filename);	}
+
+	public DocTopics(String srcDir, String artifactsDir, String language)
+			throws Exception {
+		this();
+		// Begin by importing documents from text to feature sequences
+		char fs = File.separatorChar;
+
+		int numTopics = 100;
 		
-		InstanceList previousInstances = InstanceList.load(new File(artifactsDir+"/output.pipe"));
+		InstanceList previousInstances = InstanceList.load(
+			new File(artifactsDir + fs + "output.pipe"));
 		
-		TopicInferencer inferencer = 
-				TopicInferencer.read(new File(artifactsDir+"/infer.mallet"));
-		
+		TopicInferencer inferencer = TopicInferencer.read(
+			new File(artifactsDir + fs + "infer.mallet"));
+
 		for (int instIndex = 0; instIndex < previousInstances.size(); instIndex++) {
 			DocTopicItem dtItem = new DocTopicItem();
-			dtItem.doc = instIndex;
-			dtItem.source = (String) previousInstances.get(instIndex).getName();
+			dtItem.setDoc(instIndex);
+			dtItem.setSource((String) previousInstances.get(instIndex).getName());
 
-			dtItem.topics = new ArrayList<>();
-
-			double[] topicDistribution = inferencer.getSampledDistribution(previousInstances.get(instIndex), 1000, 10, 10);
+			double[] topicDistribution = 
+				inferencer.getSampledDistribution(
+					previousInstances.get(instIndex), 1000, 10, 10);
+			
 			for (int topicIdx = 0; topicIdx < numTopics; topicIdx++) {
 				TopicItem t = new TopicItem();
-				t.topicNum = topicIdx;
-				t.proportion = topicDistribution[topicIdx];
-				dtItem.topics.add(t);
+				t.setTopicNum(topicIdx);
+				t.setProportion(topicDistribution[topicIdx]);
+				dtItem.addTopic(t);
 			}
 			dtItemList.add(dtItem);
 		}
 	}
-	
+	// #endregion CONSTRUCTORS ---------------------------------------------------
+
+	// #region ACCESSORS ---------------------------------------------------------
+	public List<DocTopicItem> getDocTopicItemList() { return dtItemList; }
+
 	/**
-	 * @param filename
-	 * @throws FileNotFoundException
+	 * Gets the DocTopicItem for a given file name or entity.
+	 * 
+	 * @param name Name of the file or entity.
+	 * @param language Source language of the file.
+	 * @return Associated DocTopicItem
 	 */
-	public DocTopics(String filename) throws FileNotFoundException {
-		loadFromFile(filename);
+	public DocTopicItem getDocTopicItem(String name, String language) {
+		if (language.equalsIgnoreCase("java"))
+			return getDocTopicItemForJava(name);
+		if (language.equalsIgnoreCase("c"))
+			return getDocTopicItemForC(name);
+
+		throw new IllegalArgumentException("Unknown source language " + language);
 	}
-	
+
+	/**
+	 * Gets the DocTopicItem for a given Java file name or Class name.
+	 * 
+	 * @param name Name of the file or Java class.
+	 * @return Associated DocTopicItem.
+	 */
 	public DocTopicItem getDocTopicItemForJava(String name) {
+		String altName = name.replace("/", ".").replace(".java", "").trim();
+
 		for (DocTopicItem dti : dtItemList) {
-			String altName = name.replace("/", ".").replace(".java", "").trim();
-			if (dti.source.endsWith(name) || altName.equals(dti.source.trim()))
+			if (dti.getSource().endsWith(name) 
+					|| altName.equals(dti.getSource().trim()))
 				return dti;
 		}
 		return null;
 	}
-	
+
+	/**
+	 * Gets the DocTopicItem for a given C file name or entity.
+	 * 
+	 * @param name Name of the file or C entity.
+	 * @return Associated DocTopicItem.
+	 */
 	public DocTopicItem getDocTopicItemForC(String name) {
 		for (DocTopicItem dti : dtItemList) {
 			String strippedSource = null;
-			String nameWithoutQuotations = null;
-			if (dti.source.endsWith(".func")) {
-				strippedSource = dti.source.substring(dti.source.lastIndexOf('/')+1,dti.source.lastIndexOf(".func"));
-				nameWithoutQuotations = name.replace("\"", "");
+			String nameWithoutQuotations = name.replace("\"", "");
+
+			if (dti.getSource().endsWith(".func")) {
+				strippedSource = dti.getSource().substring(
+					dti.getSource().lastIndexOf('/') + 1,
+					dti.getSource().lastIndexOf(".func"));
 				if (strippedSource.contains(nameWithoutQuotations))
 					return dti;
-			} else if (dti.source.endsWith(".c") || dti.source.endsWith(".h")
-					|| dti.source.endsWith(".tbl") || dti.source.endsWith(".p")
-					|| dti.source.endsWith(".cpp") || dti.source.endsWith(".s")
-					|| dti.source.endsWith(".hpp") || dti.source.endsWith(".icc")
-					|| dti.source.endsWith(".ia")) {
-				nameWithoutQuotations = name.replace("\"", "");
-				if (dti.source.endsWith(nameWithoutQuotations))
+			} else if (dti.isCSourced()) {
+				//FIXME Make sure this works on Linux and find a permanent fix
+				strippedSource = dti.getSource().substring(1, dti.getSource().length());
+				strippedSource = strippedSource.replace("\\", "/");
+				if (strippedSource.endsWith(nameWithoutQuotations))
 					return dti;
 			}
-			else if (dti.source.endsWith(".S")) {
-				String dtiSourceRenamed = dti.source.replace(".S", ".c");
-				nameWithoutQuotations = name.replace("\"", "");
+			else if (dti.getSource().endsWith(".S")) {
+				String dtiSourceRenamed = dti.getSource().replace(".S", ".c");
 				if (dtiSourceRenamed.endsWith(nameWithoutQuotations))
 					return dti;
 			}
@@ -177,49 +153,66 @@ public class DocTopics {
 		logger.error("Cannot find doc topic for: " + name);
 		return null;
 	}
-	
-	public List<DocTopicItem> getDocTopicItemList() {
-		return dtItemList;
-	}
+	// #endregion ACCESSORS ------------------------------------------------------
 
+	// #region PROCESSING --------------------------------------------------------
+	public static DocTopicItem computeGlobalCentroidUsingTopics(
+			List<DocTopicItem> docTopicItems) {
+		int firstNonNullDocTopicItemIndex = 0;
+		for (; docTopicItems.get(firstNonNullDocTopicItemIndex) == null
+				&& firstNonNullDocTopicItemIndex < docTopicItems.size(); firstNonNullDocTopicItemIndex++) {
+		}
+		DocTopicItem mergedDocTopicItem = new DocTopicItem(
+			docTopicItems.get(firstNonNullDocTopicItemIndex));
+		for (int i = firstNonNullDocTopicItemIndex; i < docTopicItems.size(); i++) {
+			if (docTopicItems.get(i) == null)
+				continue;
+			DocTopicItem currDocTopicItem = docTopicItems.get(i);
+			try {
+				mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
+					mergedDocTopicItem, currDocTopicItem);
+			} catch (UnmatchingDocTopicItemsException e) {
+				e.printStackTrace(); //TODO handle it
+			}
+		}
+		return mergedDocTopicItem;
+	}
+	// #endregion PROCESSING -----------------------------------------------------
+
+	// #region IO ----------------------------------------------------------------
 	public void loadFromFile(String filename) throws FileNotFoundException {
 		logger.debug("Loading DocTopics from file...");
 		File f = new File(filename);
-
-		Scanner s = new Scanner(f);
-
 		dtItemList = new ArrayList<>();
-		
-		while (s.hasNext()) {
-			String line = s.nextLine();
-			if (line.startsWith("#")) {
-				continue;
-			}
-			String[] items = line.split("\\s+");
 
-			DocTopicItem dtItem = new DocTopicItem();
-			dtItem.doc = (Integer.valueOf(items[0])).intValue();
-			dtItem.source = items[1];
-
-			dtItem.topics = new ArrayList<>();
-
-			TopicItem t = new TopicItem();
-			for (int i = 2; i < items.length; i++) {
-				if (i % 2 == 0) {
-					t.topicNum = (Integer.valueOf(items[i])).intValue();
-				} else {
-					t.proportion = (Double.valueOf(items[i])).doubleValue();
-					dtItem.topics.add(t);
-					t = new TopicItem();
+		try (Scanner s = new Scanner(f)) {
+			while (s.hasNext()) {
+				String line = s.nextLine();
+				if (line.startsWith("#"))
+					continue;
+				String[] items = line.split("\\s+");
+	
+				DocTopicItem dtItem = new DocTopicItem();
+				dtItem.setDoc((Integer.valueOf(items[0])).intValue());
+				dtItem.setSource(items[1]);
+	
+				TopicItem t = new TopicItem();
+				for (int i = 2; i < items.length; i++) {
+					if (i % 2 == 0)
+						t.setTopicNum((Integer.valueOf(items[i])).intValue());
+					else {
+						t.setProportion((Double.valueOf(items[i])).doubleValue());
+						dtItem.addTopic(t);
+						t = new TopicItem(); //TODO Doesn't this nullify the previous two?
+					}
 				}
+				dtItemList.add(dtItem);
+				logger.debug(line);
 			}
-			dtItemList.add(dtItem);
-			logger.debug(line);
 		}
-		
+
 		logger.debug("\n");
-		for (DocTopicItem dtItem : dtItemList) {
-			logger.debug(dtItem);
-		}
-	}	
+		logger.debug(dtItemList);
+	}
+	// #endregion IO -------------------------------------------------------------
 }

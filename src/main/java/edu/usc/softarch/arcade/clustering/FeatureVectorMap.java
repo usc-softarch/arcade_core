@@ -58,19 +58,6 @@ public class FeatureVectorMap {
 	private Set<String> allNodesSet;
 	// #endregion FIELDS ---------------------------------------------------------
 
-	public void serializeAsFastFeatureVectors() {
-		FastFeatureVectors ffv = convertToFastFeatureVectors();
-		
-		//TODO Remove Config - This is only used in RsfReader, which initializes
-		//Config. So by refactoring RsfReader, I should be able to clean this up.
-		try(ObjectOutput out = new ObjectOutputStream(
-				new FileOutputStream(Config.getFastFeatureVectorsFilename()))) {
-			out.writeObject(ffv);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public FastFeatureVectors convertToFastFeatureVectors() {
 		return new FastFeatureVectors(
 			new ArrayList<>(allNodesSet),
@@ -108,14 +95,14 @@ public class FeatureVectorMap {
 
 		List<String> startNodesList = Lists.transform(
 				new ArrayList<StringTypedEdge>(edges),
-				(StringTypedEdge edge) -> edge.srcStr
+				(StringTypedEdge edge) -> edge.getSrcStr()
 				);
 
 		startNodesSet = Sets.newHashSet(startNodesList);
 
 		List<String> endNodesList = Lists.transform(
 				new ArrayList<StringTypedEdge>(edges),
-				(StringTypedEdge edge) -> edge.tgtStr
+				(StringTypedEdge edge) -> edge.getTgtStr()
 				);
 		TreeSet<String> endNodesSet = Sets.newTreeSet(endNodesList);
 		endNodesListWithNoDupes = Lists.newArrayList(endNodesSet);
@@ -182,103 +169,19 @@ public class FeatureVectorMap {
 		featureVectorNameToFeatureVectorMap = new HashMap<>();
 	}
 
-	public void writeXMLFeatureVectorMapUsingSootClassEdges() throws TransformerException,
-			ParserConfigurationException {
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-		// classgraph elements
-		Document doc = docBuilder.newDocument();
-		Element rootElement = doc.createElement("FeatureVectorMap");
-		doc.appendChild(rootElement);
-
-		// classedge elements
-		logger.trace("Printing out feature vector map...");
-		for (FeatureVector fv : sc_fv_map.values()) {
-			logger.trace(fv);
-			Element fvElem = doc.createElement("FeatureVector");
-			rootElement.appendChild(fvElem);
-
-			// set attribute to staff element
-			Attr attr = doc.createAttribute("name");
-			attr.setValue(fv.name);
-			fvElem.setAttributeNode(attr);
-
-			rootElement.appendChild(fvElem);
-			for (Feature f : fv) {
-				Element fElem = doc.createElement("Feature");
-				fvElem.appendChild(fElem);
-				Element ce = doc.createElement("ClassEdge");
-				fElem.appendChild(ce);
-				Element src = doc.createElement("src");
-				
-				SootClassEdge fSootEdge = null;
-				
-				if (f.edge instanceof SootClassEdge) {
-					fSootEdge = (SootClassEdge) f.edge;
-				}
-				if (fSootEdge != null) 
-					src.appendChild(doc.createTextNode(fSootEdge.src.toString()));
-				else
-					src.appendChild(doc.createTextNode(f.edge.srcStr));
-				
-				
-				Element tgt = doc.createElement("tgt");
-				
-				if (fSootEdge !=null) 
-					tgt.appendChild(doc.createTextNode(fSootEdge.tgt.toString()));
-				else 
-					tgt.appendChild(doc.createTextNode(f.edge.tgtStr));
-				
-				Element type = doc.createElement("type");
-				type.appendChild(doc.createTextNode(fSootEdge.getType()));
-				
-				ce.appendChild(src);
-				ce.appendChild(tgt);
-				ce.appendChild(type);
-
-				Element valueElem = doc.createElement("value");
-				fElem.appendChild(valueElem);
-				if (f.value == 1)
-					valueElem.appendChild(doc.createTextNode("1"));
-				else if (f.value == 0)
-					valueElem.appendChild(doc.createTextNode("0"));
-			}
-
-		}
-
-		// write the content into xml file
-		TransformerFactory transformerFactory = TransformerFactory
-				.newInstance();
-		Transformer transformer = transformerFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-		DOMSource source = new DOMSource(doc);
-		StreamResult result = new StreamResult(new File(
-				Config.getXMLFeatureVectorMapFilename()));
-		transformer.transform(source, result);
-
-		System.out.println("In "
-				+ Thread.currentThread().getStackTrace()[1].getClassName()
-				+ ". "
-				+ Thread.currentThread().getStackTrace()[1].getMethodName()
-				+ ", Wrote " + Config.getXMLFeatureVectorMapFilename());
-
-	}
-
 	public void constructFeatureVectorMapFromClassGraph(ClassGraph clg) {
 		for (SootClass caller : clg.getNodes()) {
 			FeatureVector vec = new FeatureVector();
-			vec.name = caller.toString();
+			vec.setName(caller.toString());
 			for (SootClass c : clg.getNodes()) {
 				SootClassEdge currEdge = null;
 				for (SootClassEdge edge : clg.getEdges()) {
 					currEdge = edge;
 					if (edge.getSrc().getName().trim().equals(c.getName().trim())) {
-						vec.add(new Feature(new SootClassEdge(edge), 1));
+						vec.add(new Feature(new SootClassEdge(edge), 1.0));
 					}
 				}
-				vec.add(new Feature(new SootClassEdge(currEdge), 0));
+				vec.add(new Feature(new SootClassEdge(currEdge), 0.0));
 			}
 			sc_fv_map.put(caller, vec);
 		}
