@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import edu.usc.softarch.arcade.clustering.acdc.ACDC;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 
@@ -56,8 +55,8 @@ public class ArchSmellDetectorTest {
 		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources"
       + "///struts-2.3.30_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
-		+ ".///target///test_results///ArchSmellDetectorTest"
-      + "///struts-2.3.30_acdc_clusters.rsf,"
+		+ ".///src///test///resources///ACDCTest_resources"
+      + "///struts-2.3.30_acdc_clustered.rsf,"
 		+ "struts-2.3.30_acdc_smells.ser",
 
 		// struts 2.5.2
@@ -66,8 +65,8 @@ public class ArchSmellDetectorTest {
 		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources"
       + "///struts-2.5.2_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
-		+ ".///target///test_results///ArchSmellDetectorTest"
-      + "///struts-2.5.2_acdc_clusters.rsf,"
+		+ ".///src///test///resources///ACDCTest_resources"
+      + "///struts-2.5.2_acdc_clustered.rsf,"
 		+ "struts-2.5.2_acdc_smells.ser",
 
 		// httpd 2.3.8
@@ -76,8 +75,8 @@ public class ArchSmellDetectorTest {
 		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources"
       + "///httpd-2.3.8_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
-		+ ".///target///test_results///ArchSmellDetectorTest"
-      + "///httpd-2.3.8_acdc_clusters.rsf,"
+		+ ".///src///test///resources///ACDCTest_resources"
+      + "///httpd-2.3.8_acdc_clustered.rsf,"
 		+ "httpd-2.3.8_acdc_smells.ser",
 
 		// httpd 2.4.26
@@ -86,8 +85,8 @@ public class ArchSmellDetectorTest {
 		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources"
       + "///httpd-2.4.26_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
-		+ ".///target///test_results///ArchSmellDetectorTest"
-      + "///httpd-2.4.26_acdc_clusters.rsf,"
+		+ ".///src///test///resources///ACDCTest_resources"
+      + "///httpd-2.4.26_acdc_clustered.rsf,"
 		+ "httpd-2.4.26_acdc_smells.ser",
 	})
 	public void asdWithoutConcernsTest(String oracle, String deps,
@@ -97,10 +96,8 @@ public class ArchSmellDetectorTest {
 		String depsPath = deps.replace("///", fs);
 		String outputPath = output.replace("///", fs);
 		String outputClustersPath = clusters.replace ("///", fs);
-		
-		// Get clusters
-		ACDC.run(depsPath, outputClustersPath);
 		String resultSerFilename = outputPath + fs + ser;
+
 		ArchSmellDetector asd =
       new ArchSmellDetector(depsPath, outputClustersPath, resultSerFilename);
 		
