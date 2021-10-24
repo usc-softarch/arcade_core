@@ -1,5 +1,7 @@
-name: GitHub Actions Test
-on: [push, workflow_dispatch]
+name: Windows Test
+on: 
+  workflow_dispatch:
+  push:
 jobs:
   Explore-GitHub-Actions:
     runs-on: windows-latest
