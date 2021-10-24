@@ -1,9 +1,7 @@
 package edu.usc.softarch.arcade.clustering.drivers;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
+import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.clustering.techniques.ConcernClusteringRunner;
 import edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder;
 import edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder;
@@ -99,15 +98,17 @@ public class BatchClusteringEngine {
 		builder.build(fullClassesDir, depsRsfFilename, ffVecsFilename);
 		if (builder.getEdges().isEmpty()) return;
 
+		FastFeatureVectors ffVecsResult = builder.getFfVecs();
+
 		// Set the number of topics to be used in clustering
-		int numTopics = (int) ((double) builder.getNumSourceEntities() * 0.18);
+		int numTopics = (int) (ffVecsResult.getNumSourceEntities() * 0.18);
 		
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
-			builder.getFfVecs(), fullSrcDir, outputDirName + "/base", language);
+			ffVecsResult, fullSrcDir, outputDirName + "/base", language);
 
 		// have to set some Config settings before executing the runner
 		// number of clusters to obtain is based on the number of entities
-		int numClusters = (int) ((double) runner.getFastClusters().size() * .20);
+		int numClusters = (int) (runner.getFastClusters().size() * .20);
 		runner.computeClustersWithConcernsAndFastClusters(
 			new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters),
 			"preselected", "js");
@@ -127,24 +128,6 @@ public class BatchClusteringEngine {
 		// Need to provide docTopics first
 		logger.debug("Running smell detecion for revision "	+ revisionNumber);
 
-		//Added for testing
-		//Serialization for test oracles.
-		/*
-		try{
-			//String resources_dir = ".///src///target///";
-			//resources_dir = resources_dir.replace("///", File.separator);
-
-			File out_docs = new File(revisionNumber + "_docTopics.txt");
-			out_docs.createNewFile();
-			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(out_docs,false));
-			oosDSmells2.writeObject(TopicUtil.docTopics);
-			oosDSmells2.flush();
-			oosDSmells2.close();
-
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		*/
 		ArchSmellDetector asd = new ArchSmellDetector(
 			depsRsfFile.getAbsolutePath(), arcClustersFilename,
 			detectedSmellsFilename, language,

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -68,16 +67,15 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 	// #region ACCESSORS ---------------------------------------------------------
 	public FastClusterArchitecture getInitialFastClusters() {
-		return this.initialFastClusters;
-	}
+		return this.initialFastClusters; }
 
 	public FastClusterArchitecture getFastClustersWithDocTopics() {
-		return this.fastClustersWithDocTopics;
-	}
+		return this.fastClustersWithDocTopics; }
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	public void computeClustersWithConcernsAndFastClusters(
-			StoppingCriterion stoppingCriterion, String stopCriterion, String simMeasure) {
+			StoppingCriterion stoppingCriterion, String stopCriterion,
+			String simMeasure) {
 		List<List<Double>> simMatrix =
 			fastClusters.createSimilarityMatrixUsingJSDivergence(simMeasure);
 
@@ -88,19 +86,20 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			}
 
 			MaxSimData data  = identifyMostSimClusters(simMatrix);
-			printDataForTwoMostSimilarClustersWithTopicsForConcerns(data);
 			FastCluster newCluster = mergeFastClustersUsingTopics(data);
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix, simMeasure);
-
-			logger.debug("after merge, clusters size: " + fastClusters.size());
 		}
-
-		logger.debug("max cluster gain: " + maxClusterGain);
-		logger.debug("num clusters at max cluster gain: "
-			+ numClustersAtMaxClusterGain);
 	}
 	
-	private static MaxSimData identifyMostSimClusters(List<List<Double>> simMatrix) {
+	/**
+	 * Looks for the smallest non-diagonal value in the matrix, which represents
+	 * the pair of clusters with the lowest level of divergence (highest
+	 * similarity).
+	 * 
+	 * @param simMatrix Similarity matrix to analyze.
+	 * @return The maximum-similarity cell.
+	 */
+	private MaxSimData identifyMostSimClusters(List<List<Double>> simMatrix) {
 		if (simMatrix.size() != fastClusters.size())
 			throw new IllegalArgumentException("expected simMatrix.size():"
 				+ simMatrix.size() + " to be fastClusters.size(): "
@@ -116,6 +115,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		msData.colIndex = 0;
 		double smallestJsDiv = Double.MAX_VALUE;
 
+		// Looks for the smallest value in the matrix
 		for (int i = 0; i < length; i++) {
 			for (int j = 0; j < length; j++) {
 				double currJsDiv = simMatrix.get(i).get(j);
@@ -133,14 +133,14 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 	private void initializeDocTopicsForEachFastCluster(
 			String srcDir, String artifactsDir) {
-		logger.debug("Initializing doc-topics for each cluster...");
-
+		// Initialize DocTopics from files
 		try {
 			TopicUtil.docTopics = new DocTopics(srcDir, artifactsDir, this.language);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+		// Set the DocTopics of each Cluster
 		for (FastCluster c : fastClusters)
 			TopicUtil.setDocTopicForFastClusterForMalletApi(c, this.language);
 		
@@ -151,48 +151,24 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				jspRemoveList.add(c);
 			}
 		}
-
-		logger.debug("Removing jspRemoveList from fastClusters");
 		for (FastCluster c : jspRemoveList)
 			fastClusters.remove(c);
 		
+		// Map inner classes to their parents
 		Map<String,String> parentClassMap = new HashMap<>();
 		for (FastCluster c : fastClusters) {
 			if (c.getName().contains("$")) {
-				logger.debug("Nested class singleton cluster with missing doc topic: " + c.getName());
 				String[] tokens = c.getName().split("\\$");
 				String parentClassName = tokens[0];
 				parentClassMap.put(c.getName(), parentClassName);
 			}
 		}
 		
-		logger.debug("Removing singleton clusters with no doc-topic and are non-inner classes...");
-		FastClusterArchitecture excessClusters = new FastClusterArchitecture();
-		for (FastCluster c : fastClusters) {
-			if (c.docTopicItem == null && !c.getName().contains("$")) {
-				logger.error("Could not find doc-topic for non-inner class: " + c.getName());
-				excessClusters.add(c);
-			}
-		}
-		
-		FastClusterArchitecture excessInners = new FastClusterArchitecture();
-		for (FastCluster excessCluster : excessClusters) {
-			for (FastCluster cluster : fastClusters) {
-				if (parentClassMap.containsKey(cluster)) {
-					String parentClass = parentClassMap.get(cluster);
-					if (parentClass.equals(excessCluster.getName()))
-						excessInners.add(cluster);
-				}
-			}
-		}
-
-		fastClusters.removeAll(excessClusters);
-		fastClusters.removeAll(excessInners);
+		removeClassesWithoutDTI(parentClassMap);
 
 		FastClusterArchitecture updatedFastClusters =
 			new FastClusterArchitecture(fastClusters);
 		for (String key : parentClassMap.keySet()) {
-			
 			for (FastCluster nestedCluster : fastClusters) {
 				if (nestedCluster.getName().equals(key)) {
 					for (FastCluster parentCluster : fastClusters) {
@@ -228,32 +204,36 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		if (ignoreMissingDocTopics) {
 			logger.debug("Removing clusters with missing doc topics...");
 			for (FastCluster c : clustersWithMissingDocTopics) {
-				logger.debug("Removing cluster: " + c.getName());
 				fastClusters.remove(c);
 			}
-			logger.debug("New initial clusters size: " + fastClusters.size());
+		}
+	}
+
+	private void removeClassesWithoutDTI(Map<String, String> parentClassMap) {
+		// Locate non-inner classes without DTI
+		FastClusterArchitecture excessClusters = new FastClusterArchitecture();
+		for (FastCluster c : fastClusters) {
+			if (c.docTopicItem == null && !c.getName().contains("$")) {
+				logger.error("Could not find doc-topic for non-inner class: " + c.getName());
+				excessClusters.add(c);
+			}
 		}
 		
-		logger.debug("New initial fast clusters:");
-		logger.debug(String.join("\n", fastClusters.stream()
-			.map(FastCluster::toString).collect(Collectors.toList())));
-	}
-	
-	private static void printDataForTwoMostSimilarClustersWithTopicsForConcerns(
-			MaxSimData data) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("In, "
-				+ Thread.currentThread().getStackTrace()[1].getMethodName()
-				+ ", \nMax Similar Clusters: ");
-			logger.debug("sim value(" + data.rowIndex + "," + data.colIndex + "): " + data.currentMaxSim);
-			logger.debug("\n");
-			logger.debug("most sim clusters: " + fastClusters.get(data.rowIndex).getName() + ", " + fastClusters.get(data.colIndex).getName());
-			TopicUtil.printTwoDocTopics(fastClusters.get(data.rowIndex).docTopicItem,
-				fastClusters.get(data.colIndex).docTopicItem);
-
-			logger.debug("before merge, fast clusters size: "
-				+ fastClusters.size());
+		// Locate inner classes of those non-inner classes without DTI
+		FastClusterArchitecture excessInners = new FastClusterArchitecture();
+		for (FastCluster excessCluster : excessClusters) {
+			for (FastCluster cluster : fastClusters) {
+				if (parentClassMap.containsKey(cluster.getName())) {
+					String parentClass = parentClassMap.get(cluster.getName());
+					if (parentClass.equals(excessCluster.getName()))
+						excessInners.add(cluster);
+				}
+			}
 		}
+
+		// Remove them from the analysis
+		fastClusters.removeAll(excessClusters);
+		fastClusters.removeAll(excessInners);
 	}
 	
 	private static FastCluster mergeFastClustersUsingTopics(MaxSimData data) {

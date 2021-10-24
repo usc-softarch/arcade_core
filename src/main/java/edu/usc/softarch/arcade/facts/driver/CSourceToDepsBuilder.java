@@ -4,13 +4,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.AbstractMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
@@ -21,7 +20,7 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 	public static int numSourceEntities = 0;
 	
 	@Override
-	public Set<Pair<String,String>> getEdges() {
+	public Set<Map.Entry<String,String>> getEdges() {
 		return this.edges;
 	}
 
@@ -54,23 +53,24 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		numSourceEntities = RsfReader.unfilteredFaCtS.size();
 		
 		TypedEdgeGraph typedEdgeGraph = new TypedEdgeGraph();
-		edges = new LinkedHashSet<Pair<String,String>>();
+		edges = new LinkedHashSet<Map.Entry<String,String>>();
 		for (List<String> fact : RsfReader.unfilteredFaCtS) {
 			String source = fact.get(1);
 			String target = fact.get(2);
 			
 			typedEdgeGraph.addEdge("depends",source,target);
 			
-			Pair<String,String> edge = new ImmutablePair<>(source,target);
+			Map.Entry<String,String> edge =
+				new AbstractMap.SimpleEntry<>(source,target);
 			edges.add(edge);
 		}
 		
 		Set<String> sources = new HashSet<>();
-		for (Pair<String,String> edge : edges) {
-			sources.add(edge.getLeft());
+		for (Map.Entry<String,String> edge : edges) {
+			sources.add(edge.getKey());
 		}
 		numSourceEntities = sources.size();
-		ffVecs = new FastFeatureVectors(typedEdgeGraph);
+		ffVecs = new FastFeatureVectors(edges);
 
 		ffVecs.serializeFFVectors(ffVecsFilename);
 	}
