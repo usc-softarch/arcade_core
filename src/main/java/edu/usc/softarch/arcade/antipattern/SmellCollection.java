@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.antipattern;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -36,6 +37,8 @@ public class SmellCollection extends HashSet<Smell> {
 	 * @param fileName Path to an output file to serialize into.
 	 */
   public void serializeSmellCollection(String fileName) throws IOException {
+    (new File(fileName)).getParentFile().mkdirs();
+
     try (PrintWriter writer =
 				new PrintWriter(fileName, StandardCharsets.UTF_8)) {
 			XStream xstream = new XStream();

@@ -118,7 +118,7 @@ public class BatchClusteringEngineTest {
 		// [expected clusters file name]
 
 		// struts 2.3.30
-		".src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_deps.rsf,"
+		".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_deps.rsf,"
 		+ "java,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_239_topics_234_arc_clusters.rsf,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_239_topics_234_arc_docTopics.json,"
@@ -127,7 +127,7 @@ public class BatchClusteringEngineTest {
 		+ ".///target///test_results///BatchClusteringEngineTest///struts-2.3.30_arc_smells.ser",
 
 		// struts 2.5.2
-		".src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_deps.rsf,"
+		".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_deps.rsf,"
 		+ "java,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_284_topics_275_arc_clusters.rsf,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_284_topics_275_arc_docTopics.json,"
@@ -136,7 +136,7 @@ public class BatchClusteringEngineTest {
 		+ ".///target///test_results///BatchClusteringEngineTest///struts-2.5.2_arc_smells.ser",
 
 		// httpd 2.3.8
-		".src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_deps.rsf,"
+		".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_deps.rsf,"
 		+ "c,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_46_topics_71_arc_clusters.rsf,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_46_topics_71_arc_docTopics.json,"
@@ -145,7 +145,7 @@ public class BatchClusteringEngineTest {
 		+ ".///target///test_results///BatchClusteringEngineTest///httpd-2.3.8_arc_smells.ser",
 
 		// httpd 2.4.26
-		".src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_deps.rsf,"
+		".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_deps.rsf,"
 		+ "c,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_50_topics_82_arc_clusters.rsf,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_50_topics_82_arc_docTopics.json,"
