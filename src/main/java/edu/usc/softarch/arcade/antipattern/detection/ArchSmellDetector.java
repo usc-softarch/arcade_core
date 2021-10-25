@@ -92,6 +92,27 @@ public class ArchSmellDetector {
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 	
 	// #region PUBLIC INTERFACE --------------------------------------------------
+	public static void main(String[] args) throws IOException {
+		String depsRsfFilename = args[0];
+		String clustersRsfFilename = args[1];
+		String detectedSmellsFilename = args[2];
+		String language = args[3];
+		String docTopicsPath = args[4];
+		String isArc = args[5];
+
+		if (isArc.equals("true")) {
+			TopicUtil.docTopics = DocTopics.deserializeDocTopics(docTopicsPath);
+			ArchSmellDetector asd = new ArchSmellDetector(depsRsfFilename,
+				clustersRsfFilename, detectedSmellsFilename, language,
+				TopicModelExtractionMethod.MALLET_API, TopicUtil.docTopics);
+			asd.run(true, true, true);
+		} else {
+			ArchSmellDetector asd = new ArchSmellDetector(depsRsfFilename,
+				clustersRsfFilename, detectedSmellsFilename);
+			asd.run(true, false, true);
+		}
+	}
+
 	public SmellCollection run(boolean runStructural, boolean runConcern, 
 			boolean runSerialize) throws IOException {
 		// Make sure at least one type of smell detection algorithms was selected

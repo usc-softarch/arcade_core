@@ -23,6 +23,13 @@ import org.apache.logging.log4j.Logger;
 public class ACDC {
 	private static final Logger logger = LogManager.getLogger(ACDC.class);
 	
+	public static void main(String[] args) {
+		String inputName = args[0];
+		String outputName = args[1];
+
+		run(inputName, outputName);
+	}
+
 	public static void run(String inputName, String outputName) {
 		IO.set_debug_level(0);
     int maxClusterSize = 20; //used by SubGraph pattern

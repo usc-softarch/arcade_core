@@ -18,10 +18,26 @@ import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
+	// #region INTERFACE ---------------------------------------------------------
+	public static void main(String[] args) throws IOException {
+		String classesDirPath = args[0];
+		String depsRsfFilename = args[1];
+		String ffVecsFilename = args[2];
+		String packagePrefix = args[3];
+
+		(new JavaSourceToDepsBuilder()).build(classesDirPath, depsRsfFilename, ffVecsFilename, packagePrefix);
+	}
+	// #endregion INTERFACE ------------------------------------------------------
+
 	// #region PROCESSING --------------------------------------------------------
 	@Override
 	public void build(String classesDirPath, String depsRsfFilename, String ffVecsFilename)
 			throws IOException {
+		build(classesDirPath, depsRsfFilename, ffVecsFilename, "");
+	}
+
+	public void build(String classesDirPath, String depsRsfFilename,
+			String ffVecsFilename, String packagePrefix) throws IOException {
 		String[] inputClasses = { FileUtil.tildeExpandPath(classesDirPath) };
 		String depsRsfFilepath = FileUtil.tildeExpandPath(depsRsfFilename);
 		(new File(depsRsfFilepath)).getParentFile().mkdirs();
@@ -34,7 +50,7 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 
 		// Building the dependency graph as a set of edges between classes
 		AtomicVertex[] graph = analyzer.getClassGraph();
-		this.edges = buildEdges(graph);
+		this.edges = buildEdges(graph, packagePrefix);
 		
 		// Prints the dependencies to a file
 		serializeEdges(this.edges, depsRsfFilepath);
@@ -55,7 +71,8 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 	 * 
 	 * @param graph A graph drawn from Classycle.
 	 */
-	private Set<Map.Entry<String, String>> buildEdges(AtomicVertex[] graph) {
+	private Set<Map.Entry<String, String>> buildEdges(
+			AtomicVertex[] graph, String packagePrefix) {
 		Set<Map.Entry<String, String>> edges = new LinkedHashSet<>();
 
 		// For each Vertex in the graph
@@ -63,6 +80,12 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 			// Get the attributes of the vertex
 			ClassAttributes sourceAttributes =
 				(ClassAttributes)vertex.getAttributes();
+
+			// Ignore edges where source is irrelevant
+			if (!packagePrefix.equals("")
+					&& !sourceAttributes.getName().startsWith(packagePrefix))
+				continue;
+
 			// And then for each edge of that vertex
 			for (int j = 0; j < vertex.getNumberOfOutgoingArcs(); j++) {
 				// Get the attributes of the related vertex
@@ -71,6 +94,7 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 				// Create a Pair to represent the edge
 				Map.Entry<String,String> edge = new AbstractMap.SimpleEntry<>(
 					sourceAttributes.getName(), targetAttributes.getName());
+
 				// And add it to the set of edges
 				edges.add(edge);
 			}
