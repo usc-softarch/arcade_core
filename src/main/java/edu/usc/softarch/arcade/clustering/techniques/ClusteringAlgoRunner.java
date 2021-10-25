@@ -43,11 +43,11 @@ public class ClusteringAlgoRunner {
 	protected static void initializeClusters(String srcDir, String language) {
 		fastClusters = new FastClusterArchitecture();
 
-		// For each node in the adjacency matrix
+		// For each cell in the adjacency matrix
 		for (String name : fastFeatureVectors.getFeatureVectorNames()) {
-			// Get the vector relative to that node
+			// Get the vector relative to that cell
 			BitSet featureSet = fastFeatureVectors.getNameToFeatureSetMap().get(name);
-			// Create a cluster containing only that node
+			// Create a cluster containing only that cell
 			FastCluster fastCluster = new FastCluster(name, featureSet,
 				fastFeatureVectors.getNamesInFeatureSet());
 			

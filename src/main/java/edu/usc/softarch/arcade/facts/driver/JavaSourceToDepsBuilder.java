@@ -2,28 +2,25 @@ package edu.usc.softarch.arcade.facts.driver;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.AbstractMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 
 import classycle.Analyser;
 import classycle.ClassAttributes;
 import classycle.graph.AtomicVertex;
-import edu.usc.softarch.arcade.clustering.FeatureVectorMap;
-import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
+import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 	// #region PROCESSING --------------------------------------------------------
-	public void build(String classesDirPath, String depsRsfFilename)
+	@Override
+	public void build(String classesDirPath, String depsRsfFilename, String ffVecsFilename)
 			throws IOException {
 		String[] inputClasses = { FileUtil.tildeExpandPath(classesDirPath) };
 		String depsRsfFilepath = FileUtil.tildeExpandPath(depsRsfFilename);
@@ -44,25 +41,13 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 		
 		// Calculating the number of source entities in dependency graph
 		Set<String> sources = new HashSet<>();
-		for (Pair<String,String> edge : edges)
-			sources.add(edge.getLeft());
+		for (Map.Entry<String,String> edge : edges)
+			sources.add(edge.getKey());
 		this.numSourceEntities = sources.size();
-		
-		// Creates a proper graph object to hold the edges set.
-		TypedEdgeGraph typedEdgeGraph = new TypedEdgeGraph();
-		for (Pair<String,String> edge : edges)
-			typedEdgeGraph.addEdge("depends", edge.getLeft(), edge.getRight());
-		FeatureVectorMap fvMap = new FeatureVectorMap(typedEdgeGraph);
-		this.ffVecs = fvMap.convertToFastFeatureVectors();
 
-		/*** BEGIN SERIALIZATION CODE ***/
-		// char fs = File.separatorChar;
-		// ObjectOutputStream oosffVecs = new ObjectOutputStream(new FileOutputStream("." + fs + "src" + fs + "test" + fs + "resources"
-		// 	+ fs +"ConcernClusteringRunnerTest_resources" + fs + "ffVecs_serialized" + fs + 
-		// 	"struts-2.3.30_ffVecs_builder.txt"));
-		// oosffVecs.writeObject(ffVecs);
-		// oosffVecs.close();
-		/*** END SERIALIZATION CODE ***/
+		this.ffVecs = new FastFeatureVectors(edges);
+
+		this.ffVecs.serializeFFVectors(ffVecsFilename);
 	}
 
 	/**
@@ -70,8 +55,8 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 	 * 
 	 * @param graph A graph drawn from Classycle.
 	 */
-	private Set<Pair<String, String>> buildEdges(AtomicVertex[] graph) {
-		Set<Pair<String, String>> edges = new LinkedHashSet<>();
+	private Set<Map.Entry<String, String>> buildEdges(AtomicVertex[] graph) {
+		Set<Map.Entry<String, String>> edges = new LinkedHashSet<>();
 
 		// For each Vertex in the graph
 		for (AtomicVertex vertex : graph) {
@@ -84,7 +69,7 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 				ClassAttributes targetAttributes =
 					(ClassAttributes)vertex.getHeadVertex(j).getAttributes();
 				// Create a Pair to represent the edge
-				Pair<String,String> edge = new ImmutablePair<>(
+				Map.Entry<String,String> edge = new AbstractMap.SimpleEntry<>(
 					sourceAttributes.getName(), targetAttributes.getName());
 				// And add it to the set of edges
 				edges.add(edge);
@@ -96,12 +81,12 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 	// #endregion PROCESSING -----------------------------------------------------
 
 	// #region IO ----------------------------------------------------------------
-	private void serializeEdges(Set<Pair<String, String>> edges,
+	private void serializeEdges(Set<Map.Entry<String, String>> edges,
 			String depsRsfFilepath) throws FileNotFoundException{
 		PrintStream out = new PrintStream(depsRsfFilepath);
 		PrintWriter writer = new PrintWriter(out);
-		for (Pair<String,String> edge : edges) {
-			writer.println("depends " + edge.getLeft() + " " + edge.getRight());
+		for (Map.Entry<String,String> edge : edges) {
+			writer.println("depends " + edge.getKey() + " " + edge.getValue());
 		}
 		writer.close();
 	}

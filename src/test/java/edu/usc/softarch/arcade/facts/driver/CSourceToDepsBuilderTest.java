@@ -33,13 +33,15 @@ public class CSourceToDepsBuilderTest {
 		// httpd 2.3.8
 		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
 		+ ".///target///test_results///CSourceToDepsBuilderTest///httpd-2.3.8_buildTestResult.rsf,"
-		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.3.8_deps.rsf",
+		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.3.8_deps.rsf,"
+		+ ".///target///test_results///CSourceToDepsBuilderTest///httpd-2.3.8_buildTestResult_ffVecs.json",
 		// httpd 2.4.26
 		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
 		+ ".///target///test_results///CSourceToDepsBuilderTest///httpd-2.4.26_buildTestResult.rsf,"
-		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.4.26_deps.rsf",
+		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.4.26_deps.rsf,"
+		+ ".///target///test_results///CSourceToDepsBuilderTest///httpd-2.4.26_buildTestResult_ffVecs.json",
 	})
-	public void buildTest(String classesDirPath, String depsRsfFilename, String oraclePath){
+	public void buildTest(String classesDirPath, String depsRsfFilename, String oraclePath, String ffVecsFilename){
 		/** Builds the dependencies RSF file for C system **/
 		// Format the paths properly
 		String classes = classesDirPath.replace("///", File.separator);
@@ -47,7 +49,7 @@ public class CSourceToDepsBuilderTest {
 		String oracle = oraclePath.replace("///", File.separator);
 
 		// Run CSourceToDepsBuilder.build()
-		assertDoesNotThrow(() -> (new CSourceToDepsBuilder()).build(classes, deps));
+		assertDoesNotThrow(() -> (new CSourceToDepsBuilder()).build(classes, deps, ffVecsFilename));
 		String result = assertDoesNotThrow(() ->
 			{ return FileUtil.readFile(deps, StandardCharsets.UTF_8); });
 

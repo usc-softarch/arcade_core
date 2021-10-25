@@ -137,8 +137,7 @@ public class ArchSmellDetectorTest {
     + "///runStructuralDetectionAlgs_resources"
       + "///struts-2.3.30_output_run_clusters.txt,"
     + "///runStructuralDetectionAlgs_resources"
-      + "///struts-2.3.30_output_run_detected_smells.txt,"
-    + "struts-2.3.30",
+      + "///struts-2.3.30_output_run_detected_smells.txt",
 
     //Input for asd constructor to run on struts-2.5.2
     "///input_files///struts-2.5.2_deps.rsf,"
@@ -150,8 +149,7 @@ public class ArchSmellDetectorTest {
     + "///runStructuralDetectionAlgs_resources"
       + "///struts-2.5.2_output_run_clusters.txt,"
     + "///runStructuralDetectionAlgs_resources"
-      + "///struts-2.5.2_output_run_detected_smells.txt,"
-    + "struts-2.5.2",
+      + "///struts-2.5.2_output_run_detected_smells.txt",
 
     //Input for asd constructor to run on httpd 2.3.8
     //TODO RESOURCES ARE PLACEHOLDERS REPLACE LATER
@@ -164,8 +162,7 @@ public class ArchSmellDetectorTest {
     + "///runStructuralDetectionAlgs_resources"
       + "///httpd-2.3.8_output_run_clusters.txt,"
     + "///runStructuralDetectionAlgs_resources"
-      + "///httpd-2.3.8_output_run_detected_smells.txt,"
-    + "httpd-2.3.8",
+      + "///httpd-2.3.8_output_run_detected_smells.txt",
 
     //Input for asd constructor to run on httpd 2.4.26
     //TODO RESOURCES ARE PLACEHOLDERS REPLACE LATER
@@ -178,14 +175,13 @@ public class ArchSmellDetectorTest {
     + "///runStructuralDetectionAlgs_resources"
       + "///httpd-2.4.26_output_run_clusters.txt,"
     + "///runStructuralDetectionAlgs_resources"
-      + "///httpd-2.4.26_output_run_detected_smells.txt,"
-    + "httpd-2.4.26",
+      + "///httpd-2.4.26_output_run_detected_smells.txt",
   })
   @ParameterizedTest
   public void runStructuralDetectionAlgsTest(String depsRsfFilename,
       String clustersRsfFilename, String detectedSmellsFilename, 
       String clusterSmellMapObjectFile, String clusterObjectFile,
-      String smellsObjectFile, String version) {
+      String smellsObjectFile) {
     String resources_dir =
       "src///test///resources///ArchSmellDetectorTest_resources///";
     resources_dir = resources_dir.replace("///", fs);
@@ -200,7 +196,7 @@ public class ArchSmellDetectorTest {
     smellsObjectFile = smellsObjectFile.replace("///", fs);
 
     ArchSmellDetector asd = new ArchSmellDetector(
-      depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, version);
+      depsRsfFilename, clustersRsfFilename, detectedSmellsFilename);
     
     // Initialize variables
 		SmellCollection detectedSmells = new SmellCollection();
@@ -354,8 +350,7 @@ public class ArchSmellDetectorTest {
     + "///output///struts-2.3.30_acdc_clustered.rsf,"
     + "///output///struts-2.3.30_acdc_smells.ser,"
     + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_clusterSmellMap_after.txt,"
-    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_smellClusterMap_after.txt,"
-    + "struts-2.3.30",
+    + "///runConcernDetectionAlgs_resources///struts-2.3.30_output_smellClusterMap_after.txt",
 
 
     //Input for asd constructor to run on struts-2.5.2
@@ -363,12 +358,11 @@ public class ArchSmellDetectorTest {
     + "///output///struts-2.5.2_acdc_clustered.rsf,"
     + "///output///struts-2.5.2_acdc_smells.ser,"
     + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_clusterSmellMap_after.txt,"
-    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_smellClusterMap_after.txt,"
-    + "struts-2.5.2",
+    + "///runConcernDetectionAlgs_resources///struts-2.5.2_output_smellClusterMap_after.txt",
   })
   @ParameterizedTest
   public void buildSmellToClustersMapTest(String depsRsfFilename, String clustersRsfFilename, String detectedSmellsFilename, 
-                                          String clusterSmellMapBefore, String clusterSmellMapAter, String version) {
+                                          String clusterSmellMapBefore, String clusterSmellMapAter) {
     String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///";
     resources_dir = resources_dir.replace("///", File.separator);
 
@@ -380,7 +374,7 @@ public class ArchSmellDetectorTest {
     clusterSmellMapAter = clusterSmellMapAter.replace("///", File.separator);
 
     ArchSmellDetector asd = new ArchSmellDetector(
-      depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, version);
+      depsRsfFilename, clustersRsfFilename, detectedSmellsFilename);
 
     try {
       //Read in the clusterSmellMap

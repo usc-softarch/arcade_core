@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import cc.mallet.util.Maths;
 
 import java.util.ArrayList;
@@ -51,12 +53,17 @@ public class DocTopicItem implements Serializable {
 	// #region ACCESSORS ---------------------------------------------------------
 	public int getDoc() { return this.doc; }
 	public String getSource() { return this.source; }
+	@JsonIgnore
 	public List<TopicItem> getTopics() {
 		return new ArrayList<>(topics.values()); }
+	public Map<Integer, TopicItem> getTopicsForJackson() {
+		return this.topics;
+	}
 	public Sort getSortMethod() { return this.sortMethod; }
 	public int size() { return this.topics.size(); }
 	public TopicItem getTopic(int topicNum) { return this.topics.get(topicNum); }
 	public boolean hasTopic(int topicNum) { return topics.containsKey(topicNum); }
+	@JsonIgnore
 	public Set<Integer> getTopicNumbers() { return this.topics.keySet(); }
 
 	public void setDoc(int doc) { this.doc = doc; }
@@ -83,6 +90,7 @@ public class DocTopicItem implements Serializable {
 		}
 	}
 
+	@JsonIgnore
 	public boolean isCSourced() {
 		return source.endsWith(".c") || source.endsWith(".h")
 			|| source.endsWith(".tbl") || source.endsWith(".p")
