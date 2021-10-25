@@ -144,16 +144,6 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		for (FastCluster c : fastClusters)
 			TopicUtil.setDocTopicForFastClusterForMalletApi(c, this.language);
 		
-		FastClusterArchitecture jspRemoveList = new FastClusterArchitecture();
-		for (FastCluster c : fastClusters) {
-			if (c.getName().endsWith("_jsp")) {
-				logger.debug("Adding " + c.getName() + " to jspRemoveList...");
-				jspRemoveList.add(c);
-			}
-		}
-		for (FastCluster c : jspRemoveList)
-			fastClusters.remove(c);
-		
 		// Map inner classes to their parents
 		Map<String,String> parentClassMap = new HashMap<>();
 		for (FastCluster c : fastClusters) {

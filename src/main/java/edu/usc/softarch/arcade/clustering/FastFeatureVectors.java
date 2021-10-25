@@ -13,10 +13,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class FastFeatureVectors implements Serializable {
 	// #region ATTRIBUTES --------------------------------------------------------
+	private static ObjectMapper mapper;
 	private static final long serialVersionUID = -8870834810415855677L;
 
 	private List<String> featureVectorNames = new ArrayList<>();
@@ -26,6 +35,11 @@ public class FastFeatureVectors implements Serializable {
 	// #endregion ATTRIBUTES -----------------------------------------------------
 
 	// #region CONSTRUCTORS ------------------------------------------------------
+	/**
+	 * Used by Jackson for deserialization.
+	 */
+	private FastFeatureVectors() { super(); }
+
 	public FastFeatureVectors(Set<Map.Entry<String,String>> edges) {
 		// Make a List with the sources of all edges
 		List<String> startNodesList =
@@ -34,19 +48,12 @@ public class FastFeatureVectors implements Serializable {
 		this.numSourceEntities = new HashSet<>(startNodesList).size();
 
 		// Make a List with the targets of all edges
-		List<String> endNodesList =
-		edges.stream().map(Map.Entry::getValue).collect(Collectors.toList());
-
-		// Make a List after removing the duplicate targets
-		Set<String> endNodesSet = new HashSet<>(endNodesList);
-		List<String> endNodesListWithNoDupes = new ArrayList<>(endNodesSet);
+		Set<String> endNodesListWithNoDupes =
+		edges.stream().map(Map.Entry::getValue).collect(Collectors.toSet());
 		
-		// Make a List with all sources and non-duplicate targets
-		List<String> allNodesList = new ArrayList<>(startNodesList);
-		allNodesList.addAll(endNodesListWithNoDupes);
-		
-		// Remove duplicates
-		Set<String> allNodesSet = new HashSet<>(allNodesList);
+		// Make a Set with all nodes
+		Set<String> allNodesSet = new HashSet<>(startNodesList);
+		allNodesSet.addAll(endNodesListWithNoDupes);
 
 		for (String source : allNodesSet) {
 			BitSet featureSet = new BitSet(endNodesListWithNoDupes.size());
@@ -63,7 +70,7 @@ public class FastFeatureVectors implements Serializable {
 		}
 
 		this.setFeatureVectorNames(new ArrayList<>(allNodesSet));
-		this.namesInFeatureSet = endNodesListWithNoDupes;
+		this.namesInFeatureSet = new ArrayList<>(endNodesListWithNoDupes);
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
@@ -91,16 +98,55 @@ public class FastFeatureVectors implements Serializable {
 	}
 
 	// #region SERIALIZATION -----------------------------------------------------
-	public void serializeFFVectors(String filePath)
-			throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(new File(filePath), this);
+	public void serializeFFVectors(String filePath) throws IOException {
+		getSerializationMapper().writeValue(new File(filePath), this);
 	}
 
 	public static FastFeatureVectors deserializeFFVectors(String filePath)
 			throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		return mapper.readValue(new File(filePath), FastFeatureVectors.class);
+		return getSerializationMapper().readValue(
+			new File(filePath), FastFeatureVectors.class);
+	}
+
+	private static class BitSetSerializer extends JsonSerializer<BitSet> {
+		@Override
+		public void serialize(BitSet value, JsonGenerator gen,
+				SerializerProvider serializers) throws IOException {
+			gen.writeStartArray();
+			for (long l : value.toLongArray())
+				gen.writeNumber(l);
+			gen.writeEndArray();
+		}
+
+		@Override
+		public Class<BitSet> handledType() {
+			return BitSet.class;
+		}
+	}
+
+	private static class BitSetDeserializer extends JsonDeserializer<BitSet> {
+		@Override
+		public BitSet deserialize(JsonParser jsonParser,
+				DeserializationContext deserializationContext) throws IOException {
+			ArrayList<Long> l = new ArrayList<>();
+			JsonToken token;
+			while (!JsonToken.END_ARRAY.equals(token = jsonParser.nextValue()))
+				if (token.isNumeric())
+					l.add(jsonParser.getLongValue());
+
+			return BitSet.valueOf(l.stream().mapToLong(i -> i).toArray());
+		}
+	}
+
+	private static ObjectMapper getSerializationMapper() {
+		if (FastFeatureVectors.mapper != null) return FastFeatureVectors.mapper;
+
+		FastFeatureVectors.mapper = new ObjectMapper();
+		SimpleModule bitSetModule = new SimpleModule("BitSetModule");
+		bitSetModule.addSerializer(new BitSetSerializer());
+		bitSetModule.addDeserializer(BitSet.class, new BitSetDeserializer());
+		FastFeatureVectors.mapper.registerModule(bitSetModule);
+		return FastFeatureVectors.mapper;
 	}
 	// #endregion SERIALIZATION --------------------------------------------------
 }

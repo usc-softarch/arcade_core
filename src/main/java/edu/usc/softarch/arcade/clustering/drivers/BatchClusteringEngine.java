@@ -72,7 +72,6 @@ public class BatchClusteringEngine {
 
 		// Set up variables
 		String fs = File.separator;
-		logger.debug("Processing directory: " + folder.getName());
 		String revisionNumber = folder.getName();
 		String fullClassesDir =	folder.getAbsolutePath() + fs + inClassesDir;
 		String fullSrcDir = folder.getAbsolutePath() + fs;
@@ -83,22 +82,18 @@ public class BatchClusteringEngine {
 			throw new IOException("Could not find classDir at given path.");
 
 		// Ensure output directory exists
+		String ffVecsFilename = outputDirName + fs + revisionNumber + "_ffVecs.json";
 		String depsRsfFilename = outputDirName + fs + revisionNumber + "_deps.rsf";
 		File depsRsfFile = new File(depsRsfFilename);
 		depsRsfFile.getParentFile().mkdirs();
 
-		String ffVecsFilename = outputDirName + fs + revisionNumber + "_ffVecs.json";
-		File ffVecsFile = new File(ffVecsFilename);
-		ffVecsFile.getParentFile().mkdirs();
-
 		// Fact extraction
-		logger.debug("Get deps for revision " + revisionNumber);
 		SourceToDepsBuilder builder = new JavaSourceToDepsBuilder();
 		if (language.equals("c"))	builder = new CSourceToDepsBuilder();
 		builder.build(fullClassesDir, depsRsfFilename, ffVecsFilename);
 		if (builder.getEdges().isEmpty()) return;
 
-		FastFeatureVectors ffVecsResult = builder.getFfVecs();
+		FastFeatureVectors ffVecsResult = FastFeatureVectors.deserializeFFVectors(ffVecsFilename);
 
 		// Set the number of topics to be used in clustering
 		int numTopics = (int) (ffVecsResult.getNumSourceEntities() * 0.18);
@@ -124,9 +119,6 @@ public class BatchClusteringEngine {
 
 		String detectedSmellsFilename = outputDirName + fs + revisionNumber
 			+ "_arc_smells.ser";
-
-		// Need to provide docTopics first
-		logger.debug("Running smell detecion for revision "	+ revisionNumber);
 
 		ArchSmellDetector asd = new ArchSmellDetector(
 			depsRsfFile.getAbsolutePath(), arcClustersFilename,
