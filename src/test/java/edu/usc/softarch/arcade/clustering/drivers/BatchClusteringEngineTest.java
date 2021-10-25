@@ -29,7 +29,7 @@ public class BatchClusteringEngineTest {
 		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.3.30,"
 		+ "java,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30///arc,"
-		+ "lib_struts,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_ffVecs.json,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_239_topics_234_arc_clusters.rsf,"
 		+ "struts-2.3.30_239_topics_234_arc_clusters.rsf",
 
@@ -37,7 +37,7 @@ public class BatchClusteringEngineTest {
 		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.5.2,"
 		+ "java,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2///arc,"
-		+ "lib_struts,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_ffVecs.json,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_284_topics_275_arc_clusters.rsf,"
 		+ "struts-2.5.2_284_topics_275_arc_clusters.rsf",
 
@@ -45,7 +45,7 @@ public class BatchClusteringEngineTest {
 		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
 		+ "c,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8///arc,"
-		+ "/,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_ffVecs.json,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_46_topics_71_arc_clusters.rsf,"
 		+ "httpd-2.3.8_46_topics_71_arc_clusters.rsf",
 
@@ -53,12 +53,12 @@ public class BatchClusteringEngineTest {
 		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
 		+ "c,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26///arc,"
-		+ "/,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_ffVecs.json,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_50_topics_82_arc_clusters.rsf,"
 		+ "httpd-2.4.26_50_topics_82_arc_clusters.rsf"
 	})
 	public void ARCRecoveryTest(String sysVersionDir, String lang,
-			String testOutputDir, String classesDir, String oraclePath,
+			String testOutputDir, String ffVecsFilepath, String oraclePath,
 			String arcFilename) {
 		/** Tests ARC recovery for a single version of a system **/
 		// Format paths
@@ -66,8 +66,11 @@ public class BatchClusteringEngineTest {
 		String outputDirName = testOutputDir.replace("///", File.separator);
 		String oracleFilePath = oraclePath.replace("///", File.separator);
 
+		File sysDirFile = new File(sysDir);
+
 		assertDoesNotThrow(() -> {
-			BatchClusteringEngine.single(new File(sysDir), lang, outputDirName, classesDir);
+			BatchClusteringEngine.runARC(lang, outputDirName, sysDirFile.getName(),
+				sysDirFile.getAbsolutePath() + File.separator, ffVecsFilepath);
 		});
 
 		// Result file with clusters

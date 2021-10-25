@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.clustering.drivers;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -37,15 +38,6 @@ public class BatchClusteringEngine {
 		
 		File[] files = inputDir.listFiles();
 		Set<File> fileSet = new TreeSet<>(Arrays.asList(files));
-		List<String> fileSetNames =
-			fileSet.stream().map(File::toString).collect(Collectors.toList());
-
-		// Logging
-		logger.debug("All files in " + inputDir + ":");
-		logger.debug(String.join("\n", fileSetNames));
-		for (File file : fileSet)
-			if (file.isDirectory())
-				logger.debug("Identified directory: " + file.getName());
 		
 		// location of classes file, jar, or zip
 		String inClassesDir = args[2];
@@ -93,7 +85,25 @@ public class BatchClusteringEngine {
 		builder.build(fullClassesDir, depsRsfFilename, ffVecsFilename);
 		if (builder.getEdges().isEmpty()) return;
 
-		FastFeatureVectors ffVecsResult = FastFeatureVectors.deserializeFFVectors(ffVecsFilename);
+		// Runs all of the clustering in ARC
+		String arcClustersFilename = runARC(language, outputDirName,
+			revisionNumber, fullSrcDir, ffVecsFilename);
+
+		String detectedSmellsFilename = outputDirName + fs + revisionNumber
+			+ "_arc_smells.ser";
+
+		ArchSmellDetector asd = new ArchSmellDetector(
+			depsRsfFile.getAbsolutePath(), arcClustersFilename,
+			detectedSmellsFilename, language,
+			TopicModelExtractionMethod.MALLET_API, TopicUtil.docTopics);
+		asd.run(true, true, true);
+	}
+
+	public static String runARC(String language, String outputDirName,
+			String revisionNumber, String fullSrcDir, String ffVecsFilename)
+			throws IOException {
+		FastFeatureVectors ffVecsResult =
+			FastFeatureVectors.deserializeFFVectors(ffVecsFilename);
 
 		// Set the number of topics to be used in clustering
 		int numTopics = (int) (ffVecsResult.getNumSourceEntities() * 0.18);
@@ -108,22 +118,16 @@ public class BatchClusteringEngine {
 			new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters),
 			"preselected", "js");
 
-		String arcClustersFilename = outputDirName + fs	+ revisionNumber + "_"
-			+ numTopics + "_topics_" + runner.getFastClusters().size()
-			+ "_arc_clusters.rsf";
+		String arcClustersFilename = outputDirName + File.separator
+			+ revisionNumber + "_" + numTopics + "_topics_"
+			+ runner.getFastClusters().size()	+ "_arc_clusters.rsf";
+
 		// need to build the map before writing the file
 		Map<String, Integer> clusterNameToNodeNumberMap =
 			runner.getFastClusters().createFastClusterNameToNodeNumberMap();
 		runner.getFastClusters().writeFastClustersRsfFile(
 			clusterNameToNodeNumberMap, arcClustersFilename);
 
-		String detectedSmellsFilename = outputDirName + fs + revisionNumber
-			+ "_arc_smells.ser";
-
-		ArchSmellDetector asd = new ArchSmellDetector(
-			depsRsfFile.getAbsolutePath(), arcClustersFilename,
-			detectedSmellsFilename, language,
-			TopicModelExtractionMethod.MALLET_API, TopicUtil.docTopics);
-		asd.run(true, true, true);
+		return arcClustersFilename;
 	}
 }
