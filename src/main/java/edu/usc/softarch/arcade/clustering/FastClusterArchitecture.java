@@ -48,6 +48,7 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 			String currentClustersDetailedRsfFilename)
 			throws FileNotFoundException {
 		File rsfFile = new File(currentClustersDetailedRsfFilename);
+		rsfFile.getParentFile().mkdirs();
 
     try (PrintWriter out = new PrintWriter(
         new OutputStreamWriter(

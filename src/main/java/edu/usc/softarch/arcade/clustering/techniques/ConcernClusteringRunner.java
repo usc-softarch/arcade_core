@@ -1,5 +1,7 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,6 +75,68 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		return this.fastClustersWithDocTopics; }
 	// #endregion ACCESSORS ------------------------------------------------------
 
+	// #region INTERFACE ---------------------------------------------------------
+	/**
+	 * Entry point runner for ARC.
+	 * 
+	 * args[0]: Language of the subject system, java or c.
+	 * args[1]: Path of the output directory to put the results in.
+	 * args[2]: Path to the subject system's root directory.
+	 * args[3]: Path to the FastFeatureVectors JSON file.
+	 * args[4]: Path to the directory with the mallet artifacts.
+	 * 
+	 * @param args Arguments as per documentation above.
+	 */
+	public static void main(String[] args) throws IOException {
+		String language = args[0];
+		String outputDirPath = args[1];
+		String sysDirPath = args[2];
+		String ffVecsFilePath = args[3];
+		String artifactsDirPath = args[4];
+
+		runARC(language, outputDirPath, sysDirPath,
+			ffVecsFilePath, artifactsDirPath);
+	}
+
+	/**
+	 * Runs ARC.
+	 * 
+	 * @param language Language of the subject system, java or c.
+	 * @param outputDirPath Path of the output directory to put the results in.
+	 * @param sysDirPath Path to the subject system's root directory.
+	 * @param ffVecsFilePath Path to the FastFeatureVectors JSON file.
+	 * @param artifactsDirPath Path to the directory with the mallet artifacts.
+	 */
+	public static void runARC(String language, String outputDirPath,
+			String sysDirPath, String ffVecsFilePath, String artifactsDirPath)
+			throws IOException {
+		String revisionNumber = (new File(sysDirPath)).getName();
+		FastFeatureVectors ffVecs =
+			FastFeatureVectors.deserializeFFVectors(ffVecsFilePath);
+		int numTopics = (int) (ffVecs.getNumSourceEntities() * 0.18);
+
+		ConcernClusteringRunner runner = new ConcernClusteringRunner(
+			ffVecs, sysDirPath, artifactsDirPath, language);
+		int numClusters = (int) (runner.getFastClusters().size() * .20);
+		runner.computeClustersWithConcernsAndFastClusters(
+			new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters),
+			"preselected", "js");
+		
+		String arcClustersFilename = outputDirPath + File.separator
+			+ revisionNumber + "_" + numTopics + "_topics_"
+			+ runner.getFastClusters().size()	+ "_arc_clusters.rsf";
+		String docTopicsFilename = outputDirPath + File.separator
+			+ revisionNumber + "_" + numTopics + "_topics_"
+			+ runner.getFastClusters().size() + "_arc_docTopics.json";
+
+		Map<String, Integer> clusterNameToNodeNumberMap =
+			runner.getFastClusters().createFastClusterNameToNodeNumberMap();
+		runner.getFastClusters().writeFastClustersRsfFile(
+			clusterNameToNodeNumberMap, arcClustersFilename);
+		TopicUtil.docTopics.serializeDocTopics(docTopicsFilename);
+	}
+	// #endregion INTERFACE ------------------------------------------------------
+
 	public void computeClustersWithConcernsAndFastClusters(
 			StoppingCriterion stoppingCriterion, String stopCriterion,
 			String simMeasure) {
@@ -135,7 +199,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			String srcDir, String artifactsDir) {
 		// Initialize DocTopics from files
 		try {
-			TopicUtil.docTopics = new DocTopics(srcDir, artifactsDir, this.language);
+			TopicUtil.docTopics = new DocTopics(artifactsDir);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

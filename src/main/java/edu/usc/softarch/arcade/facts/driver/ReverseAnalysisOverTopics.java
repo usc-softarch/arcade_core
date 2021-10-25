@@ -1,10 +1,6 @@
 package edu.usc.softarch.arcade.facts.driver;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,16 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import cc.mallet.util.Maths;
 
-import edu.usc.softarch.arcade.clustering.ClusterUtil;
 import edu.usc.softarch.arcade.clustering.Entity;
-import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
-import edu.usc.softarch.arcade.topics.TopicUtil;
 
 public class ReverseAnalysisOverTopics {
 	static Map<String, Integer> featureNameToBitsetIndex = new HashMap<>();
@@ -96,17 +86,6 @@ public class ReverseAnalysisOverTopics {
 		}
 	}
 
-	private static void writeToFile(Double content) {
-		String str = "";
-		str += content + ",";
-
-		try {
-			out.write(str);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public static double getInfoLossMeasure(int numberOfEntitiesToBeClustered,
 			Entity entity1, Entity entity2) {
 		double[] firstDist = new double[bitSetSize];
@@ -145,184 +124,5 @@ public class ReverseAnalysisOverTopics {
 				firstDist[i] = 0;
 			}
 		}
-	}
-
-	/**
-	 * method that calculates the result for every cluster and displays it
-	 * 
-	 * @throws IOException
-	 */
-	private static void calculateResults(
-			Map<String, Map<String, Entity>> clusterNameToEntities) {
-		Set<String> orderedClusterNames = new TreeSet<>(
-				clusterNameToEntities.keySet());
-		for (String clusterName : orderedClusterNames) {
-			double clusterSimUsingJSDivergence = computeJSDivergence(
-					clusterName, clusterNameToEntities);
-			writeToFile(clusterSimUsingJSDivergence);
-		}
-	}
-
-	/**
-	 * Arguments are:
-	 * 0 - *_deps.rsf file for a given system
-	 * 1 - *_clean_ground_truth_recovery.rsf for the same system
-	 */
-	public static void main(String[] args) {
-		String depsFile = args[0];
-		String gtFile = args[1];
-		RsfReader.loadRsfDataFromFile(depsFile);
-		List<List<String>> depFacts = RsfReader.unfilteredFaCtS;
-		RsfReader.loadRsfDataFromFile(gtFile);
-		List<List<String>> clusterFacts = RsfReader.unfilteredFaCtS;
-
-		System.out.println("Finished loading data from both files");
-
-		Map<Integer, String> docTopicFilesMap = buildDocTopicFilesMap();
-
-		initializeFileIO();
-
-		Map<String, Set<String>> clusterMap =
-			ClusterUtil.buildClusterMap(clusterFacts);
-		Map<String, Map<String, Entity>> clusterNameToEntities =
-			buildFeatureSetPerClusterEntity(clusterMap, depFacts);
-
-		Set<Integer> numTopicsSet = new TreeSet<>(docTopicFilesMap.keySet());
-		Set<String> orderedClusterNames =
-			new TreeSet<>(clusterNameToEntities.keySet());
-
-		try {
-			out.write(",");
-			for (String clusterName : orderedClusterNames)
-				out.write(clusterName + ",");
-			out.newLine();
-
-			for (int numTopics : numTopicsSet) {
-				String docTopicsFilename = docTopicFilesMap.get(numTopics);
-				
-				// Reset topic model data
-				TopicUtil.docTopics = null;
-				for (String clusterName : clusterNameToEntities.keySet()) {
-					Map<String, Entity> nameToEntity = clusterNameToEntities
-							.get(clusterName);
-					for (String entityName : nameToEntity.keySet()) {
-						Entity entity = nameToEntity.get(entityName);
-						entity.docTopicItem = null;
-					}
-				}
-				
-				initializeDocTopicsUsingFile(clusterNameToEntities,
-						docTopicsFilename, "java");
-
-				out.write("JSDivergence" + numTopics + ",");
-
-				calculateResults(clusterNameToEntities);
-				out.newLine();
-			}
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static Map<Integer, String> buildDocTopicFilesMap() {
-		Map<Integer, String> docTopicFilesMap = new HashMap<>();
-		try (BufferedReader br = new BufferedReader(
-			new FileReader(
-					"/home/joshua/Documents/Software Engineering Research/subject_systems/archstudio4/doc-topics-filelist.txt"))) {
-			
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				System.out.println(line);
-
-				File file = new File(line);
-				Pattern pattern = Pattern.compile("-(\\d+)-");
-				Matcher matcher = pattern.matcher(file.getName());
-				while (matcher.find()) {
-					String numOfTopics = matcher.group(1);
-					System.out.println(numOfTopics);
-					docTopicFilesMap.put(Integer.parseInt(numOfTopics), line);
-				}
-				System.out.println();
-			}
-
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return docTopicFilesMap;
-	}
-
-	// ----------------------DOCTOPICITEM
-	// STUFF-------------------------------------------//
-	/** method to load doc-topic-item for each entity */
-	private static void initializeDocTopicsUsingFile(
-			Map<String, Map<String, Entity>> clusterNameToEntities,
-			String filename, String type) {
-		// Reference
-		// ConcernClusteringRunner.initializeDocTopicsForEachFastCluster(),
-		// pretty much the same
-		// thing except instead of using FastClusters, this uses Entity data
-		// structure
-		for (String clusterName : clusterNameToEntities.keySet()) {
-			Map<String, Entity> nameToEntity = clusterNameToEntities
-					.get(clusterName);
-			for (String entityName : nameToEntity.keySet()) {
-				Entity entity = nameToEntity.get(entityName);
-				if (TopicUtil.docTopics == null)
-					TopicUtil.docTopics = TopicUtil
-							.getDocTopicsFromFile(filename);
-
-				if (entity.docTopicItem == null) {
-					try {
-						TopicUtil.setDocTopicForEntity(TopicUtil.docTopics, entity, type);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-
-	}
-
-	/**
-	 * Computes average JS Divergence of each cluster
-	 * 
-	 * @param clusterName
-	 * @param clusterNameToEntities
-	 * @return
-	 */
-	private static double computeJSDivergence(String clusterName,
-			Map<String, Map<String, Entity>> clusterNameToEntities) {
-		Map<String, Entity> nameToEntity = clusterNameToEntities
-				.get(clusterName);
-		Object[] entities = nameToEntity.values().toArray();
-		double sum = 0;
-		int n = 0; // number of simMeasure values
-		for (int i = 0; i < entities.length; i++) {
-			for (int j = i + 1; j < entities.length; j++) {
-				Entity entity1 = (Entity) entities[i];
-				Entity entity2 = (Entity) entities[j];
-				if ((entity1.docTopicItem != null)
-						&& (entity2.docTopicItem != null)) // this makes sure
-															// anonymous inner
-															// classes don't get
-				// included in the computation
-				{
-					double simMeasure = 0;
-					try {
-						simMeasure =
-							entity1.docTopicItem.getJsDivergence(entity2.docTopicItem);
-					} catch (DistributionSizeMismatchException e) {
-						e.printStackTrace(); //TODO handle it
-					}
-					sum = sum + simMeasure;
-					n++;
-				}
-			}
-		}
-		// average
-		return (sum / n);
 	}
 }

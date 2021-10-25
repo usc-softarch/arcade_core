@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.topics;
 
-import java.io.FileNotFoundException;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -16,16 +15,6 @@ import edu.usc.softarch.arcade.clustering.FastCluster;
 public class TopicUtil {
 	public static DocTopics docTopics;
 	private static Logger logger = LogManager.getLogger(TopicUtil.class);
-	
-	public static DocTopics getDocTopicsFromFile(String filename) {
-		DocTopics docTopics = null;
-		try {
-			docTopics = new DocTopics(filename);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return docTopics;
-	}
 	
 	/** pretty much the same method as above, except uses Entities instead
 	 * of FastClusters.

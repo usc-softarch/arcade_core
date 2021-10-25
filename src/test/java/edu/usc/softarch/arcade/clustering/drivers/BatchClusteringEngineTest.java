@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
+import edu.usc.softarch.arcade.clustering.techniques.ConcernClusteringRunner;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.RsfCompare;
 
@@ -28,49 +29,53 @@ public class BatchClusteringEngineTest {
 		// struts 2.3.30
 		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.3.30,"
 		+ "java,"
-		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30///arc,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_ffVecs.json,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_239_topics_234_arc_clusters.rsf,"
-		+ "struts-2.3.30_239_topics_234_arc_clusters.rsf",
+		+ "struts-2.3.30_239_topics_234_arc_clusters.rsf,"
+		+ ".///target///test_results///BatchClusteringEngineTest",
 
 		// struts 2.5.2
 		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.5.2,"
 		+ "java,"
-		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2///arc,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_ffVecs.json,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_284_topics_275_arc_clusters.rsf,"
-		+ "struts-2.5.2_284_topics_275_arc_clusters.rsf",
+		+ "struts-2.5.2_284_topics_275_arc_clusters.rsf,"
+		+ ".///target///test_results///BatchClusteringEngineTest",
 
 		// httpd 2.3.8
 		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
 		+ "c,"
-		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8///arc,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_ffVecs.json,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_46_topics_71_arc_clusters.rsf,"
-		+ "httpd-2.3.8_46_topics_71_arc_clusters.rsf",
+		+ "httpd-2.3.8_46_topics_71_arc_clusters.rsf,"
+		+ ".///target///test_results///BatchClusteringEngineTest",
 
 		// httpd 2.4.26
 		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
 		+ "c,"
-		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26///arc,"
+		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_ffVecs.json,"
 		+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_50_topics_82_arc_clusters.rsf,"
-		+ "httpd-2.4.26_50_topics_82_arc_clusters.rsf"
+		+ "httpd-2.4.26_50_topics_82_arc_clusters.rsf,"
+		+ ".///target///test_results///BatchClusteringEngineTest"
 	})
 	public void ARCRecoveryTest(String sysVersionDir, String lang,
-			String testOutputDir, String ffVecsFilepath, String oraclePath,
-			String arcFilename) {
+			String artifactsDirPath, String ffVecsFilepath, String oraclePath,
+			String arcFilename, String outputDirPath) {
 		/** Tests ARC recovery for a single version of a system **/
 		// Format paths
 		String sysDir = sysVersionDir.replace("///", File.separator);
-		String outputDirName = testOutputDir.replace("///", File.separator);
+		String artifactsDir = artifactsDirPath.replace("///", File.separator);
 		String oracleFilePath = oraclePath.replace("///", File.separator);
-
-		File sysDirFile = new File(sysDir);
+		String ffVecs = ffVecsFilepath.replace("///", File.separator);
+		String outputDirName = outputDirPath.replace("///", File.separator);
 
 		assertDoesNotThrow(() -> {
-			BatchClusteringEngine.runARC(lang, outputDirName, sysDirFile.getName(),
-				sysDirFile.getAbsolutePath() + File.separator, ffVecsFilepath);
+			ConcernClusteringRunner.runARC(lang, outputDirName, sysDir,
+				ffVecs, artifactsDir);
 		});
 
 		// Result file with clusters

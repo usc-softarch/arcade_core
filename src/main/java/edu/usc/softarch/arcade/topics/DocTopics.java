@@ -1,34 +1,23 @@
 package edu.usc.softarch.arcade.topics;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
-import java.util.regex.Pattern;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import cc.mallet.pipe.CharSequence2TokenSequence;
-import cc.mallet.pipe.CharSequenceLowercase;
-import cc.mallet.pipe.CharSequenceReplace;
-import cc.mallet.pipe.Pipe;
-import cc.mallet.pipe.TokenSequence2FeatureSequence;
-import cc.mallet.pipe.TokenSequenceRemoveStopwords;
 import cc.mallet.topics.TopicInferencer;
 import cc.mallet.types.InstanceList;
 
 /**
  * @author joshua
  */
-public class DocTopics implements Serializable{
+public class DocTopics implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	static final long serialVersionUID = 1L;
 	private static Logger logger = LogManager.getLogger(DocTopics.class);
@@ -47,10 +36,7 @@ public class DocTopics implements Serializable{
 			dtItemList.add(new DocTopicItem(docTopicItem));
 	}
 
-	public DocTopics(String filename) throws FileNotFoundException {
-		loadFromFile(filename);	}
-
-	public DocTopics(String srcDir, String artifactsDir, String language)
+	public DocTopics(String artifactsDir)
 			throws Exception {
 		this();
 		// Begin by importing documents from text to feature sequences
@@ -179,40 +165,14 @@ public class DocTopics implements Serializable{
 	}
 	// #endregion PROCESSING -----------------------------------------------------
 
-	// #region IO ----------------------------------------------------------------
-	public void loadFromFile(String filename) throws FileNotFoundException {
-		logger.debug("Loading DocTopics from file...");
-		File f = new File(filename);
-		dtItemList = new ArrayList<>();
-
-		try (Scanner s = new Scanner(f)) {
-			while (s.hasNext()) {
-				String line = s.nextLine();
-				if (line.startsWith("#"))
-					continue;
-				String[] items = line.split("\\s+");
-	
-				DocTopicItem dtItem = new DocTopicItem();
-				dtItem.setDoc((Integer.valueOf(items[0])).intValue());
-				dtItem.setSource(items[1]);
-	
-				TopicItem t = new TopicItem();
-				for (int i = 2; i < items.length; i++) {
-					if (i % 2 == 0)
-						t.setTopicNum((Integer.valueOf(items[i])).intValue());
-					else {
-						t.setProportion((Double.valueOf(items[i])).doubleValue());
-						dtItem.addTopic(t);
-						t = new TopicItem(); //TODO Doesn't this nullify the previous two?
-					}
-				}
-				dtItemList.add(dtItem);
-				logger.debug(line);
-			}
-		}
-
-		logger.debug("\n");
-		logger.debug(dtItemList);
+	// #region SERIALIZATION -----------------------------------------------------
+	public void serializeDocTopics(String filePath) throws IOException {
+		(new ObjectMapper()).writeValue(new File(filePath), this);
 	}
-	// #endregion IO -------------------------------------------------------------
+
+	public static DocTopics deserializeDocTopics(String filePath)
+			throws IOException {
+		return (new ObjectMapper()).readValue(new File(filePath), DocTopics.class);
+	}
+	// #endregion SERIALIZATION --------------------------------------------------
 }

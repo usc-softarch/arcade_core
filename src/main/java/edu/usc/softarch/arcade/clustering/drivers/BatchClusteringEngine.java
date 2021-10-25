@@ -1,17 +1,11 @@
 package edu.usc.softarch.arcade.clustering.drivers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
@@ -24,9 +18,6 @@ import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchClusteringEngine {
-	private static Logger logger =
-		LogManager.getLogger(BatchClusteringEngine.class);
-
 	public static void main(String[] args) throws Exception {
 		// directory where each subdirectory is a different version or revision of
 		// the system you want to analyze
