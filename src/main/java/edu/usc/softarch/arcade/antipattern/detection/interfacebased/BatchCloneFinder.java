@@ -57,7 +57,7 @@ public class BatchCloneFinder {
 	// #region PROCESSING --------------------------------------------------------
 	public void run(File versionFolder, File outputDir, 
 			String classesDirName) throws IOException {
-		logger.debug("Processing directory: " + versionFolder.getName());
+		logger.debug("Processing directory: {}", versionFolder.getName());
 		
 		String fs = File.separator;
 		// the revision number is really just the name of the subdirectory
@@ -77,7 +77,7 @@ public class BatchCloneFinder {
 		File classesDirFile = new File(absoluteClassesDir);
 		if (!classesDirFile.exists())	return;
 
-		logger.debug("Get deps for revision " + revisionNumber);
+		logger.debug("Get deps for revision {}", revisionNumber);
 
 		// Run deps for a single folder
 		List<String> command;
@@ -102,7 +102,7 @@ public class BatchCloneFinder {
 	// #region IO ----------------------------------------------------------------
 	public static void main(String[] args) throws IOException {
 		if (args.length != 2) {
-			System.out.println(
+			System.console().writer().println(
 				"Usage: BatchCloneFinder <inputSrcDirName> <outputDirName>");
 			System.exit(-1);
 		}
@@ -125,19 +125,21 @@ public class BatchCloneFinder {
 		List<String> fileSetNames =
 			fileSet.stream().map(File::toString).collect(Collectors.toList());
 
-		logger.debug("All files in " + inputDir + ":");
-		logger.debug(String.join("\n", fileSetNames));
+		if (logger.isDebugEnabled()) {
+			logger.debug("All files in {}:", inputDir);
+			logger.debug(String.join("\n", fileSetNames));
+		}
 
 		boolean nothingtodo = true;
 		for (File versionFolder : fileSet) {
 			if (versionFolder.isDirectory()) {
-				logger.debug("Identified directory: " + versionFolder.getName());
+				logger.debug("Identified directory: {}", versionFolder.getName());
 				nothingtodo = false;
 				batchCloneFinder.run(versionFolder, outputDir, classesDir);
 			}
-			else logger.debug("Not a directory: " + versionFolder.getName());
+			else logger.debug("Not a directory: {}", versionFolder.getName());
 		}
-		if (nothingtodo) System.out.println("Nothing to do!");
+		if (nothingtodo) System.console().writer().println("Nothing to do!");
 	}
 	// #endregion IO -------------------------------------------------------------
 }
