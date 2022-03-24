@@ -3,10 +3,10 @@ package edu.usc.softarch.arcade.clustering.techniques;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.usc.softarch.arcade.clustering.Cluster;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import edu.usc.softarch.arcade.clustering.FastCluster;
 import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
 import edu.usc.softarch.arcade.clustering.MaxSimData;
 import edu.usc.softarch.arcade.clustering.StoppingCriterion;
@@ -21,12 +21,12 @@ public class WcaRunner extends ClusteringAlgoRunner {
 
 		initializeClusters(null, language);
 		
-		List<List<Double>> simMatrix = fastClusters.createSimilarityMatrixUsingUEM(simMeasure);
+		List<List<Double>> simMatrix = fastClusters.computeUEMSimMatrix(simMeasure);
 
 		while (stopCriterion.notReadyToStop()) {
 			if (stoppingCriterion.equalsIgnoreCase("clustergain")) {
 				double clusterGain = 0;
-				clusterGain = fastClusters.computeClusterGainUsingStructuralData();
+				clusterGain = fastClusters.computeStructuralClusterGain();
 				checkAndUpdateClusterGain(clusterGain);
 			}
 
@@ -34,9 +34,9 @@ public class WcaRunner extends ClusteringAlgoRunner {
 			
 			printTwoMostSimilarClustersUsingStructuralData(data);
 			
-			FastCluster cluster = fastClusters.get(data.rowIndex);
-			FastCluster otherCluster = fastClusters.get(data.colIndex);
-			FastCluster newCluster = new FastCluster(cluster, otherCluster);
+			Cluster cluster = fastClusters.get(data.rowIndex);
+			Cluster otherCluster = fastClusters.get(data.colIndex);
+			Cluster newCluster = new Cluster(cluster, otherCluster);
 			
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix, simMeasure);
 		}
@@ -47,9 +47,9 @@ public class WcaRunner extends ClusteringAlgoRunner {
 	}
 	
 	private static void updateFastClustersAndSimMatrixToReflectMergedCluster(MaxSimData data,
-			FastCluster newCluster, List<List<Double>> simMatrix, String simMeasure) {
-		FastCluster cluster = fastClusters.get(data.rowIndex);
-		FastCluster otherCluster = fastClusters.get(data.colIndex);
+																																					 Cluster newCluster, List<List<Double>> simMatrix, String simMeasure) {
+		Cluster cluster = fastClusters.get(data.rowIndex);
+		Cluster otherCluster = fastClusters.get(data.colIndex);
 		
 		int greaterIndex = -1;
 		int lesserIndex = -1;
@@ -97,7 +97,7 @@ public class WcaRunner extends ClusteringAlgoRunner {
 	
 		
 		for (int i = 0; i < fastClusters.size(); i++) {
-			FastCluster currCluster = fastClusters.get(i);
+			Cluster currCluster = fastClusters.get(i);
 			double currSimMeasure = 0; 
 			if (simMeasure.equalsIgnoreCase("uem"))
 				currSimMeasure = FastSimCalcUtil.getUnbiasedEllenbergMeasure(newCluster, currCluster);

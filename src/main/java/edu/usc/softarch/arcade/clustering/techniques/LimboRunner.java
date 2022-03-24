@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
-import edu.usc.softarch.arcade.clustering.FastCluster;
+import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
 import edu.usc.softarch.arcade.clustering.MaxSimData;
 import edu.usc.softarch.arcade.clustering.StoppingCriterion;
@@ -26,7 +26,7 @@ public class LimboRunner extends ClusteringAlgoRunner {
 		StopWatch matrixCreateTimer = new StopWatch();
 		matrixCreateTimer.start();
 		List<List<Double>> simMatrix = fastClusters
-			.createSimilarityMatrixUsingInfoLoss(numberOfEntitiesToBeClustered);
+			.computeInfoLossSimMatrix(numberOfEntitiesToBeClustered);
 		matrixCreateTimer.stop();
 		logger.debug("time to create similarity matrix: "
 				+ matrixCreateTimer.getElapsedTime());
@@ -34,7 +34,7 @@ public class LimboRunner extends ClusteringAlgoRunner {
 		while (stopCriterion.notReadyToStop()) {
 			if (stoppingCriterion.equalsIgnoreCase("clustergain")) {
 				double clusterGain = 0;
-				clusterGain = fastClusters.computeClusterGainUsingStructuralData();
+				clusterGain = fastClusters.computeStructuralClusterGain();
 				checkAndUpdateClusterGain(clusterGain);
 			}
 
@@ -47,9 +47,9 @@ public class LimboRunner extends ClusteringAlgoRunner {
 			
 			printTwoMostSimilarClustersUsingStructuralData(data);
 			
-			FastCluster cluster = fastClusters.get(data.rowIndex);
-			FastCluster otherCluster = fastClusters.get(data.colIndex);
-			FastCluster newCluster = new FastCluster(ClusteringAlgorithmType.LIMBO, cluster, otherCluster);
+			Cluster cluster = fastClusters.get(data.rowIndex);
+			Cluster otherCluster = fastClusters.get(data.colIndex);
+			Cluster newCluster = new Cluster(ClusteringAlgorithmType.LIMBO, cluster, otherCluster);
 			
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data,newCluster,simMatrix);
 		}
@@ -64,10 +64,10 @@ public class LimboRunner extends ClusteringAlgoRunner {
 	}
 
 	private static void updateFastClustersAndSimMatrixToReflectMergedCluster(MaxSimData data,
-			FastCluster newCluster, List<List<Double>> simMatrix) {
+																																					 Cluster newCluster, List<List<Double>> simMatrix) {
 		
-		FastCluster cluster = fastClusters.get(data.rowIndex);
-		FastCluster otherCluster = fastClusters.get(data.colIndex);
+		Cluster cluster = fastClusters.get(data.rowIndex);
+		Cluster otherCluster = fastClusters.get(data.colIndex);
 		
 		int greaterIndex = -1, lesserIndex = -1;
 		if (data.rowIndex == data.colIndex) {
@@ -120,7 +120,7 @@ public class LimboRunner extends ClusteringAlgoRunner {
 		}
 	
 		for (int i=0;i<fastClusters.size();i++) {
-			FastCluster currCluster = fastClusters.get(i);
+			Cluster currCluster = fastClusters.get(i);
 			double currSimMeasure = 0; 
 			
 			currSimMeasure = FastSimCalcUtil.getInfoLossMeasure(numberOfEntitiesToBeClustered,newCluster,currCluster);

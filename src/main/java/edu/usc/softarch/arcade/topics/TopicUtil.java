@@ -7,7 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.usc.softarch.arcade.clustering.Entity;
-import edu.usc.softarch.arcade.clustering.FastCluster;
+import edu.usc.softarch.arcade.clustering.Cluster;
 
 /**
  * @author joshua
@@ -108,7 +108,7 @@ public class TopicUtil {
 	 * Sets the DocTopicItem of a FastCluster.
 	 */
 	public static void setDocTopicForFastClusterForMalletApi(
-			FastCluster c, String language) {
+					Cluster c, String language) {
 		c.docTopicItem = docTopics.getDocTopicItem(c.getName(), language);
 	}
 

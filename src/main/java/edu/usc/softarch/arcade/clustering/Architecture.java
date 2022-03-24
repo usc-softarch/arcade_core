@@ -21,42 +21,40 @@ import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 
-public class FastClusterArchitecture extends ArrayList<FastCluster> {
+public class Architecture extends ArrayList<Cluster> {
   private static final long serialVersionUID = 1L;
   private static Logger logger =
-    LogManager.getLogger(FastClusterArchitecture.class);
+    LogManager.getLogger(Architecture.class);
 
-  public FastClusterArchitecture() { super(); }
+  public Architecture() { super(); }
 
-  public FastClusterArchitecture(FastClusterArchitecture fca) {
+  public Architecture(Architecture arch) {
     super();
-    for (FastCluster fc : fca)
-      this.add(new FastCluster(fc));
+    for (Cluster c : arch)
+      this.add(new Cluster(c));
   }
 
-  public Map<String, Integer> createFastClusterNameToNodeNumberMap() {
-		Map<String, Integer> clusterNameToNodeNumberMap = new HashMap<>();
+  public Map<String, Integer> computeArchitectureIndex() {
+		Map<String, Integer> architectureIndex = new HashMap<>();
 		for (int i = 0; i < this.size(); i++) {
-			FastCluster cluster = this.get(i);
-			clusterNameToNodeNumberMap.put(cluster.getName(), Integer.valueOf(i));
+			Cluster cluster = this.get(i);
+			architectureIndex.put(cluster.getName(), Integer.valueOf(i));
 		}
-		return clusterNameToNodeNumberMap;
+		return architectureIndex;
 	}
 
-  public void writeFastClustersRsfFile(
-			Map<String, Integer> clusterNameToNodeNumberMap,
-			String currentClustersDetailedRsfFilename)
+  public void writeToRsf(Map<String, Integer> architectureIndex, String path)
 			throws FileNotFoundException {
-		File rsfFile = new File(currentClustersDetailedRsfFilename);
+		File rsfFile = new File(path);
 		rsfFile.getParentFile().mkdirs();
 
     try (PrintWriter out = new PrintWriter(
         new OutputStreamWriter(
         new FileOutputStream(rsfFile), StandardCharsets.UTF_8))) {
       logger.trace("Printing each cluster and its leaves...");
-      for (FastCluster cluster : this) {
+      for (Cluster cluster : this) {
         Integer currentNodeNumber =
-          clusterNameToNodeNumberMap.get(cluster.getName());
+          architectureIndex.get(cluster.getName());
         logger.trace("Cluster name: " + currentNodeNumber);
         logger.trace("Cluster node number: " + cluster);
         String[] entities = cluster.getName().split(",");
@@ -71,15 +69,15 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
     }
 	}
 
-  public double computeClusterGainUsingStructuralData() {
+  public double computeStructuralClusterGain() {
 		List<Double> clusterCentroids = new ArrayList<>();
 
-		for (FastCluster cluster : this) {
-			double centroid = cluster.computeCentroidUsingStructuralData();
+		for (Cluster cluster : this) {
+			double centroid = cluster.computeStructuralCentroid();
 			clusterCentroids.add(centroid);
 		}
 
-		double globalCentroid = computeGlobalCentroidForStructuralData(clusterCentroids);
+		double globalCentroid = computeStructuralGlobalCentroid(clusterCentroids);
 
 		double clusterGain = 0;
 		for (int i = 0; i < clusterCentroids.size(); i++)
@@ -89,8 +87,8 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 		return clusterGain;
 	}
 
-  private double computeGlobalCentroidForStructuralData(
-			List<Double> clusterCentroids) {
+  private double computeStructuralGlobalCentroid(
+					List<Double> clusterCentroids) {
 		double centroidSum = 0;
 
 		for (Double centroid : clusterCentroids)
@@ -99,27 +97,26 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 		return centroidSum / clusterCentroids.size();
 	}
 
-  public List<List<Double>> createSimilarityMatrixUsingJSDivergence(String simMeasure) {
+  public List<List<Double>> computeJSDivergenceSimMatrix(String simMeasure) {
 		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
 
 		for (int i = 0; i < this.size(); i++)
 			simMatrixObj.add(new ArrayList<>(this.size()));
 
 		for (int i = 0; i < this.size(); i++) {
-			FastCluster cluster = this.get(i);
+			Cluster c1 = this.get(i);
 			for (int j = 0; j < this.size(); j++) {
-				FastCluster otherCluster = this.get(j);
+				Cluster c2 = this.get(j);
 				double currJSDivergence = 0;
 
 				if (simMeasure.equalsIgnoreCase("js"))
 					try {
-						currJSDivergence =
-							cluster.docTopicItem.getJsDivergence(otherCluster.docTopicItem);
+						currJSDivergence = c1.docTopicItem.getJsDivergence(c2.docTopicItem);
 					} catch (DistributionSizeMismatchException e) {
 						e.printStackTrace(); //TODO handle it
 					}
 				else if (simMeasure.equalsIgnoreCase("scm"))
-					currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(cluster, otherCluster);
+					currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(c1, c2);
 				else
 					throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
 				
@@ -129,7 +126,7 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 		return simMatrixObj;
 	}
 
-  public List<List<Double>> createSimilarityMatrixUsingInfoLoss(
+  public List<List<Double>> computeInfoLossSimMatrix(
       int numberOfEntitiesToBeClustered) {
 		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
 		
@@ -137,12 +134,12 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 			simMatrixObj.add(new ArrayList<>(this.size()));
 
 		for (int i = 0; i < this.size(); i++) {
-			FastCluster cluster = this.get(i);
+			Cluster c1 = this.get(i);
 			for (int j = 0; j < this.size(); j++) {
-				FastCluster otherCluster = this.get(j);
+				Cluster c2 = this.get(j);
 
 				double currSimMeasure = 0;
-				currSimMeasure = FastSimCalcUtil.getInfoLossMeasure(numberOfEntitiesToBeClustered, cluster,	otherCluster);
+				currSimMeasure = FastSimCalcUtil.getInfoLossMeasure(numberOfEntitiesToBeClustered, c1,	c2);
 				
 				simMatrixObj.get(i).add(currSimMeasure);
 			}
@@ -151,16 +148,16 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 		return simMatrixObj;
 	}
 
-  public List<List<Double>> createSimilarityMatrixUsingUEM(String simMeasure) {
+  public List<List<Double>> computeUEMSimMatrix(String simMeasure) {
 		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
 		
 		for (int i = 0; i < this.size(); i++)
 			simMatrixObj.add(new ArrayList<>(this.size()));
 
 		for (int i = 0; i < this.size(); i++) {
-			FastCluster cluster = this.get(i);
+			Cluster cluster = this.get(i);
 			for (int j = 0; j < this.size(); j++) {
-				FastCluster otherCluster = this.get(j);
+				Cluster otherCluster = this.get(j);
 
 				double currSimMeasure = 0;
 				if (simMeasure.equalsIgnoreCase("uem"))
@@ -180,9 +177,9 @@ public class FastClusterArchitecture extends ArrayList<FastCluster> {
 		return simMatrixObj;
 	}
 
-  public double computeClusterGainUsingTopics() {
+  public double computeTopicClusterGain() {
 		List<DocTopicItem> docTopicItems = new ArrayList<>();
-		for (FastCluster c : this)
+		for (Cluster c : this)
 			docTopicItems.add(c.docTopicItem);
 		DocTopicItem globalDocTopicItem =
       DocTopics.computeGlobalCentroidUsingTopics(docTopicItems);

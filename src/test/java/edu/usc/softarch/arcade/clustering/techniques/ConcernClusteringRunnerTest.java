@@ -15,7 +15,7 @@ import java.io.ObjectInputStream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import edu.usc.softarch.arcade.clustering.FastClusterArchitecture;
+import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 
 public class ConcernClusteringRunnerTest {
@@ -94,8 +94,8 @@ public class ConcernClusteringRunnerTest {
 
 		/* Tests whether fastClusters was altered by
 		 * initializeDocTopicsForEachFastCluster */
-		FastClusterArchitecture fastClustersBefore = runner.getInitialFastClusters();
-		FastClusterArchitecture fastClustersAfterInit = runner.getFastClustersWithDocTopics();
+		Architecture fastClustersBefore = runner.getInitialFastClusters();
+		Architecture fastClustersAfterInit = runner.getFastClustersWithDocTopics();
 		System.out.println("fastClusters size before: " + fastClustersBefore.size());
 		System.out.println("fastClusters size after: " + fastClustersAfterInit.size());
 		// every node should get a cluster, so there should be at least one cluster
@@ -191,8 +191,8 @@ public class ConcernClusteringRunnerTest {
 				"preselected", "js");
 		});
 
-		FastClusterArchitecture fastClustersAfterInit = runner.getFastClustersWithDocTopics();
-		FastClusterArchitecture fastClustersCompute = runner.getFastClusters();
+		Architecture fastClustersAfterInit = runner.getFastClustersWithDocTopics();
+		Architecture fastClustersCompute = runner.getFastClusters();
 		// Check that fastClusters not empty after computeClustersWithConcernsAndFastClusters call 
 		assertFalse(fastClustersCompute.isEmpty());
 		// The size of the fastClusters should be smaller afterward
