@@ -8,8 +8,6 @@ import java.io.ObjectInputStream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 import org.xml.sax.SAXException;
 
 import edu.usc.softarch.arcade.classgraphs.ClassGraph;
@@ -22,8 +20,6 @@ import edu.usc.softarch.arcade.config.Config;
  * @author joshua
  */
 public class ClusteringEngine {
-	private static Logger logger = LogManager.getLogger(ClusteringEngine.class);
-
 	class ClusterGainStoppingCriterion implements StoppingCriterion {
 		public boolean notReadyToStop() {
 			return ClusteringAlgoRunner.fastClusters.size() != 1
@@ -54,13 +50,9 @@ public class ClusteringEngine {
 		try (ObjectInputStream objInStream = new ObjectInputStream(
 				new FileInputStream(fastFeatureVectorsFile))) {
 			fastFeatureVectors = (FastFeatureVectors) objInStream.readObject();
-			logger.debug("feature set size: "+ fastFeatureVectors.getNamesInFeatureSet().size());
-			logger.debug("Names in Feature Set:");
-			logger.debug(fastFeatureVectors.getNamesInFeatureSet());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		logger.debug("Read in serialized feature vectors...");
 
 		if (clusteringAlgorithm.equalsIgnoreCase("wca")) {
 			WcaRunner.setFastFeatureVectors(fastFeatureVectors);

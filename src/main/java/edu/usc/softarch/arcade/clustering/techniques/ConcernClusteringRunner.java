@@ -8,10 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import edu.usc.softarch.arcade.clustering.*;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
-import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicUtil;
@@ -19,9 +15,6 @@ import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #region ATTRIBUTES --------------------------------------------------------
-	private static Logger logger =
-		LogManager.getLogger(ConcernClusteringRunner.class);
-
 	private String language;
 	// Initial fastClusters state before any clustering
 	private Architecture initialFastClusters;
@@ -46,10 +39,9 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	/**
 	 * @param vecs feature vectors (dependencies) of entities
 	 * @param srcDir directories with java or c files
-	 * @param numTopics number of topics to extract
 	 */
 	public ConcernClusteringRunner(FastFeatureVectors vecs,
-			String srcDir, String artifactsDir, String language) {
+																 String srcDir, String artifactsDir, String language) {
 		this.language = language;
 		setFastFeatureVectors(vecs);
 
@@ -57,7 +49,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		initializeClusters(srcDir, language);
 		this.initialFastClusters = new Architecture(fastClusters);
 
-		initializeDocTopicsForEachFastCluster(srcDir, artifactsDir);
+		initializeDocTopicsForEachFastCluster(artifactsDir);
 		this.fastClustersWithDocTopics = new Architecture(fastClusters);
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
@@ -190,8 +182,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		return msData;
 	}
 
-	private void initializeDocTopicsForEachFastCluster(
-			String srcDir, String artifactsDir) {
+	private void initializeDocTopicsForEachFastCluster(String artifactsDir) {
 		// Initialize DocTopics from files
 		try {
 			TopicUtil.docTopics = new DocTopics(artifactsDir);
@@ -236,37 +227,24 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		
 		Architecture clustersWithMissingDocTopics =
 			new Architecture();
-		for (Cluster c : fastClusters) {
-			if (c.docTopicItem == null) {
-				if (c.getName().contains("$"))
-					logger.debug("Could not find doc-topic for: " + c.getName());
-				else
-					logger.error("Could not find doc-topic for: " + c.getName());
+		for (Cluster c : fastClusters)
+			if (c.docTopicItem == null)
 				clustersWithMissingDocTopics.add(c);
-			}
-		}
-		
-		logger.debug("Removing clusters with missing doc topics...");
+
 		fastClusters.removeAll(clustersWithMissingDocTopics);
 
 		boolean ignoreMissingDocTopics = true;
-		if (ignoreMissingDocTopics) {
-			logger.debug("Removing clusters with missing doc topics...");
-			for (Cluster c : clustersWithMissingDocTopics) {
+		if (ignoreMissingDocTopics)
+			for (Cluster c : clustersWithMissingDocTopics)
 				fastClusters.remove(c);
-			}
-		}
 	}
 
 	private void removeClassesWithoutDTI(Map<String, String> parentClassMap) {
 		// Locate non-inner classes without DTI
 		Architecture excessClusters = new Architecture();
-		for (Cluster c : fastClusters) {
-			if (c.docTopicItem == null && !c.getName().contains("$")) {
-				logger.error("Could not find doc-topic for non-inner class: " + c.getName());
+		for (Cluster c : fastClusters)
+			if (c.docTopicItem == null && !c.getName().contains("$"))
 				excessClusters.add(c);
-			}
-		}
 		
 		// Locate inner classes of those non-inner classes without DTI
 		Architecture excessInners = new Architecture();

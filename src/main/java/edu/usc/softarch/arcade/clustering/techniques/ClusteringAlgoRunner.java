@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import edu.usc.softarch.arcade.clustering.Cluster;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.config.Config;
@@ -18,9 +15,6 @@ import edu.usc.softarch.arcade.util.FileListing;
 
 public class ClusteringAlgoRunner {
 	// #region ATTRIBUTES --------------------------------------------------------
-	private static Logger logger =
-		LogManager.getLogger(ClusteringAlgoRunner.class);
-	
 	public static Architecture fastClusters;
 	protected static FastFeatureVectors fastFeatureVectors;
 	protected static double maxClusterGain = 0;
@@ -66,18 +60,6 @@ public class ClusteringAlgoRunner {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-
-		// Logging
-		logger.debug("Listing initial cluster names using for-each...");
-		for (Cluster cluster : fastClusters)
-			logger.debug(cluster.getName());
-		logger.debug("Listing initial cluster names using indexed loop...");
-		for (int i = 0; i < fastClusters.size(); i++) {
-			Cluster cluster = fastClusters.get(i);
-			logger.debug(cluster.getName());
-		}
-		numberOfEntitiesToBeClustered = fastClusters.size();
-		logger.debug("number of initial clusters: " + numberOfEntitiesToBeClustered);
 	}
 
 	/**
@@ -94,8 +76,6 @@ public class ClusteringAlgoRunner {
 					!cluster.getName().startsWith("/") &&
 					p.matcher(cluster.getName()).find())
 				fastClusters.add(cluster);
-			else
-				logger.debug("Excluding file: " + cluster.getName());
 		}
 
 		// This block is used only for certain older modules, disregard
@@ -112,15 +92,7 @@ public class ClusteringAlgoRunner {
 	}
 	
 	protected static void checkAndUpdateClusterGain(double clusterGain) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Current cluster gain: " + clusterGain);
-			logger.debug("Current max cluster gain: " + maxClusterGain);
-		}
-
 		if (clusterGain > maxClusterGain) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Updating max cluster gain and num clusters at it...");
-			}
 			maxClusterGain = clusterGain;
 			numClustersAtMaxClusterGain = fastClusters.size();
 		}

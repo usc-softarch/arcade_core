@@ -7,15 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 
 public class Cluster implements Serializable {
 	// #region ATTRIBUTES --------------------------------------------------------
-	private static Logger logger = LogManager.getLogger(Cluster.class);
-
 	private String name;
 	private int numEntities;
 	private int numFeatures = 0;
@@ -146,21 +141,6 @@ public class Cluster implements Serializable {
 
 		// centroid
 		return centroidAvg / getNumEntities();
-	}
-
-	public void printSimilarFeatures(Cluster toCompare,
-																	 FastFeatureVectors fastFeatureVectors) {
-		List<String> names = fastFeatureVectors.getNamesInFeatureSet();
-
-		logger.debug("Features shared between " + this.getName() + " and "
-			+ toCompare.getName());
-
-		Set<Integer> c1Keys = this.getFeatureMap().keySet();
-
-		for (Integer key : c1Keys)
-			if (this.getFeatureMap().get(key) != null
-					&& toCompare.getFeatureMap().get(key) != null)
-				logger.debug(names.get(key));
 	}
 	
 	public String toString() {

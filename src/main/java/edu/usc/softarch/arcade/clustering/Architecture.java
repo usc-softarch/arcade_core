@@ -14,17 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 
 public class Architecture extends ArrayList<Cluster> {
   private static final long serialVersionUID = 1L;
-  private static Logger logger =
-    LogManager.getLogger(Architecture.class);
 
   public Architecture() { super(); }
 
@@ -51,19 +46,13 @@ public class Architecture extends ArrayList<Cluster> {
     try (PrintWriter out = new PrintWriter(
         new OutputStreamWriter(
         new FileOutputStream(rsfFile), StandardCharsets.UTF_8))) {
-      logger.trace("Printing each cluster and its leaves...");
       for (Cluster cluster : this) {
         Integer currentNodeNumber =
           architectureIndex.get(cluster.getName());
-        logger.trace("Cluster name: " + currentNodeNumber);
-        logger.trace("Cluster node number: " + cluster);
         String[] entities = cluster.getName().split(",");
         Set<String> entitiesSet = new HashSet<>(Arrays.asList(entities));
-        int entityCount = 0;
         for (String entity : entitiesSet) {
-          logger.trace(entityCount + ":\t" + entity);
           out.println("contain " + currentNodeNumber + " " + entity);
-          entityCount++;
         }
       }
     }
@@ -183,8 +172,6 @@ public class Architecture extends ArrayList<Cluster> {
 			docTopicItems.add(c.docTopicItem);
 		DocTopicItem globalDocTopicItem =
       DocTopics.computeGlobalCentroidUsingTopics(docTopicItems);
-		logger.debug("Global Centroid Using Topics: "
-			+ globalDocTopicItem.toStringWithLeadingTabsAndLineBreaks(0));
 
 		double clusterGain = 0;
 

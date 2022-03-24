@@ -4,17 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.usc.softarch.arcade.clustering.Cluster;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
 import edu.usc.softarch.arcade.clustering.MaxSimData;
 import edu.usc.softarch.arcade.clustering.StoppingCriterion;
 
 public class WcaRunner extends ClusteringAlgoRunner {
-	
-	private static Logger logger = LogManager.getLogger(WcaRunner.class);
-
 	public static void computeClustersWithPQAndWCA(
 			StoppingCriterion stopCriterion, String language,
 			String stoppingCriterion, String simMeasure) {
@@ -31,19 +26,13 @@ public class WcaRunner extends ClusteringAlgoRunner {
 			}
 
 			MaxSimData data  = identifyMostSimClusters(simMatrix);
-			
-			printTwoMostSimilarClustersUsingStructuralData(data);
-			
+
 			Cluster cluster = fastClusters.get(data.rowIndex);
 			Cluster otherCluster = fastClusters.get(data.colIndex);
 			Cluster newCluster = new Cluster(cluster, otherCluster);
 			
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix, simMeasure);
 		}
-
-		logger.debug("max cluster gain: " + maxClusterGain);
-		logger.debug("num clusters at max cluster gain: "
-			+ numClustersAtMaxClusterGain);
 	}
 	
 	private static void updateFastClustersAndSimMatrixToReflectMergedCluster(MaxSimData data,
@@ -109,24 +98,7 @@ public class WcaRunner extends ClusteringAlgoRunner {
 			simMatrix.get(i).set(fastClusters.size()-1, currSimMeasure);
 		}
 	}
-	
-	protected static void printTwoMostSimilarClustersUsingStructuralData(
-			MaxSimData maxSimData) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("In, "
-					+ Thread.currentThread().getStackTrace()[1].getMethodName()
-					+ ", \nMax Similar Clusters: ");
 
-			fastClusters.get(maxSimData.rowIndex).printSimilarFeatures(
-				fastClusters.get(maxSimData.colIndex), fastFeatureVectors);
-
-			logger.debug(maxSimData.currentMaxSim);
-			logger.debug("\n");
-
-			logger.debug("before merge, clusters size: " + fastClusters.size());
-		}
-	}
-	
 	private static MaxSimData identifyMostSimClusters(List<List<Double>> simMatrix) {
 		if ( simMatrix.size() != fastClusters.size() )
 			throw new IllegalArgumentException("expected simMatrix.size():" + simMatrix.size() + " to be fastClusters.size(): " + fastClusters.size());
@@ -153,8 +125,6 @@ public class WcaRunner extends ClusteringAlgoRunner {
 			}
 		}
 		if (!foundMoreSimilarMeasure) {
-			String couldNotFindMoreSimilarMeasureMsg = "Cannot find any similar entities...making arbitrary decision at " + fastClusters.size() + " clusters...";
-			logger.debug(couldNotFindMoreSimilarMeasureMsg);
 			msData.foundMoreSimilarMeasure = foundMoreSimilarMeasure;
 		}
 		msData.currentMaxSim = greatestUnbiasedEllenberg;
