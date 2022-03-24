@@ -20,14 +20,11 @@ import com.thoughtworks.xstream.XStream;
 import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.MapUtil;
-import edu.usc.softarch.arcade.util.StopWatch;
 
 public class IssuesAnalyzer {
 	static Logger logger = LogManager.getLogger(IssuesAnalyzer.class);
 
 	public static void main(String[] args) throws FileNotFoundException {
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
 		// The directory where the serialized issue files are stored
 		String issuesDir = args[0];
 		
@@ -87,9 +84,7 @@ public class IssuesAnalyzer {
 			.keySet().stream()
 			.map(key -> key + "=" + versionToIssueCountMapPrintable.get(key))
 			.collect(Collectors.toList())));
-		
-		System.out.println("Running time: " + stopWatch.getElapsedTimeSecs());
-		
+
 		// The filename that is generated based on the supplied issuesDir
 		String mapFilename = issuesDir + File.separatorChar + "version2issuecountmap.obj";
 		XStream xstream = new XStream();
