@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.clustering.techniques;
 
 import java.io.FileNotFoundException;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -10,7 +9,6 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.FastCluster;
 import edu.usc.softarch.arcade.clustering.FastClusterArchitecture;
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
@@ -24,7 +22,6 @@ public class ClusteringAlgoRunner {
 		LogManager.getLogger(ClusteringAlgoRunner.class);
 	
 	public static FastClusterArchitecture fastClusters;
-	protected static ArrayList<Cluster> clusters;
 	protected static FastFeatureVectors fastFeatureVectors;
 	protected static double maxClusterGain = 0;
 	public static int numClustersAtMaxClusterGain = 0;

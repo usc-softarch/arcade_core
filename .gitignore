@@ -7,6 +7,7 @@ logs/
 .DS_Store
 .console.txt.swp
 myextractors.jar
+.idea/
 
 acdc_linux_mojo.csv
 acdc_mojo.csv
