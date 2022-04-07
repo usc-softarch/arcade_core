@@ -33,6 +33,17 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				&& ClusteringAlgoRunner.fastClusters.size() != numClusters;
 		}
 	}
+
+	public static class NoOrphansStoppingCriterion
+					implements StoppingCriterion {
+		private final ConcernClusteringRunner parent;
+
+		public NoOrphansStoppingCriterion(ConcernClusteringRunner parent) {
+			this.parent = parent;	}
+
+		public boolean notReadyToStop() {
+			return parent.getFastClusters().hasOrphans(); }
+	}
 	// #endregion ATTRIBUTES -----------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
@@ -105,9 +116,15 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
 			ffVecs, sysDirPath, artifactsDirPath, language);
 		int numClusters = (int) (runner.getFastClusters().size() * .20);
-		runner.computeClustersWithConcernsAndFastClusters(
+
+		// !!!!! CHANGES TO TEST NEW STOPPING CRITERIA !!!!!
+		/*runner.computeClustersWithConcernsAndFastClusters(
 			new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters),
-			"preselected", "js");
+			"preselected", "js");*/
+		runner.computeClustersWithConcernsAndFastClusters(
+						new ConcernClusteringRunner.NoOrphansStoppingCriterion(runner),
+						"noOrphans", "js"	);
+		// !!!!! CHANGES TO TEST NEW STOPPING CRITERIA !!!!!
 		
 		String arcClustersFilename = outputDirPath + File.separator
 			+ revisionNumber + "_" + numTopics + "_topics_"
@@ -136,7 +153,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				checkAndUpdateClusterGain(clusterGain);
 			}
 
-			MaxSimData data  = identifyMostSimClusters(simMatrix);
+			MaxSimData data = identifyMostSimClusters(simMatrix);
 			Cluster newCluster = mergeFastClustersUsingTopics(data);
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix, simMeasure);
 		}

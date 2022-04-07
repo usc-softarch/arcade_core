@@ -186,4 +186,12 @@ public class Architecture extends ArrayList<Cluster> {
 
 		return clusterGain;
 	}
+
+	public boolean hasOrphans() {
+		for (Cluster c : this) {
+			if (c.getNumEntities() == 1)
+				return true;
+		}
+		return false;
+	}
 }
