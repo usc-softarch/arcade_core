@@ -9,27 +9,28 @@ public class TopicItem implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = 4599518018739063447L;
 	private int topicNum;
+	private int weight;
 	private double proportion;
-	private String type;
 	// #endregion FIELDS ---------------------------------------------------------
 	
 	// #region CONTRUCTORS -------------------------------------------------------
-	public TopicItem() { super(); }
+	public TopicItem() { setWeight(1); }
 	
 	public TopicItem(TopicItem topicItem) {
 		setTopicNum(topicItem.getTopicNum());
+		setWeight(topicItem.getWeight());
 		setProportion(topicItem.getProportion());
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
 	public int getTopicNum() { return this.topicNum; }
+	public int getWeight() { return weight; }
 	public double getProportion() { return this.proportion; }
-	public String getType() { return this.type; }
 
 	public void setTopicNum(int topicNum) { this.topicNum = topicNum; }
+	public void setWeight(int weight) {	this.weight = weight; }
 	public void setProportion(double proportion) { this.proportion = proportion; }
-	public void setType(String type) { this.type = type; }
 	// #endregion ACCESSORS ------------------------------------------------------
 	
 	// #region MISC --------------------------------------------------------------
@@ -50,6 +51,6 @@ public class TopicItem implements Serializable {
 	}
 
 	public String toString() {
-		return "[" + topicNum + "," + proportion + "," + type + "]"; }
+		return "[" + topicNum + "," + proportion + "]"; }
 	// #endregion MISC -----------------------------------------------------------
 }

@@ -41,8 +41,12 @@ public class TopicUtil {
 			TopicItem ti2 = docTopicItem2.getTopic(i);
 			TopicItem mergedTopicItem = mergedDocTopicItem.getTopic(i);
 
+			mergedTopicItem.setWeight(ti1.getWeight() + ti2.getWeight());
+
 			mergedTopicItem.setProportion(
-				(ti1.getProportion() + ti2.getProportion()) / 2);
+				(ti1.getProportion() * ti1.getWeight()
+					+ ti2.getProportion() * ti2.getWeight())
+					/ mergedTopicItem.getWeight());
 		}
 
 		return mergedDocTopicItem;
