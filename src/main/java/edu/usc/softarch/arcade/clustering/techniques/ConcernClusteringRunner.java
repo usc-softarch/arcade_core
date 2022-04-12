@@ -7,7 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.usc.softarch.arcade.clustering.*;
+import edu.usc.softarch.arcade.clustering.Architecture;
+import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
+import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
+import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
+import edu.usc.softarch.arcade.clustering.MaxSimData;
+import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
+import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicUtil;
@@ -15,35 +22,11 @@ import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #region ATTRIBUTES --------------------------------------------------------
-	private String language;
+	private final String language;
 	// Initial fastClusters state before any clustering
-	private Architecture initialFastClusters;
+	private final Architecture initialFastClusters;
 	// fastClusters state after initializing docTopics
-	private Architecture fastClustersWithDocTopics;
-
-	public static class PreSelectedStoppingCriterion
-			implements StoppingCriterion {
-		private int numClusters;
-
-		public PreSelectedStoppingCriterion(int numClusters) {
-			this.numClusters = numClusters; }
-
-		public boolean notReadyToStop() {
-			return ClusteringAlgoRunner.fastClusters.size() != 1
-				&& ClusteringAlgoRunner.fastClusters.size() != numClusters;
-		}
-	}
-
-	public static class NoOrphansStoppingCriterion
-					implements StoppingCriterion {
-		private final ConcernClusteringRunner parent;
-
-		public NoOrphansStoppingCriterion(ConcernClusteringRunner parent) {
-			this.parent = parent;	}
-
-		public boolean notReadyToStop() {
-			return parent.getFastClusters().hasOrphans(); }
-	}
+	private final Architecture fastClustersWithDocTopics;
 	// #endregion ATTRIBUTES -----------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
@@ -51,8 +34,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	 * @param vecs feature vectors (dependencies) of entities
 	 * @param srcDir directories with java or c files
 	 */
-	public ConcernClusteringRunner(FastFeatureVectors vecs,
-																 String srcDir, String artifactsDir, String language) {
+	public ConcernClusteringRunner(FastFeatureVectors vecs, String srcDir,
+			String artifactsDir, String language) {
 		this.language = language;
 		setFastFeatureVectors(vecs);
 
@@ -117,14 +100,9 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			ffVecs, sysDirPath, artifactsDirPath, language);
 		int numClusters = (int) (runner.getFastClusters().size() * .20);
 
-		// !!!!! CHANGES TO TEST NEW STOPPING CRITERIA !!!!!
-		/*runner.computeClustersWithConcernsAndFastClusters(
-			new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters),
-			"preselected", "js");*/
 		runner.computeClustersWithConcernsAndFastClusters(
-						new ConcernClusteringRunner.NoOrphansStoppingCriterion(runner),
-						"noOrphans", "js"	);
-		// !!!!! CHANGES TO TEST NEW STOPPING CRITERIA !!!!!
+			new PreSelectedStoppingCriterion(numClusters),
+			"preselected", "js");
 		
 		String arcClustersFilename = outputDirPath + File.separator
 			+ revisionNumber + "_" + numTopics + "_topics_"
@@ -155,7 +133,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 			MaxSimData data = identifyMostSimClusters(simMatrix);
 			Cluster newCluster = mergeFastClustersUsingTopics(data);
-			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix, simMeasure);
+			updateFastClustersAndSimMatrixToReflectMergedCluster(
+				data, newCluster, simMatrix, simMeasure);
 		}
 	}
 	
@@ -242,18 +221,15 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 		fastClusters = updatedFastClusters;
 		
-		Architecture clustersWithMissingDocTopics =
-			new Architecture();
+		Architecture clustersWithMissingDocTopics =	new Architecture();
 		for (Cluster c : fastClusters)
 			if (c.docTopicItem == null)
 				clustersWithMissingDocTopics.add(c);
 
 		fastClusters.removeAll(clustersWithMissingDocTopics);
 
-		boolean ignoreMissingDocTopics = true;
-		if (ignoreMissingDocTopics)
-			for (Cluster c : clustersWithMissingDocTopics)
-				fastClusters.remove(c);
+		for (Cluster c : clustersWithMissingDocTopics)
+			fastClusters.remove(c);
 	}
 
 	private void removeClassesWithoutDTI(Map<String, String> parentClassMap) {
@@ -287,7 +263,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 
 	private static Cluster mergeFastClustersUsingTopics(
-					Cluster cluster, Cluster otherCluster) {
+			Cluster cluster, Cluster otherCluster) {
 		Cluster newCluster =
 			new Cluster(ClusteringAlgorithmType.LIMBO, cluster, otherCluster);
 		
@@ -302,8 +278,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 	
 	private static void updateFastClustersAndSimMatrixToReflectMergedCluster(
-					MaxSimData data, Cluster newCluster, List<List<Double>> simMatrix,
-					String simMeasure) {
+			MaxSimData data, Cluster newCluster, List<List<Double>> simMatrix,
+			String simMeasure) {
 		Cluster cluster = fastClusters.get(data.rowIndex);
 		Cluster otherCluster = fastClusters.get(data.colIndex);
 		
@@ -316,8 +292,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		if (data.rowIndex > data.colIndex) {
 			greaterIndex = data.rowIndex;
 			lesserIndex = data.colIndex;
-		}
-		if (data.rowIndex < data.colIndex) {
+		} else if (data.rowIndex < data.colIndex) {
 			greaterIndex = data.colIndex;
 			lesserIndex = data.rowIndex;
 		}

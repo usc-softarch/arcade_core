@@ -7,7 +7,7 @@ import edu.usc.softarch.arcade.clustering.Cluster;
 
 import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
 import edu.usc.softarch.arcade.clustering.MaxSimData;
-import edu.usc.softarch.arcade.clustering.StoppingCriterion;
+import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 
 public class WcaRunner extends ClusteringAlgoRunner {
 	public static void computeClustersWithPQAndWCA(

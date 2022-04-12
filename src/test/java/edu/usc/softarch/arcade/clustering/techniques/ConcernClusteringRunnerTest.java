@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
+import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -187,7 +188,7 @@ public class ConcernClusteringRunnerTest {
 			int numClusters = (int) ((double) runner.getFastClusters().size() * .20);
 			// USING THE CLONE THAT TAKES IN THE VERSION NAME HERE
 			runner.computeClustersWithConcernsAndFastClusters(
-				new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters),
+				new PreSelectedStoppingCriterion(numClusters),
 				"preselected", "js");
 		});
 

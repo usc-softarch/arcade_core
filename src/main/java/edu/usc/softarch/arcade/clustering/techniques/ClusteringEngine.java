@@ -8,12 +8,13 @@ import java.io.ObjectInputStream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import org.xml.sax.SAXException;
 
 import edu.usc.softarch.arcade.classgraphs.ClassGraph;
 import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 import edu.usc.softarch.arcade.clustering.Feature;
-import edu.usc.softarch.arcade.clustering.StoppingCriterion;
+import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.config.Config;
 
 /**
@@ -57,7 +58,7 @@ public class ClusteringEngine {
 		if (clusteringAlgorithm.equalsIgnoreCase("wca")) {
 			WcaRunner.setFastFeatureVectors(fastFeatureVectors);
 			if (stoppingCriterion.equalsIgnoreCase("preselected")) {
-				StoppingCriterion stopCriterion = new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters);
+				StoppingCriterion stopCriterion = new PreSelectedStoppingCriterion(numClusters);
 				WcaRunner.computeClustersWithPQAndWCA(stopCriterion, language, stoppingCriterion, simMeasure);
 			}
 			if (stoppingCriterion.equalsIgnoreCase("clustergain")) {
@@ -76,7 +77,7 @@ public class ClusteringEngine {
 		
 		if (clusteringAlgorithm.equalsIgnoreCase("limbo")) {
 			LimboRunner.setFastFeatureVectors(fastFeatureVectors);
-			LimboRunner.computeClusters(new ConcernClusteringRunner.PreSelectedStoppingCriterion(numClusters), language, stoppingCriterion);
+			LimboRunner.computeClusters(new PreSelectedStoppingCriterion(numClusters), language, stoppingCriterion);
 			if (stoppingCriterion.equalsIgnoreCase("clustergain"))
 				LimboRunner.computeClusters(new ClusterGainStoppingCriterion(), language, stoppingCriterion);
 		}
