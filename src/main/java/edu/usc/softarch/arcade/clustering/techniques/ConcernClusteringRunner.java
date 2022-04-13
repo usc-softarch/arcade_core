@@ -179,11 +179,15 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 
 	private void initializeDocTopicsForEachFastCluster(String artifactsDir) {
-		// Initialize DocTopics from files
-		try {
-			TopicUtil.docTopics = new DocTopics(artifactsDir);
-		} catch (Exception e) {
-			e.printStackTrace();
+		try	{
+			TopicUtil.docTopics = DocTopics.deserializeDocTopics(artifactsDir + File.separator + "docTopics.json");
+		} catch (IOException e) {
+			// Initialize DocTopics from files
+			try {
+				TopicUtil.docTopics = new DocTopics(artifactsDir);
+			} catch (Exception f) {
+				f.printStackTrace();
+			}
 		}
 
 		// Set the DocTopics of each Cluster
