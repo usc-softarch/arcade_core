@@ -71,3 +71,24 @@ main functionalities of ARCADE, not to supplant it.
   universally seemed better suited as a member of a newly-formed data 
   structure. The exception is IO utilities such as FileUtil, as I have yet 
   to find an appropriately elegant way to handle those.
+- **Choose external libraries with care**: I have found that at least half 
+  of the time, entire external libraries are imported just to use one or two 
+  very simple utility methods. Of those, the vast majority could easily be 
+  implemented with one or two lines of Java Streams (the sole exception 
+  being the SystemUtils class from Apache Commons, which proved too 
+  contrived to safely replace). Preference should be given to these in-house 
+  implementations of exceptionally simple functionalities such as object 
+  comparisons and manipulation. For reference, after the first round of 
+  refactorings, which exclusively involved updating of deprecated code and 
+  removal of under-utilized utility libraries, ARCADE_Core's packaged jar 
+  became half the size it was prior. Care should be given to avoid bloating 
+  it again. To this end, while maintainer, I may elect to reject any 
+  contributions that include libraries not already present in ARCADE_Core's 
+  dependencies if I deem that those libraries are being under-utilized and 
+  can easily be replaced by in-house code.
+- **Dead code is deleted code**: No matter how useful a piece of code has 
+  been in the past, if it is no longer in use and its past use case is not 
+  documented, it will most likely be deleted. Without usage examples, the 
+  effort of manufacturing an use case outweighs the benefits of 
+  retro-fitting dead code into the system. This is particularly true when 
+  external files are involved where no such files exist anymore.
