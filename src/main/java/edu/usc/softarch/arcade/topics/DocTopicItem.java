@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.topics;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -121,11 +122,14 @@ public class DocTopicItem implements Serializable {
 		
 		double[] sortedP = new double[this.size()];
 		double[] sortedQ = new double[this.size()];
-		
-		for (TopicItem pTopicItem : this.getTopics())
+
+		Collection<TopicItem> currTopics = this.topics.values();
+		Collection<TopicItem> toCompareTopics = toCompare.topics.values();
+
+		for (TopicItem pTopicItem : currTopics)
 			sortedP[pTopicItem.getTopicNum()] = pTopicItem.getProportion();
 		
-		for (TopicItem qTopicItem : toCompare.getTopics())
+		for (TopicItem qTopicItem : toCompareTopics)
 			sortedQ[qTopicItem.getTopicNum()] = qTopicItem.getProportion();
 
 		divergence = Maths.jensenShannonDivergence(sortedP, sortedQ);
