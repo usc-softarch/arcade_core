@@ -102,8 +102,7 @@ public class TopicCompositionParser {
 	}
 
 	private static long[][] reverseTypeTopicCounts(
-			int[][] typeTopicCounts, int alphabetSize, int numTopics, int topicMask)
-			throws Exception {
+			int[][] typeTopicCounts, int alphabetSize, int numTopics, int topicMask) {
 		// Setting up auxiliary variables
 		int topicMaskBitLength = Integer.SIZE - Integer.numberOfLeadingZeros(topicMask);
 		int typeMaskBitLength = Integer.SIZE - Integer.numberOfLeadingZeros(alphabetSize);
