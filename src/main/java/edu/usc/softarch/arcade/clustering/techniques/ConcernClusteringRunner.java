@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.Cluster;
@@ -281,78 +283,71 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		return newCluster;
 	}
 	
-	private static void updateFastClustersAndSimMatrixToReflectMergedCluster(
+	private void updateFastClustersAndSimMatrixToReflectMergedCluster(
 			MaxSimData data, Cluster newCluster, List<List<Double>> simMatrix,
 			String simMeasure) {
-		Cluster cluster = fastClusters.get(data.rowIndex);
-		Cluster otherCluster = fastClusters.get(data.colIndex);
-		
-		int greaterIndex = -1;
-		int lesserIndex = -1;
+		// Sanity check
 		if (data.rowIndex == data.colIndex)
 			throw new IllegalArgumentException("data.rowIndex: " + data.rowIndex
 				+ " should not be the same as data.colIndex: " + data.colIndex);
-		
-		if (data.rowIndex > data.colIndex) {
-			greaterIndex = data.rowIndex;
-			lesserIndex = data.colIndex;
-		} else if (data.rowIndex < data.colIndex) {
-			greaterIndex = data.colIndex;
-			lesserIndex = data.rowIndex;
-		}
-		
+
+		// Initializing variables
+		Cluster cluster = fastClusters.get(data.rowIndex);
+		Cluster otherCluster = fastClusters.get(data.colIndex);
+		int greaterIndex = Math.max(data.rowIndex, data.colIndex);
+		int lesserIndex = Math.min(data.rowIndex, data.colIndex);
+
+		// Remove the merged row and column from the matrix
 		simMatrix.remove(greaterIndex);
-		for (List<Double> col : simMatrix)
-			col.remove(greaterIndex);
-		
+		simMatrix.forEach(list -> list.remove(greaterIndex));
 		simMatrix.remove(lesserIndex);
-		for (List<Double> col : simMatrix)
-			col.remove(lesserIndex);
+		simMatrix.forEach(list -> list.remove(lesserIndex));
+
+		// Remove merged clusters, add new cluster
+		super.removeCluster(cluster);
+		super.removeCluster(otherCluster);
+		super.addCluster(newCluster);
+
+		// Create new row with lowest similarity possible, Double.MAX_VALUE
+		simMatrix.add(Stream.generate(() -> Double.MAX_VALUE)
+			.limit(fastClusters.size()).collect(Collectors.toList()));
 		
-		fastClusters.remove(cluster);
-		fastClusters.remove(otherCluster);
-		fastClusters.add(newCluster);
-		
-		List<Double> newRow = new ArrayList<>(fastClusters.size());
-		for (int i = 0; i < fastClusters.size(); i++)
-			newRow.add(Double.MAX_VALUE);
-		
-		simMatrix.add(newRow);
-		
-		// adding a new value to create new column for all but the last row, which
-		// already has the column for the new cluster
+		// Likewise, create new column. Last cell not added to avoid duplication.
 		for (int i = 0; i < fastClusters.size() - 1; i++)
 			simMatrix.get(i).add(Double.MAX_VALUE);
-		
-		if (simMatrix.size() != fastClusters.size())
-			throw new RuntimeException("simMatrix.size(): " + simMatrix.size()
-				+ " is not equal to fastClusters.size(): " + fastClusters.size());
-		
-		for (int i = 0; i < fastClusters.size(); i++)
-			if (simMatrix.get(i).size() != fastClusters.size())
-				throw new RuntimeException("simMatrix.get(" + i + ").size(): "
-					+ simMatrix.get(i).size() + " is not equal to fastClusters.size(): "
-					+ fastClusters.size());
-	
-		
+
+		// Calculate new cluster divergence measure against all others
 		for (int i = 0; i < fastClusters.size(); i++) {
 			Cluster currCluster = fastClusters.get(i);
-			double currJSDivergence = 0;
-			if (simMeasure.equalsIgnoreCase("js")) {
-				try {
-					currJSDivergence =
-						newCluster.docTopicItem.getJsDivergence(currCluster.docTopicItem);
-				} catch (DistributionSizeMismatchException e) {
-					e.printStackTrace(); //TODO handle it
-				}
-			}
-			else if (simMeasure.equalsIgnoreCase("scm"))
-				currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(newCluster, currCluster);
-			else
-				throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
+			double currDivergence = 0;
 
-			simMatrix.get(fastClusters.size()-1).set(i, currJSDivergence);
-			simMatrix.get(i).set(fastClusters.size()-1, currJSDivergence);
+			// Calculate it based on the selected similarity measure
+			switch (simMeasure.toLowerCase()) {
+				case "js":
+					try {
+						currDivergence = getJsDivergence(newCluster, currCluster);
+					} catch (DistributionSizeMismatchException e) {
+						e.printStackTrace(); //TODO handle it
+					}
+					break;
+				case "scm":
+					currDivergence = getScmDivergence(newCluster, currCluster);
+					break;
+				default:
+					throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
+			}
+
+			simMatrix.get(fastClusters.size()-1).set(i, currDivergence);
+			simMatrix.get(i).set(fastClusters.size()-1, currDivergence);
 		}
+	}
+
+	private double getScmDivergence(Cluster newCluster, Cluster currCluster) {
+		return FastSimCalcUtil.getStructAndConcernMeasure(newCluster, currCluster);
+	}
+
+	private double getJsDivergence(Cluster newCluster, Cluster currCluster)
+			throws DistributionSizeMismatchException {
+		return newCluster.docTopicItem.getJsDivergence(currCluster.docTopicItem);
 	}
 }

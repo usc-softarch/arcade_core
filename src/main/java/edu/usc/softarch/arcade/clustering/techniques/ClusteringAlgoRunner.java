@@ -29,6 +29,10 @@ public class ClusteringAlgoRunner {
 			FastFeatureVectors inFastFeatureVectors) {
 		fastFeatureVectors = inFastFeatureVectors;
 	}
+	protected void removeCluster(Cluster cluster) {
+		fastClusters.remove(cluster);	}
+	protected void addCluster(Cluster cluster) {
+		fastClusters.add(cluster); }
 	// #endregion ACCESSORS ------------------------------------------------------
 	
 	protected static void initializeClusters(String srcDir, String language) {
