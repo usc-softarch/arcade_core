@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.clustering.techniques;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
 import edu.usc.softarch.arcade.clustering.MaxSimData;
+import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
@@ -27,9 +29,9 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	private DocTopics docTopics;
 
 	// Initial fastClusters state before any clustering
-	private final Architecture initialFastClusters;
+	private final Architecture initialArchitecture;
 	// fastClusters state after initializing docTopics
-	private final Architecture fastClustersWithDocTopics;
+	private final Architecture architectureWithDocTopics;
 	// #endregion ATTRIBUTES -----------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
@@ -44,19 +46,19 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 		// Initially, every node gets a cluster
 		initializeClusters(srcDir, language);
-		this.initialFastClusters = new Architecture(architecture);
+		this.initialArchitecture = new Architecture(architecture);
 
 		initializeDocTopicsForEachFastCluster(artifactsDir);
-		this.fastClustersWithDocTopics = new Architecture(architecture);
+		this.architectureWithDocTopics = new Architecture(architecture);
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public Architecture getInitialFastClusters() {
-		return this.initialFastClusters; }
+	public Architecture getInitialArchitecture() {
+		return this.initialArchitecture; }
 
-	public Architecture getFastClustersWithDocTopics() {
-		return this.fastClustersWithDocTopics; }
+	public Architecture getArchitectureWithDocTopics() {
+		return this.architectureWithDocTopics; }
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region INTERFACE ---------------------------------------------------------
@@ -103,9 +105,13 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			ffVecs, sysDirPath, artifactsDirPath, language);
 		int numClusters = (int) (runner.getFastClusters().size() * .20);
 
-		runner.computeClustersWithConcernsAndFastClusters(
-			new PreSelectedStoppingCriterion(numClusters, runner),
-			"preselected", "js");
+		try {
+			runner.computeClustersWithConcernsAndFastClusters(
+				new PreSelectedStoppingCriterion(numClusters, runner),
+				"preselected", "js");
+		} catch (DistributionSizeMismatchException e) {
+			e.printStackTrace(); //TODO Handle it
+		}
 
 		String prefix = outputDirPath + File.separator
 			+ revisionNumber + "_" + numTopics + "_topics_"
@@ -123,9 +129,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 	public void computeClustersWithConcernsAndFastClusters(
 			StoppingCriterion stoppingCriterion, String stopCriterion,
-			String simMeasure) {
-		List<List<Double>> simMatrix =
-			architecture.computeJSDivergenceSimMatrix(simMeasure);
+			String simMeasure) throws DistributionSizeMismatchException {
+		SimilarityMatrix simMatrix = architecture.computeJSDivergenceSimMatrix(simMeasure);
 
 		while (stoppingCriterion.notReadyToStop()) {
 			if (stopCriterion.equalsIgnoreCase("clustergain")) {
@@ -148,35 +153,27 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	 * @param simMatrix Similarity matrix to analyze.
 	 * @return The maximum-similarity cell.
 	 */
-	private MaxSimData identifyMostSimClusters(List<List<Double>> simMatrix) {
+	private MaxSimData identifyMostSimClusters(SimilarityMatrix simMatrix) {
 		if (simMatrix.size() != architecture.size())
 			throw new IllegalArgumentException("expected simMatrix.size():"
 				+ simMatrix.size() + " to be fastClusters.size(): "
 				+ architecture.size());
-		for (List<Double> col : simMatrix)
+
+		for (HashMap<String, Double> col : simMatrix.values())
 			if (col.size() != architecture.size())
 				throw new IllegalArgumentException("expected col.size():" + col.size()
 					+ " to be fastClusters.size(): " + architecture.size());
 		
-		int length = simMatrix.size();
 		MaxSimData msData = new MaxSimData();
-		msData.rowIndex = 0;
-		msData.colIndex = 0;
-		double smallestJsDiv = Double.MAX_VALUE;
-
-		// Looks for the smallest value in the matrix
-		for (int i = 0; i < length; i++) {
-			for (int j = 0; j < length; j++) {
-				double currJsDiv = simMatrix.get(i).get(j);
-				if (currJsDiv < smallestJsDiv && i != j) {
-					smallestJsDiv = currJsDiv;
-					msData.rowIndex = i;
-					msData.colIndex = j;
-				}
-			}
+		Map.Entry<String, String> minCell = null;
+		try {
+			minCell = simMatrix.getMinCell();
+		} catch (Exception e) {
+			e.printStackTrace(); //TODO Handle it
 		}
+		msData.c1 = super.architecture.get(minCell.getKey());
+		msData.c2 = super.architecture.get(minCell.getValue());
 
-		msData.currentMaxSim = smallestJsDiv;
 		return msData;
 	}
 
@@ -262,8 +259,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 	
 	private Cluster mergeFastClustersUsingTopics(MaxSimData data) {
-		Cluster cluster = (Cluster) architecture.values().toArray()[data.rowIndex];
-		Cluster otherCluster = (Cluster) architecture.values().toArray()[data.colIndex];
+		Cluster cluster = data.c1;
+		Cluster otherCluster = data.c2;
 		return mergeFastClustersUsingTopics(cluster, otherCluster);
 	}
 
@@ -283,37 +280,26 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 	
 	private void updateFastClustersAndSimMatrixToReflectMergedCluster(
-			MaxSimData data, Cluster newCluster, List<List<Double>> simMatrix,
+			MaxSimData data, Cluster newCluster, SimilarityMatrix simMatrix,
 			String simMeasure) {
 		// Sanity check
-		if (data.rowIndex == data.colIndex)
+		if (data.c1.getName().equals(data.c2.getName()))
 			throw new IllegalArgumentException("data.rowIndex: " + data.rowIndex
 				+ " should not be the same as data.colIndex: " + data.colIndex);
 
 		// Initializing variables
-		Cluster cluster = (Cluster) architecture.values().toArray()[data.rowIndex];
-		Cluster otherCluster = (Cluster) architecture.values().toArray()[data.colIndex];
-		int greaterIndex = Math.max(data.rowIndex, data.colIndex);
-		int lesserIndex = Math.min(data.rowIndex, data.colIndex);
+		Cluster cluster = data.c1;
+		Cluster otherCluster = data.c2;
 
 		// Remove the merged row and column from the matrix
-		simMatrix.remove(greaterIndex);
-		simMatrix.forEach(list -> list.remove(greaterIndex));
-		simMatrix.remove(lesserIndex);
-		simMatrix.forEach(list -> list.remove(lesserIndex));
+		simMatrix.remove(cluster);
+		simMatrix.remove(otherCluster);
+		simMatrix.put(newCluster.getName(), new LinkedHashMap<>());
 
 		// Remove merged clusters, add new cluster
 		super.removeCluster(cluster);
 		super.removeCluster(otherCluster);
 		super.addCluster(newCluster);
-
-		// Create new row with lowest similarity possible, Double.MAX_VALUE
-		simMatrix.add(Stream.generate(() -> Double.MAX_VALUE)
-			.limit(architecture.size()).collect(Collectors.toList()));
-		
-		// Likewise, create new column. Last cell not added to avoid duplication.
-		for (int i = 0; i < architecture.size() - 1; i++)
-			simMatrix.get(i).add(Double.MAX_VALUE);
 
 		// Calculate new cluster divergence measure against all others
 		for (int i = 0; i < architecture.size(); i++) {
@@ -336,8 +322,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 					throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
 			}
 
-			simMatrix.get(architecture.size()-1).set(i, currDivergence);
-			simMatrix.get(i).set(architecture.size()-1, currDivergence);
+			simMatrix.get(currCluster.getName()).put(newCluster.getName(), currDivergence);
+			simMatrix.get(newCluster.getName()).put(currCluster.getName(), currDivergence);
 		}
 	}
 

@@ -95,8 +95,8 @@ public class ConcernClusteringRunnerTest {
 
 		/* Tests whether fastClusters was altered by
 		 * initializeDocTopicsForEachFastCluster */
-		Architecture fastClustersBefore = runner.getInitialFastClusters();
-		Architecture fastClustersAfterInit = runner.getFastClustersWithDocTopics();
+		Architecture fastClustersBefore = runner.getInitialArchitecture();
+		Architecture fastClustersAfterInit = runner.getArchitectureWithDocTopics();
 		System.out.println("fastClusters size before: " + fastClustersBefore.size());
 		System.out.println("fastClusters size after: " + fastClustersAfterInit.size());
 		// every node should get a cluster, so there should be at least one cluster
@@ -192,7 +192,7 @@ public class ConcernClusteringRunnerTest {
 				"preselected", "js");
 		});
 
-		Architecture fastClustersAfterInit = runner.getFastClustersWithDocTopics();
+		Architecture fastClustersAfterInit = runner.getArchitectureWithDocTopics();
 		Architecture fastClustersCompute = runner.getFastClusters();
 		// Check that fastClusters not empty after computeClustersWithConcernsAndFastClusters call 
 		assertFalse(fastClustersCompute.isEmpty());

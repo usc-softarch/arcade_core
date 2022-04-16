@@ -109,33 +109,28 @@ public class Architecture extends LinkedHashMap<String, Cluster> {
 		return centroidSum / clusterCentroids.size();
 	}
 
-  public List<List<Double>> computeJSDivergenceSimMatrix(String simMeasure) {
-		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
+  public SimilarityMatrix computeJSDivergenceSimMatrix(String simMeasure)
+			throws DistributionSizeMismatchException {
+		SimilarityMatrix simMatrix = new SimilarityMatrix();
 
-		for (int i = 0; i < this.size(); i++)
-			simMatrixObj.add(new ArrayList<>(this.size()));
+		for (Cluster c1 : this.values()) {
+			simMatrix.put(c1.getName(), new LinkedHashMap<>());
 
-		for (int i = 0; i < this.size(); i++) {
-			Cluster c1 = (Cluster) this.values().toArray()[i];
-			for (int j = 0; j < this.size(); j++) {
-				Cluster c2 = (Cluster) this.values().toArray()[j];
-				double currJSDivergence = 0;
+			for (Cluster c2 : this.values()) {
+				double divergence = 0;
 
 				if (simMeasure.equalsIgnoreCase("js"))
-					try {
-						currJSDivergence = c1.docTopicItem.getJsDivergence(c2.docTopicItem);
-					} catch (DistributionSizeMismatchException e) {
-						e.printStackTrace(); //TODO handle it
-					}
+					divergence = c1.docTopicItem.getJsDivergence(c2.docTopicItem);
 				else if (simMeasure.equalsIgnoreCase("scm"))
-					currJSDivergence = FastSimCalcUtil.getStructAndConcernMeasure(c1, c2);
+					divergence = FastSimCalcUtil.getStructAndConcernMeasure(c1, c2);
 				else
 					throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
-				
-				simMatrixObj.get(i).add(currJSDivergence);
+
+				simMatrix.get(c1.getName()).put(c2.getName(), divergence);
 			}
 		}
-		return simMatrixObj;
+
+		return simMatrix;
 	}
 
   public List<List<Double>> computeInfoLossSimMatrix(
