@@ -10,7 +10,7 @@ public class PreSelectedStoppingCriterion
 		this.numClusters = numClusters; }
 
 	public boolean notReadyToStop() {
-		return ClusteringAlgoRunner.fastClusters.size() != 1
-						&& ClusteringAlgoRunner.fastClusters.size() != numClusters;
+		return ClusteringAlgoRunner.architecture.size() != 1
+						&& ClusteringAlgoRunner.architecture.size() != numClusters;
 	}
 }

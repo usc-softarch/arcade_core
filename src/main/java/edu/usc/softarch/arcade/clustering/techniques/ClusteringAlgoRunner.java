@@ -15,7 +15,7 @@ import edu.usc.softarch.arcade.util.FileListing;
 
 public class ClusteringAlgoRunner {
 	// #region ATTRIBUTES --------------------------------------------------------
-	public static Architecture fastClusters;
+	public static Architecture architecture;
 	protected static FastFeatureVectors fastFeatureVectors;
 	protected static double maxClusterGain = 0;
 	public static int numClustersAtMaxClusterGain = 0;
@@ -23,20 +23,20 @@ public class ClusteringAlgoRunner {
 	// #endregion ATTRIBUTES -----------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public Architecture getFastClusters() { return fastClusters; }
+	public Architecture getFastClusters() { return architecture; }
 
 	public static void setFastFeatureVectors(
 			FastFeatureVectors inFastFeatureVectors) {
 		fastFeatureVectors = inFastFeatureVectors;
 	}
 	protected void removeCluster(Cluster cluster) {
-		fastClusters.remove(cluster);	}
+		architecture.remove(cluster.getName());	}
 	protected void addCluster(Cluster cluster) {
-		fastClusters.add(cluster); }
+		architecture.put(cluster.getName(), cluster); }
 	// #endregion ACCESSORS ------------------------------------------------------
 	
 	protected static void initializeClusters(String srcDir, String language) {
-		fastClusters = new Architecture();
+		architecture = new Architecture();
 
 		// For each cell in the adjacency matrix
 		for (String name : fastFeatureVectors.getFeatureVectorNames()) {
@@ -52,13 +52,13 @@ public class ClusteringAlgoRunner {
 		
 		// Unknown whether this block ever executes
 		try {
-			if (fastClusters.isEmpty()) {
+			if (architecture.isEmpty()) {
 				List<File> javaFiles =
 					FileListing.getFileListing(new File(srcDir), ".java");
 				
 				for (File javaFile : javaFiles) {
 					Cluster cluster = new Cluster(javaFile.getPath());
-					fastClusters.add(cluster);
+					architecture.put(cluster.getName(), cluster);
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -79,26 +79,26 @@ public class ClusteringAlgoRunner {
 			if (Config.getClusteringGranule().equals(Granule.file) &&
 					!cluster.getName().startsWith("/") &&
 					p.matcher(cluster.getName()).find())
-				fastClusters.add(cluster);
+				architecture.put(cluster.getName(), cluster);
 		}
 
 		// This block is used only for certain older modules, disregard
 		if (Config.getClusteringGranule().equals(Granule.func)) {
 			if (cluster.getName().equals("\"##\""))
 				return;
-			fastClusters.add(cluster);
+			architecture.put(cluster.getName(), cluster);
 		}
 
 		// If the source language is Java, add all clusters
 		// Second condition to be assumed true
 		if (language.equalsIgnoreCase("java"))
-			fastClusters.add(cluster);
+			architecture.put(cluster.getName(), cluster);
 	}
 	
 	protected static void checkAndUpdateClusterGain(double clusterGain) {
 		if (clusterGain > maxClusterGain) {
 			maxClusterGain = clusterGain;
-			numClustersAtMaxClusterGain = fastClusters.size();
+			numClustersAtMaxClusterGain = architecture.size();
 		}
 	}
 }

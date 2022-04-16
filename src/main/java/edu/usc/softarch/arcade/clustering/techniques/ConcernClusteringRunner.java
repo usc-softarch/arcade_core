@@ -44,10 +44,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 		// Initially, every node gets a cluster
 		initializeClusters(srcDir, language);
-		this.initialFastClusters = new Architecture(fastClusters);
+		this.initialFastClusters = new Architecture(architecture);
 
 		initializeDocTopicsForEachFastCluster(artifactsDir);
-		this.fastClustersWithDocTopics = new Architecture(fastClusters);
+		this.fastClustersWithDocTopics = new Architecture(architecture);
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
@@ -125,11 +125,11 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			StoppingCriterion stoppingCriterion, String stopCriterion,
 			String simMeasure) {
 		List<List<Double>> simMatrix =
-			fastClusters.computeJSDivergenceSimMatrix(simMeasure);
+			architecture.computeJSDivergenceSimMatrix(simMeasure);
 
 		while (stoppingCriterion.notReadyToStop()) {
 			if (stopCriterion.equalsIgnoreCase("clustergain")) {
-				double clusterGain = fastClusters.computeTopicClusterGain();
+				double clusterGain = architecture.computeTopicClusterGain();
 				checkAndUpdateClusterGain(clusterGain);
 			}
 
@@ -149,14 +149,14 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	 * @return The maximum-similarity cell.
 	 */
 	private MaxSimData identifyMostSimClusters(List<List<Double>> simMatrix) {
-		if (simMatrix.size() != fastClusters.size())
+		if (simMatrix.size() != architecture.size())
 			throw new IllegalArgumentException("expected simMatrix.size():"
 				+ simMatrix.size() + " to be fastClusters.size(): "
-				+ fastClusters.size());
+				+ architecture.size());
 		for (List<Double> col : simMatrix)
-			if (col.size() != fastClusters.size())
+			if (col.size() != architecture.size())
 				throw new IllegalArgumentException("expected col.size():" + col.size()
-					+ " to be fastClusters.size(): " + fastClusters.size());
+					+ " to be fastClusters.size(): " + architecture.size());
 		
 		int length = simMatrix.size();
 		MaxSimData msData = new MaxSimData();
@@ -193,12 +193,12 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		}
 
 		// Set the DocTopics of each Cluster
-		for (Cluster c : fastClusters)
+		for (Cluster c : architecture.values())
 			this.docTopics.setClusterDocTopic(c, this.language);
 		
 		// Map inner classes to their parents
 		Map<String,String> parentClassMap = new HashMap<>();
-		for (Cluster c : fastClusters) {
+		for (Cluster c : architecture.values()) {
 			if (c.getName().contains("$")) {
 				String[] tokens = c.getName().split("\\$");
 				String parentClassName = tokens[0];
@@ -208,63 +208,62 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		
 		removeClassesWithoutDTI(parentClassMap);
 
-		Architecture updatedFastClusters =
-			new Architecture(fastClusters);
+		Architecture updatedArchitecture = new Architecture(architecture);
 		for (String key : parentClassMap.keySet()) {
-			for (Cluster nestedCluster : fastClusters) {
+			for (Cluster nestedCluster : architecture.values()) {
 				if (nestedCluster.getName().equals(key)) {
-					for (Cluster parentCluster : fastClusters) {
+					for (Cluster parentCluster : architecture.values()) {
 						if (parentClassMap.get(key).equals(parentCluster.getName())) {
 							Cluster mergedCluster = mergeFastClustersUsingTopics(nestedCluster,parentCluster);
-							updatedFastClusters.remove(parentCluster);
-							updatedFastClusters.remove(nestedCluster);
-							updatedFastClusters.add(mergedCluster);
+							updatedArchitecture.remove(parentCluster.getName());
+							updatedArchitecture.remove(nestedCluster.getName());
+							updatedArchitecture.put(mergedCluster.getName(), mergedCluster);
 						}
 					}
 				}
 			}
 		}
 
-		fastClusters = updatedFastClusters;
+		architecture = updatedArchitecture;
 		
 		Architecture clustersWithMissingDocTopics =	new Architecture();
-		for (Cluster c : fastClusters)
+		for (Cluster c : architecture.values())
 			if (c.docTopicItem == null)
-				clustersWithMissingDocTopics.add(c);
+				clustersWithMissingDocTopics.put(c.getName(), c);
 
-		fastClusters.removeAll(clustersWithMissingDocTopics);
+		architecture.removeAll(clustersWithMissingDocTopics);
 
-		for (Cluster c : clustersWithMissingDocTopics)
-			fastClusters.remove(c);
+		for (Cluster c : clustersWithMissingDocTopics.values())
+			architecture.remove(c.getName());
 	}
 
 	private void removeClassesWithoutDTI(Map<String, String> parentClassMap) {
 		// Locate non-inner classes without DTI
 		Architecture excessClusters = new Architecture();
-		for (Cluster c : fastClusters)
+		for (Cluster c : architecture.values())
 			if (c.docTopicItem == null && !c.getName().contains("$"))
-				excessClusters.add(c);
+				excessClusters.put(c.getName(), c);
 		
 		// Locate inner classes of those non-inner classes without DTI
 		Architecture excessInners = new Architecture();
-		for (Cluster excessCluster : excessClusters) {
-			for (Cluster cluster : fastClusters) {
+		for (Cluster excessCluster : excessClusters.values()) {
+			for (Cluster cluster : architecture.values()) {
 				if (parentClassMap.containsKey(cluster.getName())) {
 					String parentClass = parentClassMap.get(cluster.getName());
 					if (parentClass.equals(excessCluster.getName()))
-						excessInners.add(cluster);
+						excessInners.put(cluster.getName(), cluster);
 				}
 			}
 		}
 
 		// Remove them from the analysis
-		fastClusters.removeAll(excessClusters);
-		fastClusters.removeAll(excessInners);
+		architecture.removeAll(excessClusters);
+		architecture.removeAll(excessInners);
 	}
 	
 	private Cluster mergeFastClustersUsingTopics(MaxSimData data) {
-		Cluster cluster = fastClusters.get(data.rowIndex);
-		Cluster otherCluster = fastClusters.get(data.colIndex);
+		Cluster cluster = (Cluster) architecture.values().toArray()[data.rowIndex];
+		Cluster otherCluster = (Cluster) architecture.values().toArray()[data.colIndex];
 		return mergeFastClustersUsingTopics(cluster, otherCluster);
 	}
 
@@ -292,8 +291,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				+ " should not be the same as data.colIndex: " + data.colIndex);
 
 		// Initializing variables
-		Cluster cluster = fastClusters.get(data.rowIndex);
-		Cluster otherCluster = fastClusters.get(data.colIndex);
+		Cluster cluster = (Cluster) architecture.values().toArray()[data.rowIndex];
+		Cluster otherCluster = (Cluster) architecture.values().toArray()[data.colIndex];
 		int greaterIndex = Math.max(data.rowIndex, data.colIndex);
 		int lesserIndex = Math.min(data.rowIndex, data.colIndex);
 
@@ -310,15 +309,15 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 		// Create new row with lowest similarity possible, Double.MAX_VALUE
 		simMatrix.add(Stream.generate(() -> Double.MAX_VALUE)
-			.limit(fastClusters.size()).collect(Collectors.toList()));
+			.limit(architecture.size()).collect(Collectors.toList()));
 		
 		// Likewise, create new column. Last cell not added to avoid duplication.
-		for (int i = 0; i < fastClusters.size() - 1; i++)
+		for (int i = 0; i < architecture.size() - 1; i++)
 			simMatrix.get(i).add(Double.MAX_VALUE);
 
 		// Calculate new cluster divergence measure against all others
-		for (int i = 0; i < fastClusters.size(); i++) {
-			Cluster currCluster = fastClusters.get(i);
+		for (int i = 0; i < architecture.size(); i++) {
+			Cluster currCluster = (Cluster) architecture.values().toArray()[i];
 			double currDivergence = 0;
 
 			// Calculate it based on the selected similarity measure
@@ -337,8 +336,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 					throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
 			}
 
-			simMatrix.get(fastClusters.size()-1).set(i, currDivergence);
-			simMatrix.get(i).set(fastClusters.size()-1, currDivergence);
+			simMatrix.get(architecture.size()-1).set(i, currDivergence);
+			simMatrix.get(i).set(architecture.size()-1, currDivergence);
 		}
 	}
 
