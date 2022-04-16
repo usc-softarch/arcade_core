@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.Cluster;
@@ -159,20 +156,20 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				+ simMatrix.size() + " to be fastClusters.size(): "
 				+ architecture.size());
 
-		for (HashMap<String, Double> col : simMatrix.values())
+		for (HashMap<Cluster, Double> col : simMatrix.values())
 			if (col.size() != architecture.size())
 				throw new IllegalArgumentException("expected col.size():" + col.size()
 					+ " to be fastClusters.size(): " + architecture.size());
 		
 		MaxSimData msData = new MaxSimData();
-		Map.Entry<String, String> minCell = null;
+		Map.Entry<Cluster, Cluster> minCell = null;
 		try {
 			minCell = simMatrix.getMinCell();
 		} catch (Exception e) {
 			e.printStackTrace(); //TODO Handle it
 		}
-		msData.c1 = super.architecture.get(minCell.getKey());
-		msData.c2 = super.architecture.get(minCell.getValue());
+		msData.c1 = minCell.getKey();
+		msData.c2 = minCell.getValue();
 
 		return msData;
 	}
@@ -294,7 +291,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		// Remove the merged row and column from the matrix
 		simMatrix.remove(cluster);
 		simMatrix.remove(otherCluster);
-		simMatrix.put(newCluster.getName(), new LinkedHashMap<>());
+		simMatrix.put(newCluster, new HashMap<>());
 
 		// Remove merged clusters, add new cluster
 		super.removeCluster(cluster);
@@ -302,8 +299,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		super.addCluster(newCluster);
 
 		// Calculate new cluster divergence measure against all others
-		for (int i = 0; i < architecture.size(); i++) {
-			Cluster currCluster = (Cluster) architecture.values().toArray()[i];
+		for (Cluster currCluster : super.architecture.values()) {
 			double currDivergence = 0;
 
 			// Calculate it based on the selected similarity measure
@@ -322,8 +318,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 					throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
 			}
 
-			simMatrix.get(currCluster.getName()).put(newCluster.getName(), currDivergence);
-			simMatrix.get(newCluster.getName()).put(currCluster.getName(), currDivergence);
+			simMatrix.get(currCluster).put(newCluster, currDivergence);
+			simMatrix.get(newCluster).put(currCluster, currDivergence);
 		}
 	}
 

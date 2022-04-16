@@ -11,11 +11,15 @@ import edu.usc.softarch.arcade.topics.DocTopicItem;
 
 public class Cluster implements Serializable {
 	// #region ATTRIBUTES --------------------------------------------------------
+	// This attribute helps guarantee the order of clustering, and makes ARC deterministic.
+	private static int ageCounter = 0;
 	private String name;
 	private int numEntities;
 	private int numFeatures = 0;
 	private Map<Integer, Double> featureMap = new HashMap<>();
 	public DocTopicItem docTopicItem;
+
+	private int age;
 	private static final long serialVersionUID = 1L;
 	// #endregion ATTRIBUTES -----------------------------------------------------
 
@@ -35,14 +39,22 @@ public class Cluster implements Serializable {
 
 		// Cluster currently only has one entity, the node itself
 		this.numEntities = 1;
+
+		this.age = ageCounter++;
 	}
 	
 	public Cluster(String name) {
 		this.name = name;
 		this.numEntities = 1;
+
+		this.age = ageCounter++;
 	}
 
-	public Cluster() { super(); }
+	public Cluster() {
+		super();
+
+		this.age = ageCounter++;
+	}
 
 	public Cluster(Cluster c1) {
 		this.name = c1.getName();
@@ -50,6 +62,8 @@ public class Cluster implements Serializable {
 		this.featureMap = c1.getFeatureMap();
 		this.numFeatures = c1.getNumFeatures();
 		this.docTopicItem = c1.docTopicItem;
+
+		this.age = ageCounter++;
 	}
 
 	public Cluster(Cluster c1, Cluster c2) {
@@ -63,6 +77,8 @@ public class Cluster implements Serializable {
 
 		this.numEntities = c1.getNumEntities() + c2.getNumEntities();
 		this.numFeatures = c1.getNumFeatures();
+
+		this.age = ageCounter++;
 	}
 
 	public Cluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2) {
@@ -77,12 +93,16 @@ public class Cluster implements Serializable {
 
 			this.numEntities = c1.getNumEntities() + c2.getNumEntities();
 			this.numFeatures = c1.getNumFeatures();
+
+			this.age = ageCounter++;
 		}
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
 	public int getNumFeatures() { return numFeatures; }
+
+	public int getAge() { return this.age; }
 
 	public Map<Integer, Double> getFeatureMap() {
 		return featureMap; }

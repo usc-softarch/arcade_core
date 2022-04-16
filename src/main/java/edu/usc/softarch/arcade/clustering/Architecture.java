@@ -114,7 +114,7 @@ public class Architecture extends LinkedHashMap<String, Cluster> {
 		SimilarityMatrix simMatrix = new SimilarityMatrix();
 
 		for (Cluster c1 : this.values()) {
-			simMatrix.put(c1.getName(), new LinkedHashMap<>());
+			simMatrix.put(c1, new HashMap<>());
 
 			for (Cluster c2 : this.values()) {
 				double divergence = 0;
@@ -126,7 +126,7 @@ public class Architecture extends LinkedHashMap<String, Cluster> {
 				else
 					throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
 
-				simMatrix.get(c1.getName()).put(c2.getName(), divergence);
+				simMatrix.get(c1).put(c2, divergence);
 			}
 		}
 
