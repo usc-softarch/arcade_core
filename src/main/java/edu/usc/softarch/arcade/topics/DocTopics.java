@@ -2,25 +2,20 @@ package edu.usc.softarch.arcade.topics;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
 import cc.mallet.topics.TopicInferencer;
 import cc.mallet.types.InstanceList;
+import edu.usc.softarch.arcade.clustering.Cluster;
 
 /**
  * @author joshua
  */
-public class DocTopics implements Serializable {
+public class DocTopics {
 	// #region FIELDS ------------------------------------------------------------
-	static final long serialVersionUID = 1L;
-	private static Logger logger = LogManager.getLogger(DocTopics.class);
 	private List<DocTopicItem> dtItemList;
 	// #endregion FIELDS ---------------------------------------------------------
 	
@@ -72,6 +67,9 @@ public class DocTopics implements Serializable {
 
 	// #region ACCESSORS ---------------------------------------------------------
 	public List<DocTopicItem> getDocTopicItemList() { return dtItemList; }
+
+	public void setClusterDocTopic(Cluster c, String language) {
+		c.docTopicItem = this.getDocTopicItem(c.getName(), language); }
 
 	/**
 	 * Gets the DocTopicItem for a given file name or entity.
@@ -136,7 +134,6 @@ public class DocTopics implements Serializable {
 					return dti;
 			}
 		}
-		logger.error("Cannot find doc topic for: " + name);
 		return null;
 	}
 	// #endregion ACCESSORS ------------------------------------------------------

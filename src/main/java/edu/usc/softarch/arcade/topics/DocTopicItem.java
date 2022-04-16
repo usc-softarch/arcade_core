@@ -41,12 +41,56 @@ public class DocTopicItem implements Serializable {
 	/**
 	 * Clone contructor
 	 */
-	public DocTopicItem(DocTopicItem docTopicItem) {
-		this.doc = docTopicItem.doc;
-		this.source = docTopicItem.source;
+	public DocTopicItem(DocTopicItem dti) {
+		initialize(dti);
+	}
+
+	/**
+	 * Merge constructor
+	 */
+	public DocTopicItem(DocTopicItem dti1, DocTopicItem dti2)
+			throws UnmatchingDocTopicItemsException {
+		// If either argument is null, then return the non-null argument
+		if (dti1 == null) {
+			initialize(dti2);
+			return;
+		}
+		if (dti2 == null) {
+			initialize(dti1);
+			return;
+		}
+
+		// If arguments do not match, throw exception
+		if (!dti1.hasSameTopics(dti2))
+			throw new UnmatchingDocTopicItemsException(
+				"In mergeDocTopicItems, nonmatching docTopicItems");
+
+		initialize(dti1);
+		Set<Integer> topicNumbers = dti1.getTopicNumbers();
+
+		for (Integer i : topicNumbers) {
+			TopicItem ti1 = dti1.getTopic(i);
+			TopicItem ti2 = dti2.getTopic(i);
+			TopicItem mergedTopicItem = this.getTopic(i);
+
+			mergedTopicItem.setWeight(ti1.getWeight() + ti2.getWeight());
+
+			mergedTopicItem.setProportion(
+				(ti1.getProportion() * ti1.getWeight()
+					+ ti2.getProportion() * ti2.getWeight())
+					/ mergedTopicItem.getWeight());
+		}
+	}
+
+	/**
+	 * Initialize clone
+	 */
+	public void initialize(DocTopicItem dti) {
+		this.doc = dti.doc;
+		this.source = dti.source;
 		this.topics = new HashMap<>();
 		setSortMethod(Sort.prop); //TODO Clone from argument
-		for (TopicItem topicItem : docTopicItem.getTopics())
+		for (TopicItem topicItem : dti.getTopics())
 			addTopic(new TopicItem(topicItem));
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------

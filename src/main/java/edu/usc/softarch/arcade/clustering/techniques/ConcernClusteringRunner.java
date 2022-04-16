@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.clustering.techniques;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +17,15 @@ import edu.usc.softarch.arcade.clustering.MaxSimData;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
+import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
-import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #region ATTRIBUTES --------------------------------------------------------
 	private final String language;
+	private DocTopics docTopics;
+
 	// Initial fastClusters state before any clustering
 	private final Architecture initialFastClusters;
 	// fastClusters state after initializing docTopics
@@ -105,19 +106,18 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		runner.computeClustersWithConcernsAndFastClusters(
 			new PreSelectedStoppingCriterion(numClusters),
 			"preselected", "js");
-		
-		String arcClustersFilename = outputDirPath + File.separator
+
+		String prefix = outputDirPath + File.separator
 			+ revisionNumber + "_" + numTopics + "_topics_"
-			+ runner.getFastClusters().size()	+ "_arc_clusters.rsf";
-		String docTopicsFilename = outputDirPath + File.separator
-			+ revisionNumber + "_" + numTopics + "_topics_"
-			+ runner.getFastClusters().size() + "_arc_docTopics.json";
+			+ runner.getFastClusters().size();
+		String arcClustersFilename = prefix	+ "_arc_clusters.rsf";
+		String docTopicsFilename = prefix + "_arc_docTopics.json";
 
 		Map<String, Integer> clusterNameToNodeNumberMap =
 			runner.getFastClusters().computeArchitectureIndex();
 		runner.getFastClusters().writeToRsf(
 			clusterNameToNodeNumberMap, arcClustersFilename);
-		TopicUtil.docTopics.serializeDocTopics(docTopicsFilename);
+		runner.docTopics.serializeDocTopics(docTopicsFilename);
 	}
 	// #endregion INTERFACE ------------------------------------------------------
 
@@ -182,11 +182,11 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 	private void initializeDocTopicsForEachFastCluster(String artifactsDir) {
 		try	{
-			TopicUtil.docTopics = DocTopics.deserializeDocTopics(artifactsDir + File.separator + "docTopics.json");
+			this.docTopics = DocTopics.deserializeDocTopics(artifactsDir + File.separator + "docTopics.json");
 		} catch (IOException e) {
 			// Initialize DocTopics from files
 			try {
-				TopicUtil.docTopics = new DocTopics(artifactsDir);
+				this.docTopics = new DocTopics(artifactsDir);
 			} catch (Exception f) {
 				f.printStackTrace();
 			}
@@ -194,7 +194,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 		// Set the DocTopics of each Cluster
 		for (Cluster c : fastClusters)
-			TopicUtil.setDocTopicForFastClusterForMalletApi(c, this.language);
+			this.docTopics.setClusterDocTopic(c, this.language);
 		
 		// Map inner classes to their parents
 		Map<String,String> parentClassMap = new HashMap<>();
@@ -262,19 +262,19 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		fastClusters.removeAll(excessInners);
 	}
 	
-	private static Cluster mergeFastClustersUsingTopics(MaxSimData data) {
+	private Cluster mergeFastClustersUsingTopics(MaxSimData data) {
 		Cluster cluster = fastClusters.get(data.rowIndex);
 		Cluster otherCluster = fastClusters.get(data.colIndex);
 		return mergeFastClustersUsingTopics(cluster, otherCluster);
 	}
 
-	private static Cluster mergeFastClustersUsingTopics(
+	private Cluster mergeFastClustersUsingTopics(
 			Cluster cluster, Cluster otherCluster) {
 		Cluster newCluster =
 			new Cluster(ClusteringAlgorithmType.LIMBO, cluster, otherCluster);
 		
 		try {
-			newCluster.docTopicItem = TopicUtil.mergeDocTopicItems(
+			newCluster.docTopicItem = new DocTopicItem(
 				cluster.docTopicItem, otherCluster.docTopicItem);
 		} catch (UnmatchingDocTopicItemsException e) {
 			e.printStackTrace(); //TODO handle it

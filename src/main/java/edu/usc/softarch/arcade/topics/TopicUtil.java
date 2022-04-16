@@ -51,12 +51,4 @@ public class TopicUtil {
 
 		return mergedDocTopicItem;
 	}
-
-	/**
-	 * Sets the DocTopicItem of a FastCluster.
-	 */
-	public static void setDocTopicForFastClusterForMalletApi(
-					Cluster c, String language) {
-		c.docTopicItem = docTopics.getDocTopicItem(c.getName(), language);
-	}
 }
