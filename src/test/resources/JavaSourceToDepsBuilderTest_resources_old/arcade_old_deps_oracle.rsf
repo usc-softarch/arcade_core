@@ -1724,7 +1724,7 @@ depends edu.usc.softarch.arcade.clustering.BatchClusteringEngine edu.usc.softarc
 depends edu.usc.softarch.arcade.clustering.BatchClusteringEngine edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder
 depends edu.usc.softarch.arcade.clustering.BatchClusteringEngine edu.usc.softarch.arcade.config.Config$Language
 depends edu.usc.softarch.arcade.clustering.BatchClusteringEngine edu.usc.softarch.arcade.clustering.ConcernClusteringRunner
-depends edu.usc.softarch.arcade.clustering.BatchClusteringEngine edu.usc.softarch.arcade.clustering.FastFeatureVectors
+depends edu.usc.softarch.arcade.clustering.BatchClusteringEngine edu.usc.softarch.arcade.clustering.FeatureVectors
 depends edu.usc.softarch.arcade.clustering.BatchClusteringEngine edu.usc.softarch.arcade.topics.TopicModelExtractionMethod
 depends edu.usc.softarch.arcade.clustering.BatchClusteringEngine java.util.ArrayList
 depends edu.usc.softarch.arcade.clustering.BatchClusteringEngine edu.usc.softarch.arcade.config.Config$StoppingCriterionConfig
@@ -1780,7 +1780,7 @@ depends edu.usc.softarch.arcade.clustering.ClusterGainStoppingCriterion java.uti
 depends edu.usc.softarch.arcade.clustering.ClusterGainStoppingCriterion edu.usc.softarch.arcade.clustering.StoppingCriterion
 depends edu.usc.softarch.arcade.clustering.ClusteringAlgoRunner java.lang.Object
 depends edu.usc.softarch.arcade.clustering.ClusteringAlgoRunner java.util.ArrayList
-depends edu.usc.softarch.arcade.clustering.ClusteringAlgoRunner edu.usc.softarch.arcade.clustering.FastFeatureVectors
+depends edu.usc.softarch.arcade.clustering.ClusteringAlgoRunner edu.usc.softarch.arcade.clustering.FeatureVectors
 depends edu.usc.softarch.arcade.clustering.ClusteringAlgoRunner java.util.Iterator
 depends edu.usc.softarch.arcade.clustering.ClusteringAlgoRunner java.lang.String
 depends edu.usc.softarch.arcade.clustering.ClusteringAlgoRunner java.util.HashMap
@@ -1818,7 +1818,7 @@ depends edu.usc.softarch.arcade.clustering.ClusteringEngine java.lang.String
 depends edu.usc.softarch.arcade.clustering.ClusteringEngine java.io.ObjectInputStream
 depends edu.usc.softarch.arcade.clustering.ClusteringEngine java.io.FileInputStream
 depends edu.usc.softarch.arcade.clustering.ClusteringEngine java.io.InputStream
-depends edu.usc.softarch.arcade.clustering.ClusteringEngine edu.usc.softarch.arcade.clustering.FastFeatureVectors
+depends edu.usc.softarch.arcade.clustering.ClusteringEngine edu.usc.softarch.arcade.clustering.FeatureVectors
 depends edu.usc.softarch.arcade.clustering.ClusteringEngine org.apache.log4j.Logger
 depends edu.usc.softarch.arcade.clustering.ClusteringEngine java.lang.StringBuilder
 depends edu.usc.softarch.arcade.clustering.ClusteringEngine java.util.ArrayList
@@ -1878,7 +1878,7 @@ depends edu.usc.softarch.arcade.clustering.ClusteringEngine$SharedFeature edu.us
 depends edu.usc.softarch.arcade.clustering.ClusteringEngine$SharedFeature java.lang.StringBuilder
 depends edu.usc.softarch.arcade.clustering.ClusteringEngine$SharedFeature java.lang.String
 depends edu.usc.softarch.arcade.clustering.ConcernClusteringRunner edu.usc.softarch.arcade.clustering.ClusteringAlgoRunner
-depends edu.usc.softarch.arcade.clustering.ConcernClusteringRunner edu.usc.softarch.arcade.clustering.FastFeatureVectors
+depends edu.usc.softarch.arcade.clustering.ConcernClusteringRunner edu.usc.softarch.arcade.clustering.FeatureVectors
 depends edu.usc.softarch.arcade.clustering.ConcernClusteringRunner java.lang.String
 depends edu.usc.softarch.arcade.clustering.ConcernClusteringRunner edu.usc.softarch.arcade.topics.TopicModelExtractionMethod
 depends edu.usc.softarch.arcade.clustering.ConcernClusteringRunner edu.usc.softarch.arcade.util.StopWatch
@@ -1955,12 +1955,12 @@ depends edu.usc.softarch.arcade.clustering.FastCluster java.lang.StringBuilder
 depends edu.usc.softarch.arcade.clustering.FastCluster edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType
 depends edu.usc.softarch.arcade.clustering.FastCluster java.util.Iterator
 depends edu.usc.softarch.arcade.clustering.FastCluster edu.usc.softarch.arcade.topics.DocTopicItem
-depends edu.usc.softarch.arcade.clustering.FastFeatureVectors java.util.HashMap
-depends edu.usc.softarch.arcade.clustering.FastFeatureVectors java.util.ArrayList
-depends edu.usc.softarch.arcade.clustering.FastFeatureVectors java.lang.Object
-depends edu.usc.softarch.arcade.clustering.FastFeatureVectors java.io.Serializable
-depends edu.usc.softarch.arcade.clustering.FastFeatureVectors java.lang.String
-depends edu.usc.softarch.arcade.clustering.FastFeatureVectors java.util.BitSet
+depends edu.usc.softarch.arcade.clustering.FeatureVectors java.util.HashMap
+depends edu.usc.softarch.arcade.clustering.FeatureVectors java.util.ArrayList
+depends edu.usc.softarch.arcade.clustering.FeatureVectors java.lang.Object
+depends edu.usc.softarch.arcade.clustering.FeatureVectors java.io.Serializable
+depends edu.usc.softarch.arcade.clustering.FeatureVectors java.lang.String
+depends edu.usc.softarch.arcade.clustering.FeatureVectors java.util.BitSet
 depends edu.usc.softarch.arcade.clustering.FastSimCalcUtil java.lang.Object
 depends edu.usc.softarch.arcade.clustering.FastSimCalcUtil edu.usc.softarch.arcade.clustering.FastCluster
 depends edu.usc.softarch.arcade.clustering.FastSimCalcUtil java.util.HashMap
@@ -1987,7 +1987,7 @@ depends edu.usc.softarch.arcade.clustering.FeatureVector edu.usc.softarch.arcade
 depends edu.usc.softarch.arcade.clustering.FeatureVector java.lang.Double
 depends edu.usc.softarch.arcade.clustering.FeatureVector java.util.Iterator
 depends edu.usc.softarch.arcade.clustering.FeatureVector edu.usc.softarch.arcade.classgraphs.StringEdge
-depends edu.usc.softarch.arcade.clustering.FeatureVectorMap edu.usc.softarch.arcade.clustering.FastFeatureVectors
+depends edu.usc.softarch.arcade.clustering.FeatureVectorMap edu.usc.softarch.arcade.clustering.FeatureVectors
 depends edu.usc.softarch.arcade.clustering.FeatureVectorMap java.io.ObjectOutputStream
 depends edu.usc.softarch.arcade.clustering.FeatureVectorMap java.io.FileOutputStream
 depends edu.usc.softarch.arcade.clustering.FeatureVectorMap edu.usc.softarch.arcade.config.Config
@@ -2106,7 +2106,7 @@ depends edu.usc.softarch.arcade.clustering.LimboRunner java.lang.RuntimeExceptio
 depends edu.usc.softarch.arcade.clustering.LimboRunner edu.usc.softarch.arcade.clustering.FastSimCalcUtil
 depends edu.usc.softarch.arcade.clustering.LimboRunner java.lang.Thread
 depends edu.usc.softarch.arcade.clustering.LimboRunner java.lang.StackTraceElement
-depends edu.usc.softarch.arcade.clustering.LimboRunner edu.usc.softarch.arcade.clustering.FastFeatureVectors
+depends edu.usc.softarch.arcade.clustering.LimboRunner edu.usc.softarch.arcade.clustering.FeatureVectors
 depends edu.usc.softarch.arcade.clustering.LimboRunner java.lang.Class
 depends edu.usc.softarch.arcade.clustering.MaxSimData java.lang.Object
 depends edu.usc.softarch.arcade.clustering.MaxSimData edu.usc.softarch.arcade.clustering.Cluster
@@ -2251,7 +2251,7 @@ depends edu.usc.softarch.arcade.clustering.WcaRunner edu.usc.softarch.arcade.con
 depends edu.usc.softarch.arcade.clustering.WcaRunner edu.usc.softarch.arcade.clustering.FastSimCalcUtil
 depends edu.usc.softarch.arcade.clustering.WcaRunner java.lang.Thread
 depends edu.usc.softarch.arcade.clustering.WcaRunner java.lang.StackTraceElement
-depends edu.usc.softarch.arcade.clustering.WcaRunner edu.usc.softarch.arcade.clustering.FastFeatureVectors
+depends edu.usc.softarch.arcade.clustering.WcaRunner edu.usc.softarch.arcade.clustering.FeatureVectors
 depends edu.usc.softarch.arcade.clustering.WcaRunner java.lang.Class
 depends edu.usc.softarch.arcade.clustering.util.ClusterUtil java.lang.Object
 depends edu.usc.softarch.arcade.clustering.util.ClusterUtil java.util.ArrayList
@@ -2315,7 +2315,7 @@ depends edu.usc.softarch.arcade.clustering.util.ClusterUtil java.io.Writer
 depends edu.usc.softarch.arcade.clustering.util.ClusterUtil edu.usc.softarch.arcade.util.DebugUtil
 depends edu.usc.softarch.arcade.clustering.util.ClusterUtil java.io.FileOutputStream
 depends edu.usc.softarch.arcade.clustering.util.ClusterUtil java.util.Arrays
-depends edu.usc.softarch.arcade.clustering.util.ClusterUtil edu.usc.softarch.arcade.clustering.FastFeatureVectors
+depends edu.usc.softarch.arcade.clustering.util.ClusterUtil edu.usc.softarch.arcade.clustering.FeatureVectors
 depends edu.usc.softarch.arcade.clustering.util.ClusterUtil java.io.ObjectInputStream
 depends edu.usc.softarch.arcade.clustering.util.ClusterUtil java.io.FileInputStream
 depends edu.usc.softarch.arcade.clustering.util.ClusterUtil java.io.InputStream
@@ -2664,7 +2664,7 @@ depends edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder org.apache.com
 depends edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder java.util.HashSet
 depends edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder org.apache.commons.lang3.tuple.Pair
 depends edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder edu.usc.softarch.arcade.clustering.FeatureVectorMap
-depends edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder edu.usc.softarch.arcade.clustering.FastFeatureVectors
+depends edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder edu.usc.softarch.arcade.clustering.FeatureVectors
 depends edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder java.io.PrintStream
 depends edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder java.lang.Runtime
 depends edu.usc.softarch.arcade.facts.driver.CSourceToDepsBuilder java.lang.Process
@@ -2937,7 +2937,7 @@ depends edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder java.lang.S
 depends edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder java.util.HashSet
 depends edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph
 depends edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder edu.usc.softarch.arcade.clustering.FeatureVectorMap
-depends edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder edu.usc.softarch.arcade.clustering.FastFeatureVectors
+depends edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder edu.usc.softarch.arcade.clustering.FeatureVectors
 depends edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder org.apache.log4j.Logger
 depends edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder java.lang.Class
 depends edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder
@@ -3317,7 +3317,7 @@ depends edu.usc.softarch.arcade.facts.driver.RsfTargetsDifferencer java.lang.Str
 depends edu.usc.softarch.arcade.facts.driver.RsfTargetsDifferencer com.google.common.base.Joiner
 depends edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder java.util.LinkedHashSet
 depends edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder java.util.Set
-depends edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder edu.usc.softarch.arcade.clustering.FastFeatureVectors
+depends edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder edu.usc.softarch.arcade.clustering.FeatureVectors
 depends edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder java.lang.Object
 depends edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder org.apache.commons.lang3.tuple.Pair
 depends edu.usc.softarch.arcade.facts.driver.SourceToDepsBuilder java.lang.String

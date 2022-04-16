@@ -25,16 +25,12 @@ public class Architecture extends LinkedHashMap<String, Cluster> {
 	//endregion
 
 	//region CONSTRUCTORS
-	public Architecture() {
-		super();
-	}
+	public Architecture() {	super(); }
 
 	/**
 	 * Clone constructor
 	 */
-  public Architecture(Architecture arch) {
-    super(arch);
-  }
+  public Architecture(Architecture arch) { super(arch); }
 	//endregion
 
 	//region ACCESSORS
@@ -44,6 +40,10 @@ public class Architecture extends LinkedHashMap<String, Cluster> {
 				return true;
 		}
 		return false;
+	}
+
+	public void add(Cluster c) {
+		this.put(c.getName(), c);
 	}
 
 	public void removeAll(Architecture arch) {

@@ -14,7 +14,7 @@ import java.util.Set;
 import classycle.Analyser;
 import classycle.ClassAttributes;
 import classycle.graph.AtomicVertex;
-import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
+import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
@@ -61,7 +61,7 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 			sources.add(edge.getKey());
 		this.numSourceEntities = sources.size();
 
-		this.ffVecs = new FastFeatureVectors(edges);
+		this.ffVecs = new FeatureVectors(edges);
 
 		this.ffVecs.serializeFFVectors(ffVecsFilename);
 	}

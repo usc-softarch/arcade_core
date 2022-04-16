@@ -8,15 +8,15 @@ import java.util.regex.Pattern;
 
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
+import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.Granule;
 import edu.usc.softarch.arcade.util.FileListing;
 
 public class ClusteringAlgoRunner {
 	// #region ATTRIBUTES --------------------------------------------------------
-	public static Architecture architecture;
-	protected static FastFeatureVectors fastFeatureVectors;
+	public Architecture architecture;
+	protected FeatureVectors featureVectors;
 	protected static double maxClusterGain = 0;
 	public static int numClustersAtMaxClusterGain = 0;
 	protected static int numberOfEntitiesToBeClustered = 0;
@@ -25,9 +25,8 @@ public class ClusteringAlgoRunner {
 	// #region ACCESSORS ---------------------------------------------------------
 	public Architecture getFastClusters() { return architecture; }
 
-	public static void setFastFeatureVectors(
-			FastFeatureVectors inFastFeatureVectors) {
-		fastFeatureVectors = inFastFeatureVectors;
+	public void setFeatureVectors(FeatureVectors featureVectors) {
+		this.featureVectors = featureVectors;
 	}
 	protected void removeCluster(Cluster cluster) {
 		architecture.remove(cluster.getName());	}
@@ -35,16 +34,16 @@ public class ClusteringAlgoRunner {
 		architecture.put(cluster.getName(), cluster); }
 	// #endregion ACCESSORS ------------------------------------------------------
 	
-	protected static void initializeClusters(String srcDir, String language) {
+	protected void initializeClusters(String srcDir, String language) {
 		architecture = new Architecture();
 
 		// For each cell in the adjacency matrix
-		for (String name : fastFeatureVectors.getFeatureVectorNames()) {
+		for (String name : featureVectors.getFeatureVectorNames()) {
 			// Get the vector relative to that cell
-			BitSet featureSet = fastFeatureVectors.getNameToFeatureSetMap().get(name);
+			BitSet featureSet = featureVectors.getNameToFeatureSetMap().get(name);
 			// Create a cluster containing only that cell
 			Cluster cluster = new Cluster(name, featureSet,
-				fastFeatureVectors.getNamesInFeatureSet());
+				featureVectors.getNamesInFeatureSet());
 			
 			// Add the cluster except extraordinary circumstances (assume always)
 			addClusterConditionally(cluster, language);
@@ -69,7 +68,7 @@ public class ClusteringAlgoRunner {
 	/**
 	 * For almost all situations, adds the cluster to the list.
 	 */
-	private static void addClusterConditionally(Cluster cluster, String language) {
+	private void addClusterConditionally(Cluster cluster, String language) {
 		// If the source language is C or C++, add the only C-based entities
 		if (language.equalsIgnoreCase("c")) {
 			Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
@@ -79,26 +78,26 @@ public class ClusteringAlgoRunner {
 			if (Config.getClusteringGranule().equals(Granule.file) &&
 					!cluster.getName().startsWith("/") &&
 					p.matcher(cluster.getName()).find())
-				architecture.put(cluster.getName(), cluster);
+				this.architecture.put(cluster.getName(), cluster);
 		}
 
 		// This block is used only for certain older modules, disregard
 		if (Config.getClusteringGranule().equals(Granule.func)) {
 			if (cluster.getName().equals("\"##\""))
 				return;
-			architecture.put(cluster.getName(), cluster);
+			this.architecture.put(cluster.getName(), cluster);
 		}
 
 		// If the source language is Java, add all clusters
 		// Second condition to be assumed true
 		if (language.equalsIgnoreCase("java"))
-			architecture.put(cluster.getName(), cluster);
+			this.architecture.put(cluster.getName(), cluster);
 	}
 	
-	protected static void checkAndUpdateClusterGain(double clusterGain) {
+	protected void checkAndUpdateClusterGain(double clusterGain) {
 		if (clusterGain > maxClusterGain) {
 			maxClusterGain = clusterGain;
-			numClustersAtMaxClusterGain = architecture.size();
+			numClustersAtMaxClusterGain = this.architecture.size();
 		}
 	}
 }

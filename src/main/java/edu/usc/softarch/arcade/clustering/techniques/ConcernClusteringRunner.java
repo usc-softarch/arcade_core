@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
-import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
+import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
 import edu.usc.softarch.arcade.clustering.MaxSimData;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
@@ -37,10 +37,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	 * @param vecs feature vectors (dependencies) of entities
 	 * @param srcDir directories with java or c files
 	 */
-	public ConcernClusteringRunner(FastFeatureVectors vecs, String srcDir,
+	public ConcernClusteringRunner(FeatureVectors vecs, String srcDir,
 			String artifactsDir, String language) {
 		this.language = language;
-		setFastFeatureVectors(vecs);
+		setFeatureVectors(vecs);
 
 		// Initially, every node gets a cluster
 		initializeClusters(srcDir, language);
@@ -95,8 +95,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			String sysDirPath, String ffVecsFilePath, String artifactsDirPath)
 			throws IOException {
 		String revisionNumber = (new File(sysDirPath)).getName();
-		FastFeatureVectors ffVecs =
-			FastFeatureVectors.deserializeFFVectors(ffVecsFilePath);
+		FeatureVectors ffVecs =
+			FeatureVectors.deserializeFFVectors(ffVecsFilePath);
 		int numTopics = (int) (ffVecs.getNumSourceEntities() * 0.18);
 
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
@@ -104,7 +104,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		int numClusters = (int) (runner.getFastClusters().size() * .20);
 
 		runner.computeClustersWithConcernsAndFastClusters(
-			new PreSelectedStoppingCriterion(numClusters),
+			new PreSelectedStoppingCriterion(numClusters, runner),
 			"preselected", "js");
 
 		String prefix = outputDirPath + File.separator

@@ -3,14 +3,17 @@ package edu.usc.softarch.arcade.clustering.criteria;
 import edu.usc.softarch.arcade.clustering.techniques.ClusteringAlgoRunner;
 
 public class PreSelectedStoppingCriterion
-				implements StoppingCriterion {
+		implements StoppingCriterion {
 	private int numClusters;
+	private ClusteringAlgoRunner runner;
 
-	public PreSelectedStoppingCriterion(int numClusters) {
-		this.numClusters = numClusters; }
+	public PreSelectedStoppingCriterion(int numClusters, ClusteringAlgoRunner runner) {
+		this.numClusters = numClusters;
+		this.runner = runner;
+	}
 
 	public boolean notReadyToStop() {
-		return ClusteringAlgoRunner.architecture.size() != 1
-						&& ClusteringAlgoRunner.architecture.size() != numClusters;
+		return runner.architecture.size() != 1
+						&& runner.architecture.size() != numClusters;
 	}
 }

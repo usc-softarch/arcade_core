@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
+import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.functiongraph.TypedEdgeGraph;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class CSourceToDepsBuilder extends SourceToDepsBuilder {
-	public static FastFeatureVectors ffVecs = null;
+	public static FeatureVectors ffVecs = null;
 	public static int numSourceEntities = 0;
 	
 	@Override
@@ -70,7 +70,7 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 			sources.add(edge.getKey());
 		}
 		numSourceEntities = sources.size();
-		ffVecs = new FastFeatureVectors(edges);
+		ffVecs = new FeatureVectors(edges);
 
 		ffVecs.serializeFFVectors(ffVecsFilename);
 	}
@@ -94,7 +94,7 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 	}
 
 	@Override
-	public FastFeatureVectors getFfVecs() {
+	public FeatureVectors getFfVecs() {
 		return ffVecs;
 	}
 }

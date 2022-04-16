@@ -12,7 +12,7 @@
 //import org.xml.sax.SAXException;
 //
 //import edu.usc.softarch.arcade.classgraphs.ClassGraph;
-//import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
+//import edu.usc.softarch.arcade.clustering.FeatureVectors;
 //import edu.usc.softarch.arcade.clustering.Feature;
 //import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 //import edu.usc.softarch.arcade.config.Config;

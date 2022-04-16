@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-public class FastFeatureVectors implements Serializable {
+public class FeatureVectors implements Serializable {
 	// #region ATTRIBUTES --------------------------------------------------------
 	private static ObjectMapper mapper;
 	private static final long serialVersionUID = -8870834810415855677L;
@@ -38,9 +38,9 @@ public class FastFeatureVectors implements Serializable {
 	/**
 	 * Used by Jackson for deserialization.
 	 */
-	private FastFeatureVectors() { super(); }
+	private FeatureVectors() { super(); }
 
-	public FastFeatureVectors(Set<Map.Entry<String,String>> edges) {
+	public FeatureVectors(Set<Map.Entry<String,String>> edges) {
 		// Make a List with the sources of all edges
 		List<String> startNodesList =
 			edges.stream().map(Map.Entry::getKey).collect(Collectors.toList());
@@ -102,10 +102,10 @@ public class FastFeatureVectors implements Serializable {
 		getSerializationMapper().writeValue(new File(filePath), this);
 	}
 
-	public static FastFeatureVectors deserializeFFVectors(String filePath)
+	public static FeatureVectors deserializeFFVectors(String filePath)
 			throws IOException {
 		return getSerializationMapper().readValue(
-			new File(filePath), FastFeatureVectors.class);
+			new File(filePath), FeatureVectors.class);
 	}
 
 	private static class BitSetSerializer extends JsonSerializer<BitSet> {
@@ -139,14 +139,14 @@ public class FastFeatureVectors implements Serializable {
 	}
 
 	private static ObjectMapper getSerializationMapper() {
-		if (FastFeatureVectors.mapper != null) return FastFeatureVectors.mapper;
+		if (FeatureVectors.mapper != null) return FeatureVectors.mapper;
 
-		FastFeatureVectors.mapper = new ObjectMapper();
+		FeatureVectors.mapper = new ObjectMapper();
 		SimpleModule bitSetModule = new SimpleModule("BitSetModule");
 		bitSetModule.addSerializer(new BitSetSerializer());
 		bitSetModule.addDeserializer(BitSet.class, new BitSetDeserializer());
-		FastFeatureVectors.mapper.registerModule(bitSetModule);
-		return FastFeatureVectors.mapper;
+		FeatureVectors.mapper.registerModule(bitSetModule);
+		return FeatureVectors.mapper;
 	}
 	// #endregion SERIALIZATION --------------------------------------------------
 }

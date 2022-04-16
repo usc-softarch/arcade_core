@@ -539,7 +539,7 @@ contain edu.usc.softarch.arcade.clustering.ss edu.usc.softarch.arcade.classgraph
 contain edu.usc.softarch.arcade.clustering.ss java.io.OutputStreamWriter
 contain edu.usc.softarch.arcade.clustering.ss org.w3c.dom.Text
 contain edu.usc.softarch.arcade.clustering.ss edu.usc.softarch.arcade.util.DebugUtil
-contain edu.usc.softarch.arcade.clustering.ss edu.usc.softarch.arcade.clustering.FastFeatureVectors
+contain edu.usc.softarch.arcade.clustering.ss edu.usc.softarch.arcade.clustering.FeatureVectors
 contain edu.usc.softarch.arcade.clustering.ss edu.usc.softarch.arcade.clustering.PreSelectedStoppingCriterion
 contain edu.usc.softarch.arcade.clustering.ss edu.usc.softarch.arcade.clustering.StoppingCriterion
 contain edu.usc.softarch.arcade.clustering.ss edu.usc.softarch.arcade.clustering.Feature

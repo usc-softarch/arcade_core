@@ -12,12 +12,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
+import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.FastFeatureVectors;
 
 public class ConcernClusteringRunnerTest {
 	@ParameterizedTest
@@ -75,11 +75,11 @@ public class ConcernClusteringRunnerTest {
 		String outputDir = outDir.replace("///", File.separator);
 		
 		// Deserialize FastFeatureVectors oracle
-		FastFeatureVectors builderffVecs = null;
+		FeatureVectors builderffVecs = null;
 		try (ObjectInputStream ois = new ObjectInputStream(
 				new FileInputStream(resDir + fs	+ "ffVecs_serialized" + fs
 				+ versionName + "_ffVecs_builder.txt"))) {
-			builderffVecs = (FastFeatureVectors)ois.readObject();
+			builderffVecs = (FeatureVectors)ois.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
@@ -109,7 +109,7 @@ public class ConcernClusteringRunnerTest {
 
 		/* Tests whether fastFeatureVectors was filled out by
 		 * initializeDocTopicsForEachFastCluster */
-		FastFeatureVectors ffvInit = runner.fastFeatureVectors;
+		FeatureVectors ffvInit = runner.featureVectors;
 		// Should not be null
 		assertFalse(ffvInit.getFeatureVectorNames().isEmpty());
 	}
@@ -165,11 +165,11 @@ public class ConcernClusteringRunnerTest {
 		String outputDir = outDir.replace("///", File.separator);
 		
 		// Deserialize FastFeatureVectors oracle
-		FastFeatureVectors builderffVecs = null;
+		FeatureVectors builderffVecs = null;
 		try (ObjectInputStream ois = new ObjectInputStream(
 				new FileInputStream(resDir + fs + "ffVecs_serialized" + fs
 				+ versionName + "_ffVecs_builder.txt"))) {
-			builderffVecs = (FastFeatureVectors)ois.readObject();
+			builderffVecs = (FeatureVectors)ois.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
@@ -188,7 +188,7 @@ public class ConcernClusteringRunnerTest {
 			int numClusters = (int) ((double) runner.getFastClusters().size() * .20);
 			// USING THE CLONE THAT TAKES IN THE VERSION NAME HERE
 			runner.computeClustersWithConcernsAndFastClusters(
-				new PreSelectedStoppingCriterion(numClusters),
+				new PreSelectedStoppingCriterion(numClusters, runner),
 				"preselected", "js");
 		});
 
