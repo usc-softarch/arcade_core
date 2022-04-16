@@ -89,6 +89,14 @@ main functionalities of ARCADE, not to supplant it.
 - **Dead code is deleted code**: No matter how useful a piece of code has 
   been in the past, if it is no longer in use and its past use case is not 
   documented, it will most likely be deleted. Without usage examples, the 
-  effort of manufacturing an use case outweighs the benefits of 
+  effort of manufacturing a use case outweighs the benefits of 
   retro-fitting dead code into the system. This is particularly true when 
   external files are involved where no such files exist anymore.
+- **English has rules, and they should be followed**: Software code is meant 
+  to be read by people, not computers; otherwise, we may as well all go back 
+  to using punchcards. As such, spelling errors and grammatical mistakes are 
+  unacceptable in ARCADE, whether in its source code or its documentation.
+  Please report all such errors that I may have committed, and be aware that I 
+  will review pull requests for them. Having English as a second language is 
+  not an admissible excuse: both Neno and I are foreigners who learned 
+  English well into our adulthood. If we could do it, so can you.
