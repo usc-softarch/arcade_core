@@ -3,15 +3,13 @@ package edu.usc.softarch.arcade.clustering.techniques;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
-import edu.usc.softarch.arcade.clustering.FastSimCalcUtil;
-import edu.usc.softarch.arcade.clustering.MaxSimData;
+import edu.usc.softarch.arcade.clustering.SimData;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
@@ -105,7 +103,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		try {
 			runner.computeClustersWithConcernsAndFastClusters(
 				new PreSelectedStoppingCriterion(numClusters, runner),
-				"preselected", "js");
+				"preselected", SimilarityMatrix.SimMeasure.JS);
 		} catch (DistributionSizeMismatchException e) {
 			e.printStackTrace(); //TODO Handle it
 		}
@@ -126,8 +124,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 	public void computeClustersWithConcernsAndFastClusters(
 			StoppingCriterion stoppingCriterion, String stopCriterion,
-			String simMeasure) throws DistributionSizeMismatchException {
-		SimilarityMatrix simMatrix = architecture.computeJSDivergenceSimMatrix(simMeasure);
+			SimilarityMatrix.SimMeasure simMeasure) throws DistributionSizeMismatchException {
+		SimilarityMatrix simMatrix = new SimilarityMatrix(simMeasure, architecture);
 
 		while (stoppingCriterion.notReadyToStop()) {
 			if (stopCriterion.equalsIgnoreCase("clustergain")) {
@@ -135,10 +133,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				checkAndUpdateClusterGain(clusterGain);
 			}
 
-			MaxSimData data = identifyMostSimClusters(simMatrix);
+			SimData data = identifyMostSimClusters(simMatrix);
 			Cluster newCluster = mergeFastClustersUsingTopics(data);
 			updateFastClustersAndSimMatrixToReflectMergedCluster(
-				data, newCluster, simMatrix, simMeasure);
+				data, newCluster, simMatrix);
 		}
 	}
 	
@@ -150,28 +148,26 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	 * @param simMatrix Similarity matrix to analyze.
 	 * @return The maximum-similarity cell.
 	 */
-	private MaxSimData identifyMostSimClusters(SimilarityMatrix simMatrix) {
+	private SimData identifyMostSimClusters(SimilarityMatrix simMatrix) {
 		if (simMatrix.size() != architecture.size())
 			throw new IllegalArgumentException("expected simMatrix.size():"
 				+ simMatrix.size() + " to be fastClusters.size(): "
 				+ architecture.size());
 
-		for (HashMap<Cluster, Double> col : simMatrix.values())
+		for (HashMap<Cluster, SimData> col : simMatrix.getColumns())
 			if (col.size() != architecture.size())
 				throw new IllegalArgumentException("expected col.size():" + col.size()
 					+ " to be fastClusters.size(): " + architecture.size());
-		
-		MaxSimData msData = new MaxSimData();
-		Map.Entry<Cluster, Cluster> minCell = null;
-		try {
-			minCell = simMatrix.getMinCell();
-		} catch (Exception e) {
-			e.printStackTrace(); //TODO Handle it
-		}
-		msData.c1 = minCell.getKey();
-		msData.c2 = minCell.getValue();
 
-		return msData;
+		SimData toReturn = null;
+
+		try {
+			toReturn = simMatrix.getMinCell();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return toReturn;
 	}
 
 	private void initializeDocTopicsForEachFastCluster(String artifactsDir) {
@@ -255,7 +251,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		architecture.removeAll(excessInners);
 	}
 	
-	private Cluster mergeFastClustersUsingTopics(MaxSimData data) {
+	private Cluster mergeFastClustersUsingTopics(SimData data) {
 		Cluster cluster = data.c1;
 		Cluster otherCluster = data.c2;
 		return mergeFastClustersUsingTopics(cluster, otherCluster);
@@ -277,58 +273,25 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 	
 	private void updateFastClustersAndSimMatrixToReflectMergedCluster(
-			MaxSimData data, Cluster newCluster, SimilarityMatrix simMatrix,
-			String simMeasure) {
+			SimData data, Cluster newCluster,	SimilarityMatrix simMatrix)
+			throws DistributionSizeMismatchException {
 		// Sanity check
 		if (data.c1.getName().equals(data.c2.getName()))
-			throw new IllegalArgumentException("data.rowIndex: " + data.rowIndex
-				+ " should not be the same as data.colIndex: " + data.colIndex);
+			throw new IllegalArgumentException("data.c1: " + data.c1
+				+ " should not be the same as data.c2: " + data.c2);
 
 		// Initializing variables
 		Cluster cluster = data.c1;
 		Cluster otherCluster = data.c2;
 
 		// Remove the merged row and column from the matrix
-		simMatrix.remove(cluster);
-		simMatrix.remove(otherCluster);
-		simMatrix.put(newCluster, new HashMap<>());
+		simMatrix.removeCluster(cluster);
+		simMatrix.removeCluster(otherCluster);
+		simMatrix.addCluster(newCluster);
 
 		// Remove merged clusters, add new cluster
 		super.removeCluster(cluster);
 		super.removeCluster(otherCluster);
 		super.addCluster(newCluster);
-
-		// Calculate new cluster divergence measure against all others
-		for (Cluster currCluster : super.architecture.values()) {
-			double currDivergence = 0;
-
-			// Calculate it based on the selected similarity measure
-			switch (simMeasure.toLowerCase()) {
-				case "js":
-					try {
-						currDivergence = getJsDivergence(newCluster, currCluster);
-					} catch (DistributionSizeMismatchException e) {
-						e.printStackTrace(); //TODO handle it
-					}
-					break;
-				case "scm":
-					currDivergence = getScmDivergence(newCluster, currCluster);
-					break;
-				default:
-					throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
-			}
-
-			simMatrix.get(currCluster).put(newCluster, currDivergence);
-			simMatrix.get(newCluster).put(currCluster, currDivergence);
-		}
-	}
-
-	private double getScmDivergence(Cluster newCluster, Cluster currCluster) {
-		return FastSimCalcUtil.getStructAndConcernMeasure(newCluster, currCluster);
-	}
-
-	private double getJsDivergence(Cluster newCluster, Cluster currCluster)
-			throws DistributionSizeMismatchException {
-		return newCluster.docTopicItem.getJsDivergence(currCluster.docTopicItem);
 	}
 }

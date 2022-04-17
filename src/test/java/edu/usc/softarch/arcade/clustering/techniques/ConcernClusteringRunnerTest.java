@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
+import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -189,7 +190,7 @@ public class ConcernClusteringRunnerTest {
 			// USING THE CLONE THAT TAKES IN THE VERSION NAME HERE
 			runner.computeClustersWithConcernsAndFastClusters(
 				new PreSelectedStoppingCriterion(numClusters, runner),
-				"preselected", "js");
+				"preselected", SimilarityMatrix.SimMeasure.JS);
 		});
 
 		Architecture fastClustersAfterInit = runner.getArchitectureWithDocTopics();

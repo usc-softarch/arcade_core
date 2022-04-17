@@ -109,30 +109,6 @@ public class Architecture extends LinkedHashMap<String, Cluster> {
 		return centroidSum / clusterCentroids.size();
 	}
 
-  public SimilarityMatrix computeJSDivergenceSimMatrix(String simMeasure)
-			throws DistributionSizeMismatchException {
-		SimilarityMatrix simMatrix = new SimilarityMatrix();
-
-		for (Cluster c1 : this.values()) {
-			simMatrix.put(c1, new HashMap<>());
-
-			for (Cluster c2 : this.values()) {
-				double divergence = 0;
-
-				if (simMeasure.equalsIgnoreCase("js"))
-					divergence = c1.docTopicItem.getJsDivergence(c2.docTopicItem);
-				else if (simMeasure.equalsIgnoreCase("scm"))
-					divergence = FastSimCalcUtil.getStructAndConcernMeasure(c1, c2);
-				else
-					throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
-
-				simMatrix.get(c1).put(c2, divergence);
-			}
-		}
-
-		return simMatrix;
-	}
-
   public List<List<Double>> computeInfoLossSimMatrix(
       int numberOfEntitiesToBeClustered) {
 		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
