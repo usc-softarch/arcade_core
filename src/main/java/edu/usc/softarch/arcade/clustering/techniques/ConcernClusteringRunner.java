@@ -108,7 +108,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	public void computeArchitecture(
 			StoppingCriterion stoppingCriterion, String stopCriterion,
 			SimilarityMatrix.SimMeasure simMeasure) throws DistributionSizeMismatchException {
-		SimilarityMatrix simMatrix = new SimilarityMatrix(simMeasure, architecture);
+		SimilarityMatrix simMatrix = initializeSimMatrix(simMeasure);
 
 		while (stoppingCriterion.notReadyToStop()) {
 			if (stopCriterion.equalsIgnoreCase("clustergain")) {
@@ -122,6 +122,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				data, newCluster, simMatrix);
 		}
 	}
+
+	protected SimilarityMatrix initializeSimMatrix(SimilarityMatrix.SimMeasure simMeasure)
+			throws DistributionSizeMismatchException {
+		return new SimilarityMatrix(simMeasure, this.architecture);	}
 	
 	/**
 	 * Looks for the smallest non-diagonal value in the matrix, which represents
@@ -137,7 +141,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 				+ simMatrix.size() + " to be fastClusters.size(): "
 				+ architecture.size());
 
-		for (HashMap<Cluster, SimData> col : simMatrix.getColumns())
+		for (Map<Cluster, SimData> col : simMatrix.getColumns())
 			if (col.size() != architecture.size())
 				throw new IllegalArgumentException("expected col.size():" + col.size()
 					+ " to be fastClusters.size(): " + architecture.size());

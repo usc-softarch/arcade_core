@@ -14,10 +14,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
+import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
@@ -204,7 +206,8 @@ public class ConcernClusteringRunnerTest {
 		String fullSrcDir = subjectSystemsDir + fs + versionName;
 		String artifactsDir = resourcesDir + fs + versionName;
 		String initialArchitecturePath = artifactsDir + fs + "initial_architecture.txt";
-		String architectureWithDocTopicsPath = artifactsDir + fs + "architecture_with_doc_topics.txt";
+		String architectureWithDocTopicsPath =
+			artifactsDir + fs + "architecture_with_doc_topics.txt";
 		
 		// Deserialize FastFeatureVectors oracle
 		String ffVecsFilePath = artifactsDir + fs + versionName + "_ffVecs.json";
@@ -272,6 +275,7 @@ public class ConcernClusteringRunnerTest {
 			() -> assertEquals(initialArchitectureOracle, initialArchitecture),
 			() -> assertEquals(architectureWithDocTopicsOracle, architectureWithDocTopics)
 		);
+		resetClusterAges();
 	}
 
 	/**
@@ -300,10 +304,11 @@ public class ConcernClusteringRunnerTest {
 		"httpd-2.4.26,"
 		+ "c",
 	})
-	public void computeClustersWithConcernsAndFastClustersTest(String versionName,
-			String language) {
+	public void computeArchitectureTest(String versionName,	String language) {
 		String fullSrcDir = subjectSystemsDir + fs + versionName;
 		String artifactsDir = resourcesDir + fs + versionName;
+		String architectureWithDocTopicsPath =
+			artifactsDir + fs + "architecture_with_doc_topics.txt";
 		(new File(outputDirPath)).mkdirs();
 		
 		// Deserialize FastFeatureVectors oracle
@@ -340,6 +345,36 @@ public class ConcernClusteringRunnerTest {
 		assertFalse(fastClustersCompute.isEmpty());
 		// The size of the fastClusters should be smaller afterward
 		assertTrue(fastClustersCompute.size() < fastClustersAfterInit.size());
+
+		Architecture simMatrixInputOracle = assertDoesNotThrow(() -> {
+			ObjectInputStream in =
+				new ObjectInputStream(new FileInputStream(architectureWithDocTopicsPath));
+			return (Architecture) in.readObject();
+		});
+
+		SimilarityMatrix oracleSimMatrix = assertDoesNotThrow(() ->
+			new SimilarityMatrix(SimilarityMatrix.SimMeasure.JS, simMatrixInputOracle));
+		SimilarityMatrix initialSimMatrix = runner.getInitialSimMatrix();
+
+		assertEquals(oracleSimMatrix, initialSimMatrix);
+		resetClusterAges();
+	}
+
+	private void resetClusterAges() {
+		Cluster dummy = new Cluster();
+		Class<? extends Cluster> clusterClass = dummy.getClass();
+		Field ageCounterField;
+		try {
+			ageCounterField = clusterClass.getDeclaredField("ageCounter");
+		} catch (NoSuchFieldException e) {
+			throw new RuntimeException(e);
+		}
+		ageCounterField.setAccessible(true);
+		try {
+			ageCounterField.set(null, 0);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

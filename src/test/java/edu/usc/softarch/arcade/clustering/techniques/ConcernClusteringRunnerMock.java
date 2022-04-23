@@ -2,6 +2,8 @@ package edu.usc.softarch.arcade.clustering.techniques;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
+import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
 /**
  * Enhanced version of ConcernClusteringRunner for testing.
@@ -11,6 +13,7 @@ public class ConcernClusteringRunnerMock
 	//region ATTRIBUTES
 	private Architecture initialArchitecture;
 	private Architecture architectureWithDocTopics;
+	private SimilarityMatrix initialSimMatrix;
 	//endregion
 
 	//region CONSTRUCTORS
@@ -25,6 +28,9 @@ public class ConcernClusteringRunnerMock
 
 	public Architecture getArchitectureWithDocTopics() {
 		return this.architectureWithDocTopics; }
+
+	public SimilarityMatrix getInitialSimMatrix() {
+		return this.initialSimMatrix; }
 	//endregion
 
 	//region OVERRIDES
@@ -38,6 +44,13 @@ public class ConcernClusteringRunnerMock
 	protected void initializeClusterDocTopics(String artifactsDir) {
 		super.initializeClusterDocTopics(artifactsDir);
 		this.architectureWithDocTopics = new Architecture(super.architecture);
+	}
+
+	@Override
+	protected SimilarityMatrix initializeSimMatrix(SimilarityMatrix.SimMeasure simMeasure)
+			throws DistributionSizeMismatchException {
+		this.initialSimMatrix = super.initializeSimMatrix(simMeasure);
+		return new SimilarityMatrix(this.initialSimMatrix);
 	}
 	//endregion
 }

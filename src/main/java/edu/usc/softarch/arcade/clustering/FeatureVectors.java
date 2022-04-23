@@ -60,7 +60,7 @@ public class FeatureVectors implements Serializable {
 			int bitIndex = 0;
 			for (String target : endNodesListWithNoDupes) {
 				if (edges.contains(new
-						AbstractMap.SimpleEntry<String,String>(source, target))) {
+						AbstractMap.SimpleEntry<>(source, target))) {
 					featureSet.set(bitIndex, true);
 				}
 				bitIndex++;
@@ -74,6 +74,7 @@ public class FeatureVectors implements Serializable {
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
+	//region ACCESSORS
 	public Map<String, BitSet> getNameToFeatureSetMap() {
 		return nameToFeatureSetMap;	}
 
@@ -96,6 +97,7 @@ public class FeatureVectors implements Serializable {
 	public void setFeatureVectorNames(List<String> featureVectorNames) {
 		this.featureVectorNames = featureVectorNames;
 	}
+	//endregion
 
 	// #region SERIALIZATION -----------------------------------------------------
 	public void serializeFFVectors(String filePath) throws IOException {

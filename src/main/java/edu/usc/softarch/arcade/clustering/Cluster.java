@@ -5,6 +5,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import edu.usc.softarch.arcade.topics.DocTopicItem;
@@ -177,21 +178,19 @@ public class Cluster implements Serializable {
 
 		Cluster toCompare = (Cluster) o;
 
-		boolean condition1 = this.name != null
-			? this.name.equals(toCompare.name)
-			: toCompare.name == null;
-
+		boolean condition1 = Objects.equals(this.name, toCompare.name);
 		boolean condition2 = this.numEntities == toCompare.numEntities;
 		boolean condition3 = this.numFeatures == toCompare.numFeatures;
+		boolean condition4 = Objects.equals(this.docTopicItem, toCompare.docTopicItem);
+		boolean condition5 = Objects.equals(this.featureMap, toCompare.featureMap);
+		boolean condition6 = this.age == toCompare.age;
 
-		boolean condition4 = this.docTopicItem != null
-			? this.docTopicItem.equals(toCompare.docTopicItem)
-			: toCompare.docTopicItem == null;
+		return condition1 && condition2	&& condition3
+			&& condition4	&& condition5 && condition6;
+	}
 
-		boolean condition5 = this.featureMap != null
-			? this.featureMap.equals(toCompare.featureMap)
-			: toCompare.featureMap == null;
-
-		return condition1 && condition2	&& condition3 && condition4	&& condition5;
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, numEntities, numFeatures, featureMap, docTopicItem, age);
 	}
 }
