@@ -9,7 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
@@ -22,6 +27,7 @@ import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.RsfCompare;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -35,6 +41,20 @@ public class ConcernClusteringRunnerTest {
 	private final String subjectSystemsDir = resourcesBase + fs + "subject_systems";
 	private final String outputDirPath =
 		"." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest";
+
+	/* ------------------------------------------------------------------------ */
+	/* -------------------------- DANGER ZONE --------------------------------- */
+	/* ------------------------------------------------------------------------ */
+
+	/* DO NOT TOUCH THIS ATTRIBUTE. It will trigger a procedure to re-generate
+	 * the oracles of every ARC test case. Unless your name is Marcelo, or you
+	 * have been given express permission by me to touch this, it must remain
+	 * false at all times. */
+	private final boolean generateOracles = false;
+
+	/* ------------------------------------------------------------------------ */
+	/* -------------------------- DANGER ZONE --------------------------------- */
+	/* ------------------------------------------------------------------------ */
 
 	/**
 	 * Tests ARC recovery for a single version of a system.
@@ -184,8 +204,8 @@ public class ConcernClusteringRunnerTest {
 	public void initDataStructuresTest(String versionName, String language) {
 		String fullSrcDir = subjectSystemsDir + fs + versionName;
 		String artifactsDir = resourcesDir + fs + versionName;
-		String outputPath = outputDirPath + fs + "ds_serialized";
-		(new File(outputPath)).mkdirs();
+		String initialArchitecturePath = artifactsDir + fs + "initial_architecture.txt";
+		String architectureWithDocTopicsPath = artifactsDir + fs + "architecture_with_doc_topics.txt";
 		
 		// Deserialize FastFeatureVectors oracle
 		String ffVecsFilePath = artifactsDir + fs + versionName + "_ffVecs.json";
@@ -207,23 +227,52 @@ public class ConcernClusteringRunnerTest {
 
 		/* Tests whether fastClusters was altered by
 		 * initializeDocTopicsForEachFastCluster */
-		Architecture fastClustersBefore = runner.getInitialArchitecture();
-		Architecture fastClustersAfterInit = runner.getArchitectureWithDocTopics();
-		System.out.println("fastClusters size before: " + fastClustersBefore.size());
-		System.out.println("fastClusters size after: " + fastClustersAfterInit.size());
+		Architecture initialArchitecture = runner.getInitialArchitecture();
+		Architecture architectureWithDocTopics = runner.getArchitectureWithDocTopics();
+
+		// ------------------------- Generate Oracles ------------------------------
+
+		if (generateOracles) {
+			assertDoesNotThrow(() -> {
+				ObjectOutputStream out =
+					new ObjectOutputStream(new FileOutputStream(initialArchitecturePath));
+				out.writeObject(initialArchitecture);
+				out.close();
+				out = new ObjectOutputStream(new FileOutputStream(architectureWithDocTopicsPath));
+				out.writeObject(architectureWithDocTopics);
+				out.close();
+			});
+		}
+
+		// ------------------------- Generate Oracles ------------------------------
+
+		System.out.println("fastClusters size before: " + initialArchitecture.size());
+		System.out.println("fastClusters size after: " + architectureWithDocTopics.size());
+
 		// every node should get a cluster, so there should be at least one cluster
-		assertFalse(fastClustersBefore.isEmpty());
+		assertFalse(initialArchitecture.isEmpty());
 		assertAll(
-			() -> assertFalse(fastClustersAfterInit.isEmpty(),
+			() -> assertFalse(architectureWithDocTopics.isEmpty(),
 				"fastClusters empty after initializeDocTopicsForEachFastCluster"),
-			() -> assertNotEquals(fastClustersAfterInit, fastClustersBefore)
+			() -> assertNotEquals(architectureWithDocTopics, initialArchitecture)
 		);
 
-		/* Tests whether fastFeatureVectors was filled out by
-		 * initializeDocTopicsForEachFastCluster */
-		FeatureVectors ffvInit = runner.featureVectors;
-		// Should not be null
-		assertFalse(ffvInit.getFeatureVectorNames().isEmpty());
+		// check the integrity of both data structures, before and after docTopics
+		Architecture initialArchitectureOracle = assertDoesNotThrow(() -> {
+			ObjectInputStream in =
+				new ObjectInputStream(new FileInputStream(initialArchitecturePath));
+			return (Architecture) in.readObject();
+		});
+		Architecture architectureWithDocTopicsOracle = assertDoesNotThrow(() -> {
+			ObjectInputStream in =
+				new ObjectInputStream(new FileInputStream(architectureWithDocTopicsPath));
+			return (Architecture) in.readObject();
+		});
+
+		assertAll(
+			() -> assertEquals(initialArchitectureOracle, initialArchitecture),
+			() -> assertEquals(architectureWithDocTopicsOracle, architectureWithDocTopics)
+		);
 	}
 
 	/**
@@ -293,4 +342,12 @@ public class ConcernClusteringRunnerTest {
 		// The size of the fastClusters should be smaller afterward
 		assertTrue(fastClustersCompute.size() < fastClustersAfterInit.size());
 	}
+
+	/**
+	 * This test stops ARCADE from ever passing CI if someone forgets to turn off
+	 * oracle generation.
+	 */
+	@Test
+	public void oracleGenerationIsOffTest() {
+		assertFalse(generateOracles);	}
 }

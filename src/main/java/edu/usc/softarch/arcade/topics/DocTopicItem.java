@@ -193,6 +193,8 @@ public class DocTopicItem implements Serializable {
 
 	public List<TopicItem> sort() {
 		List<TopicItem> topicsToSort = getTopics();
+		// This ensures sortMethod is properly initialized when deserializing DTIs
+		if (sorter == null) setSortMethod(this.sortMethod);
 		Collections.sort(topicsToSort, sorter);
 		return topicsToSort;
 	}
@@ -231,5 +233,21 @@ public class DocTopicItem implements Serializable {
 		dtItemStr += "]";
 		return dtItemStr;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) return false;
+		if (o == this) return true;
+		if (!(o instanceof DocTopicItem)) return false;
+
+		DocTopicItem toCompare = (DocTopicItem) o;
+
+		boolean condition1 = this.doc == toCompare.doc;
+		boolean condition2 = this.source.equals(toCompare.source);
+		boolean condition3 = this.topics.equals(toCompare.topics);
+
+		return condition1 && condition2 && condition3;
+	}
+
 	// #endregion MISC -----------------------------------------------------------
 }
