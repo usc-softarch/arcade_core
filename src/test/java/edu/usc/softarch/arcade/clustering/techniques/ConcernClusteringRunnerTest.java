@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -96,7 +95,7 @@ public class ConcernClusteringRunnerTest {
 		String resultClustersFile = outputDirPath + fs + systemVersion + arcFileSuffix;
 
 		assertDoesNotThrow(() ->
-			ConcernClusteringRunner.runARC(lang, outputDirPath, sysDir, ffVecs, artifactsDir));
+			ConcernClusteringRunnerMock.runARC(lang, outputDirPath, sysDir, ffVecs, artifactsDir));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of
@@ -222,7 +221,7 @@ public class ConcernClusteringRunnerTest {
 			fail("failed to deserialize FastFeatureVectors from builder object");
 		
 		// Construct a ConcernClusteringRunner object
-		ConcernClusteringRunner runner = new ConcernClusteringRunner(
+		ConcernClusteringRunnerMock runner = new ConcernClusteringRunnerMock(
 			builderffVecs, fullSrcDir, artifactsDir + "/base", language);
 
 		/* Tests whether fastClusters was altered by
@@ -323,7 +322,7 @@ public class ConcernClusteringRunnerTest {
 		}
 		
 		// Construct a ConcernClusteringRunner object
-		ConcernClusteringRunner runner = new ConcernClusteringRunner(
+		ConcernClusteringRunnerMock runner = new ConcernClusteringRunnerMock(
 			builderffVecs, fullSrcDir, artifactsDir + "/base", language);
 		// call computeClustersWithConcernsAndFastClusters()
 		assertDoesNotThrow(() -> {

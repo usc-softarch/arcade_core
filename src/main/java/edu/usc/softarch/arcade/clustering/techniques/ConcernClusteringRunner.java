@@ -23,11 +23,6 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #region ATTRIBUTES --------------------------------------------------------
 	private final String language;
 	private DocTopics docTopics;
-
-	// Initial fastClusters state before any clustering
-	private final Architecture initialArchitecture;
-	// fastClusters state after initializing docTopics
-	private final Architecture architectureWithDocTopics;
 	// #endregion ATTRIBUTES -----------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
@@ -39,23 +34,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			String artifactsDir, String language) {
 		this.language = language;
 		setFeatureVectors(vecs);
-
-		// Initially, every node gets a cluster
 		initializeClusters(srcDir, language);
-		this.initialArchitecture = new Architecture(architecture);
-
 		initializeClusterDocTopics(artifactsDir);
-		this.architectureWithDocTopics = new Architecture(architecture);
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
-
-	// #region ACCESSORS ---------------------------------------------------------
-	public Architecture getInitialArchitecture() {
-		return this.initialArchitecture; }
-
-	public Architecture getArchitectureWithDocTopics() {
-		return this.architectureWithDocTopics; }
-	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region INTERFACE ---------------------------------------------------------
 	/**
@@ -171,7 +153,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		return toReturn;
 	}
 
-	private void initializeClusterDocTopics(String artifactsDir) {
+	protected void initializeClusterDocTopics(String artifactsDir) {
 		try	{
 			this.docTopics = DocTopics.deserializeDocTopics(artifactsDir + File.separator + "docTopics.json");
 		} catch (IOException e) {
