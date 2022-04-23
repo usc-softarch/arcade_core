@@ -25,7 +25,7 @@ public class BatchDepFinderTest {
     command.add(System.getProperty("user.dir") + fs + "target" + fs + "test_results" 
       + fs + "BatchDepFinderTest" + fs + version + "_deps.xml");
     command.add(System.getProperty("user.dir") + fs + "src" + fs + "test" + fs + "resources" 
-      + fs + "subject_systems_resources" + fs + "nutch" + fs + "src" + fs + version + fs + "lib_nutch");
+      + fs + "subject_systems" + fs + version + fs + "lib_nutch");
     return command;
   }
   public void setUp(String version){

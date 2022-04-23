@@ -28,70 +28,55 @@ import org.junit.jupiter.params.provider.CsvSource;
 import edu.usc.softarch.arcade.clustering.Architecture;
 
 public class ConcernClusteringRunnerTest {
+	private final String fs = File.separator;
+	private final String resourcesBase =
+		"." + fs + "src" + fs + "test" + fs + "resources";
+	private final String resourcesDir = resourcesBase + fs + "ARC";
+	private final String subjectSystemsDir = resourcesBase + fs + "subject_systems";
+	private final String outputDirPath =
+		"." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest";
+
 	/**
 	 * Tests ARC recovery for a single version of a system.
 	 *
-	 * @param sysVersionDir Dir with single system version.
+	 * @param systemVersion System version.
 	 * @param lang System language.
-	 * @param artifactsDirPath Test file output dir name. IMPORTANT: should also contain base/output.pipe and base/infer.mallet.
-	 * @param ffVecsFilepath Path to serialized FeatureVectors.
-	 * @param oraclePath Path to oracle file.
-	 * @param arcFilename Expected clusters file name.
-	 * @param outputDirPath Path to place execution output.
+	 * @param arcFileSuffix Expected clusters file suffix.
 	 */
 	@ParameterizedTest
 	@CsvSource({
 		// struts 2.3.30
-		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.3.30,"
+		"struts-2.3.30,"
 			+ "java,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_ffVecs.json,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_239_topics_234_arc_clusters.rsf,"
-			+ "struts-2.3.30_239_topics_234_arc_clusters.rsf,"
-			+ ".///target///test_results///BatchClusteringEngineTest",
+			+ "_239_topics_234_arc_clusters.rsf",
 
 		// struts 2.5.2
-		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.5.2,"
+		"struts-2.5.2,"
 			+ "java,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_ffVecs.json,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_284_topics_275_arc_clusters.rsf,"
-			+ "struts-2.5.2_284_topics_275_arc_clusters.rsf,"
-			+ ".///target///test_results///BatchClusteringEngineTest",
+			+ "_284_topics_275_arc_clusters.rsf",
 
 		// httpd 2.3.8
-		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
+		"httpd-2.3.8,"
 			+ "c,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_ffVecs.json,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_46_topics_71_arc_clusters.rsf,"
-			+ "httpd-2.3.8_46_topics_71_arc_clusters.rsf,"
-			+ ".///target///test_results///BatchClusteringEngineTest",
+			+ "_46_topics_71_arc_clusters.rsf",
 
 		// httpd 2.4.26
-		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
-			+ "c,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_ffVecs.json,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_50_topics_82_arc_clusters.rsf,"
-			+ "httpd-2.4.26_50_topics_82_arc_clusters.rsf,"
-			+ ".///target///test_results///BatchClusteringEngineTest"
+		"httpd-2.4.26," +
+			"c,"
+			+ "_50_topics_82_arc_clusters.rsf"
 	})
-	public void ARCRecoveryTest(String sysVersionDir, String lang,
-		String artifactsDirPath, String ffVecsFilepath, String oraclePath,
-		String arcFilename, String outputDirPath) {
-		// Format paths
-		String sysDir = sysVersionDir.replace("///", File.separator);
-		String artifactsDir = artifactsDirPath.replace("///", File.separator);
-		String oracleFilePath = oraclePath.replace("///", File.separator);
-		String ffVecs = ffVecsFilepath.replace("///", File.separator);
-		String outputDirName = outputDirPath.replace("///", File.separator);
+	public void ARCRecoveryTest(String systemVersion, String lang,
+			String arcFileSuffix) {
+		// Creating relevant path Strings
+		String sysDir = subjectSystemsDir + fs + systemVersion;
+		String sysResources = resourcesDir + fs + systemVersion;
+		String artifactsDir = sysResources + fs + "base";
+		String oracleFilePath = sysResources + fs + systemVersion + arcFileSuffix;
+		String ffVecs = sysResources + fs + systemVersion + "_ffVecs.json";
+		String resultClustersFile = outputDirPath + fs + systemVersion + arcFileSuffix;
 
 		assertDoesNotThrow(() ->
-			ConcernClusteringRunner.runARC(lang, outputDirName, sysDir, ffVecs, artifactsDir));
-
-		// Result file with clusters
-		String resultClustersFile = outputDirName + File.separator + arcFilename;
+			ConcernClusteringRunner.runARC(lang, outputDirPath, sysDir, ffVecs, artifactsDir));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of
@@ -116,56 +101,40 @@ public class ConcernClusteringRunnerTest {
 	/**
 	 * ARC - smell analyzer integration test.
 	 *
-	 * @param depsRsfFilePath Path to dependencies RSF input file.
+	 * @param systemVersion System version.
 	 * @param lang System language.
-	 * @param clusterFilePath Path to place the clusters RSF file output.
-	 * @param docTopicsFilePath Path to DocTopics file input.
-	 * @param oraclePath Path to oracle file.
-	 * @param arcFilename Expected clusters file name.
+	 * @param arcFileSuffix Expected result files' suffix.
 	 */
 	@ParameterizedTest
 	@CsvSource({
 		// struts 2.3.30
-		".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_deps.rsf,"
+		"struts-2.3.30,"
 			+ "java,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_239_topics_234_arc_clusters.rsf,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_239_topics_234_arc_docTopics.json,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.3.30_arc_smells.ser,"
-			+ ".///target///test_results///BatchClusteringEngineTest///struts-2.3.30_arc_smells.ser",
+			+ "_239_topics_234_arc_",
 
 		// struts 2.5.2
-		".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_deps.rsf,"
+		"struts-2.5.2,"
 			+ "java,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_284_topics_275_arc_clusters.rsf,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_284_topics_275_arc_docTopics.json,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///struts-2.5.2_arc_smells.ser,"
-			+ ".///target///test_results///BatchClusteringEngineTest///struts-2.5.2_arc_smells.ser",
+			+ "_284_topics_275_arc_",
 
 		// httpd 2.3.8
-		".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_deps.rsf,"
+		"httpd-2.3.8,"
 			+ "c,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_46_topics_71_arc_clusters.rsf,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_46_topics_71_arc_docTopics.json,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.3.8_arc_smells.ser,"
-			+ ".///target///test_results///BatchClusteringEngineTest///httpd-2.3.8_arc_smells.ser",
+			+ "_46_topics_71_arc_",
 
 		// httpd 2.4.26
-		".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_deps.rsf,"
+		"httpd-2.4.26,"
 			+ "c,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_50_topics_82_arc_clusters.rsf,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_50_topics_82_arc_docTopics.json,"
-			+ ".///src///test///resources///BatchClusteringEngineTest_resources///httpd-2.4.26_arc_smells.ser,"
-			+ ".///target///test_results///BatchClusteringEngineTest///httpd-2.4.26_arc_smells.ser",
+			+ "_50_topics_82_arc_"
 	})
-	public void asdWithConcernsTest(String depsRsfFilePath, String lang,
-		String clusterFilePath, String docTopicsFilePath, String oraclePath,
-		String arcFilename) {
-		// Format paths
-		String depsRsfFile = depsRsfFilePath.replace("///", File.separator);
-		String docTopicsPath = docTopicsFilePath.replace("///", File.separator);
-		String oracleFilePath = oraclePath.replace("///", File.separator);
-		String clusterFile = clusterFilePath.replace("///", File.separator);
-		String resultFile = arcFilename.replace("///", File.separator);
+	public void asdWithConcernsTest(String systemVersion, String lang, String arcFileSuffix) {
+		// Creating relevant path Strings
+		String sysResources = resourcesDir + fs + systemVersion;
+		String depsRsfFile = sysResources + fs + systemVersion + "_deps.rsf";
+		String docTopicsPath = sysResources + fs + systemVersion + arcFileSuffix + "docTopics.json";
+		String oracleFilePath = sysResources + fs + systemVersion + "_arc_smells.ser";
+		String clusterFile = sysResources + fs + systemVersion + arcFileSuffix + "clusters.rsf";
+		String resultFile = outputDirPath + fs + systemVersion + "_arc_smells.ser";
 
 		assertDoesNotThrow(() -> {
 			TopicUtil.docTopics = DocTopics.deserializeDocTopics(docTopicsPath);
@@ -191,55 +160,35 @@ public class ConcernClusteringRunnerTest {
 	 * ConcernClusteringRunner.architecture is modified in the
 	 * ConcernClusteringRunner constructor.
 	 *
-	 * @param srcDir Directory with single system version's src files.
-	 * @param outDir Path to the pipe and mallet files are (one directory above base/).
-	 * @param resDir Path to serialized objects (resources directory).
 	 * @param versionName System version.
 	 * @param language System language.
 	 */
 	@ParameterizedTest
 	@CsvSource({
 		// struts 2.3.30
-		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.3.30,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.3.30,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		+ "struts-2.3.30,"
+		"struts-2.3.30,"
 		+ "java",
 
 		// struts 2.5.2
-		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.5.2,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.5.2,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		+ "struts-2.5.2,"
+		"struts-2.5.2,"
 		+ "java",
 
 		// httpd-2.3.8
-		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.3.8,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		+ "httpd-2.3.8,"
+		"httpd-2.3.8,"
 		+ "c",
 
 		// httpd-2.4.26
-		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.4.26,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		+ "httpd-2.4.26,"
+		"httpd-2.4.26,"
 		+ "c",
 	})
-	public void initDataStructuresTest(String srcDir, String outDir,
-			String resDir, String versionName, String language) {
-		char fs = File.separatorChar;
-		String outputPath = "." + fs + "target" + fs + "test_results" + fs
-			+ "ConcernClusteringRunnerTest" + fs + "ds_serialized";
+	public void initDataStructuresTest(String versionName, String language) {
+		String fullSrcDir = subjectSystemsDir + fs + versionName;
+		String artifactsDir = resourcesDir + fs + versionName;
+		String outputPath = outputDirPath + fs + "ds_serialized";
 		(new File(outputPath)).mkdirs();
 		
-		String fullSrcDir = srcDir.replace("///", File.separator);
-		String outputDir = outDir.replace("///", File.separator);
-		
 		// Deserialize FastFeatureVectors oracle
-		String ffVecsFilePath = resDir + fs	+ "ffVecs_serialized" + fs
-			+ versionName + "_ffVecs.json";
+		String ffVecsFilePath = artifactsDir + fs + versionName + "_ffVecs.json";
 		FeatureVectors builderffVecs = null;
 
 		try {
@@ -254,7 +203,7 @@ public class ConcernClusteringRunnerTest {
 		
 		// Construct a ConcernClusteringRunner object
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
-			builderffVecs, fullSrcDir, outputDir + "/base", language);
+			builderffVecs, fullSrcDir, artifactsDir + "/base", language);
 
 		/* Tests whether fastClusters was altered by
 		 * initializeDocTopicsForEachFastCluster */
@@ -282,55 +231,35 @@ public class ConcernClusteringRunnerTest {
 	 * updateFastClustersAndSimMatrixToReflectMergedCluster.
 	 * stopCriterion = clustergain is not currently in use.
 	 *
-	 * @param srcDir Directory with single system version's src files.
-	 * @param outDir Path to the pipe and mallet files are (one directory above base/).
-	 * @param resDir Path to serialized objects (resources directory).
 	 * @param versionName System version.
 	 * @param language System language.
 	 */
 	@ParameterizedTest
 	@CsvSource({
 		// struts 2.3.30
-		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.3.30,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.3.30,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		+ "struts-2.3.30,"
+		"struts-2.3.30,"
 		+ "java",
 
 		// struts 2.5.2
-		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.5.2,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///struts-2.5.2,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		+ "struts-2.5.2,"
+		"struts-2.5.2,"
 		+ "java",
 
 		// httpd-2.3.8
-		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.3.8,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		+ "httpd-2.3.8,"
+		"httpd-2.3.8,"
 		+ "c",
 
 		// httpd-2.4.26
-		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources///httpd-2.4.26,"
-		+ ".///src///test///resources///ConcernClusteringRunnerTest_resources,"
-		+ "httpd-2.4.26,"
+		"httpd-2.4.26,"
 		+ "c",
 	})
-	public void computeClustersWithConcernsAndFastClustersTest(String srcDir,
-			String outDir, String resDir, String versionName, String language) {
-		char fs = File.separatorChar;
-		String outputPath = "." + fs + "target" + fs + "test_results" + fs
-			+ "ConcernClusteringRunnerTest";
-		(new File(outputPath)).mkdirs();
-		
-		String fullSrcDir = srcDir.replace("///", File.separator);
-		String outputDir = outDir.replace("///", File.separator);
+	public void computeClustersWithConcernsAndFastClustersTest(String versionName,
+			String language) {
+		String fullSrcDir = subjectSystemsDir + fs + versionName;
+		String artifactsDir = resourcesDir + fs + versionName;
+		(new File(outputDirPath)).mkdirs();
 		
 		// Deserialize FastFeatureVectors oracle
-		String ffVecsFilePath = resDir + fs	+ "ffVecs_serialized" + fs
-			+ versionName + "_ffVecs.json";
+		String ffVecsFilePath = artifactsDir + fs + versionName + "_ffVecs.json";
 		FeatureVectors builderffVecs = null;
 
 		try {
@@ -346,7 +275,7 @@ public class ConcernClusteringRunnerTest {
 		
 		// Construct a ConcernClusteringRunner object
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
-			builderffVecs, fullSrcDir, outputDir + "/base", language);
+			builderffVecs, fullSrcDir, artifactsDir + "/base", language);
 		// call computeClustersWithConcernsAndFastClusters()
 		assertDoesNotThrow(() -> {
 			// copied from BatchClusteringEngine

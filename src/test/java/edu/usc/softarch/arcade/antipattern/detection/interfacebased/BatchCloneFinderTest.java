@@ -42,8 +42,8 @@ public class BatchCloneFinderTest {
 		command.add("cpd");
 		// This is the input for PMD
 		command.add("-Din=" + System.getProperty("user.dir") + fs + "src" + fs
-			+ "test" + fs + "resources" + fs + "subject_systems_resources" + fs
-			+ system + fs + "src" + fs + version);
+			+ "test" + fs + "resources" + fs + "subject_systems" + fs
+			+ version);
 		// This is the path for an output file.
 		command.add("-Dout="+ System.getProperty("user.dir") + fs + "target" + fs
 			+ "test_results" + fs + "BatchCloneFinderTest" + fs + version 
@@ -86,7 +86,7 @@ public class BatchCloneFinderTest {
 	 */
 	private String cleanAbsolutePaths(String toClean) {
 		return toClean.replaceAll("\\r\\n?", "\n")
-			.replaceAll("path=\\\".*\\\\subject_systems(_resources)?", " ");
+			.replaceAll("path=\\\".*\\\\subject_systems(_resources)?(\\\\.*\\\\src)?", " ");
 	}
 	
 	/**

@@ -31,12 +31,12 @@ public class CSourceToDepsBuilderTest {
 		// [oracle rsf file location] // IMPORTANT: generate your own oracles to test (GitHub converts between CR/LF and LF)
 
 		// httpd 2.3.8
-		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
+		".///src///test///resources///subject_systems///httpd-2.3.8,"
 		+ ".///target///test_results///CSourceToDepsBuilderTest///httpd-2.3.8_buildTestResult.rsf,"
 		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.3.8_deps.rsf,"
 		+ ".///target///test_results///CSourceToDepsBuilderTest///httpd-2.3.8_buildTestResult_ffVecs.json",
 		// httpd 2.4.26
-		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
+		".///src///test///resources///subject_systems///httpd-2.4.26,"
 		+ ".///target///test_results///CSourceToDepsBuilderTest///httpd-2.4.26_buildTestResult.rsf,"
 		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources///httpd-2.4.26_deps.rsf,"
 		+ ".///target///test_results///CSourceToDepsBuilderTest///httpd-2.4.26_buildTestResult_ffVecs.json",

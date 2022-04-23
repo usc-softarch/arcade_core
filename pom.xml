@@ -388,7 +388,7 @@
           <excludes>
             <exclude>JavaSourceToDepsBuilderTest_resources_old/**/*</exclude>
             <exclude>JavaSourceToDepsBuilderTest_resources/**/*</exclude>
-            <exclude>subject_systems_resources/**/*</exclude>
+            <exclude>subject_systems/**/*</exclude>
           </excludes>
         </configuration>
       </plugin>

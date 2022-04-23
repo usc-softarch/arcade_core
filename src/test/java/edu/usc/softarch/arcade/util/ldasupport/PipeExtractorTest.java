@@ -38,22 +38,22 @@ public class PipeExtractorTest {
 		// [system language]
 
 		// struts 2.3.30
-		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.3.30,"
+		".///src///test///resources///subject_systems///struts-2.3.30,"
 		+ ".///target///test_results///PipeExtractorTest///struts-2.3.30///base,"
 		+ ".///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.3.30///output.pipe,"
 		+ "java",
 		// struts 2.5.2
-		".///src///test///resources///subject_systems_resources///Struts2///src///struts-2.5.2,"
+		".///src///test///resources///subject_systems///struts-2.5.2,"
 		+ ".///target///test_results///PipeExtractorTest///struts-2.5.2///base,"
 		+ ".///src///test///resources///PipeExtractorTest_resources///Struts2///arc///base///struts-2.5.2///output.pipe,"
 		+ "java",
 		// httpd 2.3.8
-		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.3.8,"
+		".///src///test///resources///subject_systems///httpd-2.3.8,"
 		+ ".///target///test_results///PipeExtractorTest///httpd-2.3.8///base,"
 		+ ".///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.3.8///output.pipe,"
 		+ "c",
 		// httpd 2.4.26
-		".///src///test///resources///subject_systems_resources///httpd///src///httpd-2.4.26,"
+		".///src///test///resources///subject_systems///httpd-2.4.26,"
 		+ ".///target///test_results///PipeExtractorTest///httpd-2.4.26///base,"
 		+ ".///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.4.26///output.pipe,"
 		+ "c",
