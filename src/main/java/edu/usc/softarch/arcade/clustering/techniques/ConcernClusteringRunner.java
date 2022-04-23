@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.clustering.techniques;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
@@ -43,7 +44,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		initializeClusters(srcDir, language);
 		this.initialArchitecture = new Architecture(architecture);
 
-		initializeDocTopicsForEachFastCluster(artifactsDir);
+		initializeClusterDocTopics(artifactsDir);
 		this.architectureWithDocTopics = new Architecture(architecture);
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
@@ -98,10 +99,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
 			ffVecs, sysDirPath, artifactsDirPath, language);
-		int numClusters = (int) (runner.getFastClusters().size() * .20);
+		int numClusters = (int) (runner.getArchitecture().size() * .20);
 
 		try {
-			runner.computeClustersWithConcernsAndFastClusters(
+			runner.computeArchitecture(
 				new PreSelectedStoppingCriterion(numClusters, runner),
 				"preselected", SimilarityMatrix.SimMeasure.JS);
 		} catch (DistributionSizeMismatchException e) {
@@ -110,19 +111,19 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 		String prefix = outputDirPath + File.separator
 			+ revisionNumber + "_" + numTopics + "_topics_"
-			+ runner.getFastClusters().size();
+			+ runner.getArchitecture().size();
 		String arcClustersFilename = prefix	+ "_arc_clusters.rsf";
 		String docTopicsFilename = prefix + "_arc_docTopics.json";
 
 		Map<String, Integer> clusterNameToNodeNumberMap =
-			runner.getFastClusters().computeArchitectureIndex();
-		runner.getFastClusters().writeToRsf(
+			runner.getArchitecture().computeArchitectureIndex();
+		runner.getArchitecture().writeToRsf(
 			clusterNameToNodeNumberMap, arcClustersFilename);
 		runner.docTopics.serializeDocTopics(docTopicsFilename);
 	}
 	// #endregion INTERFACE ------------------------------------------------------
 
-	public void computeClustersWithConcernsAndFastClusters(
+	public void computeArchitecture(
 			StoppingCriterion stoppingCriterion, String stopCriterion,
 			SimilarityMatrix.SimMeasure simMeasure) throws DistributionSizeMismatchException {
 		SimilarityMatrix simMatrix = new SimilarityMatrix(simMeasure, architecture);
@@ -134,7 +135,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			}
 
 			SimData data = identifyMostSimClusters(simMatrix);
-			Cluster newCluster = mergeFastClustersUsingTopics(data);
+			Cluster newCluster = mergeClustersUsingTopics(data);
 			updateFastClustersAndSimMatrixToReflectMergedCluster(
 				data, newCluster, simMatrix);
 		}
@@ -170,7 +171,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		return toReturn;
 	}
 
-	private void initializeDocTopicsForEachFastCluster(String artifactsDir) {
+	private void initializeClusterDocTopics(String artifactsDir) {
 		try	{
 			this.docTopics = DocTopics.deserializeDocTopics(artifactsDir + File.separator + "docTopics.json");
 		} catch (IOException e) {
@@ -185,36 +186,28 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		// Set the DocTopics of each Cluster
 		for (Cluster c : architecture.values())
 			this.docTopics.setClusterDocTopic(c, this.language);
-		
+
 		// Map inner classes to their parents
-		Map<String,String> parentClassMap = new HashMap<>();
+		Map<String,String> oldParentClassMap = new HashMap<>();
 		for (Cluster c : architecture.values()) {
 			if (c.getName().contains("$")) {
 				String[] tokens = c.getName().split("\\$");
 				String parentClassName = tokens[0];
-				parentClassMap.put(c.getName(), parentClassName);
+				oldParentClassMap.put(c.getName(), parentClassName);
+			}
+		}
+
+		Map<Cluster, Cluster> parentClassMap = new LinkedHashMap<>();
+		for (Cluster c : architecture.values()) {
+			if (c.getName().contains("$")) {
+				String[] tokens = c.getName().split("\\$");
+				String parentClassName = tokens[0];
+				parentClassMap.put(c, this.architecture.get(parentClassName));
 			}
 		}
 		
 		removeClassesWithoutDTI(parentClassMap);
-
-		Architecture updatedArchitecture = new Architecture(architecture);
-		for (String key : parentClassMap.keySet()) {
-			for (Cluster nestedCluster : architecture.values()) {
-				if (nestedCluster.getName().equals(key)) {
-					for (Cluster parentCluster : architecture.values()) {
-						if (parentClassMap.get(key).equals(parentCluster.getName())) {
-							Cluster mergedCluster = mergeFastClustersUsingTopics(nestedCluster,parentCluster);
-							updatedArchitecture.remove(parentCluster.getName());
-							updatedArchitecture.remove(nestedCluster.getName());
-							updatedArchitecture.put(mergedCluster.getName(), mergedCluster);
-						}
-					}
-				}
-			}
-		}
-
-		architecture = updatedArchitecture;
+		architecture = removeInnerClasses(oldParentClassMap);
 		
 		Architecture clustersWithMissingDocTopics =	new Architecture();
 		for (Cluster c : architecture.values())
@@ -227,23 +220,35 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			architecture.remove(c.getName());
 	}
 
-	private void removeClassesWithoutDTI(Map<String, String> parentClassMap) {
+	//TODO Change this to the correct format
+	private Architecture removeInnerClasses(Map<String, String> parentClassMap) {
+		Architecture updatedArchitecture = new Architecture(architecture);
+		for (Map.Entry<String, String> entry : parentClassMap.entrySet()) {
+			Cluster nestedCluster = this.architecture.get(entry.getKey());
+			if (nestedCluster == null) continue; // was already removed by WithoutDTI
+			Cluster parentCluster = this.architecture.get(entry.getValue());
+			Cluster mergedCluster = mergeClustersUsingTopics(nestedCluster, parentCluster);
+			updatedArchitecture.remove(parentCluster.getName());
+			updatedArchitecture.remove(nestedCluster.getName());
+			updatedArchitecture.put(mergedCluster.getName(), mergedCluster);
+		}
+		return updatedArchitecture;
+	}
+
+	private void removeClassesWithoutDTI(Map<Cluster, Cluster> parentClassMap) {
 		// Locate non-inner classes without DTI
 		Architecture excessClusters = new Architecture();
-		for (Cluster c : architecture.values())
+		for (Cluster c : this.architecture.values())
 			if (c.docTopicItem == null && !c.getName().contains("$"))
 				excessClusters.put(c.getName(), c);
-		
-		// Locate inner classes of those non-inner classes without DTI
+
 		Architecture excessInners = new Architecture();
-		for (Cluster excessCluster : excessClusters.values()) {
-			for (Cluster cluster : architecture.values()) {
-				if (parentClassMap.containsKey(cluster.getName())) {
-					String parentClass = parentClassMap.get(cluster.getName());
-					if (parentClass.equals(excessCluster.getName()))
-						excessInners.put(cluster.getName(), cluster);
-				}
-			}
+		// For each Child/Parent pair, if the parent is marked, mark the child
+		for (Map.Entry<Cluster, Cluster> entry : parentClassMap.entrySet()) {
+			Cluster child = entry.getKey();
+			Cluster parent = entry.getValue();
+			if (excessClusters.containsKey(parent.getName()))
+				excessInners.put(child.getName(), child);
 		}
 
 		// Remove them from the analysis
@@ -251,13 +256,13 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		architecture.removeAll(excessInners);
 	}
 	
-	private Cluster mergeFastClustersUsingTopics(SimData data) {
+	private Cluster mergeClustersUsingTopics(SimData data) {
 		Cluster cluster = data.c1;
 		Cluster otherCluster = data.c2;
-		return mergeFastClustersUsingTopics(cluster, otherCluster);
+		return mergeClustersUsingTopics(cluster, otherCluster);
 	}
 
-	private Cluster mergeFastClustersUsingTopics(
+	private Cluster mergeClustersUsingTopics(
 			Cluster cluster, Cluster otherCluster) {
 		Cluster newCluster =
 			new Cluster(ClusteringAlgorithmType.LIMBO, cluster, otherCluster);

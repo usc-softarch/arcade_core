@@ -10,5 +10,5 @@ public class NoOrphansStoppingCriterion
 		this.parent = parent;	}
 
 	public boolean notReadyToStop() {
-		return parent.getFastClusters().hasOrphans(); }
+		return parent.getArchitecture().hasOrphans(); }
 }

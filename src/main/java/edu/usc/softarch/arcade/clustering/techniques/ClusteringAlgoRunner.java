@@ -23,7 +23,7 @@ public class ClusteringAlgoRunner {
 	// #endregion ATTRIBUTES -----------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public Architecture getFastClusters() { return architecture; }
+	public Architecture getArchitecture() { return architecture; }
 
 	public void setFeatureVectors(FeatureVectors featureVectors) {
 		this.featureVectors = featureVectors;

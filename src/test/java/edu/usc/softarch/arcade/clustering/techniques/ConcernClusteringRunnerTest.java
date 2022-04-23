@@ -186,15 +186,15 @@ public class ConcernClusteringRunnerTest {
 		// call computeClustersWithConcernsAndFastClusters()
 		assertDoesNotThrow(() -> {
 			// copied from BatchClusteringEngine
-			int numClusters = (int) ((double) runner.getFastClusters().size() * .20);
+			int numClusters = (int) ((double) runner.getArchitecture().size() * .20);
 			// USING THE CLONE THAT TAKES IN THE VERSION NAME HERE
-			runner.computeClustersWithConcernsAndFastClusters(
+			runner.computeArchitecture(
 				new PreSelectedStoppingCriterion(numClusters, runner),
 				"preselected", SimilarityMatrix.SimMeasure.JS);
 		});
 
 		Architecture fastClustersAfterInit = runner.getArchitectureWithDocTopics();
-		Architecture fastClustersCompute = runner.getFastClusters();
+		Architecture fastClustersCompute = runner.getArchitecture();
 		// Check that fastClusters not empty after computeClustersWithConcernsAndFastClusters call 
 		assertFalse(fastClustersCompute.isEmpty());
 		// The size of the fastClusters should be smaller afterward
