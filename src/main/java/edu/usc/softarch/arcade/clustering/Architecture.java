@@ -30,7 +30,10 @@ public class Architecture extends LinkedHashMap<String, Cluster> {
 	/**
 	 * Clone constructor
 	 */
-  public Architecture(Architecture arch) { super(arch); }
+  public Architecture(Architecture arch) {
+		for (Cluster c : arch.values())
+			this.add(new Cluster(c));
+	}
 	//endregion
 
 	//region ACCESSORS

@@ -56,14 +56,16 @@ public class Cluster implements Serializable {
 		this.age = ageCounter++;
 	}
 
+	/**
+	 * Clone constructor. Does NOT increment cluster ages.
+	 */
 	public Cluster(Cluster c1) {
 		this.name = c1.getName();
 		this.numEntities = c1.getNumEntities();
 		this.featureMap = c1.getFeatureMap();
 		this.numFeatures = c1.getNumFeatures();
 		this.docTopicItem = c1.docTopicItem;
-
-		this.age = ageCounter++;
+		this.age = c1.getAge();
 	}
 
 	public Cluster(Cluster c1, Cluster c2) {

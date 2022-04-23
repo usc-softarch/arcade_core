@@ -8,9 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
@@ -76,12 +74,13 @@ public class ConcernClusteringRunnerTest {
 		String outputDir = outDir.replace("///", File.separator);
 		
 		// Deserialize FastFeatureVectors oracle
+		String ffVecsFilePath = resDir + fs	+ "ffVecs_serialized" + fs
+			+ versionName + "_ffVecs.json";
 		FeatureVectors builderffVecs = null;
-		try (ObjectInputStream ois = new ObjectInputStream(
-				new FileInputStream(resDir + fs	+ "ffVecs_serialized" + fs
-				+ versionName + "_ffVecs_builder.txt"))) {
-			builderffVecs = (FeatureVectors)ois.readObject();
-		} catch (IOException | ClassNotFoundException e) {
+
+		try {
+			builderffVecs = FeatureVectors.deserializeFFVectors(ffVecsFilePath);
+		} catch (IOException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
@@ -166,12 +165,13 @@ public class ConcernClusteringRunnerTest {
 		String outputDir = outDir.replace("///", File.separator);
 		
 		// Deserialize FastFeatureVectors oracle
+		String ffVecsFilePath = resDir + fs	+ "ffVecs_serialized" + fs
+			+ versionName + "_ffVecs.json";
 		FeatureVectors builderffVecs = null;
-		try (ObjectInputStream ois = new ObjectInputStream(
-				new FileInputStream(resDir + fs + "ffVecs_serialized" + fs
-				+ versionName + "_ffVecs_builder.txt"))) {
-			builderffVecs = (FeatureVectors)ois.readObject();
-		} catch (IOException | ClassNotFoundException e) {
+
+		try {
+			builderffVecs = FeatureVectors.deserializeFFVectors(ffVecsFilePath);
+		} catch (IOException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
