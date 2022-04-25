@@ -1,7 +1,11 @@
 package edu.usc.softarch.arcade.clustering;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -34,10 +38,8 @@ public class SimilarityMatrix {
 
 	//region CONSTRUCTORS
 	public SimilarityMatrix(SimMeasure simMeasure, Architecture architecture)
-		throws DistributionSizeMismatchException {
-		this.simMatrix = new HashMap<>();
-		this.fastSimMatrix = new TreeSet<>();
-		this.simMeasure = simMeasure;
+			throws DistributionSizeMismatchException {
+		this(simMeasure);
 
 		for (Cluster cluster : architecture.values())
 			this.addCluster(cluster);
@@ -60,6 +62,15 @@ public class SimilarityMatrix {
 			for (Entry<Cluster, SimData> cell : row.getValue().entrySet())
 				newCol.put(new Cluster(cell.getKey()), cell.getValue());
 		}
+	}
+
+	/**
+	 * Deserialization constructor.
+	 */
+	private SimilarityMatrix(SimMeasure simMeasure) {
+		this.simMatrix = new HashMap<>();
+		this.fastSimMatrix = new TreeSet<>();
+		this.simMeasure = simMeasure;
 	}
 	//endregion
 
@@ -108,18 +119,14 @@ public class SimilarityMatrix {
 	private SimData computeCellData(Cluster row, Cluster col)
 			throws DistributionSizeMismatchException {
 		int cellSize = Math.min(row.getNumEntities(), col.getNumEntities());
-		String[] clusterNames = { row.getName(), col.getName() };
-		// Order the names
-		Arrays.stream(clusterNames).sorted().collect(Collectors.toList()).toArray(clusterNames);
-		String cellName = clusterNames[0] + clusterNames[1];
 
 		switch(this.simMeasure) {
 			case JS:
 				return new SimData(row, col,
-					row.docTopicItem.getJsDivergence(col.docTopicItem), cellSize, cellName);
+					row.docTopicItem.getJsDivergence(col.docTopicItem), cellSize);
 			case SCM:
 				return new SimData(row, col,
-					FastSimCalcUtil.getStructAndConcernMeasure(row, col), cellSize, cellName);
+					FastSimCalcUtil.getStructAndConcernMeasure(row, col), cellSize);
 		}
 
 		throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
@@ -171,6 +178,45 @@ public class SimilarityMatrix {
 			}
 		}
 		return true;
+	}
+	//endregion
+
+	//region SERIALIZATION
+	public void serialize(JsonGenerator generator) throws IOException {
+		generator.writeStringField("simMeas", simMeasure.toString());
+
+		generator.writeArrayFieldStart("simData");
+		for (SimData simData : fastSimMatrix) {
+			generator.writeStartObject();
+			simData.serialize(generator);
+			generator.writeEndObject();
+		}
+		generator.writeEndArray();
+	}
+
+	public static SimilarityMatrix deserialize(
+			JsonParser parser, Architecture architecture)
+			throws IOException {
+		parser.nextToken();
+		String simMeasureString = parser.nextTextValue();
+		SimilarityMatrix newSimMatrix = new SimilarityMatrix(
+			SimMeasure.valueOf(simMeasureString));
+		Map<Integer, Cluster> hashArchitecture = new HashMap<>();
+		for (Entry<String, Cluster> entry : architecture.entrySet())
+			hashArchitecture.put(entry.getKey().hashCode(), entry.getValue());
+
+		parser.nextToken();
+		parser.nextToken(); // skip start array
+		while (parser.nextToken().equals(JsonToken.START_OBJECT)) {
+			SimData simData = SimData.deserialize(parser, hashArchitecture);
+			newSimMatrix.fastSimMatrix.add(simData);
+			newSimMatrix.simMatrix.putIfAbsent(simData.c1, new HashMap<>());
+			Map<Cluster, SimData> col = newSimMatrix.simMatrix.get(simData.c1);
+			col.put(simData.c2, simData);
+		}
+		parser.nextToken(); // skip end array
+
+		return newSimMatrix;
 	}
 	//endregion
 }

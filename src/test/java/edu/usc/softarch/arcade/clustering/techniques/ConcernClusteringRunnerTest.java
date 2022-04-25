@@ -21,6 +21,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
@@ -326,8 +330,7 @@ public class ConcernClusteringRunnerTest {
 	public void computeArchitectureTest(String versionName,	String language) {
 		String fullSrcDir = subjectSystemsDir + fs + versionName;
 		String artifactsDir = resourcesDir + fs + versionName;
-		String architectureWithDocTopicsPath =
-			artifactsDir + fs + "architecture_with_doc_topics.txt";
+		String oracleSimMatrixPath = artifactsDir + fs + "sim_matrix_oracle.json";
 		(new File(outputDirPath)).mkdirs();
 		
 		// Deserialize FastFeatureVectors oracle
@@ -365,14 +368,28 @@ public class ConcernClusteringRunnerTest {
 		// The size of the fastClusters should be smaller afterward
 		assertTrue(fastClustersCompute.size() < fastClustersAfterInit.size());
 
-		Architecture simMatrixInputOracle = assertDoesNotThrow(() -> {
-			ObjectInputStream in =
-				new ObjectInputStream(new FileInputStream(architectureWithDocTopicsPath));
-			return (Architecture) in.readObject();
-		});
+		// ------------------------- Generate Oracles ------------------------------
 
-		SimilarityMatrix oracleSimMatrix = assertDoesNotThrow(() ->
-			new SimilarityMatrix(SimilarityMatrix.SimMeasure.JS, simMatrixInputOracle));
+		if (generateOracles) {
+			JsonFactory factory = new JsonFactory();
+			assertDoesNotThrow(() -> {
+				JsonGenerator generator = factory.createGenerator(
+					new File(oracleSimMatrixPath), JsonEncoding.UTF8);
+				generator.writeStartObject();
+				runner.getInitialSimMatrix().serialize(generator);
+				generator.writeEndObject();
+				generator.close();
+			});
+		}
+
+		// ------------------------- Generate Oracles ------------------------------
+
+		SimilarityMatrix oracleSimMatrix = assertDoesNotThrow(() -> {
+			JsonFactory factory = new JsonFactory();
+			JsonParser parser = factory.createParser(new File(oracleSimMatrixPath));
+			parser.nextToken();
+			return SimilarityMatrix.deserialize(parser, runner.getArchitectureWithDocTopics());
+		});
 		SimilarityMatrix initialSimMatrix = runner.getInitialSimMatrix();
 
 		assertEquals(oracleSimMatrix, initialSimMatrix);
