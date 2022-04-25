@@ -14,12 +14,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
-import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
@@ -27,7 +30,8 @@ import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.util.FileUtil;
-import edu.usc.softarch.arcade.util.RsfCompare;
+import edu.usc.softarch.util.EnhancedHashSet;
+import edu.usc.softarch.util.EnhancedSet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -109,13 +113,27 @@ public class ConcernClusteringRunnerTest {
 		String result = assertDoesNotThrow(() ->
 			FileUtil.readFile(resultClustersFile, StandardCharsets.UTF_8));
 
+		// ------------------------- Generate Oracles ------------------------------
+
+		if (generateOracles) {
+			assertDoesNotThrow(() -> {
+				Path resultPath = Paths.get(resultClustersFile);
+				Path oraclePath = Paths.get(oracleFilePath);
+				Files.copy(resultPath, oraclePath, StandardCopyOption.REPLACE_EXISTING);
+			});
+		}
+
+		// ------------------------- Generate Oracles ------------------------------
+
 		// Load oracle
 		String oracle = assertDoesNotThrow(() ->
 			FileUtil.readFile((oracleFilePath), StandardCharsets.UTF_8));
 
 		// RsfCompare.equals() to compare contents of oracle and result files
-		RsfCompare resultRsf = new RsfCompare(result);
-		RsfCompare oracleRsf = new RsfCompare(oracle);
+		EnhancedSet<String> resultRsf = new EnhancedHashSet<>(
+			Arrays.asList(result.split("\\r?\\n")));
+		EnhancedSet<String> oracleRsf = new EnhancedHashSet<>(
+			Arrays.asList(oracle.split("\\r?\\n")));
 		assertEquals(oracleRsf, resultRsf);
 	}
 
@@ -272,10 +290,11 @@ public class ConcernClusteringRunnerTest {
 		});
 
 		assertAll(
-			() -> assertEquals(initialArchitectureOracle, initialArchitecture),
-			() -> assertEquals(architectureWithDocTopicsOracle, architectureWithDocTopics)
+			() -> assertEquals(initialArchitectureOracle, initialArchitecture,
+				"Initial Architectures did not match."),
+			() -> assertEquals(architectureWithDocTopicsOracle, architectureWithDocTopics,
+				"DocTopic Architectures did not match.")
 		);
-		resetClusterAges();
 	}
 
 	/**
@@ -357,24 +376,6 @@ public class ConcernClusteringRunnerTest {
 		SimilarityMatrix initialSimMatrix = runner.getInitialSimMatrix();
 
 		assertEquals(oracleSimMatrix, initialSimMatrix);
-		resetClusterAges();
-	}
-
-	private void resetClusterAges() {
-		Cluster dummy = new Cluster();
-		Class<? extends Cluster> clusterClass = dummy.getClass();
-		Field ageCounterField;
-		try {
-			ageCounterField = clusterClass.getDeclaredField("ageCounter");
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		}
-		ageCounterField.setAccessible(true);
-		try {
-			ageCounterField.set(null, 0);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	/**

@@ -7,15 +7,15 @@ public class SimData implements Comparable<SimData> {
 	public final Cluster c2;
 	public final Double cellValue;
 	public final Integer clusterSize;
-	public final Integer clusterAge;
+	public final String cellName;
 
 	public SimData(Cluster c1, Cluster c2, Double cellValue,
-			Integer clusterSize, Integer clusterAge) {
+			Integer clusterSize, String cellName) {
 		this.c1 = c1;
 		this.c2 = c2;
 		this.cellValue = cellValue;
 		this.clusterSize = clusterSize;
-		this.clusterAge = clusterAge;
+		this.cellName = cellName;
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class SimData implements Comparable<SimData> {
 			return this.cellValue.compareTo(o.cellValue);
 		if (!this.clusterSize.equals(o.clusterSize))
 			return this.clusterSize.compareTo(o.clusterSize);
-		return this.clusterAge.compareTo(o.clusterAge);
+		return this.cellName.compareTo(o.cellName);
 	}
 
 	//region OBJECT METHODS
@@ -38,11 +38,11 @@ public class SimData implements Comparable<SimData> {
 			&& Objects.equals(c2, simData.c2)
 			&& Objects.equals(cellValue, simData.cellValue)
 			&& Objects.equals(clusterSize, simData.clusterSize)
-			&& Objects.equals(clusterAge, simData.clusterAge);
+			&& Objects.equals(cellName, simData.cellName);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(c1, c2, cellValue, clusterSize, clusterAge); }
+		return Objects.hash(c1, c2, cellValue, clusterSize, cellName); }
 	//endregion
 }

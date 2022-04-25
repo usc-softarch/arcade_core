@@ -2,12 +2,14 @@ package edu.usc.softarch.arcade.clustering;
 
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * A matrix of similarity values between pairs of clusters. This implementation
@@ -106,18 +108,18 @@ public class SimilarityMatrix {
 	private SimData computeCellData(Cluster row, Cluster col)
 			throws DistributionSizeMismatchException {
 		int cellSize = Math.min(row.getNumEntities(), col.getNumEntities());
-		int rowAge = row.getAge();
-		int colAge = col.getAge();
-		int cellAge = Math.min(rowAge, colAge) << 16;
-		cellAge += Math.max(rowAge, colAge);
+		String[] clusterNames = { row.getName(), col.getName() };
+		// Order the names
+		Arrays.stream(clusterNames).sorted().collect(Collectors.toList()).toArray(clusterNames);
+		String cellName = clusterNames[0] + clusterNames[1];
 
 		switch(this.simMeasure) {
 			case JS:
 				return new SimData(row, col,
-					row.docTopicItem.getJsDivergence(col.docTopicItem), cellSize, cellAge);
+					row.docTopicItem.getJsDivergence(col.docTopicItem), cellSize, cellName);
 			case SCM:
 				return new SimData(row, col,
-					FastSimCalcUtil.getStructAndConcernMeasure(row, col), cellSize, cellAge);
+					FastSimCalcUtil.getStructAndConcernMeasure(row, col), cellSize, cellName);
 		}
 
 		throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
