@@ -98,7 +98,13 @@ public class SimilarityMatrix {
 		for (Cluster cluster : clusterSet) {
 			SimData cellData = computeCellData(c, cluster);
 			newRow.put(cluster, cellData);
-			if(!c.equals(cluster)) this.fastSimMatrix.add(cellData);
+			if (!c.equals(cluster)) {
+				if (cellData.cellValue == 0)
+					throw new IllegalArgumentException("Two clusters found with the " +
+						"same topic distribution: " + cellData.c1.getName() + " ; " +
+						cellData.c2.getName());
+				this.fastSimMatrix.add(cellData);
+			}
 		}
 	}
 
@@ -179,6 +185,21 @@ public class SimilarityMatrix {
 		}
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder toReturn = new StringBuilder();
+		for (Entry<Cluster, Map<Cluster, SimData>> entry : simMatrix.entrySet()) {
+			for (Entry<Cluster, SimData> innerEntry : entry.getValue().entrySet()) {
+				toReturn.append(entry.getKey().toString());
+				toReturn.append(innerEntry.getKey().toString());
+				toReturn.append(innerEntry.getValue().cellValue);
+				toReturn.append(System.lineSeparator());
+			}
+		}
+		return toReturn.toString();
+	}
+
 	//endregion
 
 	//region SERIALIZATION

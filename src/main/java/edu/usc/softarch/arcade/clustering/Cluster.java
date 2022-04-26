@@ -80,8 +80,11 @@ public class Cluster implements Serializable {
 			
 			Set<Integer> c2Indices = c2.getFeatureMap().keySet();
 			setLimboFeatureMap(c1, c2, c2Indices);
-			
-			this.name = c1.getName() + ',' + c2.getName();
+
+			if (c1.getName().contains("$"))
+				this.name = c2.getName();
+			else
+				this.name = c1.getName() + ',' + c2.getName();
 
 			this.numEntities = c1.getNumEntities() + c2.getNumEntities();
 			this.numFeatures = c1.getNumFeatures();

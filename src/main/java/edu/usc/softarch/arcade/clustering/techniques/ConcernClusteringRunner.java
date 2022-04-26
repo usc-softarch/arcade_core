@@ -193,7 +193,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		}
 		
 		removeClassesWithoutDTI(parentClassMap);
-		architecture = removeInnerClasses(oldParentClassMap);
+		removeInnerClasses(oldParentClassMap);
 		
 		Architecture clustersWithMissingDocTopics =	new Architecture();
 		for (Cluster c : architecture.values())
@@ -207,18 +207,16 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 
 	//TODO Change this to the correct format
-	private Architecture removeInnerClasses(Map<String, String> parentClassMap) {
-		Architecture updatedArchitecture = new Architecture(architecture);
+	private void removeInnerClasses(Map<String, String> parentClassMap) {
 		for (Map.Entry<String, String> entry : parentClassMap.entrySet()) {
 			Cluster nestedCluster = this.architecture.get(entry.getKey());
 			if (nestedCluster == null) continue; // was already removed by WithoutDTI
 			Cluster parentCluster = this.architecture.get(entry.getValue());
 			Cluster mergedCluster = mergeClustersUsingTopics(nestedCluster, parentCluster);
-			updatedArchitecture.remove(parentCluster.getName());
-			updatedArchitecture.remove(nestedCluster.getName());
-			updatedArchitecture.put(mergedCluster.getName(), mergedCluster);
+			architecture.remove(parentCluster.getName());
+			architecture.remove(nestedCluster.getName());
+			architecture.put(mergedCluster.getName(), mergedCluster);
 		}
-		return updatedArchitecture;
 	}
 
 	private void removeClassesWithoutDTI(Map<Cluster, Cluster> parentClassMap) {

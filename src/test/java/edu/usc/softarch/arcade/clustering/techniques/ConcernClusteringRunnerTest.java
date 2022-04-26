@@ -77,12 +77,12 @@ public class ConcernClusteringRunnerTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_239_topics_234_arc_clusters.rsf",
+			+ "_239_topics_209_arc_clusters.rsf",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_284_topics_275_arc_clusters.rsf",
+			+ "_284_topics_232_arc_clusters.rsf",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
@@ -153,12 +153,12 @@ public class ConcernClusteringRunnerTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_239_topics_234_arc_",
+			+ "_239_topics_209_arc_",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_284_topics_275_arc_",
+			+ "_284_topics_232_arc_",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
@@ -186,6 +186,18 @@ public class ConcernClusteringRunnerTest {
 				TopicModelExtractionMethod.MALLET_API, TopicUtil.docTopics);
 			asd.run(true, true, true);
 		});
+
+		// ------------------------- Generate Oracles ------------------------------
+
+		if(generateOracles) {
+			assertDoesNotThrow(() -> {
+				Path resultPath = Paths.get(resultFile);
+				Path oraclePath = Paths.get(oracleFilePath);
+				Files.copy(resultPath, oraclePath, StandardCopyOption.REPLACE_EXISTING);
+			});
+		}
+
+		// ------------------------- Generate Oracles ------------------------------
 
 		// Construct SmellCollection objects out of the oracle and result files
 		SmellCollection resultSmells = assertDoesNotThrow(() -> new SmellCollection(resultFile));
