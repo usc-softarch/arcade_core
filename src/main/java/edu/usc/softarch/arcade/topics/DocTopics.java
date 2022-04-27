@@ -55,9 +55,7 @@ public class DocTopics {
 					previousInstances.get(instIndex), 1000, 10, 10);
 			
 			for (int topicIdx = 0; topicIdx < numTopics; topicIdx++) {
-				TopicItem t = new TopicItem();
-				t.setTopicNum(topicIdx);
-				t.setProportion(topicDistribution[topicIdx]);
+				TopicItem t = new TopicItem(topicIdx, topicDistribution[topicIdx]);
 				dtItem.addTopic(t);
 			}
 			dtItemList.add(dtItem);
@@ -152,8 +150,7 @@ public class DocTopics {
 				continue;
 			DocTopicItem currDocTopicItem = docTopicItems.get(i);
 			try {
-				mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
-					mergedDocTopicItem, currDocTopicItem);
+				mergedDocTopicItem = new DocTopicItem(mergedDocTopicItem, currDocTopicItem);
 			} catch (UnmatchingDocTopicItemsException e) {
 				e.printStackTrace(); //TODO handle it
 			}

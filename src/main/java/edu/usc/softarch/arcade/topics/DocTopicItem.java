@@ -66,20 +66,16 @@ public class DocTopicItem implements Serializable {
 			throw new UnmatchingDocTopicItemsException(
 				"In mergeDocTopicItems, nonmatching docTopicItems");
 
-		initialize(dti1);
+		this.doc = dti1.doc;
+		this.source = dti1.source;
+		this.topics = new HashMap<>();
+		setSortMethod(Sort.prop); //TODO Clone from argument
 		Set<Integer> topicNumbers = dti1.getTopicNumbers();
 
 		for (Integer i : topicNumbers) {
 			TopicItem ti1 = dti1.getTopic(i);
 			TopicItem ti2 = dti2.getTopic(i);
-			TopicItem mergedTopicItem = this.getTopic(i);
-
-			mergedTopicItem.setWeight(ti1.getWeight() + ti2.getWeight());
-
-			mergedTopicItem.setProportion(
-				(ti1.getProportion() * ti1.getWeight()
-					+ ti2.getProportion() * ti2.getWeight())
-					/ mergedTopicItem.getWeight());
+			this.addTopic(new TopicItem(ti1, ti2));
 		}
 	}
 
@@ -115,9 +111,9 @@ public class DocTopicItem implements Serializable {
 	public void setDoc(int doc) { this.doc = doc; }
 	public void setSource(String source) { this.source = source; }
 	public TopicItem addTopic(TopicItem topic) {
-		return this.topics.put(topic.getTopicNum(), topic); }
+		return this.topics.put(topic.topicNum, topic); }
 	public TopicItem removeTopic(TopicItem topic) {
-		return this.topics.remove(topic.getTopicNum()); }
+		return this.topics.remove(topic.topicNum); }
 	public TopicItem removeTopic(int topicNum) {
 		return this.topics.remove(topicNum); }
 
@@ -125,13 +121,13 @@ public class DocTopicItem implements Serializable {
 		this.sortMethod = sortMethod;
 		if(sortMethod == Sort.num) {
 			this.sorter = (TopicItem ti0, TopicItem ti1) -> {
-				Integer int0 = ti0.getTopicNum();
-				Integer int1 = ti1.getTopicNum();
+				Integer int0 = ti0.topicNum;
+				Integer int1 = ti1.topicNum;
 				return int0.compareTo(int1); };
 		} else if(sortMethod == Sort.prop) {
 			this.sorter = (TopicItem ti0, TopicItem ti1) -> {
-				Double double0 = Double.valueOf(ti0.getProportion());
-				Double double1 = Double.valueOf(ti1.getProportion());
+				Double double0 = Double.valueOf(ti0.proportion);
+				Double double1 = Double.valueOf(ti1.proportion);
 				return double0.compareTo(double1); };
 		}
 	}
@@ -172,10 +168,10 @@ public class DocTopicItem implements Serializable {
 		Collection<TopicItem> toCompareTopics = toCompare.topics.values();
 
 		for (TopicItem pTopicItem : currTopics)
-			sortedP[pTopicItem.getTopicNum()] = pTopicItem.getProportion();
+			sortedP[pTopicItem.topicNum] = pTopicItem.proportion;
 		
 		for (TopicItem qTopicItem : toCompareTopics)
-			sortedQ[qTopicItem.getTopicNum()] = qTopicItem.getProportion();
+			sortedQ[qTopicItem.topicNum] = qTopicItem.proportion;
 
 		divergence = Maths.jensenShannonDivergence(sortedP, sortedQ);
 		
@@ -217,7 +213,7 @@ public class DocTopicItem implements Serializable {
 		
 		for (TopicItem t : values) {
 			dtItemStr += "\t".repeat(numTabs);
-			dtItemStr += "[" + t.getTopicNum() + "," + t.getProportion() + "]\n";
+			dtItemStr += "[" + t.topicNum + "," + t.proportion + "]\n";
 		}
 		
 		dtItemStr += "]";
@@ -229,7 +225,7 @@ public class DocTopicItem implements Serializable {
 		String dtItemStr = "[" + doc + "," + source + ",";
 	
 		for (TopicItem t : values)
-			dtItemStr += "[" + t.getTopicNum() + "," + t.getProportion() + "]";
+			dtItemStr += "[" + t.topicNum + "," + t.proportion + "]";
 		
 		dtItemStr += "]";
 		return dtItemStr;

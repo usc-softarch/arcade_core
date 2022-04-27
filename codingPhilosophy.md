@@ -30,6 +30,8 @@ main functionalities of ARCADE, not to supplant it.
   cases, a constructor), should not have direct access to attributes, even 
   within the same class. This grealy decreases the odds of a method 
   unwittingly bypassing a consistency check put in place 10 years ago.
+- **Unless the field is immutable**: An exception to the above point: 
+  immutable attributes have no need for accessors.
 - **Accessors are your friends**: In line with the above point, I have given 
   preference to writing an excessive number of accessors to a data structure,
   rather than permitting direct operations by outsiders, even where such 
@@ -100,3 +102,8 @@ main functionalities of ARCADE, not to supplant it.
   will review pull requests for them. Having English as a second language is 
   not an admissible excuse: both Neno and I are foreigners who learned 
   English well into our adulthood. If we could do it, so can you.
+- **Empty constructors are useless constructors**: There are some exceptions,
+  but generally speaking, empty constructors are a lazy programmer's way of 
+  avoiding integrity checks. Rare is the object that makes sense without a 
+  single field being attributed to, and an object that makes no sense is an 
+  integrity threat.

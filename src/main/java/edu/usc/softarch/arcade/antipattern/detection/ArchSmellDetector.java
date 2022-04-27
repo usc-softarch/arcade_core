@@ -48,8 +48,8 @@ public class ArchSmellDetector {
 
 	static final Comparator<TopicItem> TOPIC_PROPORTION_ORDER 
 		= (TopicItem t1, TopicItem t2) -> {
-			Double prop1 = t1.getProportion();
-			Double prop2 = t2.getProportion();
+			Double prop1 = t1.proportion;
+			Double prop2 = t2.proportion;
 			return prop1.compareTo(prop2);
 		};
 	// #endregion ATTRIBUTES -----------------------------------------------------
@@ -230,7 +230,7 @@ public class ArchSmellDetector {
 					DocTopicItem mergedDocTopicItem = null;
 
 					try {
-						mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
+						mergedDocTopicItem = new DocTopicItem(
 							cluster.getDocTopicItem(), entityDocTopicItem);
 					} catch (UnmatchingDocTopicItemsException e) {
 						e.printStackTrace(); //TODO handle it
@@ -264,7 +264,7 @@ public class ArchSmellDetector {
 					DocTopicItem mergedDocTopicItem = null;
 
 					try {
-						mergedDocTopicItem = TopicUtil.mergeDocTopicItems(
+						mergedDocTopicItem = new DocTopicItem(
 							cluster.getDocTopicItem(), entityDocTopicItem);
 					} catch (UnmatchingDocTopicItemsException e) {
 						e.printStackTrace(); //TODO handle it
@@ -467,7 +467,7 @@ public class ArchSmellDetector {
 				DocTopicItem docTopicItem = cluster.getDocTopicItem();
 				int concernCount = 0;
 				for (TopicItem topicItem : docTopicItem.getTopics())  {
-					if (topicItem.getProportion() > concernOverloadTopicThreshold) {
+					if (topicItem.proportion > concernOverloadTopicThreshold) {
 						logger.debug("\t" + cluster.getName() + " is beyond concern overload threshold for " + topicItem);
 						concernCount++;
 					}
@@ -588,7 +588,7 @@ public class ArchSmellDetector {
 				DocTopicItem dti = cluster.getDocTopicItem();
 				List<TopicItem> significantTopicItems = new ArrayList<>(dti.getTopics());
 				significantTopicItems.removeIf((TopicItem ti) -> 
-					ti.getTopicNum() == topicNum || ti.getProportion() < parasiticConcernThreshold);
+					ti.topicNum == topicNum || ti.proportion < parasiticConcernThreshold);
 
 				for (int i = 0; i < significantTopicItems.size(); i++) {
 					logger.debug(cluster.getName()
@@ -630,16 +630,16 @@ public class ArchSmellDetector {
 			DocTopicItem dti = cluster.getDocTopicItem();
 			List<TopicItem> smellyTopicItems = new ArrayList<>(dti.getTopics());
 			smellyTopicItems.removeIf((TopicItem ti) -> 
-				ti.getProportion() < scatteredConcernThreshold);
+				ti.proportion < scatteredConcernThreshold);
 
 			for (TopicItem ti : smellyTopicItems) {
 				// count the number of times the topic appears
-				topicNumCountMap.compute(ti.getTopicNum(), (k, v) -> (v == null) ? 1 : ++v);
+				topicNumCountMap.compute(ti.topicNum, (k, v) -> (v == null) ? 1 : ++v);
 				
 				// map cluster to the related topicItem
 				scatteredTopicToClustersMap.putIfAbsent(
-					ti.getTopicNum(), new ConcernClusterArchitecture());
-				scatteredTopicToClustersMap.get(ti.getTopicNum()).add(cluster);
+					ti.topicNum, new ConcernClusterArchitecture());
+				scatteredTopicToClustersMap.get(ti.topicNum).add(cluster);
 			}
 		}
 	}
