@@ -17,9 +17,9 @@ public class ConcernClusteringRunnerMock
 	//endregion
 
 	//region CONSTRUCTORS
-	ConcernClusteringRunnerMock(FeatureVectors vecs, String srcDir,
+	ConcernClusteringRunnerMock(FeatureVectors vecs,
 			String artifactsDir, String language) {
-		super(vecs, srcDir, artifactsDir, language); }
+		super(vecs, artifactsDir, language); }
 	//endregion
 
 	//region ACCESSORS
@@ -35,8 +35,8 @@ public class ConcernClusteringRunnerMock
 
 	//region OVERRIDES
 	@Override
-	protected void initializeClusters(String srcDir, String language) {
-		super.initializeClusters(srcDir, language);
+	protected void initializeClusters(String language) {
+		super.initializeClusters(language);
 		this.initialArchitecture = new Architecture(super.architecture);
 	}
 

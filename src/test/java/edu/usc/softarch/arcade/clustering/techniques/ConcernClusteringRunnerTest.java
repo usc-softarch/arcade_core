@@ -237,7 +237,6 @@ public class ConcernClusteringRunnerTest {
 		+ "c",
 	})
 	public void initDataStructuresTest(String versionName, String language) {
-		String fullSrcDir = subjectSystemsDir + fs + versionName;
 		String artifactsDir = resourcesDir + fs + versionName;
 		String initialArchitecturePath = artifactsDir + fs + "initial_architecture.txt";
 		String architectureWithDocTopicsPath =
@@ -259,7 +258,7 @@ public class ConcernClusteringRunnerTest {
 		
 		// Construct a ConcernClusteringRunner object
 		ConcernClusteringRunnerMock runner = new ConcernClusteringRunnerMock(
-			builderffVecs, fullSrcDir, artifactsDir + "/base", language);
+			builderffVecs, artifactsDir + "/base", language);
 
 		/* Tests whether fastClusters was altered by
 		 * initializeDocTopicsForEachFastCluster */
@@ -340,7 +339,6 @@ public class ConcernClusteringRunnerTest {
 		+ "c",
 	})
 	public void computeArchitectureTest(String versionName,	String language) {
-		String fullSrcDir = subjectSystemsDir + fs + versionName;
 		String artifactsDir = resourcesDir + fs + versionName;
 		String oracleSimMatrixPath = artifactsDir + fs + "sim_matrix_oracle.json";
 		(new File(outputDirPath)).mkdirs();
@@ -362,7 +360,7 @@ public class ConcernClusteringRunnerTest {
 		
 		// Construct a ConcernClusteringRunner object
 		ConcernClusteringRunnerMock runner = new ConcernClusteringRunnerMock(
-			builderffVecs, fullSrcDir, artifactsDir + "/base", language);
+			builderffVecs, artifactsDir + "/base", language);
 		// call computeClustersWithConcernsAndFastClusters()
 		assertDoesNotThrow(() -> {
 			// copied from BatchClusteringEngine

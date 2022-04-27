@@ -28,13 +28,12 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #region CONSTRUCTORS ------------------------------------------------------
 	/**
 	 * @param vecs feature vectors (dependencies) of entities
-	 * @param srcDir directories with java or c files
 	 */
-	public ConcernClusteringRunner(FeatureVectors vecs, String srcDir,
-			String artifactsDir, String language) {
+	public ConcernClusteringRunner(FeatureVectors vecs, String artifactsDir,
+			String language) {
 		this.language = language;
 		setFeatureVectors(vecs);
-		initializeClusters(srcDir, language);
+		initializeClusters(language);
 		initializeClusterDocTopics(artifactsDir);
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
@@ -80,7 +79,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		int numTopics = (int) (ffVecs.getNumSourceEntities() * 0.18);
 
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
-			ffVecs, sysDirPath, artifactsDirPath, language);
+			ffVecs, artifactsDirPath, language);
 		int numClusters = (int) (runner.getArchitecture().size() * .20);
 
 		try {
@@ -126,36 +125,6 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	protected SimilarityMatrix initializeSimMatrix(SimilarityMatrix.SimMeasure simMeasure)
 			throws DistributionSizeMismatchException {
 		return new SimilarityMatrix(simMeasure, this.architecture);	}
-	
-	/**
-	 * Looks for the smallest non-diagonal value in the matrix, which represents
-	 * the pair of clusters with the lowest level of divergence (highest
-	 * similarity).
-	 * 
-	 * @param simMatrix Similarity matrix to analyze.
-	 * @return The maximum-similarity cell.
-	 */
-	private SimData identifyMostSimClusters(SimilarityMatrix simMatrix) {
-		if (simMatrix.size() != architecture.size())
-			throw new IllegalArgumentException("expected simMatrix.size():"
-				+ simMatrix.size() + " to be fastClusters.size(): "
-				+ architecture.size());
-
-		for (Map<Cluster, SimData> col : simMatrix.getColumns())
-			if (col.size() != architecture.size())
-				throw new IllegalArgumentException("expected col.size():" + col.size()
-					+ " to be fastClusters.size(): " + architecture.size());
-
-		SimData toReturn = null;
-
-		try {
-			toReturn = simMatrix.getMinCell();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return toReturn;
-	}
 
 	protected void initializeClusterDocTopics(String artifactsDir) {
 		try	{
@@ -259,28 +228,5 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		}
 
 		return newCluster;
-	}
-	
-	private void updateFastClustersAndSimMatrixToReflectMergedCluster(
-			SimData data, Cluster newCluster,	SimilarityMatrix simMatrix)
-			throws DistributionSizeMismatchException {
-		// Sanity check
-		if (data.c1.getName().equals(data.c2.getName()))
-			throw new IllegalArgumentException("data.c1: " + data.c1
-				+ " should not be the same as data.c2: " + data.c2);
-
-		// Initializing variables
-		Cluster cluster = data.c1;
-		Cluster otherCluster = data.c2;
-
-		// Remove the merged row and column from the matrix
-		simMatrix.removeCluster(cluster);
-		simMatrix.removeCluster(otherCluster);
-		simMatrix.addCluster(newCluster);
-
-		// Remove merged clusters, add new cluster
-		super.removeCluster(cluster);
-		super.removeCluster(otherCluster);
-		super.addCluster(newCluster);
 	}
 }

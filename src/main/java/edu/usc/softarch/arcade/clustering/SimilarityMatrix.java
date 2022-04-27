@@ -6,14 +6,14 @@ import com.fasterxml.jackson.core.JsonToken;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
+
+import static edu.usc.softarch.arcade.clustering.techniques.ClusteringAlgoRunner.numberOfEntitiesToBeClustered;
 
 /**
  * A matrix of similarity values between pairs of clusters. This implementation
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  */
 public class SimilarityMatrix {
 	//region ATTRIBUTES
-	public enum SimMeasure { JS, SCM }
+	public enum SimMeasure { JS, SCM, UEM, UEMNM, IL }
 	private final Map<Cluster, Map<Cluster, SimData>> simMatrix;
 	/*TODO fastSimMatrix is preposterously big, it might cause problems when
 	 * analyzing immense systems because of the JVM's memory limitations.
@@ -133,6 +133,16 @@ public class SimilarityMatrix {
 			case SCM:
 				return new SimData(row, col,
 					FastSimCalcUtil.getStructAndConcernMeasure(row, col), cellSize);
+			case UEM:
+				return new SimData(row, col,
+					FastSimCalcUtil.getUnbiasedEllenbergMeasure(row, col), cellSize);
+			case UEMNM:
+				return new SimData(row, col,
+					FastSimCalcUtil.getUnbiasedEllenbergMeasureNM(row, col), cellSize);
+			case IL:
+				return new SimData(row, col,
+					FastSimCalcUtil.getInfoLossMeasure(numberOfEntitiesToBeClustered, row, col),
+					cellSize);
 		}
 
 		throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);

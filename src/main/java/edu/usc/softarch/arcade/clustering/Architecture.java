@@ -112,57 +112,6 @@ public class Architecture extends LinkedHashMap<String, Cluster> {
 		return centroidSum / clusterCentroids.size();
 	}
 
-  public List<List<Double>> computeInfoLossSimMatrix(
-      int numberOfEntitiesToBeClustered) {
-		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
-		
-		for (int i = 0; i < this.size(); i++)
-			simMatrixObj.add(new ArrayList<>(this.size()));
-
-		for (int i = 0; i < this.size(); i++) {
-			Cluster c1 = (Cluster) this.values().toArray()[i];
-			for (int j = 0; j < this.size(); j++) {
-				Cluster c2 = (Cluster) this.values().toArray()[j];
-
-				double currSimMeasure = 0;
-				currSimMeasure = FastSimCalcUtil.getInfoLossMeasure(numberOfEntitiesToBeClustered, c1,	c2);
-				
-				simMatrixObj.get(i).add(currSimMeasure);
-			}
-		}
-		
-		return simMatrixObj;
-	}
-
-  public List<List<Double>> computeUEMSimMatrix(String simMeasure) {
-		List<List<Double>> simMatrixObj = new ArrayList<>(this.size());
-		
-		for (int i = 0; i < this.size(); i++)
-			simMatrixObj.add(new ArrayList<>(this.size()));
-
-		for (int i = 0; i < this.size(); i++) {
-			Cluster cluster = (Cluster) this.values().toArray()[i];
-			for (int j = 0; j < this.size(); j++) {
-				Cluster otherCluster = (Cluster) this.values().toArray()[j];
-
-				double currSimMeasure = 0;
-				if (simMeasure.equalsIgnoreCase("uem"))
-					currSimMeasure =
-            FastSimCalcUtil.getUnbiasedEllenbergMeasure(cluster, otherCluster);
-				else if (simMeasure.equalsIgnoreCase("uemnm"))
-					currSimMeasure =
-            FastSimCalcUtil.getUnbiasedEllenbergMeasureNM(cluster, otherCluster);
-				else
-					throw new IllegalArgumentException(simMeasure
-            + " is not a valid similarity measure for WCA");
-				
-				simMatrixObj.get(i).add(currSimMeasure);
-			}
-		}
-		
-		return simMatrixObj;
-	}
-
   public double computeTopicClusterGain() {
 		List<DocTopicItem> docTopicItems = new ArrayList<>();
 		for (Cluster c : this.values())
