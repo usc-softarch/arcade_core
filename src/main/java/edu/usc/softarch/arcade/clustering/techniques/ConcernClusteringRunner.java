@@ -247,8 +247,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		return mergeClustersUsingTopics(cluster, otherCluster);
 	}
 
-	private Cluster mergeClustersUsingTopics(
-			Cluster cluster, Cluster otherCluster) {
+	private Cluster mergeClustersUsingTopics(Cluster cluster, Cluster otherCluster) {
 		Cluster newCluster =
 			new Cluster(ClusteringAlgorithmType.LIMBO, cluster, otherCluster);
 		

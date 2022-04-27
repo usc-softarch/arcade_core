@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Represents a topic's prevalence in a document.
  */
-public class TopicItem implements Serializable {
+public class TopicItem implements Serializable, Comparable<TopicItem> {
 	//region FIELDS
 	private static final long serialVersionUID = 4599518018739063447L;
 	/**
@@ -50,7 +50,7 @@ public class TopicItem implements Serializable {
 	 *
 	 * @param topicNum Topic number of the new TopicItem.
 	 * @param proportion Proportion of the new TopicItem within its
-	 * 	 * 							 {@link DocTopicItem}.
+	 * 									 {@link DocTopicItem}.
 	 * @param weight Weight of (number of entities represented by) this TopicItem.
 	 */
 	@JsonCreator
@@ -106,5 +106,9 @@ public class TopicItem implements Serializable {
 
 	public String toString() {
 		return "[" + this.topicNum + "," + this.proportion + "]"; }
+
+	@Override
+	public int compareTo(TopicItem o) {
+		return Double.compare(this.proportion, o.proportion);	}
 	//endregion
 }

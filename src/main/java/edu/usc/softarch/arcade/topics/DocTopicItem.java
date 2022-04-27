@@ -7,35 +7,33 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import cc.mallet.util.Maths;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
-/**
- * @author joshua
- */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DocTopicItem implements Serializable {
-	// #region FIELDS ------------------------------------------------------------
-	public enum Sort { num, prop }
-
+	//region FIELDS
 	private static final long serialVersionUID = 5162975838519632395L;
 	
-	private int doc;
-	private String source;
+	public final int doc;
+	public final String source;
 	private Map<Integer, TopicItem> topics;
-	private Sort sortMethod;
-	private transient Comparator<TopicItem> sorter;
-	// #endregion FIELDS ---------------------------------------------------------
+	//endregion FIELDS
 	
-	// #region CONSTRUCTORS ------------------------------------------------------
-	public DocTopicItem() {
-		super();
-		setSortMethod(Sort.prop);
+	//region CONSTRUCTORS
+	@JsonCreator
+	public DocTopicItem(@JsonProperty("doc") int doc,
+											@JsonProperty("source") String source) {
+		this.doc = doc;
+		this.source = source;
 		this.topics = new HashMap<>();
 	}
 	
@@ -43,6 +41,8 @@ public class DocTopicItem implements Serializable {
 	 * Clone contructor
 	 */
 	public DocTopicItem(DocTopicItem dti) {
+		this.doc = dti.doc;
+		this.source = dti.source;
 		initialize(dti);
 	}
 
@@ -53,10 +53,14 @@ public class DocTopicItem implements Serializable {
 			throws UnmatchingDocTopicItemsException {
 		// If either argument is null, then return the non-null argument
 		if (dti1 == null) {
+			this.doc = dti2.doc;
+			this.source = dti2.source;
 			initialize(dti2);
 			return;
 		}
 		if (dti2 == null) {
+			this.doc = dti1.doc;
+			this.source = dti1.source;
 			initialize(dti1);
 			return;
 		}
@@ -69,7 +73,6 @@ public class DocTopicItem implements Serializable {
 		this.doc = dti1.doc;
 		this.source = dti1.source;
 		this.topics = new HashMap<>();
-		setSortMethod(Sort.prop); //TODO Clone from argument
 		Set<Integer> topicNumbers = dti1.getTopicNumbers();
 
 		for (Integer i : topicNumbers) {
@@ -83,54 +86,27 @@ public class DocTopicItem implements Serializable {
 	 * Initialize clone
 	 */
 	public void initialize(DocTopicItem dti) {
-		this.doc = dti.doc;
-		this.source = dti.source;
 		this.topics = new HashMap<>();
-		setSortMethod(Sort.prop); //TODO Clone from argument
 		for (TopicItem topicItem : dti.getTopics())
 			addTopic(new TopicItem(topicItem));
 	}
-	// #endregion CONSTRUCTORS ---------------------------------------------------
+	//endregion
 
-	// #region ACCESSORS ---------------------------------------------------------
-	public int getDoc() { return this.doc; }
-	public String getSource() { return this.source; }
+	//region ACCESSORS
 	@JsonIgnore
 	public List<TopicItem> getTopics() {
 		return new ArrayList<>(topics.values()); }
 	public Map<Integer, TopicItem> getTopicsForJackson() {
 		return this.topics;
 	}
-	public Sort getSortMethod() { return this.sortMethod; }
 	public int size() { return this.topics.size(); }
 	public TopicItem getTopic(int topicNum) { return this.topics.get(topicNum); }
 	public boolean hasTopic(int topicNum) { return topics.containsKey(topicNum); }
 	@JsonIgnore
 	public Set<Integer> getTopicNumbers() { return this.topics.keySet(); }
 
-	public void setDoc(int doc) { this.doc = doc; }
-	public void setSource(String source) { this.source = source; }
 	public TopicItem addTopic(TopicItem topic) {
 		return this.topics.put(topic.topicNum, topic); }
-	public TopicItem removeTopic(TopicItem topic) {
-		return this.topics.remove(topic.topicNum); }
-	public TopicItem removeTopic(int topicNum) {
-		return this.topics.remove(topicNum); }
-
-	public void setSortMethod(Sort sortMethod) {
-		this.sortMethod = sortMethod;
-		if(sortMethod == Sort.num) {
-			this.sorter = (TopicItem ti0, TopicItem ti1) -> {
-				Integer int0 = ti0.topicNum;
-				Integer int1 = ti1.topicNum;
-				return int0.compareTo(int1); };
-		} else if(sortMethod == Sort.prop) {
-			this.sorter = (TopicItem ti0, TopicItem ti1) -> {
-				Double double0 = Double.valueOf(ti0.proportion);
-				Double double1 = Double.valueOf(ti1.proportion);
-				return double0.compareTo(double1); };
-		}
-	}
 
 	@JsonIgnore
 	public boolean isCSourced() {
@@ -154,8 +130,6 @@ public class DocTopicItem implements Serializable {
 
 	public double getJsDivergence(DocTopicItem toCompare)
 			throws DistributionSizeMismatchException {
-		double divergence = 0;
-
 		// Error due to size mismatch
 		if (this.size() != toCompare.size())
 			throw new DistributionSizeMismatchException(
@@ -172,82 +146,38 @@ public class DocTopicItem implements Serializable {
 		
 		for (TopicItem qTopicItem : toCompareTopics)
 			sortedQ[qTopicItem.topicNum] = qTopicItem.proportion;
-
-		divergence = Maths.jensenShannonDivergence(sortedP, sortedQ);
 		
-		return divergence;
+		return Maths.jensenShannonDivergence(sortedP, sortedQ);
 	}
-	// #endregion ACCESSORS ------------------------------------------------------
+	//endregion
 
-	// #region PROCESSING --------------------------------------------------------
-	public List<TopicItem> sort(Sort sortMethod) {
-		Sort oldMethod = this.sortMethod;
-		setSortMethod(sortMethod);
-		List<TopicItem> sortedTopics = sort();
-		setSortMethod(oldMethod);
-		return sortedTopics;
-	}
-
-	public List<TopicItem> sort() {
-		List<TopicItem> topicsToSort = getTopics();
-		// This ensures sortMethod is properly initialized when deserializing DTIs
-		if (sorter == null) setSortMethod(this.sortMethod);
-		Collections.sort(topicsToSort, sorter);
-		return topicsToSort;
-	}
-
-	public List<Integer> intersection(DocTopicItem dti) {
-		List<Integer> result = new ArrayList<>();
-
-		for (Integer key : this.topics.keySet())
-			if (dti.hasTopic(key)) result.add(key);
-
-		return result;
-	}
-	// #endregion PROCESSING -----------------------------------------------------
-	
-	// #region MISC --------------------------------------------------------------
-	public String toStringWithLeadingTabsAndLineBreaks(int numTabs) {
-		List<TopicItem> values = sort();
-		String dtItemStr = "[" + doc + "," + source + ",\n";
-		
-		for (TopicItem t : values) {
-			dtItemStr += "\t".repeat(numTabs);
-			dtItemStr += "[" + t.topicNum + "," + t.proportion + "]\n";
-		}
-		
-		dtItemStr += "]";
-		return dtItemStr;
-	}
-	
+	//region OBJECT METHODS
 	public String toString() {
-		List<TopicItem> values = sort();
-		String dtItemStr = "[" + doc + "," + source + ",";
+		List<TopicItem> values =
+			getTopics().stream().sorted().collect(Collectors.toList());
+		StringBuilder dtItemStr = new StringBuilder("[" + doc + "," + source + ",");
 	
 		for (TopicItem t : values)
-			dtItemStr += "[" + t.topicNum + "," + t.proportion + "]";
+			dtItemStr.append(t);
 		
-		dtItemStr += "]";
-		return dtItemStr;
+		dtItemStr.append("]");
+		return dtItemStr.toString();
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == null) return false;
-		if (o == this) return true;
+		if (this == o) return true;
 		if (!(o instanceof DocTopicItem)) return false;
 
-		DocTopicItem toCompare = (DocTopicItem) o;
+		DocTopicItem that = (DocTopicItem) o;
 
-		boolean condition1 = this.doc == toCompare.doc;
-		boolean condition2 = this.source.equals(toCompare.source);
-		boolean condition3 = this.topics.equals(toCompare.topics);
-
-		return condition1 && condition2 && condition3;
+		return this.doc == that.doc
+			&& Objects.equals(this.source, that.source)
+			&& Objects.equals(getTopics(), that.getTopics());
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(doc, source, topics);	}
-	// #endregion MISC -----------------------------------------------------------
+	//endregion
 }

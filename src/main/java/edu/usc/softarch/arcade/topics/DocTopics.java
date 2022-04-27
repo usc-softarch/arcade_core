@@ -46,9 +46,8 @@ public class DocTopics {
 			new File(artifactsDir + fs + "infer.mallet"));
 
 		for (int instIndex = 0; instIndex < previousInstances.size(); instIndex++) {
-			DocTopicItem dtItem = new DocTopicItem();
-			dtItem.setDoc(instIndex);
-			dtItem.setSource((String) previousInstances.get(instIndex).getName());
+			DocTopicItem dtItem = new DocTopicItem(instIndex,
+				(String) previousInstances.get(instIndex).getName());
 
 			double[] topicDistribution = 
 				inferencer.getSampledDistribution(
@@ -95,8 +94,8 @@ public class DocTopics {
 		String altName = name.replace("/", ".").replace(".java", "").trim();
 
 		for (DocTopicItem dti : dtItemList) {
-			if (dti.getSource().endsWith(name) 
-					|| altName.equals(dti.getSource().trim()))
+			if (dti.source.endsWith(name)
+					|| altName.equals(dti.source.trim()))
 				return dti;
 		}
 		return null;
@@ -113,21 +112,21 @@ public class DocTopics {
 			String strippedSource = null;
 			String nameWithoutQuotations = name.replace("\"", "");
 
-			if (dti.getSource().endsWith(".func")) {
-				strippedSource = dti.getSource().substring(
-					dti.getSource().lastIndexOf('/') + 1,
-					dti.getSource().lastIndexOf(".func"));
+			if (dti.source.endsWith(".func")) {
+				strippedSource = dti.source.substring(
+					dti.source.lastIndexOf('/') + 1,
+					dti.source.lastIndexOf(".func"));
 				if (strippedSource.contains(nameWithoutQuotations))
 					return dti;
 			} else if (dti.isCSourced()) {
 				//FIXME Make sure this works on Linux and find a permanent fix
-				strippedSource = dti.getSource().substring(1, dti.getSource().length());
+				strippedSource = dti.source.substring(1, dti.source.length());
 				strippedSource = strippedSource.replace("\\", "/");
 				if (strippedSource.endsWith(nameWithoutQuotations))
 					return dti;
 			}
-			else if (dti.getSource().endsWith(".S")) {
-				String dtiSourceRenamed = dti.getSource().replace(".S", ".c");
+			else if (dti.source.endsWith(".S")) {
+				String dtiSourceRenamed = dti.source.replace(".S", ".c");
 				if (dtiSourceRenamed.endsWith(nameWithoutQuotations))
 					return dti;
 			}
