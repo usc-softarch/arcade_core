@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -48,8 +50,8 @@ public class FeatureVectors implements Serializable {
 		this.numSourceEntities = new HashSet<>(startNodesList).size();
 
 		// Make a List with the targets of all edges
-		Set<String> endNodesListWithNoDupes =
-		edges.stream().map(Map.Entry::getValue).collect(Collectors.toSet());
+		Set<String> endNodesListWithNoDupes =	edges.stream().map(Map.Entry::getValue)
+			.collect(Collectors.toCollection(TreeSet::new));
 		
 		// Make a Set with all nodes
 		Set<String> allNodesSet = new HashSet<>(startNodesList);
@@ -151,4 +153,23 @@ public class FeatureVectors implements Serializable {
 		return FeatureVectors.mapper;
 	}
 	// #endregion SERIALIZATION --------------------------------------------------
+
+	//region OBJECT METHODS
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof FeatureVectors)) return false;
+		FeatureVectors that = (FeatureVectors) o;
+		return getNumSourceEntities() == that.getNumSourceEntities()
+			&& Objects.equals(getFeatureVectorNames(), that.getFeatureVectorNames())
+			&& Objects.equals(getNamesInFeatureSet(), that.getNamesInFeatureSet())
+			&& Objects.equals(getNameToFeatureSetMap(), that.getNameToFeatureSetMap());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getFeatureVectorNames(), getNamesInFeatureSet(),
+			getNameToFeatureSetMap(), getNumSourceEntities());
+	}
+	//endregion
 }

@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import edu.usc.softarch.arcade.BaseTest;
+import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -22,7 +23,7 @@ public class SourceToDepsBuilderTest extends BaseTest {
 	private final String subjectSystemsDir = resourcesBase + fs + "subject_systems";
 
 	/**
-	 * Builds the dependencies RSF file for subject systems.
+	 * Builds the dependencies RSF and Feature Vectors files for subject systems.
 	 *
 	 * @param systemVersion System version to test with.
 	 * @param classesDirName Name of the binaries directory.
@@ -47,7 +48,8 @@ public class SourceToDepsBuilderTest extends BaseTest {
 		+ "lib_struts,"
 		+ "java"
 	})
-	public void buildTest(String systemVersion, String classesDirName, String language) {
+	public void buildTest(String systemVersion, String classesDirName,
+			String language) {
 		String classes = subjectSystemsDir + fs + systemVersion;
 		if (language.equals("java"))
 			classes += fs + classesDirName;
@@ -93,5 +95,11 @@ public class SourceToDepsBuilderTest extends BaseTest {
 		RsfCompare resultRsf = new RsfCompare(result);
 		RsfCompare oracleRsf = new RsfCompare(oracleResult);
 		assertEquals(oracleRsf, resultRsf);
+
+		FeatureVectors resultVectors = assertDoesNotThrow(() ->
+			FeatureVectors.deserializeFFVectors(fVectors));
+		FeatureVectors oracleVectors = assertDoesNotThrow(() ->
+			FeatureVectors.deserializeFFVectors(fVectorsOracle));
+		assertEquals(oracleVectors, resultVectors);
 	}
 }
