@@ -44,6 +44,7 @@ import edu.usc.softarch.arcade.clustering.Architecture;
 
 public class ConcernClusteringRunnerTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "ARC";
+	private final String factsDir = resourcesBase + fs + "Facts";
 	private final String subjectSystemsDir = resourcesBase + fs + "subject_systems";
 	private final String outputDirPath = outputBase + fs + "ConcernClusteringRunnerTest";
 
@@ -83,7 +84,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		String sysResources = resourcesDir + fs + systemVersion;
 		String artifactsDir = sysResources + fs + "base";
 		String oracleFilePath = sysResources + fs + systemVersion + arcFileSuffix;
-		String ffVecs = sysResources + fs + systemVersion + "_ffVecs.json";
+		String ffVecs = factsDir + fs + systemVersion + "_fVectors.json";
 		String resultClustersFile = outputDirPath + fs + systemVersion + arcFileSuffix;
 
 		assertDoesNotThrow(() ->
@@ -155,7 +156,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 	public void asdWithConcernsTest(String systemVersion, String lang, String arcFileSuffix) {
 		// Creating relevant path Strings
 		String sysResources = resourcesDir + fs + systemVersion;
-		String depsRsfFile = sysResources + fs + systemVersion + "_deps.rsf";
+		String depsRsfFile = factsDir + fs + systemVersion + "_deps.rsf";
 		String docTopicsPath = sysResources + fs + systemVersion + arcFileSuffix + "docTopics.json";
 		String oracleFilePath = sysResources + fs + systemVersion + "_arc_smells.ser";
 		String clusterFile = sysResources + fs + systemVersion + arcFileSuffix + "clusters.rsf";
@@ -225,7 +226,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 			artifactsDir + fs + "architecture_with_doc_topics.txt";
 		
 		// Deserialize FastFeatureVectors oracle
-		String ffVecsFilePath = artifactsDir + fs + versionName + "_ffVecs.json";
+		String ffVecsFilePath = factsDir + fs + versionName + "_fVectors.json";
 		FeatureVectors builderffVecs = null;
 
 		try {
@@ -326,7 +327,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		(new File(outputDirPath)).mkdirs();
 		
 		// Deserialize FastFeatureVectors oracle
-		String ffVecsFilePath = artifactsDir + fs + versionName + "_ffVecs.json";
+		String ffVecsFilePath = factsDir + fs + versionName + "_fVectors.json";
 		FeatureVectors builderffVecs = null;
 
 		try {
