@@ -25,6 +25,7 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
@@ -36,34 +37,15 @@ import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
 
-public class ConcernClusteringRunnerTest {
-	private final String fs = File.separator;
-	private final String resourcesBase =
-		"." + fs + "src" + fs + "test" + fs + "resources";
+public class ConcernClusteringRunnerTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "ARC";
 	private final String subjectSystemsDir = resourcesBase + fs + "subject_systems";
-	private final String outputDirPath =
-		"." + fs + "target" + fs + "test_results" + fs + "ConcernClusteringRunnerTest";
-
-	/* ------------------------------------------------------------------------ */
-	/* -------------------------- DANGER ZONE --------------------------------- */
-	/* ------------------------------------------------------------------------ */
-
-	/* DO NOT TOUCH THIS ATTRIBUTE. It will trigger a procedure to re-generate
-	 * the oracles of every ARC test case. Unless your name is Marcelo, or you
-	 * have been given express permission by me to touch this, it must remain
-	 * false at all times. */
-	private final boolean generateOracles = false;
-
-	/* ------------------------------------------------------------------------ */
-	/* -------------------------- DANGER ZONE --------------------------------- */
-	/* ------------------------------------------------------------------------ */
+	private final String outputDirPath = outputBase + fs + "ConcernClusteringRunnerTest";
 
 	/**
 	 * Tests ARC recovery for a single version of a system.
@@ -404,12 +386,4 @@ public class ConcernClusteringRunnerTest {
 
 		assertEquals(oracleSimMatrix, initialSimMatrix);
 	}
-
-	/**
-	 * This test stops ARCADE from ever passing CI if someone forgets to turn off
-	 * oracle generation.
-	 */
-	@Test
-	public void oracleGenerationIsOffTest() {
-		assertFalse(generateOracles);	}
 }

@@ -52,8 +52,7 @@ public class ArchSmellDetectorTest {
 		// struts 2.3.30
 		".///src///test///resources///ArchSmellDetectorTest_resources"
       + "///edited_struts-2.3.30_acdc_smells.ser,"
-		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources"
-      + "///struts-2.3.30_deps.rsf,"
+		+ ".///src///test///resources///Facts///struts-2.3.30_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
 		+ ".///src///test///resources///ACDCTest_resources"
       + "///struts-2.3.30_acdc_clustered.rsf,"
@@ -62,8 +61,7 @@ public class ArchSmellDetectorTest {
 		// struts 2.5.2
 		".///src///test///resources///ArchSmellDetectorTest_resources"
       + "///edited_struts-2.5.2_acdc_smells.ser,"
-		+ ".///src///test///resources///JavaSourceToDepsBuilderTest_resources"
-      + "///struts-2.5.2_deps.rsf,"
+		+ ".///src///test///resources///Facts///struts-2.5.2_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
 		+ ".///src///test///resources///ACDCTest_resources"
       + "///struts-2.5.2_acdc_clustered.rsf,"
@@ -72,8 +70,7 @@ public class ArchSmellDetectorTest {
 		// httpd 2.3.8
 		".///src///test///resources///ArchSmellDetectorTest_resources"
       + "///edited_httpd-2.3.8_acdc_smells.ser,"
-		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources"
-      + "///httpd-2.3.8_deps.rsf,"
+		+ ".///src///test///resources///Facts///httpd-2.3.8_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
 		+ ".///src///test///resources///ACDCTest_resources"
       + "///httpd-2.3.8_acdc_clustered.rsf,"
@@ -82,8 +79,7 @@ public class ArchSmellDetectorTest {
 		// httpd 2.4.26
 		".///src///test///resources///ArchSmellDetectorTest_resources"
       + "///edited_httpd-2.4.26_acdc_smells.ser,"
-		+ ".///src///test///resources///CSourceToDepsBuilderTest_resources"
-      + "///httpd-2.4.26_deps.rsf,"
+		+ ".///src///test///resources///Facts///httpd-2.4.26_deps.rsf,"
 		+ ".///target///test_results///ArchSmellDetectorTest,"
 		+ ".///src///test///resources///ACDCTest_resources"
       + "///httpd-2.4.26_acdc_clustered.rsf,"
@@ -124,7 +120,6 @@ public class ArchSmellDetectorTest {
    * @param clusterSmellMapObjectFile Oracle clustermap serialized object
    * @param clusterObjectFile Oracle clusters serialized object
    * @param smellsObjectFile Oracle detected smells serialized object
-   * @param version Version
    */
   @CsvSource({
     //Input for asd constructor to run on struts-2.3.30

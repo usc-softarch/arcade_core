@@ -32,6 +32,7 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 	public void build(String classesDirPath, String depsRsfFilename, String ffVecsFilename) throws IOException {
 		String inputDir = FileUtil.tildeExpandPath(classesDirPath);
 		String depsRsfFilepath = FileUtil.tildeExpandPath(depsRsfFilename);
+		(new File(depsRsfFilepath)).getParentFile().mkdirs();
 		
 		String pwd = System.getProperty("user.dir");
 		String mkFilesCmd = "perl " + pwd + File.separator + "mkfiles.pl";

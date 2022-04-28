@@ -106,7 +106,8 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 
 	// #region IO ----------------------------------------------------------------
 	private void serializeEdges(Set<Map.Entry<String, String>> edges,
-			String depsRsfFilepath) throws FileNotFoundException{
+			String depsRsfFilepath) throws FileNotFoundException {
+		(new File(depsRsfFilepath)).getParentFile().mkdirs();
 		PrintStream out = new PrintStream(depsRsfFilepath);
 		PrintWriter writer = new PrintWriter(out);
 		for (Map.Entry<String,String> edge : edges) {

@@ -35,8 +35,8 @@ public class ConcernClusteringRunnerMock
 
 	//region OVERRIDES
 	@Override
-	protected void initializeClusters(String language) {
-		super.initializeClusters(language);
+	protected void initializeClusters() {
+		super.initializeClusters();
 		this.initialArchitecture = new Architecture(super.architecture);
 	}
 
