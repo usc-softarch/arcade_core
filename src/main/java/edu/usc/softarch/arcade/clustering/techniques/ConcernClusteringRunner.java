@@ -21,7 +21,6 @@ import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #region ATTRIBUTES --------------------------------------------------------
-	private final String language;
 	private DocTopics docTopics;
 	// #endregion ATTRIBUTES -----------------------------------------------------
 	
@@ -31,9 +30,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	 */
 	public ConcernClusteringRunner(FeatureVectors vecs, String artifactsDir,
 			String language) {
-		this.language = language;
-		setFeatureVectors(vecs);
-		initializeClusters(language);
+		super(language, vecs);
+		initializeClusters();
 		initializeClusterDocTopics(artifactsDir);
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
@@ -104,6 +102,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	}
 	// #endregion INTERFACE ------------------------------------------------------
 
+	@Override
 	public void computeArchitecture(
 			StoppingCriterion stoppingCriterion, String stopCriterion,
 			SimilarityMatrix.SimMeasure simMeasure) throws DistributionSizeMismatchException {

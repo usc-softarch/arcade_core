@@ -2,22 +2,29 @@ package edu.usc.softarch.arcade.clustering.techniques;
 
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimData;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
 public class LimboRunner extends ClusteringAlgoRunner {
-	public void computeClusters(StoppingCriterion stopCriterion,
-			String language, String stoppingCriterion)
+	//region CONSTRUCTORS
+	public LimboRunner(String language, FeatureVectors vectors) {
+		super(language, vectors);	}
+	//endregion
+
+	@Override
+	public void computeArchitecture(StoppingCriterion stoppingCriterion,
+			String stopCriterion, SimilarityMatrix.SimMeasure simMeasure)
 			throws DistributionSizeMismatchException {
-		initializeClusters(language);
+		initializeClusters();
 
 		SimilarityMatrix simMatrix = new SimilarityMatrix(
-			SimilarityMatrix.SimMeasure.IL, this.architecture);
+			simMeasure, this.architecture);
 
-		while (stopCriterion.notReadyToStop()) {
-			if (stoppingCriterion.equalsIgnoreCase("clustergain"))
+		while (stoppingCriterion.notReadyToStop()) {
+			if (stopCriterion.equalsIgnoreCase("clustergain"))
 				checkAndUpdateClusterGain(
 					super.architecture.computeStructuralClusterGain());
 

@@ -1,17 +1,24 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
 import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimData;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
 public class WcaRunner extends ClusteringAlgoRunner {
-	public void computeClustersWithPQAndWCA(
-			StoppingCriterion stopCriterion, String language,
-			String stoppingCriterion, SimilarityMatrix.SimMeasure simMeasure)
+	//region CONSTRUCTORS
+	public WcaRunner(String language, FeatureVectors vectors) {
+		super(language, vectors);	}
+	//endregion
+
+	@Override
+	public void computeArchitecture(
+			StoppingCriterion stopCriterion, String stoppingCriterion,
+			SimilarityMatrix.SimMeasure simMeasure)
 			throws DistributionSizeMismatchException {
-		initializeClusters(language);
+		initializeClusters();
 
 		SimilarityMatrix simMatrix = new SimilarityMatrix(simMeasure, this.architecture);
 

@@ -99,7 +99,7 @@ public class SimilarityMatrix {
 			SimData cellData = computeCellData(c, cluster);
 			newRow.put(cluster, cellData);
 			if (!c.equals(cluster)) {
-				if (cellData.cellValue == 0)
+				if (cellData.cellValue == 0 && simMeasure == SimMeasure.JS)
 					throw new IllegalArgumentException("Two clusters found with the " +
 						"same topic distribution: " + cellData.c1.getName() + " ; " +
 						cellData.c2.getName());

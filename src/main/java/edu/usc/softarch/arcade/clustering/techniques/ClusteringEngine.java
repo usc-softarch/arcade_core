@@ -1,9 +1,5 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.ClusterGainStoppingCriterion;
@@ -11,59 +7,58 @@ import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 
 import edu.usc.softarch.arcade.clustering.criteria.SingleClusterStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
-import edu.usc.softarch.arcade.config.Config;
 
 /**
  * @author joshua
  */
 public class ClusteringEngine {
-	public ClusteringEngine() { }
+	public static void main(String[] args) throws Exception {
+		String featureVectorsFilePath = args[0];
+		String language = args[1];
+		String clusteringAlgorithm = args[2];
+		String stoppingCriterion = args[3];
+		int numClusters = Integer.parseInt(args[4]);
+		String simMeasure = args[5];
+		String outputPath = args[6];
 
-	public void run(String fastFeatureVectorsFilePath, String language,
+		run(featureVectorsFilePath, language, clusteringAlgorithm,
+			stoppingCriterion, numClusters, simMeasure, outputPath);
+	}
+
+	public static void run(String featureVectorsFilePath, String language,
 			String clusteringAlgorithm, String stoppingCriterion,
-			int numClusters, String simMeasure) throws Exception {
-		FeatureVectors fastFeatureVectors = null;
-
-		File fastFeatureVectorsFile = new File(fastFeatureVectorsFilePath);
-
-		// Deserialize the object
-		try (ObjectInputStream objInStream = new ObjectInputStream(
-				new FileInputStream(fastFeatureVectorsFile))) {
-			fastFeatureVectors = (FeatureVectors) objInStream.readObject();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+			int numClusters, String simMeasure, String outputPath) throws Exception {
+		FeatureVectors featureVectors = FeatureVectors.deserializeFFVectors(featureVectorsFilePath);;
+		ClusteringAlgoRunner runner = null;
 
 		if (clusteringAlgorithm.equalsIgnoreCase("wca")) {
-			WcaRunner runner = new WcaRunner();
-			runner.setFeatureVectors(fastFeatureVectors);
+			runner = new WcaRunner(language, featureVectors);
 			if (stoppingCriterion.equalsIgnoreCase("preselected")) {
 				StoppingCriterion stopCriterion = new PreSelectedStoppingCriterion(numClusters, runner);
-				runner.computeClustersWithPQAndWCA(stopCriterion, language, stoppingCriterion,
+				runner.computeArchitecture(stopCriterion, stoppingCriterion,
 					SimilarityMatrix.SimMeasure.valueOf(simMeasure.toUpperCase()));
 			}
 			if (stoppingCriterion.equalsIgnoreCase("clustergain")) {
 				StoppingCriterion singleClusterStopCriterion = new SingleClusterStoppingCriterion(runner);
-				runner.computeClustersWithPQAndWCA(singleClusterStopCriterion, language, stoppingCriterion,
+				runner.computeArchitecture(singleClusterStopCriterion, stoppingCriterion,
 					SimilarityMatrix.SimMeasure.valueOf(simMeasure.toUpperCase()));
 				StoppingCriterion clusterGainStopCriterion = new ClusterGainStoppingCriterion(runner);
-				runner.computeClustersWithPQAndWCA(clusterGainStopCriterion, language, stoppingCriterion,
+				runner.computeArchitecture(clusterGainStopCriterion, stoppingCriterion,
 					SimilarityMatrix.SimMeasure.valueOf(simMeasure.toUpperCase()));
 			}
 		}
 
-		for (int numTopics : Config.getNumTopicsList()) {
-			Config.setNumTopics(numTopics);
-			if (clusteringAlgorithm.equalsIgnoreCase("arc"))
-				throw new Exception("there is a null instead of outputDir/base");
+		if (clusteringAlgorithm.equalsIgnoreCase("limbo")) {
+			runner = new LimboRunner(language, featureVectors);
+			runner.setFeatureVectors(featureVectors);
+			runner.computeArchitecture(new PreSelectedStoppingCriterion(numClusters, runner), stoppingCriterion,
+				SimilarityMatrix.SimMeasure.valueOf(simMeasure.toUpperCase()));
+			if (stoppingCriterion.equalsIgnoreCase("clustergain"))
+				runner.computeArchitecture(new ClusterGainStoppingCriterion(runner), stoppingCriterion,
+					SimilarityMatrix.SimMeasure.valueOf(simMeasure.toUpperCase()));
 		}
 
-		if (clusteringAlgorithm.equalsIgnoreCase("limbo")) {
-			LimboRunner runner = new LimboRunner();
-			runner.setFeatureVectors(fastFeatureVectors);
-			runner.computeClusters(new PreSelectedStoppingCriterion(numClusters, runner), language, stoppingCriterion);
-			if (stoppingCriterion.equalsIgnoreCase("clustergain"))
-				runner.computeClusters(new ClusterGainStoppingCriterion(runner), language, stoppingCriterion);
-		}
+		runner.architecture.writeToRsf(
+			runner.architecture.computeArchitectureIndex(), outputPath);
 	}
 }

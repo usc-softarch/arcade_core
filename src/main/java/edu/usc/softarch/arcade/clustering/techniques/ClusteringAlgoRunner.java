@@ -1,9 +1,6 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
-import java.io.FileNotFoundException;
-import java.io.File;
 import java.util.BitSet;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -12,19 +9,27 @@ import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimData;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.Granule;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
-import edu.usc.softarch.arcade.util.FileListing;
 
-public class ClusteringAlgoRunner {
+public abstract class ClusteringAlgoRunner {
 	// #region ATTRIBUTES --------------------------------------------------------
 	public Architecture architecture;
 	protected FeatureVectors featureVectors;
 	protected static double maxClusterGain = 0;
 	public static int numClustersAtMaxClusterGain = 0;
 	public static int numberOfEntitiesToBeClustered = 0;
+	protected final String language;
 	// #endregion ATTRIBUTES -----------------------------------------------------
+
+	//region CONTRUCTORS
+	protected ClusteringAlgoRunner(String language, FeatureVectors vectors) {
+		this.language = language;
+		this.featureVectors = vectors;
+	}
+	//endregion
 
 	// #region ACCESSORS ---------------------------------------------------------
 	public Architecture getArchitecture() { return architecture; }
@@ -38,7 +43,7 @@ public class ClusteringAlgoRunner {
 		architecture.put(cluster.getName(), cluster); }
 	// #endregion ACCESSORS ------------------------------------------------------
 	
-	protected void initializeClusters(String language) {
+	protected void initializeClusters() {
 		architecture = new Architecture();
 
 		// For each cell in the adjacency matrix
@@ -52,6 +57,8 @@ public class ClusteringAlgoRunner {
 			// Add the cluster except extraordinary circumstances (assume always)
 			addClusterConditionally(cluster, language);
 		}
+
+		numberOfEntitiesToBeClustered = architecture.size();
 	}
 
 	/**
@@ -142,4 +149,8 @@ public class ClusteringAlgoRunner {
 
 		return toReturn;
 	}
+
+	public abstract void computeArchitecture(StoppingCriterion stoppingCriterion,
+		String stopCriterion, SimilarityMatrix.SimMeasure simMeasure)
+		throws DistributionSizeMismatchException;
 }

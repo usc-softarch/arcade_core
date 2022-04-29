@@ -69,19 +69,19 @@ public class Architecture extends LinkedHashMap<String, Cluster> {
 		File rsfFile = new File(path);
 		rsfFile.getParentFile().mkdirs();
 
-    try (PrintWriter out = new PrintWriter(
-        new OutputStreamWriter(
-        new FileOutputStream(rsfFile), StandardCharsets.UTF_8))) {
-      for (Cluster cluster : this.values()) {
-        Integer currentNodeNumber =
-          architectureIndex.get(cluster.getName());
-        String[] entities = cluster.getName().split(",");
-        Set<String> entitiesSet = new HashSet<>(Arrays.asList(entities));
-        for (String entity : entitiesSet) {
-          out.println("contain " + currentNodeNumber + " " + entity);
-        }
-      }
-    }
+		try (PrintWriter out = new PrintWriter(
+			new OutputStreamWriter(
+				new FileOutputStream(rsfFile), StandardCharsets.UTF_8))) {
+			for (Cluster cluster : this.values()) {
+				Integer currentNodeNumber =
+					architectureIndex.get(cluster.getName());
+				String[] entities = cluster.getName().split(",");
+				Set<String> entitiesSet = new HashSet<>(Arrays.asList(entities));
+				for (String entity : entitiesSet) {
+					out.println("contain " + currentNodeNumber + " " + entity);
+				}
+			}
+		}
 	}
 
   public double computeStructuralClusterGain() {

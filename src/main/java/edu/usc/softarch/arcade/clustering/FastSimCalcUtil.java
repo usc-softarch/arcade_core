@@ -14,7 +14,9 @@ public class FastSimCalcUtil {
 		int numberOf10Features = getNumOf10Features(currCluster,otherCluster);
 		int numberOf01Features = getNumOf01Features(currCluster,otherCluster);
 		
-		return 0.5*sumOfFeaturesInBothEntities/(0.5*sumOfFeaturesInBothEntities+(double)numberOf10Features+(double)numberOf01Features);
+		return 1 - (0.5 * sumOfFeaturesInBothEntities /
+			(0.5 * sumOfFeaturesInBothEntities + (double) numberOf10Features
+				+ (double) numberOf01Features));
 	}
 	
 	public static double getUnbiasedEllenbergMeasureNM(Cluster currCluster,
@@ -26,7 +28,7 @@ public class FastSimCalcUtil {
 		int num00Features = getNumOf00Features(currCluster,otherCluster);
 		int numSharedFeatures = getNumOfFeaturesInBothEntities(currCluster,otherCluster);
 		
-		return 0.5*sumOfFeaturesInBothEntities/(0.5*sumOfFeaturesInBothEntities+2*((double)num10Features+(double)num01Features) + (double)num00Features + (double)numSharedFeatures);
+		return 1 - (0.5*sumOfFeaturesInBothEntities/(0.5*sumOfFeaturesInBothEntities+2*((double)num10Features+(double)num01Features) + (double)num00Features + (double)numSharedFeatures));
 	}
 
 	private static int getNumOf01Features(Cluster currCluster,
@@ -146,8 +148,8 @@ public class FastSimCalcUtil {
 		return structAndConcernMeasure;
 	}
 	
-	public static double getInfoLossMeasure(int numberOfEntitiesToBeClustered, Cluster cluster,
-			Cluster otherCluster) {
+	public static double getInfoLossMeasure(int numberOfEntitiesToBeClustered,
+			Cluster cluster, Cluster otherCluster) {
 		if (cluster.getNumFeatures()!=otherCluster.getNumFeatures()) {
 			throw new IllegalArgumentException("cluster.getFeaturesLength()!=otherCluster.getFeaturesLength()()");
 		}
@@ -162,7 +164,8 @@ public class FastSimCalcUtil {
 		if (Double.isInfinite(jsDivergence)) {
 			jsDivergence = Double.MAX_VALUE;
 		}
-		double infoLossMeasure = (cluster.getNumEntities()/numberOfEntitiesToBeClustered + otherCluster.getNumEntities()/numberOfEntitiesToBeClustered) * jsDivergence;
+		double infoLossMeasure = (cluster.getNumEntities()/numberOfEntitiesToBeClustered
+			+ otherCluster.getNumEntities()/numberOfEntitiesToBeClustered) * jsDivergence;
 		
 		if (Double.isNaN(infoLossMeasure)) {
 			throw new RuntimeException("infoLossMeasure is NaN");
