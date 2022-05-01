@@ -20,19 +20,21 @@ public class ClusteringEngine {
 		int numClusters = Integer.parseInt(args[4]);
 		String simMeasure = args[5];
 		String outputPath = args[6];
+		String packagePrefix = args[7];
 
 		run(featureVectorsFilePath, language, clusteringAlgorithm,
-			stoppingCriterion, numClusters, simMeasure, outputPath);
+			stoppingCriterion, numClusters, simMeasure, outputPath, packagePrefix);
 	}
 
 	public static void run(String featureVectorsFilePath, String language,
 			String clusteringAlgorithm, String stoppingCriterion,
-			int numClusters, String simMeasure, String outputPath) throws Exception {
-		FeatureVectors featureVectors = FeatureVectors.deserializeFFVectors(featureVectorsFilePath);;
+			int numClusters, String simMeasure, String outputPath,
+			String packagePrefix) throws Exception {
+		FeatureVectors featureVectors = FeatureVectors.deserializeFFVectors(featureVectorsFilePath);
 		ClusteringAlgoRunner runner = null;
 
 		if (clusteringAlgorithm.equalsIgnoreCase("wca")) {
-			runner = new WcaRunner(language, featureVectors);
+			runner = new WcaRunner(language, featureVectors, packagePrefix);
 			if (stoppingCriterion.equalsIgnoreCase("preselected")) {
 				StoppingCriterion stopCriterion = new PreSelectedStoppingCriterion(numClusters, runner);
 				runner.computeArchitecture(stopCriterion, stoppingCriterion,

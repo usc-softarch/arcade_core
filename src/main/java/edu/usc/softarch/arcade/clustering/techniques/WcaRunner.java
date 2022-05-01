@@ -11,6 +11,9 @@ public class WcaRunner extends ClusteringAlgoRunner {
 	//region CONSTRUCTORS
 	public WcaRunner(String language, FeatureVectors vectors) {
 		super(language, vectors);	}
+
+	public WcaRunner(String language, FeatureVectors vectors, String packagePrefix) {
+		super(language, vectors, packagePrefix); }
 	//endregion
 
 	@Override

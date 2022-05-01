@@ -22,12 +22,19 @@ public abstract class ClusteringAlgoRunner {
 	public static int numClustersAtMaxClusterGain = 0;
 	public static int numberOfEntitiesToBeClustered = 0;
 	protected final String language;
+	private final String packagePrefix;
 	// #endregion ATTRIBUTES -----------------------------------------------------
 
 	//region CONTRUCTORS
 	protected ClusteringAlgoRunner(String language, FeatureVectors vectors) {
+		this(language, vectors, "");
+	}
+
+	protected ClusteringAlgoRunner(String language, FeatureVectors vectors,
+			String packagePrefix) {
 		this.language = language;
 		this.featureVectors = vectors;
+		this.packagePrefix = packagePrefix;
 	}
 	//endregion
 
@@ -84,9 +91,10 @@ public abstract class ClusteringAlgoRunner {
 			this.architecture.put(cluster.getName(), cluster);
 		}
 
-		// If the source language is Java, add all clusters
-		// Second condition to be assumed true
-		if (language.equalsIgnoreCase("java"))
+		// If the source language is Java, add all clusters that match prefix
+		if (language.equalsIgnoreCase("java")
+				&& (this.packagePrefix.isEmpty()
+					|| cluster.getName().startsWith(this.packagePrefix)))
 			this.architecture.put(cluster.getName(), cluster);
 	}
 	
