@@ -107,3 +107,21 @@ main functionalities of ARCADE, not to supplant it.
   avoiding integrity checks. Rare is the object that makes sense without a 
   single field being attributed to, and an object that makes no sense is an 
   integrity threat.
+- **Never iterate a HashMap** - HashMaps are not an ordered collection, and 
+  should therefore never be iterated over. To do so causes significant 
+  problems in determinism and, by extension, testing. In short, when one 
+  iterates over a HashMap, one is delegating the condition of the order of 
+  operations to the implementation of the HashMap data structure, rather 
+  than establishing their own ordering condition. This essentially makes 
+  the control flow arbitrary. This is further compounded when switching 
+  between versions of either the data structure held by the map, or the Java 
+  language, thereby changing the hashing functions and causing the entire 
+  order of the program's execution to change. Obviously, this breaks several 
+  tests, but more importantly may even alter the accuracy of some techniques.
+  Therefore, one may never iterate over HashMaps. TreeMaps are the ideal 
+  choice when map iteration is desired, as they allow one to explicitly 
+  determine the iteration order. LinkedHashMaps are admissible, but 
+  undesirable, as they will suffer from the same arbitrariness as HashMaps 
+  when used to hold deserialized data, i.e. the order of execution is then 
+  delegated to the order of the input data, rather than the language 
+  implementation. 
