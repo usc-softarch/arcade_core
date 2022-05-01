@@ -13,7 +13,11 @@ public class FastSimCalcUtil {
 		double sumOfFeaturesInBothEntities = getSumOfFeaturesInBothEntities(currCluster,otherCluster);
 		int numberOf10Features = getNumOf10Features(currCluster,otherCluster);
 		int numberOf01Features = getNumOf01Features(currCluster,otherCluster);
-		
+
+		if (sumOfFeaturesInBothEntities + (double) numberOf10Features
+				+ (double) numberOf01Features == 0)
+			throw new IllegalArgumentException("Attempted to cluster featureless entities");
+
 		return 1 - (0.5 * sumOfFeaturesInBothEntities /
 			(0.5 * sumOfFeaturesInBothEntities + (double) numberOf10Features
 				+ (double) numberOf01Features));
@@ -27,6 +31,10 @@ public class FastSimCalcUtil {
 		int num01Features = getNumOf01Features(currCluster,otherCluster);
 		int num00Features = getNumOf00Features(currCluster,otherCluster);
 		int numSharedFeatures = getNumOfFeaturesInBothEntities(currCluster,otherCluster);
+
+		if (sumOfFeaturesInBothEntities + (double) num10Features
+				+ (double) num01Features == 0)
+			throw new IllegalArgumentException("Attempted to cluster featureless entities");
 		
 		return 1 - (0.5*sumOfFeaturesInBothEntities/(0.5*sumOfFeaturesInBothEntities+2*((double)num10Features+(double)num01Features) + (double)num00Features + (double)numSharedFeatures));
 	}
