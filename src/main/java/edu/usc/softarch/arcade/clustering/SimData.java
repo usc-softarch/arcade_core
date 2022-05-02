@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class SimData implements Comparable<SimData> {
 	public final Cluster c1;
@@ -21,15 +19,7 @@ public class SimData implements Comparable<SimData> {
 		this.c2 = c2;
 		this.cellValue = cellValue;
 		this.clusterSize = clusterSize;
-		this.cellName = getCellName(c1.getName(), c2.getName());
-	}
-
-	private static String getCellName(String c1, String c2) {
-		String[] clusterNames = { c1, c2 };
-		// Order the names
-		Arrays.stream(clusterNames).sorted()
-			.collect(Collectors.toList()).toArray(clusterNames);
-		return clusterNames[0] + clusterNames[1];
+		this.cellName = c1.getName() + c2.getName();
 	}
 
 	//region OBJECT METHODS

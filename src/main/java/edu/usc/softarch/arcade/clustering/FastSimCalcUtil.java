@@ -9,8 +9,10 @@ public class FastSimCalcUtil {
 	 
 	public static double getUnbiasedEllenbergMeasure(Cluster currCluster,
 																									 Cluster otherCluster) {
-		
-		double sumOfFeaturesInBothEntities = getSumOfFeaturesInBothEntities(currCluster,otherCluster);
+		// Gets rid of rounding error arbitrariness
+		double sumOfFeaturesInBothEntities1 = getSumOfFeaturesInBothEntities(currCluster,otherCluster);
+		double sumOfFeaturesInBothEntities2 = getSumOfFeaturesInBothEntities(otherCluster,currCluster);
+		double sumOfFeaturesInBothEntities = (sumOfFeaturesInBothEntities1 + sumOfFeaturesInBothEntities2) / 2;
 		int numberOf10Features = getNumOf10Features(currCluster,otherCluster);
 		int numberOf01Features = getNumOf01Features(currCluster,otherCluster);
 
@@ -25,8 +27,10 @@ public class FastSimCalcUtil {
 	
 	public static double getUnbiasedEllenbergMeasureNM(Cluster currCluster,
 																										 Cluster otherCluster) {
-		
-		double sumOfFeaturesInBothEntities = getSumOfFeaturesInBothEntities(currCluster,otherCluster);
+		// Gets rid of rounding error arbitrariness
+		double sumOfFeaturesInBothEntities1 = getSumOfFeaturesInBothEntities(currCluster,otherCluster);
+		double sumOfFeaturesInBothEntities2 = getSumOfFeaturesInBothEntities(otherCluster,currCluster);
+		double sumOfFeaturesInBothEntities = (sumOfFeaturesInBothEntities1 + sumOfFeaturesInBothEntities2) / 2;
 		int num10Features = getNumOf10Features(currCluster,otherCluster);
 		int num01Features = getNumOf01Features(currCluster,otherCluster);
 		int num00Features = getNumOf00Features(currCluster,otherCluster);
@@ -112,7 +116,7 @@ public class FastSimCalcUtil {
 			if (currCluster.getFeatureMap().get(currIndex) != null && otherCluster.getFeatureMap().get(currIndex) !=null) {
 				Double currFeatureValue = currCluster.getFeatureMap().get(currIndex);
 				Double otherFeatureValue = otherCluster.getFeatureMap().get(currIndex);
-				sumSharedFeatures = currFeatureValue + otherFeatureValue;
+				sumSharedFeatures += currFeatureValue + otherFeatureValue;
 			}
 		}
 		
