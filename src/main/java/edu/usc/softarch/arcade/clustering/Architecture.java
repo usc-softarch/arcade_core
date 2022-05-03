@@ -20,7 +20,7 @@ import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 
-public class Architecture extends LinkedHashMap<String, Cluster> {
+public class Architecture extends TreeMap<String, Cluster> {
 	//region ATTRIBUTES
 	private static final long serialVersionUID = 1L;
 	//endregion
