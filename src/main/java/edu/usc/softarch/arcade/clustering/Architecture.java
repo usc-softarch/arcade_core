@@ -8,12 +8,13 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
@@ -54,35 +55,6 @@ public class Architecture extends LinkedHashMap<String, Cluster> {
 			this.remove(key);
 	}
 	//endregion
-
-  public Map<String, Integer> computeArchitectureIndex() {
-		Map<String, Integer> architectureIndex = new HashMap<>();
-		for (int i = 0; i < this.size(); i++) {
-			Cluster cluster = (Cluster) this.values().toArray()[i];
-			architectureIndex.put(cluster.getName(), i);
-		}
-		return architectureIndex;
-	}
-
-  public void writeToRsf(Map<String, Integer> architectureIndex, String path)
-			throws FileNotFoundException {
-		File rsfFile = new File(path);
-		rsfFile.getParentFile().mkdirs();
-
-		try (PrintWriter out = new PrintWriter(
-			new OutputStreamWriter(
-				new FileOutputStream(rsfFile), StandardCharsets.UTF_8))) {
-			for (Cluster cluster : this.values()) {
-				Integer currentNodeNumber =
-					architectureIndex.get(cluster.getName());
-				String[] entities = cluster.getName().split(",");
-				Set<String> entitiesSet = new HashSet<>(Arrays.asList(entities));
-				for (String entity : entitiesSet) {
-					out.println("contain " + currentNodeNumber + " " + entity);
-				}
-			}
-		}
-	}
 
   public double computeStructuralClusterGain() {
 		List<Double> clusterCentroids = new ArrayList<>();
@@ -132,4 +104,37 @@ public class Architecture extends LinkedHashMap<String, Cluster> {
 
 		return clusterGain;
 	}
+
+	//region SERIALIZATION
+	public void writeToRsf(String path) throws FileNotFoundException {
+		File rsfFile = new File(path);
+		rsfFile.getParentFile().mkdirs();
+
+		Map<Integer, String> architectureIndex = computeArchitectureIndex();
+
+		try (PrintWriter out = new PrintWriter(
+			new OutputStreamWriter(
+				new FileOutputStream(rsfFile), StandardCharsets.UTF_8))) {
+			for (Map.Entry<Integer, String> cluster : architectureIndex.entrySet()) {
+				Integer clusterIndex = cluster.getKey();
+				String[] entities = cluster.getValue().split(",");
+				Set<String> entitiesSet = new HashSet<>(Arrays.asList(entities));
+				for (String entity : entitiesSet) {
+					out.println("contain " + clusterIndex + " " + entity);
+				}
+			}
+		}
+	}
+
+	private Map<Integer, String> computeArchitectureIndex() {
+		List<String> orderedClusterNames = this.values().stream()
+			.map(Cluster::getName).sorted().collect(Collectors.toList());
+
+		Map<Integer, String> architectureIndex = new TreeMap<>();
+		for (int i = 0; i < this.size(); i++)
+			architectureIndex.put(i, orderedClusterNames.get(i));
+
+		return architectureIndex;
+	}
+	//endregion
 }

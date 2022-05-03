@@ -60,7 +60,6 @@ public class ClusteringEngine {
 					SimilarityMatrix.SimMeasure.valueOf(simMeasure.toUpperCase()));
 		}
 
-		runner.architecture.writeToRsf(
-			runner.architecture.computeArchitectureIndex(), outputPath);
+		runner.architecture.writeToRsf(outputPath);
 	}
 }

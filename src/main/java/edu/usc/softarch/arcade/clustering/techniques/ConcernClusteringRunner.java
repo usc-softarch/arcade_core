@@ -94,10 +94,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		String arcClustersFilename = prefix	+ "_arc_clusters.rsf";
 		String docTopicsFilename = prefix + "_arc_docTopics.json";
 
-		Map<String, Integer> clusterNameToNodeNumberMap =
-			runner.getArchitecture().computeArchitectureIndex();
-		runner.getArchitecture().writeToRsf(
-			clusterNameToNodeNumberMap, arcClustersFilename);
+		runner.getArchitecture().writeToRsf(arcClustersFilename);
 		runner.docTopics.serializeDocTopics(docTopicsFilename);
 	}
 	// #endregion INTERFACE ------------------------------------------------------
