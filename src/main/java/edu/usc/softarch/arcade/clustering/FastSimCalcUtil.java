@@ -1,10 +1,7 @@
 package edu.usc.softarch.arcade.clustering;
 
 import java.util.BitSet;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import cc.mallet.util.Maths;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
@@ -177,8 +174,8 @@ public class FastSimCalcUtil {
 		if (Double.isInfinite(jsDivergence)) {
 			jsDivergence = Double.MAX_VALUE;
 		}
-		double infoLossMeasure = (cluster.getNumEntities()/numberOfEntitiesToBeClustered
-			+ otherCluster.getNumEntities()/numberOfEntitiesToBeClustered) * jsDivergence;
+		double infoLossMeasure = ((double)cluster.getNumEntities()/numberOfEntitiesToBeClustered
+			+ (double)otherCluster.getNumEntities()/numberOfEntitiesToBeClustered) * jsDivergence;
 		
 		if (Double.isNaN(infoLossMeasure)) {
 			throw new RuntimeException("infoLossMeasure is NaN");

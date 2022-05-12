@@ -216,7 +216,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 	private Cluster mergeClustersUsingTopics(Cluster cluster, Cluster otherCluster) {
 		Cluster newCluster =
-			new Cluster(ClusteringAlgorithmType.LIMBO, cluster, otherCluster);
+			new Cluster(ClusteringAlgorithmType.ARC, cluster, otherCluster);
 		
 		try {
 			newCluster.docTopicItem = new DocTopicItem(

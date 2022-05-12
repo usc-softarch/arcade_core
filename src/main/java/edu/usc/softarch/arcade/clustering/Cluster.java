@@ -74,21 +74,19 @@ public class Cluster implements Serializable {
 	}
 
 	public Cluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2) {
-		if (cat.equals(ClusteringAlgorithmType.LIMBO)) {
-			Set<Integer> c1Indices = c1.getFeatureMap().keySet();
-			setLimboFeatureMap(c1, c2, c1Indices);
-			
-			Set<Integer> c2Indices = c2.getFeatureMap().keySet();
-			setLimboFeatureMap(c1, c2, c2Indices);
+		Set<Integer> c1Indices = c1.getFeatureMap().keySet();
+		setLimboFeatureMap(c1, c2, c1Indices);
 
-			if (c1.getName().contains("$"))
-				this.name = c2.getName();
-			else
-				this.name = c1.getName() + ',' + c2.getName();
+		Set<Integer> c2Indices = c2.getFeatureMap().keySet();
+		setLimboFeatureMap(c1, c2, c2Indices);
 
-			this.numEntities = c1.getNumEntities() + c2.getNumEntities();
-			this.numFeatures = c1.getNumFeatures();
-		}
+		if (c1.getName().contains("$") && cat.equals(ClusteringAlgorithmType.ARC))
+			this.name = c2.getName();
+		else
+			this.name = c1.getName() + ',' + c2.getName();
+
+		this.numEntities = c1.getNumEntities() + c2.getNumEntities();
+		this.numFeatures = c1.getNumFeatures();
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
