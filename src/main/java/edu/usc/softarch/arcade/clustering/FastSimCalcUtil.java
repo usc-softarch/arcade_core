@@ -1,6 +1,9 @@
 package edu.usc.softarch.arcade.clustering;
 
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import cc.mallet.util.Maths;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
@@ -40,7 +43,10 @@ public class FastSimCalcUtil {
 				+ (double) num01Features == 0)
 			throw new IllegalArgumentException("Attempted to cluster featureless entities");
 		
-		return 1 - (0.5*sumOfFeaturesInBothEntities/(0.5*sumOfFeaturesInBothEntities+2*((double)num10Features+(double)num01Features) + (double)num00Features + (double)numSharedFeatures));
+		return 1 - (0.5 * sumOfFeaturesInBothEntities /
+			(0.5 * sumOfFeaturesInBothEntities + 2
+				* ((double) num10Features + (double) num01Features)
+				+ (double) num00Features + (double) numSharedFeatures));
 	}
 
 	private static int getNumOf01Features(Cluster currCluster,
@@ -60,19 +66,18 @@ public class FastSimCalcUtil {
 	}
 	
 	private static int getNumOf00Features(Cluster currCluster,
-																				Cluster otherCluster) {
-		
+			Cluster otherCluster) {
+		int numFeatures = currCluster.getNumFeatures();
+		Set<Integer> ooIndices =
+			IntStream.rangeClosed(0, numFeatures - 1) // Creates the range of numbers
+			.boxed().collect(Collectors.toSet());     // Puts them in a list
+
 		Set<Integer> currIndices = currCluster.getFeatureMap().keySet();
+		ooIndices.removeAll(currIndices);
+		Set<Integer> otherIndices = otherCluster.getFeatureMap().keySet();
+		ooIndices.removeAll(otherIndices);
 		
-		int num00Features = 0;
-		for (Integer currIndex : currIndices) {
-			if (otherCluster.getFeatureMap().get(currIndex) == null && currCluster.getFeatureMap().get(currIndex) == null) {
-				num00Features++;
-			}
-		}
-				
-		
-		return num00Features;
+		return ooIndices.size();
 	}
 
 	private static int getNumOf10Features(Cluster currCluster,
