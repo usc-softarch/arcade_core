@@ -3,8 +3,8 @@ package edu.usc.softarch.arcade.clustering.criteria;
 import edu.usc.softarch.arcade.clustering.techniques.ClusteringAlgoRunner;
 
 public class ClusterGainStoppingCriterion
-		implements StoppingCriterion {
-	private ClusteringAlgoRunner runner;
+		extends StoppingCriterion {
+	private final ClusteringAlgoRunner runner;
 
 	public ClusterGainStoppingCriterion(ClusteringAlgoRunner runner) {
 		this.runner = runner;	}

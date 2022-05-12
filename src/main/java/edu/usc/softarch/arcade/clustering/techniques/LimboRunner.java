@@ -7,9 +7,7 @@ import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimData;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
-import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterionFactory;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
-import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterionFactory;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
 import java.io.FileNotFoundException;
@@ -48,14 +46,14 @@ public class LimboRunner extends ClusteringAlgoRunner {
 		Architecture arch = new Architecture(projectName, projectPath);
 		// Create serialization criterion
 		SerializationCriterion serializationCriterion =
-			SerializationCriterionFactory.makeSerializationCriterion(
+			SerializationCriterion.makeSerializationCriterion(
 				serializationCriterionName, serializationCriterionVal, arch);
 		// Create the runner object
 		ClusteringAlgoRunner runner = new LimboRunner(language, featureVectors,
 			packagePrefix, serializationCriterion, arch);
 		// Establish the stopping criterion
 		StoppingCriterion stoppingCriterion =
-			StoppingCriterionFactory.makeStoppingCriterion(stoppingCriterionName,
+			StoppingCriterion.makeStoppingCriterion(stoppingCriterionName,
 				runner, numClusters);
 		// Compute the clustering algorithm and return the resulting architecture
 		return runner.computeArchitecture(stoppingCriterion, stoppingCriterionName,

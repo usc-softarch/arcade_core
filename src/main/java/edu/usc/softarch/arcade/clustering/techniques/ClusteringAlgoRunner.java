@@ -17,7 +17,7 @@ import edu.usc.softarch.arcade.config.Config.Granule;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
 public abstract class ClusteringAlgoRunner {
-	// #region ATTRIBUTES --------------------------------------------------------
+	//region ATTRIBUTES
 	public Architecture architecture;
 	protected FeatureVectors featureVectors;
 	protected static double maxClusterGain = 0;
@@ -26,7 +26,7 @@ public abstract class ClusteringAlgoRunner {
 	protected final String language;
 	private final String packagePrefix;
 	protected final SerializationCriterion serializationCriterion;
-	// #endregion ATTRIBUTES -----------------------------------------------------
+	//endregion ATTRIBUTES
 
 	//region CONTRUCTORS
 	protected ClusteringAlgoRunner(String language, FeatureVectors vectors) {

@@ -1,6 +1,6 @@
 package edu.usc.softarch.arcade.clustering.criteria;
 
-public class StepCountSerializationCriterion implements SerializationCriterion {
+public class StepCountSerializationCriterion extends SerializationCriterion {
 	private int stepCount;
 	private final int stepThreshold;
 

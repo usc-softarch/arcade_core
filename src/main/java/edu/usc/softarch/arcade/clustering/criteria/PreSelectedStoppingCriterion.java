@@ -3,9 +3,9 @@ package edu.usc.softarch.arcade.clustering.criteria;
 import edu.usc.softarch.arcade.clustering.techniques.ClusteringAlgoRunner;
 
 public class PreSelectedStoppingCriterion
-		implements StoppingCriterion {
-	private int numClusters;
-	private ClusteringAlgoRunner runner;
+		extends StoppingCriterion {
+	private final int numClusters;
+	private final ClusteringAlgoRunner runner;
 
 	public PreSelectedStoppingCriterion(int numClusters, ClusteringAlgoRunner runner) {
 		this.numClusters = numClusters;

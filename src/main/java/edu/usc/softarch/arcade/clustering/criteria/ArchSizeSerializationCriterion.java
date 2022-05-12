@@ -2,7 +2,7 @@ package edu.usc.softarch.arcade.clustering.criteria;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
 
-public class ArchSizeSerializationCriterion implements SerializationCriterion {
+public class ArchSizeSerializationCriterion extends SerializationCriterion {
 	private final Architecture arch;
 	private final int archSize;
 

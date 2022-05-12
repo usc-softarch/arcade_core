@@ -20,32 +20,16 @@ import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
-	// #region ATTRIBUTES --------------------------------------------------------
-	private DocTopics docTopics;
-	// #endregion ATTRIBUTES -----------------------------------------------------
-	
-	// #region CONSTRUCTORS ------------------------------------------------------
-	/**
-	 * @param vecs feature vectors (dependencies) of entities
-	 */
-	public ConcernClusteringRunner(FeatureVectors vecs, String artifactsDir,
-			String language) {
-		super(language, vecs);
-		initializeClusters();
-		initializeClusterDocTopics(artifactsDir);
-	}
-	// #endregion CONSTRUCTORS ---------------------------------------------------
-
 	// #region INTERFACE ---------------------------------------------------------
 	/**
 	 * Entry point runner for ARC.
-	 * 
+	 *
 	 * args[0]: Language of the subject system, java or c.
 	 * args[1]: Path of the output directory to put the results in.
 	 * args[2]: Path to the subject system's root directory.
 	 * args[3]: Path to the FastFeatureVectors JSON file.
 	 * args[4]: Path to the directory with the mallet artifacts.
-	 * 
+	 *
 	 * @param args Arguments as per documentation above.
 	 */
 	public static void main(String[] args) throws IOException {
@@ -61,7 +45,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 	/**
 	 * Runs ARC.
-	 * 
+	 *
 	 * @param language Language of the subject system, java or c.
 	 * @param outputDirPath Path of the output directory to put the results in.
 	 * @param sysDirPath Path to the subject system's root directory.
@@ -69,8 +53,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	 * @param artifactsDirPath Path to the directory with the mallet artifacts.
 	 */
 	public static void runARC(String language, String outputDirPath,
-			String sysDirPath, String ffVecsFilePath, String artifactsDirPath)
-			throws IOException {
+		String sysDirPath, String ffVecsFilePath, String artifactsDirPath)
+		throws IOException {
 		String revisionNumber = (new File(sysDirPath)).getName();
 		FeatureVectors ffVecs =
 			FeatureVectors.deserializeFFVectors(ffVecsFilePath);
@@ -98,6 +82,22 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		runner.docTopics.serializeDocTopics(docTopicsFilename);
 	}
 	// #endregion INTERFACE ------------------------------------------------------
+
+	// #region ATTRIBUTES --------------------------------------------------------
+	private DocTopics docTopics;
+	// #endregion ATTRIBUTES -----------------------------------------------------
+	
+	// #region CONSTRUCTORS ------------------------------------------------------
+	/**
+	 * @param vecs feature vectors (dependencies) of entities
+	 */
+	public ConcernClusteringRunner(FeatureVectors vecs, String artifactsDir,
+			String language) {
+		super(language, vecs);
+		initializeClusters();
+		initializeClusterDocTopics(artifactsDir);
+	}
+	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	@Override
 	public Architecture computeArchitecture(

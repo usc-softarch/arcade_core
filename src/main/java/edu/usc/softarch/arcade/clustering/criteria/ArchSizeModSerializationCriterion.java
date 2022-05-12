@@ -3,7 +3,7 @@ package edu.usc.softarch.arcade.clustering.criteria;
 import edu.usc.softarch.arcade.clustering.Architecture;
 
 public class ArchSizeModSerializationCriterion
-		implements SerializationCriterion {
+		extends SerializationCriterion {
 	private final int modValue;
 	private final Architecture arch;
 
