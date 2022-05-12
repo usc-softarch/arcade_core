@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +22,8 @@ import edu.usc.softarch.arcade.topics.DocTopics;
 public class Architecture extends TreeMap<String, Cluster> {
 	//region ATTRIBUTES
 	private static final long serialVersionUID = 1L;
+	private String projectName;
+	private String projectPath;
 	//endregion
 
 	//region CONSTRUCTORS
@@ -34,6 +35,11 @@ public class Architecture extends TreeMap<String, Cluster> {
   public Architecture(Architecture arch) {
 		for (Cluster c : arch.values())
 			this.add(new Cluster(c));
+	}
+
+	public Architecture(String projectName, String projectPath) {
+		this.projectName = projectName;
+		this.projectPath = projectPath;
 	}
 	//endregion
 
@@ -106,6 +112,13 @@ public class Architecture extends TreeMap<String, Cluster> {
 	}
 
 	//region SERIALIZATION
+	public void writeToRsf() throws FileNotFoundException {
+		String fs = File.separator;
+		String path = this.projectPath + fs + this.projectName + "_"
+			+ this.size() + "_clusters.rsf";
+		this.writeToRsf(path);
+	}
+
 	public void writeToRsf(String path) throws FileNotFoundException {
 		File rsfFile = new File(path);
 		rsfFile.getParentFile().mkdirs();

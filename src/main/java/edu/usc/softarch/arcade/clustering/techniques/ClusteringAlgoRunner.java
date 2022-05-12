@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
+import java.io.FileNotFoundException;
 import java.util.BitSet;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -9,6 +10,7 @@ import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimData;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.config.Config.Granule;
@@ -23,18 +25,34 @@ public abstract class ClusteringAlgoRunner {
 	public static int numberOfEntitiesToBeClustered = 0;
 	protected final String language;
 	private final String packagePrefix;
+	protected final SerializationCriterion serializationCriterion;
 	// #endregion ATTRIBUTES -----------------------------------------------------
 
 	//region CONTRUCTORS
 	protected ClusteringAlgoRunner(String language, FeatureVectors vectors) {
-		this(language, vectors, "");
-	}
+		this(language, vectors, "", null); }
+
+	protected ClusteringAlgoRunner(String language, FeatureVectors vectors,
+			SerializationCriterion serializationCriterion) {
+		this(language, vectors, "", serializationCriterion); }
 
 	protected ClusteringAlgoRunner(String language, FeatureVectors vectors,
 			String packagePrefix) {
+		this(language, vectors, packagePrefix, null); }
+
+	protected ClusteringAlgoRunner(String language, FeatureVectors vectors,
+			String packagePrefix, SerializationCriterion serializationCriterion) {
 		this.language = language;
 		this.featureVectors = vectors;
 		this.packagePrefix = packagePrefix;
+		this.serializationCriterion = serializationCriterion;
+	}
+
+	protected ClusteringAlgoRunner(String language, FeatureVectors vectors,
+			String packagePrefix, SerializationCriterion serializationCriterion,
+			Architecture arch) {
+		this(language, vectors, packagePrefix, serializationCriterion);
+		this.architecture = arch;
 	}
 	//endregion
 
@@ -51,7 +69,8 @@ public abstract class ClusteringAlgoRunner {
 	// #endregion ACCESSORS ------------------------------------------------------
 	
 	protected void initializeClusters() {
-		architecture = new Architecture();
+		if (this.architecture == null)
+			this.architecture = new Architecture();
 
 		// For each cell in the adjacency matrix
 		for (String name : featureVectors.getFeatureVectorNames()) {
@@ -158,7 +177,8 @@ public abstract class ClusteringAlgoRunner {
 		return toReturn;
 	}
 
-	public abstract void computeArchitecture(StoppingCriterion stoppingCriterion,
-		String stopCriterion, SimilarityMatrix.SimMeasure simMeasure)
-		throws DistributionSizeMismatchException;
+	public abstract Architecture computeArchitecture(
+		StoppingCriterion stoppingCriterion, String stopCriterion,
+		SimilarityMatrix.SimMeasure simMeasure)
+		throws DistributionSizeMismatchException, FileNotFoundException;
 }

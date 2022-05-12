@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
+import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
@@ -15,7 +16,7 @@ public class LimboRunner extends ClusteringAlgoRunner {
 	//endregion
 
 	@Override
-	public void computeArchitecture(StoppingCriterion stoppingCriterion,
+	public Architecture computeArchitecture(StoppingCriterion stoppingCriterion,
 			String stopCriterion, SimilarityMatrix.SimMeasure simMeasure)
 			throws DistributionSizeMismatchException {
 		initializeClusters();
@@ -36,5 +37,7 @@ public class LimboRunner extends ClusteringAlgoRunner {
 
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data,newCluster,simMatrix);
 		}
+
+		return super.architecture;
 	}
 }

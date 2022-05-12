@@ -100,7 +100,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #endregion INTERFACE ------------------------------------------------------
 
 	@Override
-	public void computeArchitecture(
+	public Architecture computeArchitecture(
 			StoppingCriterion stoppingCriterion, String stopCriterion,
 			SimilarityMatrix.SimMeasure simMeasure) throws DistributionSizeMismatchException {
 		SimilarityMatrix simMatrix = initializeSimMatrix(simMeasure);
@@ -116,6 +116,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			updateFastClustersAndSimMatrixToReflectMergedCluster(
 				data, newCluster, simMatrix);
 		}
+
+		return super.architecture;
 	}
 
 	protected SimilarityMatrix initializeSimMatrix(SimilarityMatrix.SimMeasure simMeasure)
