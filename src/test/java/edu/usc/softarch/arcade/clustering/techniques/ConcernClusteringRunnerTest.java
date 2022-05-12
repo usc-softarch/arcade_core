@@ -73,8 +73,8 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 			+ "_46_topics_71_arc_clusters.rsf",
 
 		// httpd 2.4.26
-		"httpd-2.4.26," +
-			"c,"
+		"httpd-2.4.26,"
+			+ "c,"
 			+ "_50_topics_82_arc_clusters.rsf"
 	})
 	public void ARCRecoveryTest(String systemVersion, String lang,
