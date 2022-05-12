@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering;
 
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,10 +20,6 @@ public class FastSimCalcUtil {
 		int numberOf10Features = getNumOf10Features(currCluster,otherCluster);
 		int numberOf01Features = getNumOf01Features(currCluster,otherCluster);
 
-		if (sumOfFeaturesInBothEntities + (double) numberOf10Features
-				+ (double) numberOf01Features == 0)
-			throw new IllegalArgumentException("Attempted to cluster featureless entities");
-
 		return 1 - (0.5 * sumOfFeaturesInBothEntities /
 			(0.5 * sumOfFeaturesInBothEntities + (double) numberOf10Features
 				+ (double) numberOf01Features));
@@ -38,10 +35,6 @@ public class FastSimCalcUtil {
 		int num01Features = getNumOf01Features(currCluster,otherCluster);
 		int num00Features = getNumOf00Features(currCluster,otherCluster);
 		int numSharedFeatures = getNumOfFeaturesInBothEntities(currCluster,otherCluster);
-
-		if (sumOfFeaturesInBothEntities + (double) num10Features
-				+ (double) num01Features == 0)
-			throw new IllegalArgumentException("Attempted to cluster featureless entities");
 		
 		return 1 - (0.5 * sumOfFeaturesInBothEntities /
 			(0.5 * sumOfFeaturesInBothEntities + 2
@@ -68,16 +61,19 @@ public class FastSimCalcUtil {
 	private static int getNumOf00Features(Cluster currCluster,
 			Cluster otherCluster) {
 		int numFeatures = currCluster.getNumFeatures();
-		Set<Integer> ooIndices =
-			IntStream.rangeClosed(0, numFeatures - 1) // Creates the range of numbers
-			.boxed().collect(Collectors.toSet());     // Puts them in a list
 
-		Set<Integer> currIndices = currCluster.getFeatureMap().keySet();
-		ooIndices.removeAll(currIndices);
-		Set<Integer> otherIndices = otherCluster.getFeatureMap().keySet();
-		ooIndices.removeAll(otherIndices);
+		BitSet currIndices = new BitSet(numFeatures);
+		for (Integer integer : currCluster.getFeatureMap().keySet())
+			currIndices.set(integer);
+
+		BitSet otherIndices = new BitSet(numFeatures);
+		for (Integer integer : otherCluster.getFeatureMap().keySet())
+			otherIndices.set(integer);
+
+		currIndices.or(otherIndices);
+		currIndices.flip(0, numFeatures);
 		
-		return ooIndices.size();
+		return currIndices.cardinality();
 	}
 
 	private static int getNumOf10Features(Cluster currCluster,
