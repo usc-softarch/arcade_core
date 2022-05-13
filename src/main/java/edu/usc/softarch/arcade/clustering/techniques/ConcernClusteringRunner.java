@@ -10,9 +10,9 @@ import java.util.Map;
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimData;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
@@ -22,71 +22,38 @@ import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #region INTERFACE ---------------------------------------------------------
-	public static void main(String[] args) throws IOException {
-		String language = args[0];
-		String outputDirPath = args[1];
-		String sysDirPath = args[2];
-		String ffVecsFilePath = args[3];
-		String artifactsDirPath = args[4];
-		String stoppingCriterionName = args[5];
-		int numClusters = Integer.parseInt(args[6]);
-		String serializationCriterionName = args[7];
-		int serializationCriterionVal = Integer.parseInt(args[8]);
-		String projectName = args[9];
-		String projectPath = args[10];
-		String packagePrefix = args[11];
-
-		runARC(language, outputDirPath, sysDirPath,
-			ffVecsFilePath, artifactsDirPath, stoppingCriterionName, numClusters,
-			serializationCriterionName, serializationCriterionVal, projectName,
-			projectPath, packagePrefix);
-	}
-
-	public static void runARC(String language, String outputDirPath,
-			String sysDirPath, String featureVecsFilePath, String artifactsDirPath,
-			String stoppingCriterionName, int numClusters,
-			String serializationCriterionName, int serializationCriterionVal,
-			String projectName, String projectPath, String packagePrefix)
+	public static Architecture run(Architecture arch,
+			SerializationCriterion serialCrit, StoppingCriterion stopCrit,
+			String language, String stoppingCriterionName,
+			SimilarityMatrix.SimMeasure simMeasure, String outputDirPath,
+			String sysDirPath, String artifactsDirPath)
 			throws IOException {
 		String revisionNumber = (new File(sysDirPath)).getName();
 
-		FeatureVectors ffVecs =
-			FeatureVectors.deserializeFFVectors(featureVecsFilePath);
-		int numTopics = (int) (ffVecs.getNumSourceEntities() * 0.18);
-
-		Architecture arch = new Architecture(projectName, projectPath, ffVecs,
-			language, packagePrefix);
-
-		SerializationCriterion serializationCriterion =
-			SerializationCriterion.makeSerializationCriterion(
-				serializationCriterionName, serializationCriterionVal, arch);
-
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
-			language, serializationCriterion, arch, artifactsDirPath);
+			language, serialCrit, arch, artifactsDirPath);
 
-		// If no numClusters was provided
-		if (numClusters == 0)
-			numClusters = (int) (runner.getArchitecture().size() * .20);
-
-		StoppingCriterion stoppingCriterion =
-			StoppingCriterion.makeStoppingCriterion(stoppingCriterionName, runner,
-				numClusters);
+		// Overwrite numClusters with docTopicfied architecture
+		int numClusters = (int) (runner.getArchitecture().size() * .20);
+		if (stopCrit instanceof PreSelectedStoppingCriterion)
+			((PreSelectedStoppingCriterion) stopCrit).setNumClusters(numClusters);
 
 		try {
-			runner.computeArchitecture(stoppingCriterion,
-				stoppingCriterionName, SimilarityMatrix.SimMeasure.JS);
+			runner.computeArchitecture(stopCrit, stoppingCriterionName,
+				simMeasure);
 		} catch (DistributionSizeMismatchException e) {
 			e.printStackTrace(); //TODO Handle it
 		}
 
 		String prefix = outputDirPath + File.separator
-			+ revisionNumber + "_" + numTopics + "_topics_"
-			+ runner.getArchitecture().size();
+			+ revisionNumber + "_" + runner.getArchitecture().size();
 		String arcClustersFilename = prefix	+ "_arc_clusters.rsf";
 		String docTopicsFilename = prefix + "_arc_docTopics.json";
 
 		runner.getArchitecture().writeToRsf(arcClustersFilename);
 		runner.docTopics.serializeDocTopics(docTopicsFilename);
+
+		return runner.getArchitecture();
 	}
 	// #endregion INTERFACE ------------------------------------------------------
 
@@ -110,7 +77,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			throws DistributionSizeMismatchException, FileNotFoundException {
 		SimilarityMatrix simMatrix = initializeSimMatrix(simMeasure);
 
-		while (stoppingCriterion.notReadyToStop()) {
+		while (stoppingCriterion.notReadyToStop(super.architecture)) {
 			if (stopCriterion.equalsIgnoreCase("clustergain")) {
 				double clusterGain = architecture.computeTopicClusterGain();
 				checkAndUpdateClusterGain(clusterGain);

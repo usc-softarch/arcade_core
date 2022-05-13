@@ -1,6 +1,11 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
 import edu.usc.softarch.arcade.BaseTest;
+import edu.usc.softarch.arcade.clustering.Architecture;
+import edu.usc.softarch.arcade.clustering.FeatureVectors;
+import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
+import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
@@ -51,17 +56,34 @@ public class WcaRunnerTest extends BaseTest {
 		String uemResultPath = resultFilePathBase + "_uem_100_clusters.rsf";
 		String uemnmResultPath = resultFilePathBase + "_uemnm_100_clusters.rsf";
 
-		assertDoesNotThrow(() ->
-			WcaRunner.run(fVecsPath, lang, "preselected",
-				100, "uem", "archsize",
-				100, systemVersion + "_uem",
-				outputDirPath, packagePrefix));
+		Architecture archUem = assertDoesNotThrow(() ->
+			new Architecture(systemVersion + "_uem", outputDirPath,
+				FeatureVectors.deserializeFFVectors(fVecsPath),
+				lang,	packagePrefix));
+
+		Architecture archUemnm = assertDoesNotThrow(() ->
+			new Architecture(systemVersion + "_uemnm", outputDirPath,
+				FeatureVectors.deserializeFFVectors(fVecsPath),
+				lang,	packagePrefix));
+
+		SerializationCriterion serialCritUem =
+			SerializationCriterion.makeSerializationCriterion(
+				"archsize", 100, archUem);
+
+		SerializationCriterion serialCritUemnm =
+			SerializationCriterion.makeSerializationCriterion(
+				"archsize", 100, archUemnm);
+
+		StoppingCriterion stopCrit = StoppingCriterion.makeStoppingCriterion(
+			"preselected", 100);
 
 		assertDoesNotThrow(() ->
-			WcaRunner.run(fVecsPath, lang, "preselected",
-				100, "uemnm", "archsize",
-				100, systemVersion + "_uemnm",
-				outputDirPath, packagePrefix));
+			WcaRunner.run(archUem, serialCritUem, stopCrit, lang,
+				"preselected", SimilarityMatrix.SimMeasure.UEM));
+
+		assertDoesNotThrow(() ->
+			WcaRunner.run(archUemnm, serialCritUemnm, stopCrit, lang,
+				"preselected",	SimilarityMatrix.SimMeasure.UEMNM));
 
 		// Load uem results
 		String uemResult = assertDoesNotThrow(() ->

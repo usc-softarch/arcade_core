@@ -32,6 +32,7 @@ import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
+import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.topics.TopicUtil;
@@ -61,25 +62,25 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_239_topics_181_arc_clusters.rsf,"
+			+ "_181_arc_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_284_topics_163_arc_clusters.rsf,"
+			+ "_163_arc_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_46_topics_71_arc_clusters.rsf,"
+			+ "_71_arc_clusters.rsf,"
 			+ "",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_50_topics_82_arc_clusters.rsf,"
+			+ "_82_arc_clusters.rsf,"
 			+ ""
 	})
 	public void ARCRecoveryTest(String systemVersion, String lang,
@@ -92,11 +93,22 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		String ffVecs = factsDir + fs + systemVersion + "_fVectors.json";
 		String resultClustersFile = outputDirPath + fs + systemVersion + arcFileSuffix;
 
+		Architecture arch = assertDoesNotThrow(() ->
+			new Architecture(systemVersion, outputDirPath,
+			FeatureVectors.deserializeFFVectors(ffVecs),
+			lang,	packagePrefix));
+
+		SerializationCriterion serialCrit =
+			SerializationCriterion.makeSerializationCriterion(
+			"archsize", 100, arch);
+
+		StoppingCriterion stopCrit = StoppingCriterion.makeStoppingCriterion(
+				"preselected", 0);
+
 		assertDoesNotThrow(() ->
-			ConcernClusteringRunnerMock.runARC(lang, outputDirPath, sysDir, ffVecs,
-				artifactsDir, "preselected", 0,
-				"archsize", 100, systemVersion,
-				outputDirPath, packagePrefix));
+			ConcernClusteringRunnerMock.run(arch, serialCrit, stopCrit, lang,
+				"preselected",	SimilarityMatrix.SimMeasure.JS,
+				outputDirPath, sysDir, artifactsDir));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of
@@ -144,22 +156,22 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_239_topics_181_arc_",
+			+ "_181_arc_",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_284_topics_163_arc_",
+			+ "_163_arc_",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_46_topics_71_arc_",
+			+ "_71_arc_",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_50_topics_82_arc_"
+			+ "_82_arc_"
 	})
 	public void asdWithConcernsTest(String systemVersion, String lang, String arcFileSuffix) {
 		// Creating relevant path Strings
@@ -382,7 +394,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 			int numClusters = (int) ((double) runner.getArchitecture().size() * .20);
 			// USING THE CLONE THAT TAKES IN THE VERSION NAME HERE
 			runner.computeArchitecture(
-				new PreSelectedStoppingCriterion(numClusters, runner),
+				new PreSelectedStoppingCriterion(numClusters),
 				"preselected", SimilarityMatrix.SimMeasure.JS);
 		});
 

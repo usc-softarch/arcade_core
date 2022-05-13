@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.clustering.techniques;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.Cluster;
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimData;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
@@ -14,50 +13,17 @@ import java.io.IOException;
 
 public class WcaRunner extends ClusteringAlgoRunner {
 	//region INTERFACE
-	public static void main(String[] args)
+	public static Architecture run(Architecture arch,
+			SerializationCriterion serialCrit, StoppingCriterion stopCrit,
+			String language, String stoppingCriterionName,
+			SimilarityMatrix.SimMeasure simMeasure)
 			throws IOException, DistributionSizeMismatchException {
-		String featureVectorsFilePath = args[0];
-		String language = args[1];
-		String stoppingCriterion = args[2];
-		int numClusters = Integer.parseInt(args[3]);
-		String simMeasure = args[4];
-		String serializationCriterion = args[5];
-		int serializationCriterionVal = Integer.parseInt(args[6]);
-		String projectName = args[7];
-		String projectPath = args[8];
-		String packagePrefix = args[9];
-
-		run(featureVectorsFilePath, language, stoppingCriterion, numClusters,
-			simMeasure, serializationCriterion, serializationCriterionVal,
-			projectName, projectPath, packagePrefix);
-	}
-
-	public static Architecture run(String featureVectorsFilePath,
-			String language, String stoppingCriterionName, int numClusters,
-			String simMeasure, String serializationCriterionName,
-			int serializationCriterionVal, String projectName,
-			String projectPath, String packagePrefix)
-			throws IOException, DistributionSizeMismatchException {
-		// Read in the Feature Vectors
-		FeatureVectors featureVectors =
-			FeatureVectors.deserializeFFVectors(featureVectorsFilePath);
-		// Create architecture with assigned output values
-		Architecture arch = new Architecture(projectName, projectPath,
-			featureVectors, language, packagePrefix);
-		// Create serialization criterion
-		SerializationCriterion serializationCriterion =
-			SerializationCriterion.makeSerializationCriterion(
-				serializationCriterionName, serializationCriterionVal, arch);
 		// Create the runner object
 		ClusteringAlgoRunner runner = new WcaRunner(language,
-			serializationCriterion, arch);
-		// Establish the stopping criterion
-		StoppingCriterion stoppingCriterion =
-			StoppingCriterion.makeStoppingCriterion(stoppingCriterionName,
-				runner, numClusters);
+			serialCrit, arch);
 		// Compute the clustering algorithm and return the resulting architecture
-		return runner.computeArchitecture(stoppingCriterion, stoppingCriterionName,
-			SimilarityMatrix.SimMeasure.valueOf(simMeasure.toUpperCase()));
+		return runner.computeArchitecture(stopCrit, stoppingCriterionName,
+			simMeasure);
 	}
 	//endregion
 
@@ -75,7 +41,7 @@ public class WcaRunner extends ClusteringAlgoRunner {
 			throws DistributionSizeMismatchException, FileNotFoundException {
 		SimilarityMatrix simMatrix = new SimilarityMatrix(simMeasure, this.architecture);
 
-		while (stopCriterion.notReadyToStop()) {
+		while (stopCriterion.notReadyToStop(super.architecture)) {
 			if (stoppingCriterion.equalsIgnoreCase("clustergain")) {
 				double clusterGain = 0;
 				clusterGain = super.architecture.computeStructuralClusterGain();

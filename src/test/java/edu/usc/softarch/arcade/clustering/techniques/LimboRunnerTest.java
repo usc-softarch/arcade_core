@@ -1,14 +1,19 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
 import edu.usc.softarch.arcade.BaseTest;
+import edu.usc.softarch.arcade.clustering.Architecture;
+import edu.usc.softarch.arcade.clustering.FeatureVectors;
+import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
+import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.util.FileUtil;
-import edu.usc.softarch.util.EnhancedHashSet;
-import edu.usc.softarch.util.EnhancedSet;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,11 +54,21 @@ public class LimboRunnerTest extends BaseTest {
 		String resultPath = outputDirPath + fs + systemVersion
 			+ "_limbo_100_clusters.rsf";
 
+		Architecture arch = assertDoesNotThrow(() ->
+			new Architecture(systemVersion + "_limbo", outputDirPath,
+				FeatureVectors.deserializeFFVectors(fVecsPath),
+				lang,	packagePrefix));
+
+		SerializationCriterion serialCrit =
+			SerializationCriterion.makeSerializationCriterion(
+				"archsize", 100, arch);
+
+		StoppingCriterion stopCrit = StoppingCriterion.makeStoppingCriterion(
+			"preselected", 100);
+
 		assertDoesNotThrow(() ->
-			LimboRunner.run(fVecsPath, lang, "preselected",
-				100, "il", "archsize",
-				100, systemVersion + "_limbo",
-				outputDirPath, packagePrefix));
+			LimboRunner.run(arch, serialCrit, stopCrit, lang,
+				"preselected", SimilarityMatrix.SimMeasure.IL));
 
 		// Load results
 		String result = assertDoesNotThrow(() ->
@@ -64,9 +79,9 @@ public class LimboRunnerTest extends BaseTest {
 			FileUtil.readFile((oraclePath), StandardCharsets.UTF_8));
 
 		// RsfCompare.equals() to compare contents of oracle and result files
-		EnhancedSet<String> uemResultRsf = new EnhancedHashSet<>(
+		Set<String> uemResultRsf = new HashSet<>(
 			Arrays.asList(result.split("\\r?\\n")));
-		EnhancedSet<String> uemOracleRsf = new EnhancedHashSet<>(
+		Set<String> uemOracleRsf = new HashSet<>(
 			Arrays.asList(oracle.split("\\r?\\n")));
 		assertEquals(uemResultRsf, uemOracleRsf);
 	}
