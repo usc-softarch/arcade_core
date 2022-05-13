@@ -23,19 +23,39 @@ import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 
+/**
+ * Represents an architecture of clustered entities. An Architecture is a
+ * specialization of a TreeMap&lt;{@link String}, {@link Cluster}&gt;, meaning
+ * it is ordered by the names of its comprising {@link Cluster}s. This ensures
+ * that all iterative operations done over an Architecture will follow the same
+ * order, regardless of the order in which the Architecture was constructed,
+ * i.e. the order of the clustering algorithm's inputs.
+ */
 public class Architecture extends TreeMap<String, Cluster> {
 	//region ATTRIBUTES
 	private static final long serialVersionUID = 1L;
-	private String projectName;
-	private String projectPath;
-	private int numFeatures;
+	/**
+	 * The name of the subject system represented by this architecture. Used in
+	 * serialization.
+	 */
+	private final String projectName;
+	/**
+	 * The path to where this data structure should be serialized.
+	 */
+	private final String projectPath;
+	/**
+	 * The total number of features that can exist in any clusters of this
+	 * architecture. For architectures constructed from structural data such as
+	 * dependencies, this is the number of entities in the initial architecture,
+	 * e.g. the number of files when using file-level granularity, or the number
+	 * of functions when using function-level granularity.
+	 */
+	private final int numFeatures;
 	//endregion
 
 	//region CONSTRUCTORS
-	public Architecture() {	super(); }
-
 	/**
-	 * Clone constructor
+	 * Clone constructor.
 	 */
   public Architecture(Architecture arch) {
 		for (Cluster c : arch.values())
@@ -46,6 +66,20 @@ public class Architecture extends TreeMap<String, Cluster> {
 		this.numFeatures = arch.numFeatures;
 	}
 
+	/**
+	 * Default constructor for new Architecture objects.
+	 *
+	 * @param projectName The name of the subject system represented by this
+	 *                    architecture. Used in serialization.
+	 * @param projectPath The path to where this data structure should be
+	 *                    serialized.
+	 * @param vectors The {@link FeatureVectors} object to construct this
+	 *                Architecture from.
+	 * @param language The language of the subject system.
+	 * @param packagePrefix The package prefix to be considered in the
+	 *                      initialization of the Architecture. Only used in
+	 *                      Java systems.
+	 */
 	public Architecture(String projectName, String projectPath,
 			FeatureVectors vectors, String language, String packagePrefix) {
 		this.projectName = projectName;
@@ -54,6 +88,33 @@ public class Architecture extends TreeMap<String, Cluster> {
 		initializeClusters(vectors, language, packagePrefix);
 	}
 
+	/**
+	 * Convenience constructor for new Architecture objects in C-based systems.
+	 * Package prefix is set to empty string.
+	 *
+	 * @param projectName The name of the subject system represented by this
+	 *                    architecture. Used in serialization.
+	 * @param projectPath The path to where this data structure should be
+	 *                    serialized.
+	 * @param vectors The {@link FeatureVectors} object to construct this
+	 *                Architecture from.
+	 * @param language The language of the subject system.
+	 */
+	public Architecture(String projectName, String projectPath,
+			FeatureVectors vectors, String language) {
+		this(projectName, projectPath, vectors, language, "");
+	}
+
+	/**
+	 * Initializes the clusters of this architecture from a {@link FeatureVectors}
+	 * object.
+	 *
+	 * @param vectors The {@link FeatureVectors} to use for initialization.
+	 * @param language The language of the subject system.
+	 * @param packagePrefix The package prefix to be considered in the
+	 *                      initialization of the Architecture. Only used in
+	 *                      Java systems.
+	 */
 	private void initializeClusters(FeatureVectors vectors, String language,
 			String packagePrefix) {
 		// For each cell in the adjacency matrix
@@ -71,6 +132,23 @@ public class Architecture extends TreeMap<String, Cluster> {
 		ClusteringAlgoRunner.numberOfEntitiesToBeClustered = this.size();
 	}
 
+	/**
+	 * Adds a cluster if and only if it satisfies a set of conditions.
+	 *
+	 * For systems in C-based languages, it checks that only entities from
+	 * C-based files are accepted.
+	 *
+	 * For clustering analyses based on Function-level granularity, it ensures
+	 * that no compiler-generated functions are accepted.
+	 *
+	 * For clustering of Java-based subject systems, it ensures that only entities
+	 * within the given package prefix are accepted.
+	 *
+	 * @param cluster The {@link Cluster} to tentatively add to this architecture.
+	 * @param language The language of the subject system.
+	 * @param packagePrefix The package prefix to be considered. Only used in
+	 *                      Java systems.
+	 */
 	private void addClusterConditionally(Cluster cluster, String language,
 			String packagePrefix) {
 		// If the source language is C or C++, add the only C-based entities
@@ -101,8 +179,19 @@ public class Architecture extends TreeMap<String, Cluster> {
 	//endregion
 
 	//region ACCESSORS
+	/**
+	 * Returns the total number of features present in this architecture.
+	 */
 	public int getNumFeatures() { return this.numFeatures; }
 
+	/**
+	 * Checks whether there exist any {@link Cluster} in this architecture with
+	 * size == 1, that is, a {@link Cluster} with only 1 entity. Useful for
+	 * some stopping criteria, as it indicates a {@link Cluster} which has not
+	 * yet been considered by the clustering process.
+	 *
+	 * @return True if any {@link Cluster} has only 1 entity, False otherwise.
+	 */
 	public boolean hasOrphans() {
 		for (Cluster c : this.values()) {
 			if (c.getNumEntities() == 1)
@@ -111,17 +200,32 @@ public class Architecture extends TreeMap<String, Cluster> {
 		return false;
 	}
 
+	/**
+	 * Adds the given {@link Cluster} to this architecture.
+	 */
 	public void add(Cluster c) {
 		this.put(c.getName(), c);
 	}
 
-	public void removeAll(Architecture arch) {
-		for (String key : arch.keySet())
+	/**
+	 * Removes the given {@link Cluster}s from this architecture. Primarily used
+	 * in pre-processing phases to remove unwanted entities from the analysis.
+	 *
+	 * @param clusters A map where the keys are the names of the {@link Cluster}s
+	 *                 to be removed.
+	 */
+	public void removeAll(Map<String, Cluster> clusters) {
+		for (String key : clusters.keySet())
 			this.remove(key);
 	}
 	//endregion
 
 	//region PROCESSING
+
+	/**
+	 * TODO
+	 * @return
+	 */
   public double computeStructuralClusterGain() {
 		List<Double> clusterCentroids = new ArrayList<>();
 
@@ -140,6 +244,11 @@ public class Architecture extends TreeMap<String, Cluster> {
 		return clusterGain;
 	}
 
+	/**
+	 * TODO
+	 * @param clusterCentroids
+	 * @return
+	 */
   private double computeStructuralGlobalCentroid(
 					List<Double> clusterCentroids) {
 		double centroidSum = 0;
@@ -150,6 +259,10 @@ public class Architecture extends TreeMap<String, Cluster> {
 		return centroidSum / clusterCentroids.size();
 	}
 
+	/**
+	 * TODO
+	 * @return
+	 */
   public double computeTopicClusterGain() {
 		List<DocTopicItem> docTopicItems = new ArrayList<>();
 		for (Cluster c : this.values())
@@ -173,6 +286,11 @@ public class Architecture extends TreeMap<String, Cluster> {
 	//endregion
 
 	//region SERIALIZATION
+	/**
+	 * Writes an RSF file representing this architecture. Uses this object's
+	 * {@link #projectPath} as the output location and its {@link #projectName}
+	 * to determine the name of the output file.
+	 */
 	public void writeToRsf() throws FileNotFoundException {
 		String fs = File.separator;
 		String path = this.projectPath + fs + this.projectName + "_"
@@ -180,6 +298,12 @@ public class Architecture extends TreeMap<String, Cluster> {
 		this.writeToRsf(path);
 	}
 
+	/**
+	 * Writes an RSF file representing this architecture to the provided path.
+	 *
+	 * @param path A {@link String} pointing to the output file path, including
+	 *             the desired output filename.
+	 */
 	public void writeToRsf(String path) throws FileNotFoundException {
 		File rsfFile = new File(path);
 		rsfFile.getParentFile().mkdirs();
@@ -200,6 +324,13 @@ public class Architecture extends TreeMap<String, Cluster> {
 		}
 	}
 
+	/**
+	 * Returns a map indexing the {@link Cluster}s of this architecture. Used in
+	 * serialization: as a {@link Cluster}'s name typically represents the names
+	 * of its comprising entities, a number is assigned to the {@link Cluster} as
+	 * a unique identifier. The names of the entities are broken down into
+	 * separate entries by the serialization method.
+	 */
 	private Map<Integer, String> computeArchitectureIndex() {
 		List<String> orderedClusterNames = this.values().stream()
 			.map(Cluster::getName).sorted().collect(Collectors.toList());

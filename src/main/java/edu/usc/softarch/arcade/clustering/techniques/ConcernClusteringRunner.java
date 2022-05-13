@@ -140,7 +140,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		removeClassesWithoutDTI(parentClassMap);
 		removeInnerClasses(oldParentClassMap);
 		
-		Architecture clustersWithMissingDocTopics =	new Architecture();
+		Map<String, Cluster> clustersWithMissingDocTopics =	new HashMap<>();
 		for (Cluster c : architecture.values())
 			if (!c.hasDocTopicItem())
 				clustersWithMissingDocTopics.put(c.getName(), c);
@@ -166,12 +166,12 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 
 	private void removeClassesWithoutDTI(Map<Cluster, Cluster> parentClassMap) {
 		// Locate non-inner classes without DTI
-		Architecture excessClusters = new Architecture();
+		Map<String, Cluster> excessClusters = new HashMap<>();
 		for (Cluster c : this.architecture.values())
 			if (!c.hasDocTopicItem() && !c.getName().contains("$"))
 				excessClusters.put(c.getName(), c);
 
-		Architecture excessInners = new Architecture();
+		Map<String, Cluster> excessInners = new HashMap<>();
 		// For each Child/Parent pair, if the parent is marked, mark the child
 		for (Map.Entry<Cluster, Cluster> entry : parentClassMap.entrySet()) {
 			Cluster child = entry.getKey();
