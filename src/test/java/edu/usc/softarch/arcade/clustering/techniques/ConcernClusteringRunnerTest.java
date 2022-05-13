@@ -60,25 +60,29 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_239_topics_209_arc_clusters.rsf",
+			+ "_239_topics_209_arc_clusters.rsf,"
+			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_284_topics_232_arc_clusters.rsf",
+			+ "_284_topics_232_arc_clusters.rsf,"
+			+ "org.apache.struts2",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_46_topics_71_arc_clusters.rsf",
+			+ "_46_topics_71_arc_clusters.rsf,"
+			+ "",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_50_topics_82_arc_clusters.rsf"
+			+ "_50_topics_82_arc_clusters.rsf,"
+			+ ""
 	})
 	public void ARCRecoveryTest(String systemVersion, String lang,
-			String arcFileSuffix) {
+			String arcFileSuffix, String packagePrefix) {
 		// Creating relevant path Strings
 		String sysDir = subjectSystemsDir + fs + systemVersion;
 		String sysResources = resourcesDir + fs + systemVersion;
@@ -88,7 +92,10 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		String resultClustersFile = outputDirPath + fs + systemVersion + arcFileSuffix;
 
 		assertDoesNotThrow(() ->
-			ConcernClusteringRunnerMock.runARC(lang, outputDirPath, sysDir, ffVecs, artifactsDir));
+			ConcernClusteringRunnerMock.runARC(lang, outputDirPath, sysDir, ffVecs,
+				artifactsDir, "preselected", 0,
+				"archsize", 100, systemVersion,
+				outputDirPath, packagePrefix));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of

@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,7 +13,7 @@ import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimData;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
-import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
+import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
@@ -21,53 +22,59 @@ import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #region INTERFACE ---------------------------------------------------------
-	/**
-	 * Entry point runner for ARC.
-	 *
-	 * args[0]: Language of the subject system, java or c.
-	 * args[1]: Path of the output directory to put the results in.
-	 * args[2]: Path to the subject system's root directory.
-	 * args[3]: Path to the FastFeatureVectors JSON file.
-	 * args[4]: Path to the directory with the mallet artifacts.
-	 *
-	 * @param args Arguments as per documentation above.
-	 */
 	public static void main(String[] args) throws IOException {
 		String language = args[0];
 		String outputDirPath = args[1];
 		String sysDirPath = args[2];
 		String ffVecsFilePath = args[3];
 		String artifactsDirPath = args[4];
+		String stoppingCriterionName = args[5];
+		int numClusters = Integer.parseInt(args[6]);
+		String serializationCriterionName = args[7];
+		int serializationCriterionVal = Integer.parseInt(args[8]);
+		String projectName = args[9];
+		String projectPath = args[10];
+		String packagePrefix = args[11];
 
 		runARC(language, outputDirPath, sysDirPath,
-			ffVecsFilePath, artifactsDirPath);
+			ffVecsFilePath, artifactsDirPath, stoppingCriterionName, numClusters,
+			serializationCriterionName, serializationCriterionVal, projectName,
+			projectPath, packagePrefix);
 	}
 
-	/**
-	 * Runs ARC.
-	 *
-	 * @param language Language of the subject system, java or c.
-	 * @param outputDirPath Path of the output directory to put the results in.
-	 * @param sysDirPath Path to the subject system's root directory.
-	 * @param ffVecsFilePath Path to the FastFeatureVectors JSON file.
-	 * @param artifactsDirPath Path to the directory with the mallet artifacts.
-	 */
 	public static void runARC(String language, String outputDirPath,
-		String sysDirPath, String ffVecsFilePath, String artifactsDirPath)
-		throws IOException {
+			String sysDirPath, String featureVecsFilePath, String artifactsDirPath,
+			String stoppingCriterionName, int numClusters,
+			String serializationCriterionName, int serializationCriterionVal,
+			String projectName, String projectPath, String packagePrefix)
+			throws IOException {
 		String revisionNumber = (new File(sysDirPath)).getName();
+
 		FeatureVectors ffVecs =
-			FeatureVectors.deserializeFFVectors(ffVecsFilePath);
+			FeatureVectors.deserializeFFVectors(featureVecsFilePath);
 		int numTopics = (int) (ffVecs.getNumSourceEntities() * 0.18);
 
+		Architecture arch = new Architecture(projectName, projectPath);
+
+		SerializationCriterion serializationCriterion =
+			SerializationCriterion.makeSerializationCriterion(
+				serializationCriterionName, serializationCriterionVal, arch);
+
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
-			ffVecs, artifactsDirPath, language);
-		int numClusters = (int) (runner.getArchitecture().size() * .20);
+			language, ffVecs, packagePrefix, serializationCriterion, arch,
+			artifactsDirPath);
+
+		// If no numClusters was provided
+		if (numClusters == 0)
+			numClusters = (int) (runner.getArchitecture().size() * .20);
+
+		StoppingCriterion stoppingCriterion =
+			StoppingCriterion.makeStoppingCriterion(stoppingCriterionName, runner,
+				numClusters);
 
 		try {
-			runner.computeArchitecture(
-				new PreSelectedStoppingCriterion(numClusters, runner),
-				"preselected", SimilarityMatrix.SimMeasure.JS);
+			runner.computeArchitecture(stoppingCriterion,
+				stoppingCriterionName, SimilarityMatrix.SimMeasure.JS);
 		} catch (DistributionSizeMismatchException e) {
 			e.printStackTrace(); //TODO Handle it
 		}
@@ -97,12 +104,21 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		initializeClusters();
 		initializeClusterDocTopics(artifactsDir);
 	}
+
+	public ConcernClusteringRunner(String language, FeatureVectors vectors,
+			String packagePrefix, SerializationCriterion serializationCriterion,
+			Architecture arch, String artifactsDir) {
+		super(language, vectors, packagePrefix, serializationCriterion, arch);
+		initializeClusters();
+		initializeClusterDocTopics(artifactsDir);
+	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	@Override
 	public Architecture computeArchitecture(
 			StoppingCriterion stoppingCriterion, String stopCriterion,
-			SimilarityMatrix.SimMeasure simMeasure) throws DistributionSizeMismatchException {
+			SimilarityMatrix.SimMeasure simMeasure)
+			throws DistributionSizeMismatchException, FileNotFoundException {
 		SimilarityMatrix simMatrix = initializeSimMatrix(simMeasure);
 
 		while (stoppingCriterion.notReadyToStop()) {
@@ -115,6 +131,11 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			Cluster newCluster = mergeClustersUsingTopics(data);
 			updateFastClustersAndSimMatrixToReflectMergedCluster(
 				data, newCluster, simMatrix);
+
+			if (super.serializationCriterion != null
+				&& super.serializationCriterion.shouldSerialize()) {
+				super.architecture.writeToRsf();
+			}
 		}
 
 		return super.architecture;
