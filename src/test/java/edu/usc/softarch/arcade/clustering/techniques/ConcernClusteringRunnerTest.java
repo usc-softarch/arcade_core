@@ -61,13 +61,13 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_239_topics_209_arc_clusters.rsf,"
+			+ "_239_topics_181_arc_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_284_topics_232_arc_clusters.rsf,"
+			+ "_284_topics_163_arc_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// httpd 2.3.8
@@ -96,7 +96,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 			ConcernClusteringRunnerMock.runARC(lang, outputDirPath, sysDir, ffVecs,
 				artifactsDir, "preselected", 0,
 				"archsize", 100, systemVersion,
-				outputDirPath, ""));
+				outputDirPath, packagePrefix));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of
@@ -144,12 +144,12 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_239_topics_209_arc_",
+			+ "_239_topics_181_arc_",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_284_topics_232_arc_",
+			+ "_284_topics_163_arc_",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
@@ -253,7 +253,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 			fail("failed to deserialize FastFeatureVectors from builder object");
 
 		Architecture arch = new Architecture(versionName, outputDirPath,
-			builderffVecs, language, "");
+			builderffVecs, language, packagePrefix);
 
 		SerializationCriterion serializationCriterion =
 			SerializationCriterion.makeSerializationCriterion(
@@ -367,7 +367,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		}
 
 		Architecture arch = new Architecture(versionName, outputDirPath,
-			builderffVecs, language, "");
+			builderffVecs, language, packagePrefix);
 
 		SerializationCriterion serializationCriterion =
 			SerializationCriterion.makeSerializationCriterion(
