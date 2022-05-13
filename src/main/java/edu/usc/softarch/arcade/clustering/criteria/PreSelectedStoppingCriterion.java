@@ -13,7 +13,7 @@ public class PreSelectedStoppingCriterion
 	}
 
 	public boolean notReadyToStop() {
-		return runner.architecture.size() != 1
-						&& runner.architecture.size() != numClusters;
+		return runner.getArchitecture().size() != 1
+						&& runner.getArchitecture().size() != numClusters;
 	}
 }

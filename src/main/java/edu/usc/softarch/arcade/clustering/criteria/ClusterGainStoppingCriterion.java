@@ -10,7 +10,7 @@ public class ClusterGainStoppingCriterion
 		this.runner = runner;	}
 
 	public boolean notReadyToStop() {
-		return runner.architecture.size() != 1
-			&& runner.architecture.size() != ClusteringAlgoRunner.numClustersAtMaxClusterGain;
+		return runner.getArchitecture().size() != 1
+			&& runner.getArchitecture().size() != ClusteringAlgoRunner.numClustersAtMaxClusterGain;
 	}
 }

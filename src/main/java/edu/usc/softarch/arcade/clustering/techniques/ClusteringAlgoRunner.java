@@ -13,7 +13,7 @@ import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
 public abstract class ClusteringAlgoRunner {
 	//region ATTRIBUTES
-	public Architecture architecture;
+	protected final Architecture architecture;
 	protected static double maxClusterGain = 0;
 	public static int numClustersAtMaxClusterGain = 0;
 	public static int numberOfEntitiesToBeClustered = 0;
@@ -23,14 +23,9 @@ public abstract class ClusteringAlgoRunner {
 
 	//region CONTRUCTORS
 	protected ClusteringAlgoRunner(String language,
-			SerializationCriterion serializationCriterion) {
+			SerializationCriterion serializationCriterion, Architecture arch) {
 		this.language = language;
 		this.serializationCriterion = serializationCriterion;
-	}
-
-	protected ClusteringAlgoRunner(String language,
-			SerializationCriterion serializationCriterion, Architecture arch) {
-		this(language, serializationCriterion);
 		this.architecture = arch;
 	}
 	//endregion
