@@ -1,7 +1,8 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
@@ -44,7 +45,8 @@ public class ConcernClusteringRunnerMock
 	}
 
 	@Override
-	protected SimilarityMatrix initializeSimMatrix(SimilarityMatrix.SimMeasure simMeasure)
+	protected SimilarityMatrix initializeSimMatrix(
+			SimMeasure.SimMeasureType simMeasure)
 			throws DistributionSizeMismatchException {
 		this.initialSimMatrix = super.initializeSimMatrix(simMeasure);
 		return new SimilarityMatrix(this.initialSimMatrix);

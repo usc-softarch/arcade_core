@@ -25,11 +25,11 @@ import edu.usc.softarch.arcade.topics.DocTopics;
 
 /**
  * Represents an architecture of clustered entities. An Architecture is a
- * specialization of a TreeMap&lt;{@link String}, {@link Cluster}&gt;, meaning
- * it is ordered by the names of its comprising {@link Cluster}s. This ensures
- * that all iterative operations done over an Architecture will follow the same
- * order, regardless of the order in which the Architecture was constructed,
- * i.e. the order of the clustering algorithm's inputs.
+ * specialization of a {@link TreeMap}&lt;{@link String}, {@link Cluster}&gt;,
+ * meaning it is ordered by the names of its comprising {@link Cluster}s. This
+ * ensures that all iterative operations done over an Architecture will follow
+ * the same order, regardless of the order in which the Architecture was
+ * constructed, i.e. the order of the clustering algorithm's inputs.
  */
 public class Architecture extends TreeMap<String, Cluster> {
 	//region ATTRIBUTES

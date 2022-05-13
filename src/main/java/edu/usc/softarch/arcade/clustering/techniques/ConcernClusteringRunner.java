@@ -10,8 +10,9 @@ import java.util.Map;
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
-import edu.usc.softarch.arcade.clustering.SimData;
-import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimData;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
@@ -25,7 +26,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	public static Architecture run(Architecture arch,
 			SerializationCriterion serialCrit, StoppingCriterion stopCrit,
 			String language, String stoppingCriterionName,
-			SimilarityMatrix.SimMeasure simMeasure, String outputDirPath,
+			SimMeasure.SimMeasureType simMeasure, String outputDirPath,
 			String sysDirPath, String artifactsDirPath)
 			throws IOException {
 		String revisionNumber = (new File(sysDirPath)).getName();
@@ -73,7 +74,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	@Override
 	public Architecture computeArchitecture(
 			StoppingCriterion stoppingCriterion, String stopCriterion,
-			SimilarityMatrix.SimMeasure simMeasure)
+			SimMeasure.SimMeasureType simMeasure)
 			throws DistributionSizeMismatchException, FileNotFoundException {
 		SimilarityMatrix simMatrix = initializeSimMatrix(simMeasure);
 
@@ -97,7 +98,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		return super.architecture;
 	}
 
-	protected SimilarityMatrix initializeSimMatrix(SimilarityMatrix.SimMeasure simMeasure)
+	protected SimilarityMatrix initializeSimMatrix(
+			SimMeasure.SimMeasureType simMeasure)
 			throws DistributionSizeMismatchException {
 		return new SimilarityMatrix(simMeasure, this.architecture);	}
 

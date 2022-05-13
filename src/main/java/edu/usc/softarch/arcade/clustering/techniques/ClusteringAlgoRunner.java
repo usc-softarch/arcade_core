@@ -7,8 +7,9 @@ import java.util.Map;
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
-import edu.usc.softarch.arcade.clustering.SimData;
-import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimData;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
@@ -99,7 +100,7 @@ public abstract class ClusteringAlgoRunner {
 		public final SerializationCriterion serialCrit;
 		public final StoppingCriterion stopCrit;
 		public final String stoppingCriterion;
-		public final SimilarityMatrix.SimMeasure simMeasure;
+		public final SimMeasure.SimMeasureType simMeasure;
 
 		public ClusteringAlgoArguments(String[] args) throws IOException {
 			this.language = args[1];
@@ -111,7 +112,7 @@ public abstract class ClusteringAlgoRunner {
 				args[3], Integer.parseInt(args[4]));
 			this.stoppingCriterion = args[3];
 			this.simMeasure =
-				SimilarityMatrix.SimMeasure.valueOf(args[5].toUpperCase());
+				SimMeasure.SimMeasureType.valueOf(args[5].toUpperCase());
 		}
 	}
 	//endregion
@@ -205,6 +206,6 @@ public abstract class ClusteringAlgoRunner {
 
 	public abstract Architecture computeArchitecture(
 		StoppingCriterion stoppingCriterion, String stopCriterion,
-		SimilarityMatrix.SimMeasure simMeasure)
+		SimMeasure.SimMeasureType simMeasure)
 		throws DistributionSizeMismatchException, FileNotFoundException;
 }

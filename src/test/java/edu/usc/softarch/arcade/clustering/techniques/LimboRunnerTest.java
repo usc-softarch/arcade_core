@@ -3,7 +3,8 @@ package edu.usc.softarch.arcade.clustering.techniques;
 import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
-import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -68,7 +69,7 @@ public class LimboRunnerTest extends BaseTest {
 
 		assertDoesNotThrow(() ->
 			LimboRunner.run(arch, serialCrit, stopCrit, lang,
-				"preselected", SimilarityMatrix.SimMeasure.IL));
+				"preselected", SimMeasure.SimMeasureType.IL));
 
 		// Load results
 		String result = assertDoesNotThrow(() ->

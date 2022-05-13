@@ -3,7 +3,8 @@ package edu.usc.softarch.arcade.clustering.techniques;
 import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
-import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -79,11 +80,11 @@ public class WcaRunnerTest extends BaseTest {
 
 		assertDoesNotThrow(() ->
 			WcaRunner.run(archUem, serialCritUem, stopCrit, lang,
-				"preselected", SimilarityMatrix.SimMeasure.UEM));
+				"preselected", SimMeasure.SimMeasureType.UEM));
 
 		assertDoesNotThrow(() ->
 			WcaRunner.run(archUemnm, serialCritUemnm, stopCrit, lang,
-				"preselected",	SimilarityMatrix.SimMeasure.UEMNM));
+				"preselected",	SimMeasure.SimMeasureType.UEMNM));
 
 		// Load uem results
 		String uemResult = assertDoesNotThrow(() ->

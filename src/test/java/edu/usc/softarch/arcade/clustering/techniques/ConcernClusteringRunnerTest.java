@@ -29,7 +29,8 @@ import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
-import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
@@ -107,7 +108,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 
 		assertDoesNotThrow(() ->
 			ConcernClusteringRunnerMock.run(arch, serialCrit, stopCrit, lang,
-				"preselected",	SimilarityMatrix.SimMeasure.JS,
+				"preselected",	SimMeasure.SimMeasureType.JS,
 				outputDirPath, sysDir, artifactsDir));
 
 		/* The expectation here is that this resulting clusters file has the same
@@ -395,7 +396,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 			// USING THE CLONE THAT TAKES IN THE VERSION NAME HERE
 			runner.computeArchitecture(
 				new PreSelectedStoppingCriterion(numClusters),
-				"preselected", SimilarityMatrix.SimMeasure.JS);
+				"preselected", SimMeasure.SimMeasureType.JS);
 		});
 
 		Architecture fastClustersAfterInit = runner.getArchitectureWithDocTopics();
