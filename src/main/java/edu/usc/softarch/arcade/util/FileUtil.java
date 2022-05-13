@@ -347,6 +347,9 @@ public class FileUtil {
 		File[] filesAndDirs = aStartingDir.listFiles();
 
 		for(File file : filesAndDirs) {
+			// Catch to ignore the taint from evil Mac users
+			if (file.getName().equals(".DS_Store")) continue;
+
 			if (extension == null)
 				result.addAll(getFile(file));
 			else if (file.getName().endsWith(extension))
