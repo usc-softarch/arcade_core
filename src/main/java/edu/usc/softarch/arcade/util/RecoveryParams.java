@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -93,8 +94,13 @@ public class RecoveryParams {
 		versionDirectories.removeIf((File file) -> !file.isDirectory());
 
 		for (File d : versionDirectories) {
-			File currentClassesDir = FileUtil.checkDir(d.getAbsolutePath() + fs
-				+ classesDirs, false, false);
+			File currentClassesDir = null;
+			try {
+				currentClassesDir = FileUtil.checkDir(d.getAbsolutePath() + fs
+					+ classesDirs, false, false);
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
 			if (!currentClassesDir.isDirectory()) {
 				logger.debug("Classes directory " + d.getAbsolutePath()
 					+ " does not exist!");

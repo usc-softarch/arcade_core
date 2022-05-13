@@ -20,7 +20,6 @@ import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import edu.usc.softarch.arcade.topics.CamelCaseSeparatorPipe;
 import edu.usc.softarch.arcade.topics.StemmerPipe;
-import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class PipeExtractor {
@@ -57,7 +56,7 @@ public class PipeExtractor {
 		
 		String testDir = args[0];
 		testDir = testDir.replaceFirst("^~",System.getProperty("user.home"));
-		for (File file : FileListing.getFileListing(new File(testDir))) {
+		for (File file : FileUtil.getFileListing(new File(testDir))) {
 			if (file.isFile() && file.getName().endsWith(".java")) {
 				String shortClassName = file.getName().replace(".java", "");
 				BufferedReader reader = new BufferedReader(new FileReader(file));

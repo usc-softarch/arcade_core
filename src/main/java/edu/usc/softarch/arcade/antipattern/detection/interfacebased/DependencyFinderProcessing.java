@@ -39,7 +39,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import edu.usc.softarch.arcade.antipattern.detection.StringMatrix;
-import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 /**
@@ -115,7 +114,7 @@ public class DependencyFinderProcessing {
 
 	private Set<File> loadDirFilterExtension(File dir, String extension) 
 			throws FileNotFoundException {
-		List<File> fileList = FileListing.getFileListing(dir);
+		List<File> fileList = FileUtil.getFileListing(dir);
 		fileList = FileUtil.sortFileListByVersion(fileList);
 		Set<File> result = new LinkedHashSet<>();
 		for (File file : fileList)
@@ -134,7 +133,7 @@ public class DependencyFinderProcessing {
 		for (File file : files) {
 			logger.debug(file.getName());
 			String version =
-				FileUtil.extractVersionFromFilename(versionSchemeExpr, file.getName());
+				FileUtil.extractVersion(versionSchemeExpr, file.getName());
 			if (version.equals(""))
 				throw new IOException("Could not extract version");
 			result.put(version, file.getAbsolutePath());
@@ -501,7 +500,7 @@ public class DependencyFinderProcessing {
 						if (temp == null)
 							temp = new JSONObject();
 						temp.put("Logical_Dependency", 1);
-						fileList.put(FileUtil.cutInnterClass(classname), temp);
+						fileList.put(FileUtil.cutInnerClass(classname), temp);
 					}
 				}
 			}
@@ -608,7 +607,7 @@ public class DependencyFinderProcessing {
 			if(temp == null)
 				temp = new JSONObject();
 			temp.put("Unused_Interface", 1);
-			fileList.put(FileUtil.cutInnterClass(classname), temp);
+			fileList.put(FileUtil.cutInnerClass(classname), temp);
 		}
 		// add all unused component to json
 		for (String unused : unsedCompSmell) {
@@ -618,7 +617,7 @@ public class DependencyFinderProcessing {
 				if(temp == null)
 					temp = new JSONObject();
 				temp.put("Unused_Comp", 1);
-				fileList.put(FileUtil.cutInnterClass(classname), temp);
+				fileList.put(FileUtil.cutInnerClass(classname), temp);
 			}
 		}
 	}
@@ -682,7 +681,7 @@ public class DependencyFinderProcessing {
 					if(temp == null)
 						temp = new JSONObject();
 					temp.put("Sloopy_Delegation", 1);
-					fileList.put(FileUtil.cutInnterClass(classname), temp);
+					fileList.put(FileUtil.cutInnerClass(classname), temp);
 				}
 		}
 		
@@ -744,7 +743,7 @@ public class DependencyFinderProcessing {
 					if(temp == null)
 						temp = new JSONObject();
 					temp.put(smellType, 1);
-					fileList.put(FileUtil.cutInnterClass(classname), temp);
+					fileList.put(FileUtil.cutInnerClass(classname), temp);
 				}
 			}
 		}
@@ -799,7 +798,7 @@ public class DependencyFinderProcessing {
 					if(temp == null)
 						temp = new JSONObject();
 					temp.put("Clone_Comp", 1);
-					file_list.put(FileUtil.cutInnterClass(classname), temp);
+					file_list.put(FileUtil.cutInnerClass(classname), temp);
 				}
 			}
 		}

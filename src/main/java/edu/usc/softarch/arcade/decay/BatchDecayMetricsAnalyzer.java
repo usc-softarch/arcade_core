@@ -12,7 +12,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchDecayMetricsAnalyzer {
@@ -26,8 +25,8 @@ public class BatchDecayMetricsAnalyzer {
 		// Directory containing all deps rsf files
 		String depsDir = FileUtil.tildeExpandPath(args[1]);
 		
-		List<File> clusterFiles = FileListing.getFileListing(new File(clustersDir));
-		List<File> depsFiles = FileListing.getFileListing(new File(depsDir));
+		List<File> clusterFiles = FileUtil.getFileListing(new File(clustersDir));
+		List<File> depsFiles = FileUtil.getFileListing(new File(depsDir));
 		
 		clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
 		
@@ -36,12 +35,12 @@ public class BatchDecayMetricsAnalyzer {
 		String versionSchemeExpr = "[0-9]+\\.[0-9]+(\\.[0-9]+)*";
 		for (File clusterFile : clusterFiles) {
 			if (clusterFile.getName().endsWith(".rsf")) {
-				String clusterVersion = FileUtil.extractVersionFromFilename(versionSchemeExpr, clusterFile.getName());
+				String clusterVersion = FileUtil.extractVersion(versionSchemeExpr, clusterFile.getName());
 				
 				// Identify appropriate deps file version
 				for (File depsFile : depsFiles) {
 					if (depsFile.getName().endsWith(".rsf")) {
-						String depsVersion = FileUtil.extractVersionFromFilename(versionSchemeExpr, depsFile.getName());
+						String depsVersion = FileUtil.extractVersion(versionSchemeExpr, depsFile.getName());
 						if (clusterVersion.equals(depsVersion)) {
 							String[] dmaArgs = {clusterFile.getAbsolutePath(),depsFile.getAbsolutePath()};
 							DecayMetricAnalyzer.main(dmaArgs);

@@ -21,7 +21,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class DecayMetricAnalyzerTest {
@@ -37,10 +36,10 @@ public class DecayMetricAnalyzerTest {
     if (resultStats != null) return resultStats;
 
     List<File> clusterFiles = assertDoesNotThrow(() -> {
-      return FileListing.getFileListing(new File(clusterDir));
+      return FileUtil.getFileListing(new File(clusterDir));
     });
     List<File> depsFiles = assertDoesNotThrow(() -> {
-      return FileListing.getFileListing(new File(depDir));
+      return FileUtil.getFileListing(new File(depDir));
     });
   
     clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
@@ -49,11 +48,11 @@ public class DecayMetricAnalyzerTest {
 
     for (File clusterFile : clusterFiles) {
       if (!clusterFile.getName().endsWith(".rsf")) continue;
-      String clusterVersion = FileUtil.extractVersionFromFilename(versionSchemeExpr, clusterFile.getName());
+      String clusterVersion = FileUtil.extractVersion(versionSchemeExpr, clusterFile.getName());
       
       for (File depsFile : depsFiles) {
         if (!depsFile.getName().endsWith(".rsf"))	continue;
-        String depsVersion = FileUtil.extractVersionFromFilename(versionSchemeExpr, depsFile.getName());
+        String depsVersion = FileUtil.extractVersion(versionSchemeExpr, depsFile.getName());
 
         // Identify appropriate deps file version
         if (clusterVersion.equals(depsVersion)) {

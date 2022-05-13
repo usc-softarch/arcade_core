@@ -22,7 +22,6 @@ import com.thoughtworks.xstream.XStream;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
-import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.MapUtil;
 
@@ -37,7 +36,7 @@ public class SmellToIssuesCorrelation {
 		// location of the version2issuecountmap.obj file
 		String issuesCountMapFilename = args[1];
 		
-		List<File> fileList = FileListing.getFileListing(new File(FileUtil.tildeExpandPath(inputDirFilename)));
+		List<File> fileList = FileUtil.getFileListing(new File(FileUtil.tildeExpandPath(inputDirFilename)));
 		Set<File> orderedSerFiles = new TreeSet<>();
 		for (File file : fileList)
 			if (file.getName().endsWith(".ser"))

@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 
 import com.thoughtworks.xstream.XStream;
 
-import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.MapUtil;
 
@@ -28,7 +27,7 @@ public class IssuesAnalyzer {
 		// The directory where the serialized issue files are stored
 		String issuesDir = args[0];
 		
-		List<File> filesList = FileListing.getFileListing(new File(FileUtil.tildeExpandPath(issuesDir)));
+		List<File> filesList = FileUtil.getFileListing(new File(FileUtil.tildeExpandPath(issuesDir)));
 		
 		List<Issue> allIssues = new ArrayList<>();
 		for (File file : filesList) {

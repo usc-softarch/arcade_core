@@ -15,34 +15,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.usc.softarch.arcade.BaseTest;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
-public class MoJoEvolutionAnalyzerTest {
-  private static Map<String, Map<String, Double>> results = new HashMap<>();
-  private static Map<String, Map<String, Double>> oracles = new HashMap<>();
-  private static Map<String, List<String>> files = new HashMap<>();
+public class MoJoEvolutionAnalyzerTest extends BaseTest {
+	/**
+	 * Maps a _clusters.rsf to a map of MoJo results.
+	 */
+  private static final Map<String, Map<String, Double>> results = new HashMap<>();
+  private static final Map<String, Map<String, Double>> oracles = new HashMap<>();
+  private static final Map<String, List<String>> files = new HashMap<>();
 
   public static Map<String, Double> setUp(String clustersDir) {
+		// Short-circuit if the results already exist
     Map<String, Double> mojoMap = results.get(clustersDir);
     if (mojoMap != null) return mojoMap;
 
-    // Map to mojoFmValues and associated cluster files
+    // Map to MoJoFmValues and associated cluster files
     mojoMap = new HashMap<>();
     results.put(clustersDir, mojoMap);
 
     // Copied from MoJoEvolutionAnalyzer.main()
     List<File> clusterFiles = null;
     try {
-      clusterFiles = FileListing.getFileListing(new File(FileUtil.tildeExpandPath(clustersDir)));
+      clusterFiles = FileUtil.getFileListing(new File(FileUtil.tildeExpandPath(clustersDir)));
     } catch (FileNotFoundException e) {
       e.printStackTrace();
       fail("cluster files directory does not exist");
     }
+
     // FileUtil.sortFileListByVersion sorts the list by the versioning scheme found in the filename
     clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
     // Only testing comparison distance of 1
@@ -117,12 +122,13 @@ public class MoJoEvolutionAnalyzerTest {
     return oracleMojoMap;
   }
 
+	/**
+	 * TODO
+	 * @param clusters Directory with _clusters.rsf files.
+	 * @param oracleFile Path to the oracle file.
+	 */
   @ParameterizedTest
   @CsvSource({
-    /** Test parameters **/
-    // [directory with clusters rsf files]
-    // [oracle file path]
-    
     // Struts2 (acdc)
     ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///Struts2///acdc_clusters,"
     + ".///src///test///resources///MoJoEvolutionAnalyzerTest_resources///oracles///struts2_acdc_mojo_oracle.txt",

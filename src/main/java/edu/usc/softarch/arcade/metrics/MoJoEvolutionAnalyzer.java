@@ -10,7 +10,6 @@ import mojo.MoJoCalculator;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import edu.usc.softarch.arcade.util.FileListing;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class MoJoEvolutionAnalyzer {
@@ -18,7 +17,7 @@ public class MoJoEvolutionAnalyzer {
 		// File containing only containing recovered architectures stored as rsf files
 		String clusterFilesDir = args[0];
 
-		List<File> clusterFiles = FileListing.getFileListing(new File(FileUtil
+		List<File> clusterFiles = FileUtil.getFileListing(new File(FileUtil
 				.tildeExpandPath(clusterFilesDir)));
 		// FileUtil.sortFileListByVersion sorts the list by the versioning
 		// scheme found in the filename
