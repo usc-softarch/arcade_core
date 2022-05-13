@@ -4,7 +4,7 @@
   <groupId>edu.usc.softarch.arcade</groupId>
   <artifactId>arcade_core</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.7</version>
+  <version>1.0.0</version>
   <name>arcade_core</name>
   <url>https://github.com/usc-softarch/arcade_core</url>
   <properties>
