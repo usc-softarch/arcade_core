@@ -11,8 +11,9 @@ import java.util.Objects;
  * Represents a topic's prevalence in a document.
  */
 public class TopicItem implements Serializable, Comparable<TopicItem> {
-	//region FIELDS
+	//region ATTRIBUTES
 	private static final long serialVersionUID = 4599518018739063447L;
+
 	/**
 	 * Topic number that this TopicItem is related to.
 	 */

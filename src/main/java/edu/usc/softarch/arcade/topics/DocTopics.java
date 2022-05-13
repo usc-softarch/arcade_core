@@ -46,7 +46,7 @@ public class DocTopics {
 			new File(artifactsDir + fs + "infer.mallet"));
 
 		for (int instIndex = 0; instIndex < previousInstances.size(); instIndex++) {
-			DocTopicItem dtItem = new DocTopicItem(instIndex,
+			DocTopicItem dtItem = new DocTopicItem(
 				(String) previousInstances.get(instIndex).getName());
 
 			double[] topicDistribution = 

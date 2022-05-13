@@ -18,48 +18,56 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+/**
+ * The set of {@link TopicItem}s in a document. A document represents a cluster.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DocTopicItem implements Serializable {
-	//region FIELDS
+	//region ATTRIBUTES
 	private static final long serialVersionUID = 5162975838519632395L;
-	
-	public final int doc;
+
+	/**
+	 * Source entities that make up this DocTopicItem.
+	 */
 	public final String source;
+	/**
+	 * Set of {@link TopicItem}s in this document.
+	 */
 	private Map<Integer, TopicItem> topics;
-	//endregion FIELDS
+	//endregion
 	
 	//region CONSTRUCTORS
+	/**
+	 * Default constructor for DocTopicItems.
+	 *
+	 * @param source The source entity of this DocTopicItem.
+	 */
 	@JsonCreator
-	public DocTopicItem(@JsonProperty("doc") int doc,
-											@JsonProperty("source") String source) {
-		this.doc = doc;
+	public DocTopicItem(@JsonProperty("source") String source) {
 		this.source = source;
 		this.topics = new HashMap<>();
 	}
 	
 	/**
-	 * Clone contructor
+	 * Clone contructor.
 	 */
 	public DocTopicItem(DocTopicItem dti) {
-		this.doc = dti.doc;
 		this.source = dti.source;
 		initialize(dti);
 	}
 
 	/**
-	 * Merge constructor
+	 * Merge constructor.
 	 */
 	public DocTopicItem(DocTopicItem dti1, DocTopicItem dti2)
 			throws UnmatchingDocTopicItemsException {
 		// If either argument is null, then return the non-null argument
 		if (dti1 == null) {
-			this.doc = dti2.doc;
 			this.source = dti2.source;
 			initialize(dti2);
 			return;
 		}
 		if (dti2 == null) {
-			this.doc = dti1.doc;
 			this.source = dti1.source;
 			initialize(dti1);
 			return;
@@ -70,7 +78,6 @@ public class DocTopicItem implements Serializable {
 			throw new UnmatchingDocTopicItemsException(
 				"In mergeDocTopicItems, nonmatching docTopicItems");
 
-		this.doc = dti1.doc;
 		this.source = dti1.source;
 		this.topics = new HashMap<>();
 		Set<Integer> topicNumbers = dti1.getTopicNumbers();
@@ -83,7 +90,7 @@ public class DocTopicItem implements Serializable {
 	}
 
 	/**
-	 * Initialize clone
+	 * Initializes a clone.
 	 */
 	public void initialize(DocTopicItem dti) {
 		this.topics = new HashMap<>();
@@ -93,21 +100,54 @@ public class DocTopicItem implements Serializable {
 	//endregion
 
 	//region ACCESSORS
+
+	/**
+	 * Gets a copy of the {@link TopicItem}s in this DocTopicItem.
+	 */
 	@JsonIgnore
 	public List<TopicItem> getTopics() {
 		return new ArrayList<>(topics.values()); }
+
+	/**
+	 * Gets the original map of {@link TopicItem}s in this DocTopicItem. Meant
+	 * ONLY for use with Jackson JSON serialization.
+	 */
 	public Map<Integer, TopicItem> getTopicsForJackson() {
+		//TODO Find a better way to do this
 		return this.topics;
 	}
+
+	/**
+	 * Get the quantity of {@link TopicItem}s in this DocTopicItem.
+	 */
 	public int size() { return this.topics.size(); }
+
+	/**
+	 * Gets a {@link TopicItem} by its {@link TopicItem#topicNum}.
+	 */
 	public TopicItem getTopic(int topicNum) { return this.topics.get(topicNum); }
+
+	/**
+	 * Verifies whether this DocTopicItem contains the given {@link TopicItem}.
+	 */
 	public boolean hasTopic(int topicNum) { return topics.containsKey(topicNum); }
+
+	/**
+	 * Gets the {@link TopicItem#topicNum}s of all {@link TopicItem}s in this
+	 * DocTopicItem.
+	 */
 	@JsonIgnore
 	public Set<Integer> getTopicNumbers() { return this.topics.keySet(); }
 
+	/**
+	 * Adds the given {@link TopicItem} to this DocTopicItem.
+	 */
 	public TopicItem addTopic(TopicItem topic) {
 		return this.topics.put(topic.topicNum, topic); }
 
+	/**
+	 * Verifies whether this DocTopicItem is based on a C source entity.
+	 */
 	@JsonIgnore
 	public boolean isCSourced() {
 		return source.endsWith(".c") || source.endsWith(".h")
@@ -117,6 +157,11 @@ public class DocTopicItem implements Serializable {
 			|| source.endsWith(".ia");
 	}
 
+	/**
+	 * Verifies whether this DocTopicItem has the same {@link TopicItem}s as the
+	 * provided DocTopicItem. Only checks their {@link TopicItem#topicNum}, not
+	 * the {@link TopicItem#proportion}.
+	 */
 	public boolean hasSameTopics(DocTopicItem dti) {
 		if (dti.size() != this.size())
 			return false;
@@ -128,6 +173,13 @@ public class DocTopicItem implements Serializable {
 		return true;
 	}
 
+	/**
+	 * Returns the Jensen-Shannon divergence between the distributions of this
+	 * DocTopicItem and the provided DocTopicItem.
+	 *
+	 * @throws DistributionSizeMismatchException If the two DocTopicItems have
+	 * 		different sets of {@link TopicItem}s.
+	 */
 	public double getJsDivergence(DocTopicItem toCompare)
 			throws DistributionSizeMismatchException {
 		// Error due to size mismatch
@@ -155,7 +207,7 @@ public class DocTopicItem implements Serializable {
 	public String toString() {
 		List<TopicItem> values =
 			getTopics().stream().sorted().collect(Collectors.toList());
-		StringBuilder dtItemStr = new StringBuilder("[" + doc + "," + source + ",");
+		StringBuilder dtItemStr = new StringBuilder("[" + source + ",");
 	
 		for (TopicItem t : values)
 			dtItemStr.append(t);
@@ -171,13 +223,12 @@ public class DocTopicItem implements Serializable {
 
 		DocTopicItem that = (DocTopicItem) o;
 
-		return this.doc == that.doc
-			&& Objects.equals(this.source, that.source)
+		return Objects.equals(this.source, that.source)
 			&& Objects.equals(getTopics(), that.getTopics());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(doc, source, topics);	}
+		return Objects.hash(source, topics); }
 	//endregion
 }

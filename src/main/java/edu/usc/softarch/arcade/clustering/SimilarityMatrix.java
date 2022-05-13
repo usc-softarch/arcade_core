@@ -34,12 +34,13 @@ public class SimilarityMatrix {
 	 * the processing time savings is significant. */
 	private final TreeSet<SimData> fastSimMatrix;
 	public final SimMeasure simMeasure;
+	public final int numFeatures;
 	//endregion
 
 	//region CONSTRUCTORS
 	public SimilarityMatrix(SimMeasure simMeasure, Architecture architecture)
 			throws DistributionSizeMismatchException {
-		this(simMeasure);
+		this(simMeasure, architecture.getNumFeatures());
 
 		for (Cluster cluster : architecture.values())
 			this.addCluster(cluster);
@@ -50,6 +51,7 @@ public class SimilarityMatrix {
 	 */
 	public SimilarityMatrix(SimilarityMatrix toClone) {
 		this.simMeasure = toClone.simMeasure;
+		this.numFeatures = toClone.numFeatures;
 
 		// Because SimData is immutable, no cloning is required
 		this.fastSimMatrix = new TreeSet<>(toClone.fastSimMatrix);
@@ -67,10 +69,11 @@ public class SimilarityMatrix {
 	/**
 	 * Deserialization constructor.
 	 */
-	private SimilarityMatrix(SimMeasure simMeasure) {
+	private SimilarityMatrix(SimMeasure simMeasure, int numFeatures) {
 		this.simMatrix = new HashMap<>();
 		this.fastSimMatrix = new TreeSet<>();
 		this.simMeasure = simMeasure;
+		this.numFeatures = numFeatures;
 	}
 	//endregion
 
@@ -132,17 +135,19 @@ public class SimilarityMatrix {
 					row.docTopicItem.getJsDivergence(col.docTopicItem), cellSize);
 			case SCM:
 				return new SimData(row, col,
-					FastSimCalcUtil.getStructAndConcernMeasure(row, col), cellSize);
+					FastSimCalcUtil.getStructAndConcernMeasure(
+						row, col, this.numFeatures), cellSize);
 			case UEM:
 				return new SimData(row, col,
 					FastSimCalcUtil.getUnbiasedEllenbergMeasure(row, col), cellSize);
 			case UEMNM:
 				return new SimData(row, col,
-					FastSimCalcUtil.getUnbiasedEllenbergMeasureNM(row, col), cellSize);
+					FastSimCalcUtil.getUnbiasedEllenbergMeasureNM(
+						row, col, this.numFeatures), cellSize);
 			case IL:
 				return new SimData(row, col,
-					FastSimCalcUtil.getInfoLossMeasure(numberOfEntitiesToBeClustered, row, col),
-					cellSize);
+					FastSimCalcUtil.getInfoLossMeasure(
+						numberOfEntitiesToBeClustered, row, col, numFeatures), cellSize);
 		}
 
 		throw new IllegalArgumentException("Invalid similarity measure: " + simMeasure);
@@ -215,6 +220,7 @@ public class SimilarityMatrix {
 	//region SERIALIZATION
 	public void serialize(JsonGenerator generator) throws IOException {
 		generator.writeStringField("simMeas", simMeasure.toString());
+		generator.writeNumberField("numFeatures", this.numFeatures);
 
 		generator.writeArrayFieldStart("simData");
 		for (SimData simData : fastSimMatrix) {
@@ -230,8 +236,10 @@ public class SimilarityMatrix {
 			throws IOException {
 		parser.nextToken();
 		String simMeasureString = parser.nextTextValue();
+		parser.nextToken();
+		int numFeatures = parser.nextIntValue(0);
 		SimilarityMatrix newSimMatrix = new SimilarityMatrix(
-			SimMeasure.valueOf(simMeasureString));
+			SimMeasure.valueOf(simMeasureString), numFeatures);
 		Map<Integer, Cluster> hashArchitecture = new HashMap<>();
 		for (Entry<String, Cluster> entry : architecture.entrySet())
 			hashArchitecture.put(entry.getKey().hashCode(), entry.getValue());

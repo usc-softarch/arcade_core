@@ -19,7 +19,6 @@
               <string>org.apache.struts2.el.parser.AstValue</string>
             </entities>
             <docTopicItem>
-              <doc>1450</doc>
               <source>org.apache.struts2.el.parser.AstValue</source>
               <topics>
                 <entry>
@@ -844,7 +843,6 @@
               <string>org.apache.struts2.el.parser.ELParser</string>
             </entities>
             <docTopicItem>
-              <doc>1452</doc>
               <source>org.apache.struts2.el.parser.ELParser</source>
               <topics>
                 <entry>
@@ -1669,7 +1667,6 @@
               <string>org.apache.struts2.portlet.servlet.PortletServletOutputStream</string>
             </entities>
             <docTopicItem>
-              <doc>1815</doc>
               <source>org.apache.struts2.portlet.servlet.PortletServletOutputStream</source>
               <topics>
                 <entry>
@@ -2494,7 +2491,6 @@
               <string>org.apache.struts2.views.jsp.ui.UpDownSelectTag</string>
             </entities>
             <docTopicItem>
-              <doc>820</doc>
               <source>org.apache.struts2.views.jsp.ui.UpDownSelectTag</source>
               <topics>
                 <entry>
@@ -3319,7 +3315,6 @@
               <string>org.apache.struts2.util.tomcat.buf.Ascii</string>
             </entities>
             <docTopicItem>
-              <doc>695</doc>
               <source>org.apache.struts2.util.tomcat.buf.Ascii</source>
               <topics>
                 <entry>
@@ -4144,7 +4139,6 @@
               <string>org.apache.struts2.util.tomcat.buf.B2CConverter</string>
             </entities>
             <docTopicItem>
-              <doc>696</doc>
               <source>org.apache.struts2.util.tomcat.buf.B2CConverter</source>
               <topics>
                 <entry>
@@ -4969,7 +4963,6 @@
               <string>org.apache.struts2.jasper.xmlparser.EncodingMap</string>
             </entities>
             <docTopicItem>
-              <doc>1568</doc>
               <source>org.apache.struts2.jasper.xmlparser.EncodingMap</source>
               <topics>
                 <entry>
@@ -5794,7 +5787,6 @@
               <string>org.apache.struts2.jasper.compiler.ErrorDispatcher</string>
             </entities>
             <docTopicItem>
-              <doc>1478</doc>
               <source>org.apache.struts2.jasper.compiler.ErrorDispatcher</source>
               <topics>
                 <entry>
@@ -6621,7 +6613,6 @@
               <string>org.apache.struts2.views.gxp.AbstractGxp</string>
             </entities>
             <docTopicItem>
-              <doc>1675</doc>
               <source>org.apache.struts2.json.JSONWriter</source>
               <topics>
                 <entry>
@@ -7446,7 +7437,6 @@
               <string>org.apache.struts2.jasper.xmlparser.XMLEncodingDetector</string>
             </entities>
             <docTopicItem>
-              <doc>1575</doc>
               <source>org.apache.struts2.jasper.xmlparser.XMLEncodingDetector</source>
               <topics>
                 <entry>
@@ -8271,7 +8261,6 @@
               <string>org.apache.struts2.el.parser.SimpleCharStream</string>
             </entities>
             <docTopicItem>
-              <doc>1460</doc>
               <source>org.apache.struts2.el.parser.SimpleCharStream</source>
               <topics>
                 <entry>
@@ -9096,7 +9085,6 @@
               <string>org.apache.struts2.components.Component</string>
             </entities>
             <docTopicItem>
-              <doc>505</doc>
               <source>org.apache.struts2.components.Component</source>
               <topics>
                 <entry>
@@ -9921,7 +9909,6 @@
               <string>org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper</string>
             </entities>
             <docTopicItem>
-              <doc>600</doc>
               <source>org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper</source>
               <topics>
                 <entry>
@@ -10755,7 +10742,6 @@
               <string>org.apache.struts2.jasper.util.Enumerator</string>
             </entities>
             <docTopicItem>
-              <doc>1612</doc>
               <source>org.apache.struts2.views.java.simple.FieldErrorHandler</source>
               <topics>
                 <entry>
@@ -11581,7 +11567,6 @@
               <string>org.apache.struts2.components.OptionTransferSelect</string>
             </entities>
             <docTopicItem>
-              <doc>811</doc>
               <source>org.apache.struts2.views.jsp.ui.OptionTransferSelectTag</source>
               <topics>
                 <entry>
@@ -12407,7 +12392,6 @@
               <string>org.apache.struts2.components.ServletUrlRenderer</string>
             </entities>
             <docTopicItem>
-              <doc>1786</doc>
               <source>org.apache.struts2.components.PortletUrlRenderer</source>
               <topics>
                 <entry>
@@ -13233,7 +13217,6 @@
               <string>org.apache.struts2.views.jsp.iterator.SortIteratorTag</string>
             </entities>
             <docTopicItem>
-              <doc>1431</doc>
               <source>org.apache.struts2.el.parser.AstFunction</source>
               <topics>
                 <entry>
@@ -14045,7 +14028,6 @@
               <string>org.apache.struts2.el.parser.AstIdentifier</string>
             </entities>
             <docTopicItem>
-              <doc>1434</doc>
               <source>org.apache.struts2.el.parser.AstIdentifier</source>
               <topics>
                 <entry>
@@ -14859,7 +14841,6 @@
               <string>org.apache.struts2.views.jsp.ui.AbstractDoubleListTag</string>
             </entities>
             <docTopicItem>
-              <doc>787</doc>
               <source>org.apache.struts2.views.jsp.ui.AbstractDoubleListTag</source>
               <topics>
                 <entry>
@@ -15671,7 +15652,6 @@
               <string>org.apache.struts2.views.jsp.ui.AbstractListTag</string>
             </entities>
             <docTopicItem>
-              <doc>788</doc>
               <source>org.apache.struts2.views.jsp.ui.AbstractListTag</source>
               <topics>
                 <entry>
@@ -16483,7 +16463,6 @@
               <string>org.apache.struts2.portlet.servlet.PortletServletContext</string>
             </entities>
             <docTopicItem>
-              <doc>1813</doc>
               <source>org.apache.struts2.portlet.servlet.PortletServletContext</source>
               <topics>
                 <entry>
@@ -17295,7 +17274,6 @@
               <string>org.apache.struts2.portlet.servlet.PortletServletRequestDispatcher</string>
             </entities>
             <docTopicItem>
-              <doc>1817</doc>
               <source>org.apache.struts2.portlet.servlet.PortletServletRequestDispatcher</source>
               <topics>
                 <entry>
@@ -18109,7 +18087,6 @@
               <string>org.apache.struts2.views.xslt.ProxyAttrAdapter</string>
             </entities>
             <docTopicItem>
-              <doc>870</doc>
               <source>org.apache.struts2.views.xslt.AbstractAdapterElement</source>
               <topics>
                 <entry>
@@ -18921,7 +18898,6 @@
               <string>org.apache.struts2.rest.DefaultHttpHeaders</string>
             </entities>
             <docTopicItem>
-              <doc>1840</doc>
               <source>org.apache.struts2.rest.DefaultHttpHeaders</source>
               <topics>
                 <entry>
@@ -19733,7 +19709,6 @@
               <string>org.apache.struts2.views.xslt.AbstractAdapterNode</string>
             </entities>
             <docTopicItem>
-              <doc>871</doc>
               <source>org.apache.struts2.views.xslt.AbstractAdapterNode</source>
               <topics>
                 <entry>
@@ -20548,7 +20523,6 @@
               <string>org.apache.struts2.jasper.xmlparser.ParserUtils</string>
             </entities>
             <docTopicItem>
-              <doc>884</doc>
               <source>org.apache.struts2.views.xslt.SimpleAdapterDocument</source>
               <topics>
                 <entry>
@@ -21362,7 +21336,6 @@
               <string>org.apache.struts2.el.parser.JJTELParserState</string>
             </entities>
             <docTopicItem>
-              <doc>1456</doc>
               <source>org.apache.struts2.el.parser.JJTELParserState</source>
               <topics>
                 <entry>
@@ -22179,7 +22152,6 @@
               <string>org.apache.struts2.jasper.compiler.Dumper</string>
             </entities>
             <docTopicItem>
-              <doc>1679</doc>
               <source>org.apache.struts2.json.SerializationParams</source>
               <topics>
                 <entry>
@@ -22991,7 +22963,6 @@
               <string>org.apache.struts2.json.JSONCleaner</string>
             </entities>
             <docTopicItem>
-              <doc>1667</doc>
               <source>org.apache.struts2.json.JSONCleaner</source>
               <topics>
                 <entry>
@@ -23804,7 +23775,6 @@
               <string>org.apache.struts2.components.Date</string>
             </entities>
             <docTopicItem>
-              <doc>508</doc>
               <source>org.apache.struts2.components.Date</source>
               <topics>
                 <entry>
@@ -24617,7 +24587,6 @@
               <string>org.apache.struts2.components.I18n</string>
             </entities>
             <docTopicItem>
-              <doc>523</doc>
               <source>org.apache.struts2.components.I18n</source>
               <topics>
                 <entry>
@@ -25430,7 +25399,6 @@
               <string>org.apache.struts2.components.InputTransferSelect</string>
             </entities>
             <docTopicItem>
-              <doc>807</doc>
               <source>org.apache.struts2.views.jsp.ui.InputTransferSelectTag</source>
               <topics>
                 <entry>
@@ -26244,7 +26212,6 @@
               <string>org.apache.struts2.views.jsp.ui.PasswordTag</string>
             </entities>
             <docTopicItem>
-              <doc>535</doc>
               <source>org.apache.struts2.components.Password</source>
               <topics>
                 <entry>
@@ -27059,7 +27026,6 @@
               <string>org.apache.struts2.views.xslt.ArrayAdapter</string>
             </entities>
             <docTopicItem>
-              <doc>873</doc>
               <source>org.apache.struts2.views.xslt.AdapterNode</source>
               <topics>
                 <entry>
@@ -27871,7 +27837,6 @@
               <string>org.apache.struts2.views.xslt.BeanAdapter</string>
             </entities>
             <docTopicItem>
-              <doc>875</doc>
               <source>org.apache.struts2.views.xslt.BeanAdapter</source>
               <topics>
                 <entry>
@@ -28683,7 +28648,6 @@
               <string>org.apache.struts2.views.xslt.ProxyNodeAdapter</string>
             </entities>
             <docTopicItem>
-              <doc>881</doc>
               <source>org.apache.struts2.views.xslt.ProxyNodeAdapter</source>
               <topics>
                 <entry>
@@ -29495,7 +29459,6 @@
               <string>org.apache.struts2.sitegraph.model.SubGraph</string>
             </entities>
             <docTopicItem>
-              <doc>1876</doc>
               <source>org.apache.struts2.sitegraph.model.SubGraph</source>
               <topics>
                 <entry>
@@ -30309,7 +30272,6 @@
               <string>org.apache.struts2.osgi.StrutsOsgiListener</string>
             </entities>
             <docTopicItem>
-              <doc>1750</doc>
               <source>org.apache.struts2.osgi.OsgiHostFactory</source>
               <topics>
                 <entry>
@@ -31121,7 +31083,6 @@
               <string>org.apache.struts2.sitegraph.renderers.DOTRenderer</string>
             </entities>
             <docTopicItem>
-              <doc>1878</doc>
               <source>org.apache.struts2.sitegraph.renderers.DOTRenderer</source>
               <topics>
                 <entry>
@@ -32301,7 +32262,6 @@
               <string>org.apache.struts2.views.xslt.ServletURIResolver</string>
             </entities>
             <docTopicItem>
-              <doc>1837</doc>
               <source>org.apache.struts2.rest.ContentTypeHandlerManager</source>
               <topics>
                 <entry>
@@ -33113,7 +33073,6 @@
               <string>org.apache.struts2.tiles.StrutsTilesAnnotationProcessor</string>
             </entities>
             <docTopicItem>
-              <doc>1908</doc>
               <source>org.apache.struts2.tiles.StrutsTilesAnnotationProcessor</source>
               <topics>
                 <entry>
@@ -33925,7 +33884,6 @@
               <string>org.apache.struts2.JSPRuntime</string>
             </entities>
             <docTopicItem>
-              <doc>1579</doc>
               <source>org.apache.struts2.JSPRuntime</source>
               <topics>
                 <entry>
@@ -34782,7 +34740,6 @@
               <string>org.apache.struts2.jasper.EmbeddedServletOptions</string>
             </entities>
             <docTopicItem>
-              <doc>1550</doc>
               <source>org.apache.struts2.jasper.servlet.JspServletWrapper</source>
               <topics>
                 <entry>
@@ -35594,7 +35551,6 @@
               <string>org.apache.struts2.tiles.StrutsTilesContainerFactory</string>
             </entities>
             <docTopicItem>
-              <doc>1909</doc>
               <source>org.apache.struts2.tiles.StrutsTilesContainerFactory</source>
               <topics>
                 <entry>
@@ -36540,7 +36496,6 @@
               <string>org.apache.struts2.config_browser.ShowValidatorAction</string>
             </entities>
             <docTopicItem>
-              <doc>1790</doc>
               <source>org.apache.struts2.portlet.dispatcher.Jsr168Dispatcher</source>
               <topics>
                 <entry>
@@ -37352,7 +37307,6 @@
               <string>org.apache.struts2.tiles.StrutsTilesInitializer</string>
             </entities>
             <docTopicItem>
-              <doc>1910</doc>
               <source>org.apache.struts2.tiles.StrutsTilesInitializer</source>
               <topics>
                 <entry>
@@ -38164,7 +38118,6 @@
               <string>org.apache.struts2.tiles.annotation.TilesDefinition</string>
             </entities>
             <docTopicItem>
-              <doc>1902</doc>
               <source>org.apache.struts2.tiles.annotation.TilesDefinition</source>
               <topics>
                 <entry>
@@ -38980,7 +38933,6 @@
               <string>org.apache.struts2.jasper.el.JspValueExpression</string>
             </entities>
             <docTopicItem>
-              <doc>1514</doc>
               <source>org.apache.struts2.jasper.el.ELResolverImpl</source>
               <topics>
                 <entry>
@@ -39792,7 +39744,6 @@
               <string>org.apache.struts2.util.ComponentUtils</string>
             </entities>
             <docTopicItem>
-              <doc>667</doc>
               <source>org.apache.struts2.util.ComponentUtils</source>
               <topics>
                 <entry>
@@ -40606,7 +40557,6 @@
               <string>org.apache.struts2.el.util.ReflectionUtil</string>
             </entities>
             <docTopicItem>
-              <doc>1822</doc>
               <source>org.apache.struts2.StrutsPortletTestCase</source>
               <topics>
                 <entry>
@@ -41418,7 +41368,6 @@
               <string>org.apache.struts2.util.MakeIterator</string>
             </entities>
             <docTopicItem>
-              <doc>679</doc>
               <source>org.apache.struts2.util.MakeIterator</source>
               <topics>
                 <entry>
@@ -42235,7 +42184,6 @@
               <string>org.apache.struts2.components.ComponentUrlProvider</string>
             </entities>
             <docTopicItem>
-              <doc>821</doc>
               <source>org.apache.struts2.views.jsp.URLTag</source>
               <topics>
                 <entry>
@@ -43047,7 +42995,6 @@
               <string>org.apache.struts2.components.Reset</string>
             </entities>
             <docTopicItem>
-              <doc>539</doc>
               <source>org.apache.struts2.components.Reset</source>
               <topics>
                 <entry>
@@ -43864,7 +43811,6 @@
               <string>org.apache.struts2.jasper.compiler.ScriptingVariabler</string>
             </entities>
             <docTopicItem>
-              <doc>1536</doc>
               <source>org.apache.struts2.jasper.runtime.JspFragmentHelper</source>
               <topics>
                 <entry>
@@ -44676,7 +44622,6 @@
               <string>org.apache.struts2.components.UIBean</string>
             </entities>
             <docTopicItem>
-              <doc>556</doc>
               <source>org.apache.struts2.components.UIBean</source>
               <topics>
                 <entry>
@@ -45489,7 +45434,6 @@
               <string>org.apache.struts2.interceptor.servlet.ServletPrincipalProxy</string>
             </entities>
             <docTopicItem>
-              <doc>1795</doc>
               <source>org.apache.struts2.portlet.interceptor.PortletPrincipalProxy</source>
               <topics>
                 <entry>
@@ -46302,7 +46246,6 @@
               <string>org.apache.struts2.jasper.compiler.SmapGenerator</string>
             </entities>
             <docTopicItem>
-              <doc>1529</doc>
               <source>org.apache.struts2.jasper.Options</source>
               <topics>
                 <entry>
@@ -47114,7 +47057,6 @@
               <string>org.apache.struts2.components.UpDownSelect</string>
             </entities>
             <docTopicItem>
-              <doc>557</doc>
               <source>org.apache.struts2.components.UpDownSelect</source>
               <topics>
                 <entry>
@@ -47926,7 +47868,6 @@
               <string>org.apache.struts2.jasper.compiler.DefaultErrorHandler</string>
             </entities>
             <docTopicItem>
-              <doc>1473</doc>
               <source>org.apache.struts2.jasper.compiler.DefaultErrorHandler</source>
               <topics>
                 <entry>
@@ -48739,7 +48680,6 @@
               <string>org.apache.struts2.jasper.compiler.SmapStratum</string>
             </entities>
             <docTopicItem>
-              <doc>549</doc>
               <source>org.apache.struts2.components.template.TemplateEngineManager</source>
               <topics>
                 <entry>
@@ -49557,7 +49497,6 @@
               <string>org.apache.struts2.views.xslt.ProxyTextNodeAdapter</string>
             </entities>
             <docTopicItem>
-              <doc>886</doc>
               <source>org.apache.struts2.views.xslt.SimpleTextNode</source>
               <topics>
                 <entry>
@@ -50369,7 +50308,6 @@
               <string>org.apache.struts2.util.SubsetIteratorFilter</string>
             </entities>
             <docTopicItem>
-              <doc>690</doc>
               <source>org.apache.struts2.util.SubsetIteratorFilter</source>
               <topics>
                 <entry>
@@ -51181,7 +51119,6 @@
               <string>org.apache.struts2.util.URLDecoderUtil</string>
             </entities>
             <docTopicItem>
-              <doc>705</doc>
               <source>org.apache.struts2.util.URLDecoderUtil</source>
               <topics>
                 <entry>
@@ -51994,7 +51931,6 @@
               <string>org.apache.struts2.util.tomcat.buf.UDecoder</string>
             </entities>
             <docTopicItem>
-              <doc>702</doc>
               <source>org.apache.struts2.util.tomcat.buf.UDecoder</source>
               <topics>
                 <entry>
@@ -52806,7 +52742,6 @@
               <string>org.apache.struts2.util.tomcat.buf.Utf8Decoder</string>
             </entities>
             <docTopicItem>
-              <doc>703</doc>
               <source>org.apache.struts2.util.tomcat.buf.Utf8Decoder</source>
               <topics>
                 <entry>
@@ -53619,7 +53554,6 @@
               <string>org.apache.struts2.jasper.compiler.JavacErrorDetail</string>
             </entities>
             <docTopicItem>
-              <doc>1483</doc>
               <source>org.apache.struts2.jasper.compiler.JavacErrorDetail</source>
               <topics>
                 <entry>
@@ -54431,7 +54365,6 @@
               <string>org.apache.struts2.jasper.compiler.JspUtil</string>
             </entities>
             <docTopicItem>
-              <doc>1488</doc>
               <source>org.apache.struts2.jasper.compiler.JspUtil</source>
               <topics>
                 <entry>
@@ -55243,7 +55176,6 @@
               <string>org.apache.struts2.jasper.compiler.Mark</string>
             </entities>
             <docTopicItem>
-              <doc>1490</doc>
               <source>org.apache.struts2.jasper.compiler.Mark</source>
               <topics>
                 <entry>
@@ -56055,7 +55987,6 @@
               <string>org.apache.struts2.jasper.compiler.PageDataImpl</string>
             </entities>
             <docTopicItem>
-              <doc>1492</doc>
               <source>org.apache.struts2.jasper.compiler.PageDataImpl</source>
               <topics>
                 <entry>
@@ -56867,7 +56798,6 @@
               <string>org.apache.struts2.jasper.compiler.SmapUtil</string>
             </entities>
             <docTopicItem>
-              <doc>1500</doc>
               <source>org.apache.struts2.jasper.compiler.SmapUtil</source>
               <topics>
                 <entry>
@@ -57680,7 +57610,6 @@
               <string>org.apache.struts2.dispatcher.mapper.CompositeActionMapper</string>
             </entities>
             <docTopicItem>
-              <doc>602</doc>
               <source>org.apache.struts2.dispatcher.PrepareOperations</source>
               <topics>
                 <entry>
@@ -58499,7 +58428,6 @@
               <string>org.apache.struts2.views.java.simple.ScriptingEventsHandler</string>
             </entities>
             <docTopicItem>
-              <doc>704</doc>
               <source>org.apache.struts2.util.URLBean</source>
               <topics>
                 <entry>
@@ -59311,7 +59239,6 @@
               <string>org.apache.struts2.jasper.compiler.TextOptimizer</string>
             </entities>
             <docTopicItem>
-              <doc>1507</doc>
               <source>org.apache.struts2.jasper.compiler.TextOptimizer</source>
               <topics>
                 <entry>
@@ -60124,7 +60051,6 @@
               <string>org.apache.struts2.jasper.el.ExpressionEvaluatorImpl</string>
             </entities>
             <docTopicItem>
-              <doc>1532</doc>
               <source>org.apache.struts2.jasper.runtime.HttpJspBase</source>
               <topics>
                 <entry>
@@ -60944,7 +60870,6 @@
               <string>org.apache.struts2.views.tiles.TilesResult</string>
             </entities>
             <docTopicItem>
-              <doc>1779</doc>
               <source>org.apache.struts2.dispatcher.multipart.PellMultiPartRequest</source>
               <topics>
                 <entry>
@@ -61756,7 +61681,6 @@
               <string>org.apache.struts2.dispatcher.servlet.ServletHostConfig</string>
             </entities>
             <docTopicItem>
-              <doc>604</doc>
               <source>org.apache.struts2.dispatcher.servlet.ServletHostConfig</source>
               <topics>
                 <entry>
@@ -62568,7 +62492,6 @@
               <string>org.apache.struts2.el.ExpressionFactoryImpl</string>
             </entities>
             <docTopicItem>
-              <doc>1407</doc>
               <source>org.apache.struts2.el.ExpressionFactoryImpl</source>
               <topics>
                 <entry>
@@ -63382,7 +63305,6 @@
               <string>org.apache.struts2.el.ValueExpressionImpl</string>
             </entities>
             <docTopicItem>
-              <doc>1839</doc>
               <source>org.apache.struts2.rest.DefaultContentTypeHandlerManager</source>
               <topics>
                 <entry>
@@ -64194,7 +64116,6 @@
               <string>org.apache.struts2.views.freemarker.FreemarkerThemeTemplateLoader</string>
             </entities>
             <docTopicItem>
-              <doc>713</doc>
               <source>org.apache.struts2.views.freemarker.FreemarkerThemeTemplateLoader</source>
               <topics>
                 <entry>
@@ -65006,7 +64927,6 @@
               <string>org.apache.struts2.views.jasperreports.ValueStackDataSource</string>
             </entities>
             <docTopicItem>
-              <doc>1593</doc>
               <source>org.apache.struts2.views.jasperreports.ValueStackDataSource</source>
               <topics>
                 <entry>
@@ -65819,7 +65739,6 @@
               <string>org.apache.struts2.plexus.PlexusUtils</string>
             </entities>
             <docTopicItem>
-              <doc>1676</doc>
               <source>org.apache.struts2.json.rpc.RPCError</source>
               <topics>
                 <entry>
@@ -66631,7 +66550,6 @@
               <string>org.apache.struts2.json.smd.SMD</string>
             </entities>
             <docTopicItem>
-              <doc>1680</doc>
               <source>org.apache.struts2.json.smd.SMD</source>
               <topics>
                 <entry>
@@ -67443,7 +67361,6 @@
               <string>org.apache.struts2.json.smd.SMDGenerator</string>
             </entities>
             <docTopicItem>
-              <doc>1681</doc>
               <source>org.apache.struts2.json.smd.SMDGenerator</source>
               <topics>
                 <entry>
@@ -68255,7 +68172,6 @@
               <string>org.apache.struts2.plexus.PlexusObjectFactory</string>
             </entities>
             <docTopicItem>
-              <doc>1782</doc>
               <source>org.apache.struts2.plexus.PlexusObjectFactory</source>
               <topics>
                 <entry>
@@ -69068,7 +68984,6 @@
               <string>org.apache.struts2.jasper.runtime.BodyContentImpl</string>
             </entities>
             <docTopicItem>
-              <doc>1539</doc>
               <source>org.apache.struts2.jasper.runtime.JspWriterImpl</source>
               <topics>
                 <entry>
@@ -69881,7 +69796,6 @@
               <string>org.apache.struts2.sitegraph.StrutsConfigRetriever</string>
             </entities>
             <docTopicItem>
-              <doc>1812</doc>
               <source>org.apache.struts2.portlet.servlet.PortletServletConfig</source>
               <topics>
                 <entry>
@@ -70693,7 +70607,6 @@
               <string>org.apache.struts2.jasper.runtime.JspFactoryImpl</string>
             </entities>
             <docTopicItem>
-              <doc>1535</doc>
               <source>org.apache.struts2.jasper.runtime.JspFactoryImpl</source>
               <topics>
                 <entry>
@@ -71508,7 +71421,6 @@
               <string>org.apache.struts2.jasper.tagplugins.jstl.core.Remove</string>
             </entities>
             <docTopicItem>
-              <doc>1555</doc>
               <source>org.apache.struts2.jasper.tagplugins.jstl.core.If</source>
               <topics>
                 <entry>
@@ -72325,7 +72237,6 @@
               <string>org.apache.struts2.jasper.el.ELContextImpl</string>
             </entities>
             <docTopicItem>
-              <doc>1412</doc>
               <source>org.apache.struts2.el.lang.FunctionMapperFactory</source>
               <topics>
                 <entry>
@@ -73137,7 +73048,6 @@
               <string>org.apache.struts2.el.lang.ExpressionBuilder</string>
             </entities>
             <docTopicItem>
-              <doc>1411</doc>
               <source>org.apache.struts2.el.lang.ExpressionBuilder</source>
               <topics>
                 <entry>
@@ -73963,7 +73873,6 @@
               <string>org.apache.struts2.convention.DefaultResultMapBuilder</string>
             </entities>
             <docTopicItem>
-              <doc>1327</doc>
               <source>org.apache.struts2.convention.DefaultResultMapBuilder</source>
               <topics>
                 <entry>
@@ -74776,7 +74685,6 @@
               <string>org.apache.struts2.el.parser.ELParserConstants</string>
             </entities>
             <docTopicItem>
-              <doc>1453</doc>
               <source>org.apache.struts2.el.parser.ELParserConstants</source>
               <topics>
                 <entry>
@@ -75589,7 +75497,6 @@
               <string>org.apache.struts2.views.jsp.ui.AbstractUITagBeanInfo</string>
             </entities>
             <docTopicItem>
-              <doc>791</doc>
               <source>org.apache.struts2.views.jsp.ui.AbstractUITagBeanInfo</source>
               <topics>
                 <entry>
@@ -76407,7 +76314,6 @@
               <string>org.apache.struts2.result.PlainTextResult</string>
             </entities>
             <docTopicItem>
-              <doc>653</doc>
               <source>org.apache.struts2.result.PlainTextResult</source>
               <topics>
                 <entry>
@@ -77219,7 +77125,6 @@
               <string>org.apache.struts2.jasper.xmlparser.XMLChar</string>
             </entities>
             <docTopicItem>
-              <doc>1574</doc>
               <source>org.apache.struts2.jasper.xmlparser.XMLChar</source>
               <topics>
                 <entry>
@@ -78032,7 +77937,6 @@
               <string>org.apache.struts2.json.JSONActionRedirectResult</string>
             </entities>
             <docTopicItem>
-              <doc>1666</doc>
               <source>org.apache.struts2.json.JSONActionRedirectResult</source>
               <topics>
                 <entry>
@@ -78846,7 +78750,6 @@
               <string>org.apache.struts2.el.parser.TokenMgrError</string>
             </entities>
             <docTopicItem>
-              <doc>1463</doc>
               <source>org.apache.struts2.el.parser.TokenMgrError</source>
               <topics>
                 <entry>
@@ -79661,7 +79564,6 @@
               <string>org.apache.struts2.views.DefaultTagLibrary</string>
             </entities>
             <docTopicItem>
-              <doc>710</doc>
               <source>org.apache.struts2.views.DefaultTagLibrary</source>
               <topics>
                 <entry>
@@ -80475,7 +80377,6 @@
               <string>org.apache.struts2.views.gxp.GxpResult</string>
             </entities>
             <docTopicItem>
-              <doc>1588</doc>
               <source>org.apache.struts2.views.gxp.GxpResult</source>
               <topics>
                 <entry>
@@ -81294,7 +81195,6 @@
               <string>org.apache.struts2.cdi.CdiObjectFactory</string>
             </entities>
             <docTopicItem>
-              <doc>1291</doc>
               <source>org.apache.struts2.cdi.CdiObjectFactory</source>
               <topics>
                 <entry>
@@ -82109,7 +82009,6 @@
               <string>org.apache.struts2.portlet.result.PortletResultHelperJSR286</string>
             </entities>
             <docTopicItem>
-              <doc>1807</doc>
               <source>org.apache.struts2.portlet.result.PortletResultHelper</source>
               <topics>
                 <entry>
@@ -82922,7 +82821,6 @@
               <string>org.apache.struts2.interceptor.I18nInterceptor</string>
             </entities>
             <docTopicItem>
-              <doc>629</doc>
               <source>org.apache.struts2.interceptor.I18nInterceptor</source>
               <topics>
                 <entry>
@@ -83735,7 +83633,6 @@
               <string>org.apache.struts2.interceptor.RolesInterceptor</string>
             </entities>
             <docTopicItem>
-              <doc>639</doc>
               <source>org.apache.struts2.interceptor.RolesInterceptor</source>
               <topics>
                 <entry>
@@ -84588,7 +84485,6 @@
               <string>org.apache.struts2.views.jasperreports.ValueStackShadowMap</string>
             </entities>
             <docTopicItem>
-              <doc>1594</doc>
               <source>org.apache.struts2.views.jasperreports.ValueStackShadowMap</source>
               <topics>
                 <entry>
@@ -85455,7 +85351,6 @@
               <string>org.apache.struts2.el.lang.ELArithmetic</string>
             </entities>
             <docTopicItem>
-              <doc>1408</doc>
               <source>org.apache.struts2.el.lang.ELArithmetic</source>
               <topics>
                 <entry>
@@ -86280,7 +86175,6 @@
               <string>org.apache.struts2.jasper.tagplugins.jstl.core.ForEach</string>
             </entities>
             <docTopicItem>
-              <doc>1553</doc>
               <source>org.apache.struts2.jasper.tagplugins.jstl.core.ForEach</source>
               <topics>
                 <entry>

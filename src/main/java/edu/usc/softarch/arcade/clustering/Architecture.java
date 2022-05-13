@@ -28,6 +28,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 	private static final long serialVersionUID = 1L;
 	private String projectName;
 	private String projectPath;
+	private int numFeatures;
 	//endregion
 
 	//region CONSTRUCTORS
@@ -42,12 +43,14 @@ public class Architecture extends TreeMap<String, Cluster> {
 
 		this.projectName = arch.projectName;
 		this.projectPath = arch.projectPath;
+		this.numFeatures = arch.numFeatures;
 	}
 
 	public Architecture(String projectName, String projectPath,
 			FeatureVectors vectors, String language, String packagePrefix) {
 		this.projectName = projectName;
 		this.projectPath = projectPath;
+		this.numFeatures = vectors.getNamesInFeatureSet().size();
 		initializeClusters(vectors, language, packagePrefix);
 	}
 
@@ -59,7 +62,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 			BitSet featureSet = vectors.getNameToFeatureSetMap().get(name);
 			// Create a cluster containing only that cell
 			Cluster cluster = new Cluster(name, featureSet,
-				vectors.getNamesInFeatureSet());
+				vectors.getNamesInFeatureSet().size());
 
 			// Add the cluster except extraordinary circumstances (assume always)
 			addClusterConditionally(cluster, language, packagePrefix);
@@ -98,6 +101,8 @@ public class Architecture extends TreeMap<String, Cluster> {
 	//endregion
 
 	//region ACCESSORS
+	public int getNumFeatures() { return this.numFeatures; }
+
 	public boolean hasOrphans() {
 		for (Cluster c : this.values()) {
 			if (c.getNumEntities() == 1)
@@ -121,7 +126,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 		List<Double> clusterCentroids = new ArrayList<>();
 
 		for (Cluster cluster : this.values()) {
-			double centroid = cluster.computeStructuralCentroid();
+			double centroid = cluster.computeStructuralCentroid(this.numFeatures);
 			clusterCentroids.add(centroid);
 		}
 
