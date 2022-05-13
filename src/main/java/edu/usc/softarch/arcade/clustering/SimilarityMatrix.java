@@ -132,7 +132,8 @@ public class SimilarityMatrix {
 		switch(this.simMeasure) {
 			case JS:
 				return new SimData(row, col,
-					row.docTopicItem.getJsDivergence(col.docTopicItem), cellSize);
+					row.getDocTopicItem().getJsDivergence(col.getDocTopicItem()),
+					cellSize);
 			case SCM:
 				return new SimData(row, col,
 					FastSimCalcUtil.getStructAndConcernMeasure(

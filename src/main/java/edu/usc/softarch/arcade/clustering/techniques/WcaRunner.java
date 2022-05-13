@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.clustering.techniques;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 import edu.usc.softarch.arcade.clustering.SimData;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
@@ -52,7 +53,8 @@ public class WcaRunner extends ClusteringAlgoRunner {
 
 			Cluster cluster = data.c1;
 			Cluster otherCluster = data.c2;
-			Cluster newCluster = new Cluster(cluster, otherCluster);
+			Cluster newCluster = new Cluster(ClusteringAlgorithmType.WCA,
+				cluster, otherCluster);
 
 			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix);
 

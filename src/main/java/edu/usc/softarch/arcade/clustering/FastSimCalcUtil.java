@@ -116,7 +116,8 @@ public class FastSimCalcUtil {
 		double jsDivergenceConcern = 0;
 		try {
 			jsDivergenceConcern =
-				cluster.docTopicItem.getJsDivergence(otherCluster.docTopicItem);
+				cluster.getDocTopicItem().getJsDivergence(
+					otherCluster.getDocTopicItem());
 		} catch (DistributionSizeMismatchException e) {
 			e.printStackTrace(); //TODO handle it
 		}

@@ -153,7 +153,7 @@ public class Architecture extends TreeMap<String, Cluster> {
   public double computeTopicClusterGain() {
 		List<DocTopicItem> docTopicItems = new ArrayList<>();
 		for (Cluster c : this.values())
-			docTopicItems.add(c.docTopicItem);
+			docTopicItems.add(c.getDocTopicItem());
 		DocTopicItem globalDocTopicItem =
       DocTopics.computeGlobalCentroidUsingTopics(docTopicItems);
 

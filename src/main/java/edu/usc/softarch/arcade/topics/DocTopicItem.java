@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import cc.mallet.util.Maths;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.usc.softarch.arcade.clustering.Cluster;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,6 +56,13 @@ public class DocTopicItem implements Serializable {
 		this.source = dti.source;
 		initialize(dti);
 	}
+
+	/**
+	 * Merge constructor.
+	 */
+	public DocTopicItem(Cluster c1, Cluster c2)
+			throws UnmatchingDocTopicItemsException {
+		this(c1.getDocTopicItem(), c2.getDocTopicItem()); }
 
 	/**
 	 * Merge constructor.

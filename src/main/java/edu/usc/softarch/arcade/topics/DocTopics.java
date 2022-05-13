@@ -66,7 +66,7 @@ public class DocTopics {
 	public List<DocTopicItem> getDocTopicItemList() { return dtItemList; }
 
 	public void setClusterDocTopic(Cluster c, String language) {
-		c.docTopicItem = this.getDocTopicItem(c.getName(), language); }
+		c.setDocTopicItem(this.getDocTopicItem(c.getName(), language)); }
 
 	/**
 	 * Gets the DocTopicItem for a given file name or entity.

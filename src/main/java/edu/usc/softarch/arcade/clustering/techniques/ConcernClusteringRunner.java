@@ -142,7 +142,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		
 		Architecture clustersWithMissingDocTopics =	new Architecture();
 		for (Cluster c : architecture.values())
-			if (c.docTopicItem == null)
+			if (!c.hasDocTopicItem())
 				clustersWithMissingDocTopics.put(c.getName(), c);
 
 		architecture.removeAll(clustersWithMissingDocTopics);
@@ -168,7 +168,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		// Locate non-inner classes without DTI
 		Architecture excessClusters = new Architecture();
 		for (Cluster c : this.architecture.values())
-			if (c.docTopicItem == null && !c.getName().contains("$"))
+			if (!c.hasDocTopicItem() && !c.getName().contains("$"))
 				excessClusters.put(c.getName(), c);
 
 		Architecture excessInners = new Architecture();
@@ -196,8 +196,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			new Cluster(ClusteringAlgorithmType.ARC, cluster, otherCluster);
 		
 		try {
-			newCluster.docTopicItem = new DocTopicItem(
-				cluster.docTopicItem, otherCluster.docTopicItem);
+			newCluster.setDocTopicItem(new DocTopicItem(cluster, otherCluster));
 		} catch (UnmatchingDocTopicItemsException e) {
 			e.printStackTrace(); //TODO handle it
 		}
