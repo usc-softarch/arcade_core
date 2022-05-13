@@ -50,6 +50,14 @@ public class MoJoEvolutionAnalyzer {
 		}
 	}
 
+	/**
+	 * Calculates the MoJoFM value between two architectures by reading in two
+	 * _clusters.rsf files.
+	 *
+	 * @param prevFile RSF representation of the earlier version.
+	 * @param currFile RSF representation of the latter version.
+	 * @return The MoJoFM value between those two versions.
+	 */
 	public static double doMoJoFMComparison(File prevFile, File currFile) {
 		MoJoCalculator mojoCalc = new MoJoCalculator(
 				prevFile.getAbsolutePath(),
