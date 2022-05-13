@@ -54,15 +54,15 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			FeatureVectors.deserializeFFVectors(featureVecsFilePath);
 		int numTopics = (int) (ffVecs.getNumSourceEntities() * 0.18);
 
-		Architecture arch = new Architecture(projectName, projectPath);
+		Architecture arch = new Architecture(projectName, projectPath, ffVecs,
+			language, packagePrefix);
 
 		SerializationCriterion serializationCriterion =
 			SerializationCriterion.makeSerializationCriterion(
 				serializationCriterionName, serializationCriterionVal, arch);
 
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
-			language, ffVecs, packagePrefix, serializationCriterion, arch,
-			artifactsDirPath);
+			language, serializationCriterion, arch, artifactsDirPath);
 
 		// If no numClusters was provided
 		if (numClusters == 0)
@@ -95,21 +95,10 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #endregion ATTRIBUTES -----------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
-	/**
-	 * @param vecs feature vectors (dependencies) of entities
-	 */
-	public ConcernClusteringRunner(FeatureVectors vecs, String artifactsDir,
-			String language) {
-		super(language, vecs);
-		initializeClusters();
-		initializeClusterDocTopics(artifactsDir);
-	}
-
-	public ConcernClusteringRunner(String language, FeatureVectors vectors,
-			String packagePrefix, SerializationCriterion serializationCriterion,
-			Architecture arch, String artifactsDir) {
-		super(language, vectors, packagePrefix, serializationCriterion, arch);
-		initializeClusters();
+	public ConcernClusteringRunner(String language,
+			SerializationCriterion serializationCriterion, Architecture arch,
+			String artifactsDir) {
+		super(language, serializationCriterion, arch);
 		initializeClusterDocTopics(artifactsDir);
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------

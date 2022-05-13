@@ -42,14 +42,15 @@ public class WcaRunner extends ClusteringAlgoRunner {
 		FeatureVectors featureVectors =
 			FeatureVectors.deserializeFFVectors(featureVectorsFilePath);
 		// Create architecture with assigned output values
-		Architecture arch = new Architecture(projectName, projectPath);
+		Architecture arch = new Architecture(projectName, projectPath,
+			featureVectors, language, packagePrefix);
 		// Create serialization criterion
 		SerializationCriterion serializationCriterion =
 			SerializationCriterion.makeSerializationCriterion(
 				serializationCriterionName, serializationCriterionVal, arch);
 		// Create the runner object
-		ClusteringAlgoRunner runner = new WcaRunner(language, featureVectors,
-			packagePrefix, serializationCriterion, arch);
+		ClusteringAlgoRunner runner = new WcaRunner(language,
+			serializationCriterion, arch);
 		// Establish the stopping criterion
 		StoppingCriterion stoppingCriterion =
 			StoppingCriterion.makeStoppingCriterion(stoppingCriterionName,
@@ -61,22 +62,9 @@ public class WcaRunner extends ClusteringAlgoRunner {
 	//endregion
 
 	//region CONSTRUCTORS
-	public WcaRunner(String language, FeatureVectors vectors) {
-		super(language, vectors);	}
-
-	public WcaRunner(String language, FeatureVectors vectors,
-			String packagePrefix) {
-		super(language, vectors, packagePrefix); }
-
-	public WcaRunner(String language, FeatureVectors vectors,
-			String packagePrefix, SerializationCriterion serializationCriterion) {
-		super(language, vectors, packagePrefix, serializationCriterion); }
-
-	public WcaRunner(String language, FeatureVectors vectors,
-			String packagePrefix, SerializationCriterion serializationCriterion,
-			Architecture arch) {
-		super(language, vectors, packagePrefix,
-			serializationCriterion, arch);
+	public WcaRunner(String language,
+			SerializationCriterion serializationCriterion, Architecture arch) {
+		super(language, serializationCriterion, arch);
 	}
 	//endregion
 
@@ -85,8 +73,6 @@ public class WcaRunner extends ClusteringAlgoRunner {
 			StoppingCriterion stopCriterion, String stoppingCriterion,
 			SimilarityMatrix.SimMeasure simMeasure)
 			throws DistributionSizeMismatchException, FileNotFoundException {
-		initializeClusters();
-
 		SimilarityMatrix simMatrix = new SimilarityMatrix(simMeasure, this.architecture);
 
 		while (stopCriterion.notReadyToStop()) {

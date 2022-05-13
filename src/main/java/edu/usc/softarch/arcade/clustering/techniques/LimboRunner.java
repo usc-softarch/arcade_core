@@ -43,14 +43,15 @@ public class LimboRunner extends ClusteringAlgoRunner {
 		FeatureVectors featureVectors =
 			FeatureVectors.deserializeFFVectors(featureVectorsFilePath);
 		// Create architecture with assigned output values
-		Architecture arch = new Architecture(projectName, projectPath);
+		Architecture arch = new Architecture(projectName, projectPath,
+			featureVectors, language, packagePrefix);
 		// Create serialization criterion
 		SerializationCriterion serializationCriterion =
 			SerializationCriterion.makeSerializationCriterion(
 				serializationCriterionName, serializationCriterionVal, arch);
 		// Create the runner object
-		ClusteringAlgoRunner runner = new LimboRunner(language, featureVectors,
-			packagePrefix, serializationCriterion, arch);
+		ClusteringAlgoRunner runner = new LimboRunner(language,
+			serializationCriterion, arch);
 		// Establish the stopping criterion
 		StoppingCriterion stoppingCriterion =
 			StoppingCriterion.makeStoppingCriterion(stoppingCriterionName,
@@ -62,22 +63,9 @@ public class LimboRunner extends ClusteringAlgoRunner {
 	//endregion
 
 	//region CONSTRUCTORS
-	public LimboRunner(String language, FeatureVectors vectors) {
-		super(language, vectors);	}
-
-	public LimboRunner(String language, FeatureVectors vectors,
-			String packagePrefix) {
-		super(language, vectors, packagePrefix); }
-
-	public LimboRunner(String language, FeatureVectors vectors,
-			String packagePrefix, SerializationCriterion serializationCriterion) {
-		super(language, vectors, packagePrefix, serializationCriterion); }
-
-	public LimboRunner(String language, FeatureVectors vectors,
-			String packagePrefix, SerializationCriterion serializationCriterion,
-			Architecture arch) {
-		super(language, vectors, packagePrefix,
-			serializationCriterion, arch);
+	public LimboRunner(String language,
+			SerializationCriterion serializationCriterion, Architecture arch) {
+		super(language, serializationCriterion, arch);
 	}
 	//endregion
 
@@ -85,8 +73,6 @@ public class LimboRunner extends ClusteringAlgoRunner {
 	public Architecture computeArchitecture(StoppingCriterion stoppingCriterion,
 			String stopCriterion, SimilarityMatrix.SimMeasure simMeasure)
 			throws DistributionSizeMismatchException, FileNotFoundException {
-		initializeClusters();
-
 		SimilarityMatrix simMatrix = new SimilarityMatrix(
 			simMeasure, this.architecture);
 

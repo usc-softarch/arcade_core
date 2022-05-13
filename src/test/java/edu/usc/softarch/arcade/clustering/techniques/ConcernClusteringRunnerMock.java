@@ -1,8 +1,8 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
+import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
 /**
@@ -17,9 +17,11 @@ public class ConcernClusteringRunnerMock
 	//endregion
 
 	//region CONSTRUCTORS
-	ConcernClusteringRunnerMock(FeatureVectors vecs,
-			String artifactsDir, String language) {
-		super(vecs, artifactsDir, language); }
+	ConcernClusteringRunnerMock(String language,
+			SerializationCriterion serializationCriterion, Architecture arch,
+			String artifactsDir) {
+		super(language, serializationCriterion, arch, artifactsDir);
+	}
 	//endregion
 
 	//region ACCESSORS
@@ -35,13 +37,8 @@ public class ConcernClusteringRunnerMock
 
 	//region OVERRIDES
 	@Override
-	protected void initializeClusters() {
-		super.initializeClusters();
-		this.initialArchitecture = new Architecture(super.architecture);
-	}
-
-	@Override
 	protected void initializeClusterDocTopics(String artifactsDir) {
+		this.initialArchitecture = new Architecture(super.architecture);
 		super.initializeClusterDocTopics(artifactsDir);
 		this.architectureWithDocTopics = new Architecture(super.architecture);
 	}

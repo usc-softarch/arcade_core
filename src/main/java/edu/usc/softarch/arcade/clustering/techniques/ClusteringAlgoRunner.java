@@ -1,57 +1,36 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
 import java.io.FileNotFoundException;
-import java.util.BitSet;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimData;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
-import edu.usc.softarch.arcade.config.Config;
-import edu.usc.softarch.arcade.config.Config.Granule;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 
 public abstract class ClusteringAlgoRunner {
 	//region ATTRIBUTES
 	public Architecture architecture;
-	protected FeatureVectors featureVectors;
 	protected static double maxClusterGain = 0;
 	public static int numClustersAtMaxClusterGain = 0;
 	public static int numberOfEntitiesToBeClustered = 0;
 	protected final String language;
-	private final String packagePrefix;
 	protected final SerializationCriterion serializationCriterion;
 	//endregion ATTRIBUTES
 
 	//region CONTRUCTORS
-	protected ClusteringAlgoRunner(String language, FeatureVectors vectors) {
-		this(language, vectors, "", null); }
-
-	protected ClusteringAlgoRunner(String language, FeatureVectors vectors,
+	protected ClusteringAlgoRunner(String language,
 			SerializationCriterion serializationCriterion) {
-		this(language, vectors, "", serializationCriterion); }
-
-	protected ClusteringAlgoRunner(String language, FeatureVectors vectors,
-			String packagePrefix) {
-		this(language, vectors, packagePrefix, null); }
-
-	protected ClusteringAlgoRunner(String language, FeatureVectors vectors,
-			String packagePrefix, SerializationCriterion serializationCriterion) {
 		this.language = language;
-		this.featureVectors = vectors;
-		this.packagePrefix = packagePrefix;
 		this.serializationCriterion = serializationCriterion;
 	}
 
-	protected ClusteringAlgoRunner(String language, FeatureVectors vectors,
-			String packagePrefix, SerializationCriterion serializationCriterion,
-			Architecture arch) {
-		this(language, vectors, packagePrefix, serializationCriterion);
+	protected ClusteringAlgoRunner(String language,
+			SerializationCriterion serializationCriterion, Architecture arch) {
+		this(language, serializationCriterion);
 		this.architecture = arch;
 	}
 	//endregion
@@ -59,63 +38,11 @@ public abstract class ClusteringAlgoRunner {
 	// #region ACCESSORS ---------------------------------------------------------
 	public Architecture getArchitecture() { return architecture; }
 
-	public void setFeatureVectors(FeatureVectors featureVectors) {
-		this.featureVectors = featureVectors;
-	}
 	protected void removeCluster(Cluster cluster) {
 		architecture.remove(cluster.getName());	}
 	protected void addCluster(Cluster cluster) {
 		architecture.put(cluster.getName(), cluster); }
 	// #endregion ACCESSORS ------------------------------------------------------
-	
-	protected void initializeClusters() {
-		if (this.architecture == null)
-			this.architecture = new Architecture();
-
-		// For each cell in the adjacency matrix
-		for (String name : featureVectors.getFeatureVectorNames()) {
-			// Get the vector relative to that cell
-			BitSet featureSet = featureVectors.getNameToFeatureSetMap().get(name);
-			// Create a cluster containing only that cell
-			Cluster cluster = new Cluster(name, featureSet,
-				featureVectors.getNamesInFeatureSet());
-			
-			// Add the cluster except extraordinary circumstances (assume always)
-			addClusterConditionally(cluster, language);
-		}
-
-		numberOfEntitiesToBeClustered = architecture.size();
-	}
-
-	/**
-	 * For almost all situations, adds the cluster to the list.
-	 */
-	private void addClusterConditionally(Cluster cluster, String language) {
-		// If the source language is C or C++, add the only C-based entities
-		if (language.equalsIgnoreCase("c")) {
-			Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
-			// First condition to be assumed true
-			// Second condition to be assumed true
-			// Third condition checks whether the cluster is based on a valid C entity
-			if (Config.getClusteringGranule().equals(Granule.file) &&
-					!cluster.getName().startsWith("/") &&
-					p.matcher(cluster.getName()).find())
-				this.architecture.put(cluster.getName(), cluster);
-		}
-
-		// This block is used only for certain older modules, disregard
-		if (Config.getClusteringGranule().equals(Granule.func)) {
-			if (cluster.getName().equals("\"##\""))
-				return;
-			this.architecture.put(cluster.getName(), cluster);
-		}
-
-		// If the source language is Java, add all clusters that match prefix
-		if (language.equalsIgnoreCase("java")
-				&& (this.packagePrefix.isEmpty()
-					|| cluster.getName().startsWith(this.packagePrefix)))
-			this.architecture.put(cluster.getName(), cluster);
-	}
 	
 	protected void checkAndUpdateClusterGain(double clusterGain) {
 		if (clusterGain > maxClusterGain) {

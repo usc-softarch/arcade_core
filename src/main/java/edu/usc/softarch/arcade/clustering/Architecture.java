@@ -8,13 +8,17 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import edu.usc.softarch.arcade.clustering.techniques.ClusteringAlgoRunner;
+import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
@@ -35,11 +39,61 @@ public class Architecture extends TreeMap<String, Cluster> {
   public Architecture(Architecture arch) {
 		for (Cluster c : arch.values())
 			this.add(new Cluster(c));
+
+		this.projectName = arch.projectName;
+		this.projectPath = arch.projectPath;
 	}
 
-	public Architecture(String projectName, String projectPath) {
+	public Architecture(String projectName, String projectPath,
+			FeatureVectors vectors, String language, String packagePrefix) {
 		this.projectName = projectName;
 		this.projectPath = projectPath;
+		initializeClusters(vectors, language, packagePrefix);
+	}
+
+	private void initializeClusters(FeatureVectors vectors, String language,
+			String packagePrefix) {
+		// For each cell in the adjacency matrix
+		for (String name : vectors.getFeatureVectorNames()) {
+			// Get the vector relative to that cell
+			BitSet featureSet = vectors.getNameToFeatureSetMap().get(name);
+			// Create a cluster containing only that cell
+			Cluster cluster = new Cluster(name, featureSet,
+				vectors.getNamesInFeatureSet());
+
+			// Add the cluster except extraordinary circumstances (assume always)
+			addClusterConditionally(cluster, language, packagePrefix);
+		}
+
+		ClusteringAlgoRunner.numberOfEntitiesToBeClustered = this.size();
+	}
+
+	private void addClusterConditionally(Cluster cluster, String language,
+			String packagePrefix) {
+		// If the source language is C or C++, add the only C-based entities
+		if (language.equalsIgnoreCase("c")) {
+			Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
+			// First condition to be assumed true
+			// Second condition to be assumed true
+			// Third condition checks whether the cluster is based on a valid C entity
+			if (Config.getClusteringGranule().equals(Config.Granule.file) &&
+				!cluster.getName().startsWith("/") &&
+				p.matcher(cluster.getName()).find())
+				this.put(cluster.getName(), cluster);
+		}
+
+		// This block is used only for certain older modules, disregard
+		if (Config.getClusteringGranule().equals(Config.Granule.func)) {
+			if (cluster.getName().equals("\"##\""))
+				return;
+			this.put(cluster.getName(), cluster);
+		}
+
+		// If the source language is Java, add all clusters that match prefix
+		if (language.equalsIgnoreCase("java")
+			&& (packagePrefix.isEmpty()
+			|| cluster.getName().startsWith(packagePrefix)))
+			this.put(cluster.getName(), cluster);
 	}
 	//endregion
 
@@ -62,6 +116,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 	}
 	//endregion
 
+	//region PROCESSING
   public double computeStructuralClusterGain() {
 		List<Double> clusterCentroids = new ArrayList<>();
 
@@ -110,6 +165,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 
 		return clusterGain;
 	}
+	//endregion
 
 	//region SERIALIZATION
 	public void writeToRsf() throws FileNotFoundException {

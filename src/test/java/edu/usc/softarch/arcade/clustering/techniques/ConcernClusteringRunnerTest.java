@@ -31,6 +31,7 @@ import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
+import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.topics.TopicUtil;
@@ -95,7 +96,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 			ConcernClusteringRunnerMock.runARC(lang, outputDirPath, sysDir, ffVecs,
 				artifactsDir, "preselected", 0,
 				"archsize", 100, systemVersion,
-				outputDirPath, packagePrefix));
+				outputDirPath, ""));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of
@@ -212,21 +213,26 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 	@CsvSource({
 		// struts 2.3.30
 		"struts-2.3.30,"
-		+ "java",
+			+ "java,"
+			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
-		+ "java",
+			+ "java,"
+			+ "org.apache.struts2",
 
 		// httpd-2.3.8
 		"httpd-2.3.8,"
-		+ "c",
+			+ "c,"
+			+ "",
 
 		// httpd-2.4.26
 		"httpd-2.4.26,"
-		+ "c",
+			+ "c,"
+			+ ""
 	})
-	public void initDataStructuresTest(String versionName, String language) {
+	public void initDataStructuresTest(String versionName, String language,
+			String packagePrefix) {
 		String artifactsDir = resourcesDir + fs + versionName;
 		String initialArchitecturePath = artifactsDir + fs + "initial_architecture.txt";
 		String architectureWithDocTopicsPath =
@@ -245,10 +251,17 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 
 		if (builderffVecs == null)
 			fail("failed to deserialize FastFeatureVectors from builder object");
+
+		Architecture arch = new Architecture(versionName, outputDirPath,
+			builderffVecs, language, "");
+
+		SerializationCriterion serializationCriterion =
+			SerializationCriterion.makeSerializationCriterion(
+				"archsize", 0, arch);
 		
 		// Construct a ConcernClusteringRunner object
 		ConcernClusteringRunnerMock runner = new ConcernClusteringRunnerMock(
-			builderffVecs, artifactsDir + "/base", language);
+			language, serializationCriterion, arch, artifactsDir + "/base");
 
 		/* Tests whether fastClusters was altered by
 		 * initializeDocTopicsForEachFastCluster */
@@ -314,21 +327,26 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 	@CsvSource({
 		// struts 2.3.30
 		"struts-2.3.30,"
-		+ "java",
+			+ "java,"
+			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
-		+ "java",
+			+ "java,"
+			+ "org.apache.struts2",
 
 		// httpd-2.3.8
 		"httpd-2.3.8,"
-		+ "c",
+			+ "c,"
+			+ "",
 
 		// httpd-2.4.26
 		"httpd-2.4.26,"
-		+ "c",
+			+ "c,"
+			+ ""
 	})
-	public void computeArchitectureTest(String versionName,	String language) {
+	public void computeArchitectureTest(String versionName,	String language,
+			String packagePrefix) {
 		String artifactsDir = resourcesDir + fs + versionName;
 		String oracleSimMatrixPath = artifactsDir + fs + "sim_matrix_oracle.json";
 		(new File(outputDirPath)).mkdirs();
@@ -347,10 +365,17 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		if (builderffVecs == null){
 			fail("failed to deserialize FastFeatureVectors from builder object");
 		}
+
+		Architecture arch = new Architecture(versionName, outputDirPath,
+			builderffVecs, language, "");
+
+		SerializationCriterion serializationCriterion =
+			SerializationCriterion.makeSerializationCriterion(
+				"archsize", 0, arch);
 		
 		// Construct a ConcernClusteringRunner object
 		ConcernClusteringRunnerMock runner = new ConcernClusteringRunnerMock(
-			builderffVecs, artifactsDir + "/base", language);
+			language, serializationCriterion, arch, artifactsDir + "/base");
 		// call computeClustersWithConcernsAndFastClusters()
 		assertDoesNotThrow(() -> {
 			// copied from BatchClusteringEngine
