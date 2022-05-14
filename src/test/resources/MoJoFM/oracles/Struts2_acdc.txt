@@ -1,1 +1,0 @@
-mojofmvals,struts-2.3.32_acdc_clustered.rsf,struts-2.3.30_acdc_clustered.rsf,99.77,struts-2.5.2_acdc_clustered.rsf,struts-2.3.32_acdc_clustered.rsf,88.28,struts-2.5.8_acdc_clustered.rsf,struts-2.5.2_acdc_clustered.rsf,97.49,struts-2.5.10.1_acdc_clustered.rsf,struts-2.5.8_acdc_clustered.rsf,98.0

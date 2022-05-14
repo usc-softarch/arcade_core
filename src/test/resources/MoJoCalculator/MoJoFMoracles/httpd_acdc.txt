@@ -1,0 +1,1 @@
+mojofmvals,httpd-2.4.7_acdc_clustered.rsf,httpd-2.3.8_acdc_clustered.rsf,93.59,httpd-2.4.26_acdc_clustered.rsf,httpd-2.4.16_acdc_clustered.rsf,99.71,httpd-2.4.10_acdc_clustered.rsf,httpd-2.4.7_acdc_clustered.rsf,99.42,httpd-2.4.16_acdc_clustered.rsf,httpd-2.4.10_acdc_clustered.rsf,99.71

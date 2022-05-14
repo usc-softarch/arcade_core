@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,11 +22,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import edu.usc.softarch.arcade.util.FileUtil;
 
-public class MoJoEvolutionAnalyzerTest extends BaseTest {
+public class MoJoCalculatorTest extends BaseTest {
 	//region ATTRIBUTES
-	private final String resourcesDir = resourcesBase + fs + "MoJoFM";
-	private final String oraclesDir = resourcesDir + fs + "oracles";
-
+	private final String resourcesDir = resourcesBase + fs + "MoJoCalculator";
+	private final String oraclesFMDir = resourcesDir + fs + "MoJoFMoracles";
 	private static final Map<String, MoJoCalculator> mojoCalcs = new HashMap<>();
 	//endregion
 
@@ -57,12 +57,30 @@ public class MoJoEvolutionAnalyzerTest extends BaseTest {
 	public void mojoFmTest(String systemName, String recoveryTechnique) {
 		String clustersDir = resourcesDir + fs + systemName
 			+ fs + recoveryTechnique;
-		String oraclePath = oraclesDir + fs + systemName + "_"
+		String oraclePath = oraclesFMDir + fs + systemName + "_"
 			+ recoveryTechnique + ".txt";
 
 		Map<String, Double> mojoMap =
 			assertDoesNotThrow(() -> calcMojoFM(clustersDir),
 				"cluster files directory does not exist");
+
+		//region GENERATE ORACLES
+		if (generateOracles) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("mojofmvals");
+			for (Map.Entry<String, Double> result : mojoMap.entrySet()) {
+				sb.append(",");
+				sb.append(result.getKey());
+				sb.append(",");
+				sb.append(result.getValue());
+			}
+
+			PrintWriter writer = assertDoesNotThrow(() -> new PrintWriter(oraclePath));
+			writer.println(sb);
+			writer.close();
+		}
+		//endregion
+
 		Map<String, Double> oracleMojoMap =
 			assertDoesNotThrow(() -> readOracle(oraclePath),
 				"failed to read in oracle metrics file");
@@ -100,7 +118,7 @@ public class MoJoEvolutionAnalyzerTest extends BaseTest {
 				MoJoCalculator mojoCalc = getMojoCalc(currFile.getAbsolutePath(),
 					prevFile.getAbsolutePath(), null);
 				double mojoFmValue = mojoCalc.mojofm();
-				mojoFmMap.put(currFile.getName() + " " + prevFile.getName(), mojoFmValue);
+				mojoFmMap.put(currFile.getName() + "," + prevFile.getName(), mojoFmValue);
 			}
 			prevFile = currFile;
     }
@@ -130,7 +148,7 @@ public class MoJoEvolutionAnalyzerTest extends BaseTest {
 
     // records.get(0) contains the mojoFmValues
     for (int i = 1; i < records.get(0).size(); i += 3)
-      oracleMojoMap.put(records.get(0).get(i) + " "
+      oracleMojoMap.put(records.get(0).get(i) + ","
 				+ records.get(0).get(i + 1),
 				Double.parseDouble(records.get(0).get(i + 2)));
 
