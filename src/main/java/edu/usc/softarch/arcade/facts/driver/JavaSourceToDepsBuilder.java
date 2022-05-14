@@ -91,6 +91,12 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 				// Get the attributes of the related vertex
 				ClassAttributes targetAttributes =
 					(ClassAttributes)vertex.getHeadVertex(j).getAttributes();
+
+				// Ignore edges where target is irrelevant
+				if (!packagePrefix.equals("")
+						&& !targetAttributes.getName().startsWith(packagePrefix))
+					continue;
+
 				// Create a Pair to represent the edge
 				Map.Entry<String,String> edge = new AbstractMap.SimpleEntry<>(
 					sourceAttributes.getName(), targetAttributes.getName());
