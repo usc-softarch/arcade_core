@@ -26,7 +26,13 @@ public class MoJoCalculatorTest extends BaseTest {
 	//region ATTRIBUTES
 	private final String resourcesDir = resourcesBase + fs + "MoJoCalculator";
 	private final String oraclesFMDir = resourcesDir + fs + "MoJoFMoracles";
-	private static final Map<String, MoJoCalculator> mojoCalcs = new HashMap<>();
+	private final String oraclesEvoDir = resourcesDir + fs + "MoJoEvoOracles";
+	private final String oraclesPlusDir = resourcesDir + fs + "MoJoPlusOracles";
+	private final String oraclesBaseDir = resourcesDir + fs + "MoJoBaseOracles";
+	/*TODO fix Mojocalc so this can be static, currently there's some shenanigans
+	 * going on with the extraIn attributes */
+	private final Map<String, MoJoCalculator> mojoCalcs = new HashMap<>();
+	private enum MoJoMeasures { PLUS, EVO, FM, EDGE, MOJO }
 	//endregion
 
 	//region TESTS
@@ -61,7 +67,196 @@ public class MoJoCalculatorTest extends BaseTest {
 			+ recoveryTechnique + ".txt";
 
 		Map<String, Double> mojoMap =
-			assertDoesNotThrow(() -> calcMojoFM(clustersDir),
+			assertDoesNotThrow(() -> calcMojoMeasure(clustersDir, MoJoMeasures.FM),
+				"cluster files directory does not exist");
+
+		//region GENERATE ORACLES
+		if (generateOracles) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("mojofmvals");
+			for (Map.Entry<String, Double> result : mojoMap.entrySet()) {
+				sb.append(",");
+				sb.append(result.getKey());
+				sb.append(",");
+				sb.append(result.getValue());
+			}
+
+			PrintWriter writer = assertDoesNotThrow(() -> new PrintWriter(oraclePath));
+			writer.println(sb);
+			writer.close();
+		}
+		//endregion
+
+		Map<String, Double> oracleMojoMap =
+			assertDoesNotThrow(() -> readOracle(oraclePath),
+				"failed to read in oracle metrics file");
+
+		// Compare mojoFmValues to oracle
+		for (String filePair : mojoMap.keySet()) {
+			assertEquals(oracleMojoMap.get(filePair), mojoMap.get(filePair),
+				"mojoFmValue from comparison between " + filePair
+					+ " does not match oracle");
+		}
+	}
+
+	/**
+	 * Tests MoJoEVO's calculation against a given system and recovery technique.
+	 *
+	 * @param systemName Name of the system being tested with.
+	 * @param recoveryTechnique Name of the recovery technique being tested with.
+	 */
+	@ParameterizedTest
+	@CsvSource({
+		// Struts2 (acdc)
+		"Struts2,"
+			+ "acdc",
+
+		// httpd (acdc)
+		"httpd,"
+			+ "acdc",
+
+		// Struts2 (arc)
+		"Struts2,"
+			+ "arc",
+
+		// httpd (arc)
+		"httpd,"
+			+ "arc"
+	})
+	public void mojoEvoTest(String systemName, String recoveryTechnique) {
+		String clustersDir = resourcesDir + fs + systemName
+			+ fs + recoveryTechnique;
+		String oraclePath = oraclesEvoDir + fs + systemName + "_"
+			+ recoveryTechnique + ".txt";
+
+		Map<String, Double> mojoMap =
+			assertDoesNotThrow(() -> calcMojoMeasure(clustersDir, MoJoMeasures.EVO),
+				"cluster files directory does not exist");
+
+		//region GENERATE ORACLES
+		if (generateOracles) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("mojofmvals");
+			for (Map.Entry<String, Double> result : mojoMap.entrySet()) {
+				sb.append(",");
+				sb.append(result.getKey());
+				sb.append(",");
+				sb.append(result.getValue());
+			}
+
+			PrintWriter writer = assertDoesNotThrow(() -> new PrintWriter(oraclePath));
+			writer.println(sb);
+			writer.close();
+		}
+		//endregion
+
+		Map<String, Double> oracleMojoMap =
+			assertDoesNotThrow(() -> readOracle(oraclePath),
+				"failed to read in oracle metrics file");
+
+		// Compare mojoFmValues to oracle
+		for (String filePair : mojoMap.keySet()) {
+			assertEquals(oracleMojoMap.get(filePair), mojoMap.get(filePair),
+				"mojoFmValue from comparison between " + filePair
+					+ " does not match oracle");
+		}
+	}
+
+	/**
+	 * Tests MoJoEVO's calculation against a given system and recovery technique.
+	 *
+	 * @param systemName Name of the system being tested with.
+	 * @param recoveryTechnique Name of the recovery technique being tested with.
+	 */
+	@ParameterizedTest
+	@CsvSource({
+		// Struts2 (acdc)
+		"Struts2,"
+			+ "acdc",
+
+		// httpd (acdc)
+		"httpd,"
+			+ "acdc",
+
+		// Struts2 (arc)
+		"Struts2,"
+			+ "arc",
+
+		// httpd (arc)
+		"httpd,"
+			+ "arc"
+	})
+	public void mojoPlusTest(String systemName, String recoveryTechnique) {
+		String clustersDir = resourcesDir + fs + systemName
+			+ fs + recoveryTechnique;
+		String oraclePath = oraclesPlusDir + fs + systemName + "_"
+			+ recoveryTechnique + ".txt";
+
+		Map<String, Double> mojoMap =
+			assertDoesNotThrow(() -> calcMojoMeasure(clustersDir, MoJoMeasures.PLUS),
+				"cluster files directory does not exist");
+
+		//region GENERATE ORACLES
+		if (generateOracles) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("mojofmvals");
+			for (Map.Entry<String, Double> result : mojoMap.entrySet()) {
+				sb.append(",");
+				sb.append(result.getKey());
+				sb.append(",");
+				sb.append(result.getValue());
+			}
+
+			PrintWriter writer = assertDoesNotThrow(() -> new PrintWriter(oraclePath));
+			writer.println(sb);
+			writer.close();
+		}
+		//endregion
+
+		Map<String, Double> oracleMojoMap =
+			assertDoesNotThrow(() -> readOracle(oraclePath),
+				"failed to read in oracle metrics file");
+
+		// Compare mojoFmValues to oracle
+		for (String filePair : mojoMap.keySet()) {
+			assertEquals(oracleMojoMap.get(filePair), mojoMap.get(filePair),
+				"mojoFmValue from comparison between " + filePair
+					+ " does not match oracle");
+		}
+	}
+
+	/**
+	 * Tests MoJoEVO's calculation against a given system and recovery technique.
+	 *
+	 * @param systemName Name of the system being tested with.
+	 * @param recoveryTechnique Name of the recovery technique being tested with.
+	 */
+	@ParameterizedTest
+	@CsvSource({
+		// Struts2 (acdc)
+		"Struts2,"
+			+ "acdc",
+
+		// httpd (acdc)
+		"httpd,"
+			+ "acdc",
+
+		// Struts2 (arc)
+		"Struts2,"
+			+ "arc",
+
+		// httpd (arc)
+		"httpd,"
+			+ "arc"
+	})
+	public void mojoBaseTest(String systemName, String recoveryTechnique) {
+		String clustersDir = resourcesDir + fs + systemName
+			+ fs + recoveryTechnique;
+		String oraclePath = oraclesBaseDir + fs + systemName + "_"
+			+ recoveryTechnique + ".txt";
+
+		Map<String, Double> mojoMap =
+			assertDoesNotThrow(() -> calcMojoMeasure(clustersDir, MoJoMeasures.MOJO),
 				"cluster files directory does not exist");
 
 		//region GENERATE ORACLES
@@ -96,15 +291,16 @@ public class MoJoCalculatorTest extends BaseTest {
 
 	//region AUXILIARY
 	/**
-	 * Calculates the test results for a given system.
+	 * Calculates the test results for a given system and measure.
 	 *
 	 * @param clustersDir The path to the system's _clusters.rsf directory.
-	 * @return A map of version pairs to MoJoFM values.
+	 * @param measure The selected measure to calculate.
+	 * @return A map of version pairs to the measure's values.
 	 */
-  private Map<String, Double> calcMojoFM(String clustersDir)
-			throws FileNotFoundException {
+  private Map<String, Double> calcMojoMeasure(String clustersDir,
+			MoJoMeasures measure) throws FileNotFoundException {
     // Create map to MoJoFmValues and associated cluster files
-		Map<String, Double> mojoFmMap = new HashMap<>();
+		Map<String, Double> mojoMap = new HashMap<>();
 
     // Get the list of _clusters.rsf files for input.
     List<File> clusterFiles = getFileNames(clustersDir);
@@ -117,13 +313,29 @@ public class MoJoCalculatorTest extends BaseTest {
 			if (prevFile != null && currFile != null) {
 				MoJoCalculator mojoCalc = getMojoCalc(currFile.getAbsolutePath(),
 					prevFile.getAbsolutePath(), null);
-				double mojoFmValue = mojoCalc.mojofm();
-				mojoFmMap.put(currFile.getName() + "," + prevFile.getName(), mojoFmValue);
+				double mojoValue = 0;
+				switch (measure) {
+					case EDGE:
+						break;
+					case PLUS:
+						mojoValue = mojoCalc.mojoplus();
+						break;
+					case FM:
+						mojoValue = mojoCalc.mojofm();
+						break;
+					case MOJO:
+						mojoValue = mojoCalc.mojo();
+						break;
+					case EVO:
+						mojoValue = mojoCalc.mojoev();
+						break;
+				}
+				mojoMap.put(currFile.getName() + "," + prevFile.getName(), mojoValue);
 			}
 			prevFile = currFile;
     }
 
-    return mojoFmMap;
+    return mojoMap;
   }
 
 	/**

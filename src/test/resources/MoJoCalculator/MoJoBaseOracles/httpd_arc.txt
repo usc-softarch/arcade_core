@@ -1,0 +1,1 @@
+mojofmvals,httpd-2.4.16_46_topics_71_arc_clusters.rsf,httpd-2.4.10_46_topics_71_arc_clusters.rsf,0.0,httpd-2.4.7_46_topics_70_arc_clusters.rsf,httpd-2.3.8_46_topics_71_arc_clusters.rsf,79.0,httpd-2.4.10_46_topics_71_arc_clusters.rsf,httpd-2.4.7_46_topics_70_arc_clusters.rsf,20.0,httpd-2.4.26_50_topics_82_arc_clusters.rsf,httpd-2.4.16_46_topics_71_arc_clusters.rsf,72.0
