@@ -125,3 +125,17 @@ main functionalities of ARCADE, not to supplant it.
   when used to hold deserialized data, i.e. the order of execution is then 
   delegated to the order of the input data, rather than the language 
   implementation. 
+- **An Exception caught is an Exception treated** - The vast majority of the 
+  time, Exceptions should not be caught at all, but rather thrown down the 
+  stack. The moment you catch an Exception, you are overwriting its stack 
+  trace with your own, eliminating useful debugging information. Unless you 
+  intend to treat the Exception on the spot, throw it down. If it is a fatal 
+  Exception, it *should* be going all the way down, not caught so you can 
+  print a stack trace and System.exit(); the main function will do that for 
+  you if the Exception goes that far. If it is not fatal, then think 
+  carefully about what it means: does the Exception alter the execution of 
+  the system? If it does, it must be treated, either by providing 
+  information to the user as to why it happened, or by automatically 
+  resolving it (usually not viable in ARCADE, as most Exceptions are due to 
+  input errors). If it does not alter the execution of the system, why did 
+  it happen in the first place?
