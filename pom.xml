@@ -65,11 +65,15 @@
       <groupId>cc.mallet</groupId>
       <artifactId>mallet</artifactId>
       <version>local</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/libs/mallet.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>gnu.trove</groupId>
       <artifactId>trove</artifactId>
       <version>local</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/libs/trove-2.0.2.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -212,11 +216,15 @@
       <groupId>com.jeantessier</groupId>
       <artifactId>dependencyfinder</artifactId>
       <version>local</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/libs/DependencyFinder.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>com.ojn.gexf4j</groupId>
       <artifactId>gexf4j</artifactId>
       <version>local</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/libs/gexf4j-core-0.2.0-ALPHA.jar</systemPath>
     </dependency>
 	  <!-- https://mvnrepository.com/artifact/oro/oro -->
     <dependency>
@@ -308,73 +316,6 @@
             </manifest>
           </archive>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <version>3.0.0-M1</version>
-        <executions>
-          <execution>
-            <id>hack-binary1</id>
-            <phase>compile</phase>
-            <configuration>
-              <file>${basedir}/libs/DependencyFinder.jar</file>
-              <groupId>com.jeantessier</groupId>
-              <artifactId>dependencyfinder</artifactId>
-              <version>local</version>
-              <packaging>jar</packaging>
-              <generatePom>true</generatePom>
-            </configuration>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>hack-binary2</id>
-            <phase>compile</phase>
-            <configuration>
-              <file>${basedir}/libs/gexf4j-core-0.2.0-ALPHA.jar</file>
-              <groupId>com.ojn.gexf4j</groupId>
-              <artifactId>gexf4j</artifactId>
-              <version>local</version>
-              <packaging>jar</packaging>
-              <generatePom>true</generatePom>
-            </configuration>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>hack-binary3</id>
-            <phase>compile</phase>
-            <configuration>
-              <file>${basedir}/libs/mallet.jar</file>
-              <groupId>cc.mallet</groupId>
-              <artifactId>mallet</artifactId>
-              <version>local</version>
-              <packaging>jar</packaging>
-              <generatePom>true</generatePom>
-            </configuration>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>hack-binary4</id>
-            <phase>compile</phase>
-            <configuration>
-              <file>${basedir}/libs/trove-2.0.2.jar</file>
-              <groupId>gnu.trove</groupId>
-              <artifactId>trove</artifactId>
-              <version>local</version>
-              <packaging>jar</packaging>
-              <generatePom>true</generatePom>
-            </configuration>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
