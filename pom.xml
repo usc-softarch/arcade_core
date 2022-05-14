@@ -316,7 +316,7 @@
         <executions>
           <execution>
             <id>hack-binary1</id>
-            <phase>clean</phase>
+            <phase>compile</phase>
             <configuration>
               <file>${basedir}/libs/DependencyFinder.jar</file>
               <groupId>com.jeantessier</groupId>
@@ -331,7 +331,7 @@
           </execution>
           <execution>
             <id>hack-binary2</id>
-            <phase>clean</phase>
+            <phase>compile</phase>
             <configuration>
               <file>${basedir}/libs/gexf4j-core-0.2.0-ALPHA.jar</file>
               <groupId>com.ojn.gexf4j</groupId>
@@ -346,7 +346,7 @@
           </execution>
           <execution>
             <id>hack-binary3</id>
-            <phase>clean</phase>
+            <phase>compile</phase>
             <configuration>
               <file>${basedir}/libs/mallet.jar</file>
               <groupId>cc.mallet</groupId>
@@ -361,7 +361,7 @@
           </execution>
           <execution>
             <id>hack-binary4</id>
-            <phase>clean</phase>
+            <phase>compile</phase>
             <configuration>
               <file>${basedir}/libs/trove-2.0.2.jar</file>
               <groupId>gnu.trove</groupId>
