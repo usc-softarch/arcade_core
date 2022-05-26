@@ -60,16 +60,8 @@ public abstract class ClusteringAlgoRunner {
 		String sysDirPath = args[11];
 		String artifactsDirPath = args[12];
 
-		ConcernClusteringRunner.run(
-			parsedArguments.arch,
-			parsedArguments.serialCrit,
-			parsedArguments.stopCrit,
-			parsedArguments.language,
-			parsedArguments.stoppingCriterion,
-			parsedArguments.simMeasure,
-			outputDirPath,
-			sysDirPath,
-			artifactsDirPath);
+		ConcernClusteringRunner.run(parsedArguments, outputDirPath,
+			sysDirPath, artifactsDirPath);
 	}
 
 	private static void runLimbo(ClusteringAlgoArguments parsedArguments)

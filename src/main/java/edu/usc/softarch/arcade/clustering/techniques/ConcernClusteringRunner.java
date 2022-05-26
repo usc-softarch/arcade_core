@@ -23,6 +23,21 @@ import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #region INTERFACE ---------------------------------------------------------
+	public static Architecture run(ClusteringAlgoArguments parsedArguments,
+			String outputDirPath,	String sysDirPath, String artifactsDirPath)
+			throws IOException {
+		return run(
+			parsedArguments.arch,
+			parsedArguments.serialCrit,
+			parsedArguments.stopCrit,
+			parsedArguments.language,
+			parsedArguments.stoppingCriterion,
+			parsedArguments.simMeasure,
+			outputDirPath,
+			sysDirPath,
+			artifactsDirPath);
+	}
+
 	public static Architecture run(Architecture arch,
 			SerializationCriterion serialCrit, StoppingCriterion stopCrit,
 			String language, String stoppingCriterionName,
