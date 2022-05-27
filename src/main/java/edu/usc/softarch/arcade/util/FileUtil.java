@@ -281,7 +281,7 @@ public class FileUtil {
 	 * the name of the parent class.
 	 */
 	public static String cutInnerClass(String dir) {
-		if (dir.contains("$")) return dir.split("\\$")[0];
+		if (dir.contains("$")) return dir.split("$")[0];
 		return dir;
 	}
 
