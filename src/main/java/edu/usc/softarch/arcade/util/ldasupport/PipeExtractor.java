@@ -90,6 +90,7 @@ public class PipeExtractor {
 		
 		//save for next time
 		String outputDir = args[1].replaceFirst("^~",System.getProperty("user.home"));
+		FileUtil.checkDir(outputDir, true, false);
 		instances.save(new File (outputDir, "output.pipe"));
 	}
 }
