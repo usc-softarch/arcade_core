@@ -24,7 +24,7 @@ import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #region INTERFACE ---------------------------------------------------------
 	public static Architecture run(ClusteringAlgoArguments parsedArguments,
-			String outputDirPath,	String sysDirPath, String artifactsDirPath)
+			String outputDirPath,	String artifactsDirPath)
 			throws IOException {
 		return run(
 			parsedArguments.arch,
@@ -34,7 +34,6 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			parsedArguments.stoppingCriterion,
 			parsedArguments.simMeasure,
 			outputDirPath,
-			sysDirPath,
 			artifactsDirPath);
 	}
 
@@ -42,10 +41,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			SerializationCriterion serialCrit, StoppingCriterion stopCrit,
 			String language, String stoppingCriterionName,
 			SimMeasure.SimMeasureType simMeasure, String outputDirPath,
-			String sysDirPath, String artifactsDirPath)
+			String artifactsDirPath)
 			throws IOException {
-		String revisionNumber = (new File(sysDirPath)).getName();
-
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
 			language, serialCrit, arch, artifactsDirPath);
 
@@ -62,7 +59,7 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		}
 
 		String prefix = outputDirPath + File.separator
-			+ revisionNumber + "_" + runner.getArchitecture().size();
+			+ runner.getArchitecture().projectName;
 		String arcClustersFilename = prefix	+ "_arc_clusters.rsf";
 		String docTopicsFilename = prefix + "_arc_docTopics.json";
 

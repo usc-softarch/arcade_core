@@ -38,7 +38,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 	 * The name of the subject system represented by this architecture. Used in
 	 * serialization.
 	 */
-	private final String projectName;
+	public final String projectName;
 	/**
 	 * The path to where this data structure should be serialized.
 	 */

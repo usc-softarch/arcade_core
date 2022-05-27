@@ -48,7 +48,6 @@ import edu.usc.softarch.arcade.clustering.Architecture;
 public class ConcernClusteringRunnerTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "ARC";
 	private final String factsDir = resourcesBase + fs + "Facts";
-	private final String subjectSystemsDir = resourcesBase + fs + "subject_systems";
 	private final String outputDirPath = outputBase + fs + "ConcernClusteringRunnerTest";
 
 	/**
@@ -63,31 +62,30 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_181_arc_clusters.rsf,"
+			+ "_arc_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_163_arc_clusters.rsf,"
+			+ "_arc_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_71_arc_clusters.rsf,"
+			+ "_arc_clusters.rsf,"
 			+ "",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_82_arc_clusters.rsf,"
+			+ "_arc_clusters.rsf,"
 			+ ""
 	})
 	public void ARCRecoveryTest(String systemVersion, String lang,
 			String arcFileSuffix, String packagePrefix) {
 		// Creating relevant path Strings
-		String sysDir = subjectSystemsDir + fs + systemVersion;
 		String sysResources = resourcesDir + fs + systemVersion;
 		String artifactsDir = sysResources + fs + "base";
 		String oracleFilePath = sysResources + fs + systemVersion + arcFileSuffix;
@@ -109,7 +107,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		assertDoesNotThrow(() ->
 			ConcernClusteringRunnerMock.run(arch, serialCrit, stopCrit, lang,
 				"preselected",	SimMeasure.SimMeasureType.JS,
-				outputDirPath, sysDir, artifactsDir));
+				outputDirPath, artifactsDir));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of
@@ -157,22 +155,22 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_181_arc_",
+			+ "_arc_",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_163_arc_",
+			+ "_arc_",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_71_arc_",
+			+ "_arc_",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_82_arc_"
+			+ "_arc_"
 	})
 	public void asdWithConcernsTest(String systemVersion, String lang, String arcFileSuffix) {
 		// Creating relevant path Strings

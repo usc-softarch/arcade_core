@@ -30,8 +30,7 @@ public abstract class ClusteringAlgoRunner {
 	 * 8 : Name of the subject system.
 	 * 9 : Path to place the output.
 	 * 10: Package prefix to include in the analysis. If C, empty string.
-	 * 11: Path to the subject system root.
-	 * 12: Path to directory containing auxiliary artifacts.
+	 * 11: Path to directory containing auxiliary artifacts.
 	 */
 	public static void main(String[] args)
 			throws IOException, DistributionSizeMismatchException {
@@ -57,11 +56,10 @@ public abstract class ClusteringAlgoRunner {
 	private static void runArc(ClusteringAlgoArguments parsedArguments,
 			String[] args) throws IOException {
 		String outputDirPath = args[9];
-		String sysDirPath = args[11];
-		String artifactsDirPath = args[12];
+		String artifactsDirPath = args[11];
 
 		ConcernClusteringRunner.run(parsedArguments, outputDirPath,
-			sysDirPath, artifactsDirPath);
+			artifactsDirPath);
 	}
 
 	private static void runLimbo(ClusteringAlgoArguments parsedArguments)
