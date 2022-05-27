@@ -11,6 +11,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
+		<!-- CHANGE THIS LINE TO CHANGE MAIN CLASS -->
+		<mainclass>edu.usc.softarch.arcade.facts.driver.JavaSourceToDepsBuilder</mainclass>
+		<!-- CHANGE THIS LINE TO CHANGE MAIN CLASS -->
   </properties>
   <repositories>
     <repository>
@@ -265,12 +268,10 @@
               <descriptorRefs>
                 <descriptorRef>jar-with-dependencies</descriptorRef>
               </descriptorRefs>
-              <finalName>arcade_core_fat</finalName>
+              <finalName>${project.build.finalName}</finalName>
               <archive>
                 <manifest>
-                  <!-- CHANGE THIS LINE TO CHANGE MAIN CLASS -->
-                  <mainClass>edu.usc.softarch.arcade.clustering.drivers.AcdcWithSmellDetection</mainClass>
-                  <!-- CHANGE THIS LINE TO CHANGE MAIN CLASS -->
+                  <mainClass>${mainclass}</mainClass>
                 </manifest>
               </archive>
             </configuration>
@@ -281,7 +282,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
+			<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>3.1.1</version>
@@ -310,9 +311,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>libs/</classpathPrefix>
-              <!-- CHANGE THIS LINE TO CHANGE MAIN CLASS -->
-              <mainClass>edu.usc.softarch.arcade.AcdcWithSmellDetection</mainClass>
-              <!-- CHANGE THIS LINE TO CHANGE MAIN CLASS -->
+              <mainClass>${mainclass}</mainClass>
             </manifest>
           </archive>
         </configuration>
