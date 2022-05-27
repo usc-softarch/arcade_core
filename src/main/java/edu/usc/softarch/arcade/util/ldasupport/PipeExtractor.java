@@ -26,6 +26,7 @@ public class PipeExtractor {
 	public static void main(String[] args) throws IOException {
 		List<Pipe> pipeList = new ArrayList<>();
 		String selectedLanguage = args[2];
+		String stopWordDir = args[3];
 		char fs = File.separatorChar;
 
 		// Pipes: alphanumeric only, camel case separation, lowercase, tokenize,
@@ -37,17 +38,17 @@ public class PipeExtractor {
 		pipeList.add(new CharSequence2TokenSequence(Pattern
 				.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")));
 		pipeList.add(new TokenSequenceRemoveStopwords(new File(
-			"src" + fs + "main" + fs + "resources" + fs + "stoplists" + fs + "en.txt"), "UTF-8", false, false, false));
+			stopWordDir + fs + "stoplists" + fs + "en.txt"), "UTF-8", false, false, false));
 		
 		if (selectedLanguage.equalsIgnoreCase("c")) {
 			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-				"src" + fs + "main" + fs + "resources" + fs + "res" + fs + "ckeywords"), "UTF-8", false, false, false));
+				stopWordDir + fs + "res" + fs + "ckeywords"), "UTF-8", false, false, false));
 			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-				"src" + fs + "main" + fs + "resources" + fs + "res" + fs + "cppkeywords"), "UTF-8", false, false, false));
+				stopWordDir + fs + "res" + fs + "cppkeywords"), "UTF-8", false, false, false));
 		}
 		else {
 			pipeList.add(new TokenSequenceRemoveStopwords(new File(
-				"src" + fs + "main" + fs + "resources" + fs + "res" + fs +  "javakeywords"), "UTF-8", false, false, false));
+				stopWordDir + fs + "res" + fs +  "javakeywords"), "UTF-8", false, false, false));
 		}
 		pipeList.add(new StemmerPipe());
 		pipeList.add(new TokenSequence2FeatureSequence());

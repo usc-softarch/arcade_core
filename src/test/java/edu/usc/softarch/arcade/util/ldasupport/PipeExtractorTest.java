@@ -59,17 +59,19 @@ public class PipeExtractorTest {
 		+ "c",
 	})
 	public void mainTest(String versionDir, String outputDir, String oracleFile, String language){
+		String fs = File.separator;
 		/** Integration test for PipeExtractor **/
 		String classesDir = versionDir.replace("///", File.separator);
 		String resultDir = outputDir.replace("///", File.separator);
 		// Path to oracle pipe file
 		String oraclePath = oracleFile.replace("///", File.separator);
+		String stopWordsDir = "src" + fs + "main" + fs + "resources";
 		(new File(resultDir)).mkdirs();
 		
 		// Call PipeExtractor.main() 
 		// (arguments: sys version dir, output dir, selected language)
 		assertDoesNotThrow( () -> {
-			PipeExtractor.main(new String[] {classesDir, resultDir, language});
+			PipeExtractor.main(new String[] {classesDir, resultDir, language, stopWordsDir});
 		});
 
 		// Read result instances into a set
