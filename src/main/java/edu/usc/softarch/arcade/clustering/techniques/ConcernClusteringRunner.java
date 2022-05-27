@@ -122,10 +122,11 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		try	{
 			this.docTopics = DocTopics.deserializeDocTopics(artifactsDir + File.separator + "docTopics.json");
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("No DocTopics file found, generating new one.");
 			// Initialize DocTopics from files
 			try {
 				this.docTopics = new DocTopics(artifactsDir);
+				this.docTopics.serializeDocTopics(artifactsDir + File.separator + "docTopics.json");
 			} catch (Exception f) {
 				f.printStackTrace();
 			}
