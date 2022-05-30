@@ -51,6 +51,8 @@ public class Architecture extends TreeMap<String, Cluster> {
 	 * of functions when using function-level granularity.
 	 */
 	private final int numFeatures;
+
+	protected final String language;
 	//endregion
 
 	//region CONSTRUCTORS
@@ -64,6 +66,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 		this.projectName = arch.projectName;
 		this.projectPath = arch.projectPath;
 		this.numFeatures = arch.numFeatures;
+		this.language = arch.language;
 	}
 
 	/**
@@ -85,6 +88,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 		this.projectName = projectName;
 		this.projectPath = projectPath;
 		this.numFeatures = vectors.getNamesInFeatureSet().size();
+		this.language = language;
 		initializeClusters(vectors, language, packagePrefix);
 	}
 
@@ -115,7 +119,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 	 *                      initialization of the Architecture. Only used in
 	 *                      Java systems.
 	 */
-	private void initializeClusters(FeatureVectors vectors, String language,
+	protected void initializeClusters(FeatureVectors vectors, String language,
 			String packagePrefix) {
 		// For each cell in the adjacency matrix
 		for (String name : vectors.getFeatureVectorNames()) {

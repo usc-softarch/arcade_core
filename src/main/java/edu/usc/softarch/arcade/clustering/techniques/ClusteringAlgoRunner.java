@@ -6,6 +6,7 @@ import java.util.Map;
 
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.Architecture;
+import edu.usc.softarch.arcade.clustering.ConcernArchitecture;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimData;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
@@ -56,10 +57,8 @@ public abstract class ClusteringAlgoRunner {
 	private static void runArc(ClusteringAlgoArguments parsedArguments,
 			String[] args) throws IOException {
 		String outputDirPath = args[9];
-		String artifactsDirPath = args[11];
 
-		ConcernClusteringRunner.run(parsedArguments, outputDirPath,
-			artifactsDirPath);
+		ConcernClusteringRunner.run(parsedArguments, outputDirPath);
 	}
 
 	private static void runLimbo(ClusteringAlgoArguments parsedArguments)
@@ -87,6 +86,7 @@ public abstract class ClusteringAlgoRunner {
 	public static class ClusteringAlgoArguments {
 		public final String language;
 		public final Architecture arch;
+		public final ConcernArchitecture concernArch;
 		public final SerializationCriterion serialCrit;
 		public final StoppingCriterion stopCrit;
 		public final String stoppingCriterion;
@@ -96,6 +96,11 @@ public abstract class ClusteringAlgoRunner {
 			this.language = args[1];
 			this.arch = new Architecture(args[8], args[9],
 				FeatureVectors.deserializeFFVectors(args[2]),	this.language, args[10]);
+			if (args.length > 11)
+				this.concernArch = new ConcernArchitecture(args[8], args[9],
+					FeatureVectors.deserializeFFVectors(args[2]),	this.language, args[11],
+					args[10]);
+			else this.concernArch = null;
 			this.serialCrit = SerializationCriterion.makeSerializationCriterion(
 				args[6], Integer.parseInt(args[7]), arch);
 			this.stopCrit = StoppingCriterion.makeStoppingCriterion(

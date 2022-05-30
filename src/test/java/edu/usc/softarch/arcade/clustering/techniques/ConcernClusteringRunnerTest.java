@@ -1,19 +1,12 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,6 +21,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
+import edu.usc.softarch.arcade.clustering.ConcernArchitecture;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
@@ -92,10 +86,10 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		String ffVecs = factsDir + fs + systemVersion + "_fVectors.json";
 		String resultClustersFile = outputDirPath + fs + systemVersion + arcFileSuffix;
 
-		Architecture arch = assertDoesNotThrow(() ->
-			new Architecture(systemVersion, outputDirPath,
+		ConcernArchitecture arch = assertDoesNotThrow(() ->
+			new ConcernArchitecture(systemVersion, outputDirPath,
 			FeatureVectors.deserializeFFVectors(ffVecs),
-			lang,	packagePrefix));
+			lang,	artifactsDir, packagePrefix));
 
 		SerializationCriterion serialCrit =
 			SerializationCriterion.makeSerializationCriterion(
@@ -107,7 +101,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		assertDoesNotThrow(() ->
 			ConcernClusteringRunnerMock.run(arch, serialCrit, stopCrit, lang,
 				"preselected",	SimMeasure.SimMeasureType.JS,
-				outputDirPath, artifactsDir));
+				outputDirPath));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of
@@ -210,123 +204,6 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 	}
 
 	/**
-	 * This test primarily verifies that initializeClusterDocTopics is making
-	 * modifications to the internal structures of ConcernClusteringRunner.
-	 * Checks that ConcernClusteringRunner.featureVectors is not null after the
-	 * ConcernClusteringRunner constructor call. Checks that
-	 * ConcernClusteringRunner.architecture is modified in the
-	 * ConcernClusteringRunner constructor.
-	 *
-	 * @param versionName System version.
-	 * @param language System language.
-	 */
-	@ParameterizedTest
-	@CsvSource({
-		// struts 2.3.30
-		"struts-2.3.30,"
-			+ "java,"
-			+ "org.apache.struts2",
-
-		// struts 2.5.2
-		"struts-2.5.2,"
-			+ "java,"
-			+ "org.apache.struts2",
-
-		// httpd-2.3.8
-		"httpd-2.3.8,"
-			+ "c,"
-			+ "",
-
-		// httpd-2.4.26
-		"httpd-2.4.26,"
-			+ "c,"
-			+ ""
-	})
-	public void initDataStructuresTest(String versionName, String language,
-			String packagePrefix) {
-		String artifactsDir = resourcesDir + fs + versionName;
-		String initialArchitecturePath = artifactsDir + fs + "initial_architecture.txt";
-		String architectureWithDocTopicsPath =
-			artifactsDir + fs + "architecture_with_doc_topics.txt";
-		
-		// Deserialize FastFeatureVectors oracle
-		String ffVecsFilePath = factsDir + fs + versionName + "_fVectors.json";
-		FeatureVectors builderffVecs = null;
-
-		try {
-			builderffVecs = FeatureVectors.deserializeFFVectors(ffVecsFilePath);
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-
-		if (builderffVecs == null)
-			fail("failed to deserialize FastFeatureVectors from builder object");
-
-		Architecture arch = new Architecture(versionName, outputDirPath,
-			builderffVecs, language, packagePrefix);
-
-		SerializationCriterion serializationCriterion =
-			SerializationCriterion.makeSerializationCriterion(
-				"archsize", 0, arch);
-		
-		// Construct a ConcernClusteringRunner object
-		ConcernClusteringRunnerMock runner = new ConcernClusteringRunnerMock(
-			language, serializationCriterion, arch, artifactsDir + "/base");
-
-		/* Tests whether fastClusters was altered by
-		 * initializeDocTopicsForEachFastCluster */
-		Architecture initialArchitecture = runner.getInitialArchitecture();
-		Architecture architectureWithDocTopics = runner.getArchitectureWithDocTopics();
-
-		// ------------------------- Generate Oracles ------------------------------
-
-		if (generateOracles) {
-			assertDoesNotThrow(() -> {
-				ObjectOutputStream out =
-					new ObjectOutputStream(new FileOutputStream(initialArchitecturePath));
-				out.writeObject(initialArchitecture);
-				out.close();
-				out = new ObjectOutputStream(new FileOutputStream(architectureWithDocTopicsPath));
-				out.writeObject(architectureWithDocTopics);
-				out.close();
-			});
-		}
-
-		// ------------------------- Generate Oracles ------------------------------
-
-		System.out.println("fastClusters size before: " + initialArchitecture.size());
-		System.out.println("fastClusters size after: " + architectureWithDocTopics.size());
-
-		// every node should get a cluster, so there should be at least one cluster
-		assertFalse(initialArchitecture.isEmpty());
-		assertAll(
-			() -> assertFalse(architectureWithDocTopics.isEmpty(),
-				"fastClusters empty after initializeDocTopicsForEachFastCluster"),
-			() -> assertNotEquals(architectureWithDocTopics, initialArchitecture)
-		);
-
-		// check the integrity of both data structures, before and after docTopics
-		Architecture initialArchitectureOracle = assertDoesNotThrow(() -> {
-			ObjectInputStream in =
-				new ObjectInputStream(new FileInputStream(initialArchitecturePath));
-			return (Architecture) in.readObject();
-		});
-		Architecture architectureWithDocTopicsOracle = assertDoesNotThrow(() -> {
-			ObjectInputStream in =
-				new ObjectInputStream(new FileInputStream(architectureWithDocTopicsPath));
-			return (Architecture) in.readObject();
-		});
-
-		assertAll(
-			() -> assertEquals(initialArchitectureOracle, initialArchitecture,
-				"Initial Architectures did not match."),
-			() -> assertEquals(architectureWithDocTopicsOracle, architectureWithDocTopics,
-				"DocTopic Architectures did not match.")
-		);
-	}
-
-	/**
 	 * Checks whether fastClusters is modified by
 	 * updateFastClustersAndSimMatrixToReflectMergedCluster.
 	 * stopCriterion = clustergain is not currently in use.
@@ -377,16 +254,18 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 			fail("failed to deserialize FastFeatureVectors from builder object");
 		}
 
-		Architecture arch = new Architecture(versionName, outputDirPath,
-			builderffVecs, language, packagePrefix);
+		ConcernArchitecture concernArch = new ConcernArchitecture(versionName,
+			outputDirPath, builderffVecs, language,
+			artifactsDir + "/base", packagePrefix);
 
 		SerializationCriterion serializationCriterion =
 			SerializationCriterion.makeSerializationCriterion(
-				"archsize", 0, arch);
+				"archsize", 0, concernArch);
 		
 		// Construct a ConcernClusteringRunner object
 		ConcernClusteringRunnerMock runner = new ConcernClusteringRunnerMock(
-			language, serializationCriterion, arch, artifactsDir + "/base");
+			language, serializationCriterion, concernArch);
+		Architecture initialArchitecture = new Architecture(runner.getArchitecture());
 		// call computeClustersWithConcernsAndFastClusters()
 		assertDoesNotThrow(() -> {
 			// copied from BatchClusteringEngine
@@ -396,13 +275,6 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 				new PreSelectedStoppingCriterion(numClusters),
 				"preselected", SimMeasure.SimMeasureType.JS);
 		});
-
-		Architecture fastClustersAfterInit = runner.getArchitectureWithDocTopics();
-		Architecture fastClustersCompute = runner.getArchitecture();
-		// Check that fastClusters not empty after computeClustersWithConcernsAndFastClusters call 
-		assertFalse(fastClustersCompute.isEmpty());
-		// The size of the fastClusters should be smaller afterward
-		assertTrue(fastClustersCompute.size() < fastClustersAfterInit.size());
 
 		// ------------------------- Generate Oracles ------------------------------
 
@@ -424,7 +296,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 			JsonFactory factory = new JsonFactory();
 			JsonParser parser = factory.createParser(new File(oracleSimMatrixPath));
 			parser.nextToken();
-			return SimilarityMatrix.deserialize(parser, runner.getArchitectureWithDocTopics());
+			return SimilarityMatrix.deserialize(parser, initialArchitecture);
 		});
 		SimilarityMatrix initialSimMatrix = runner.getInitialSimMatrix();
 
