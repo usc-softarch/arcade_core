@@ -104,7 +104,7 @@ public abstract class ClusteringAlgoRunner {
 			this.serialCrit = SerializationCriterion.makeSerializationCriterion(
 				args[6], Integer.parseInt(args[7]), arch);
 			this.stopCrit = StoppingCriterion.makeStoppingCriterion(
-				args[3], Integer.parseInt(args[4]));
+				args[3], Integer.parseInt(args[4]), arch);
 			this.stoppingCriterion = args[3];
 			this.simMeasure =
 				SimMeasure.SimMeasureType.valueOf(args[5].toUpperCase());

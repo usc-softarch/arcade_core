@@ -23,6 +23,7 @@ import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.clustering.ConcernArchitecture;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
+import edu.usc.softarch.arcade.clustering.criteria.ArchSizeFractionStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
@@ -96,11 +97,11 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 			"archsize", 100, arch);
 
 		StoppingCriterion stopCrit = StoppingCriterion.makeStoppingCriterion(
-				"preselected", 0);
+				"archsizefraction", 0.2, arch);
 
 		assertDoesNotThrow(() ->
 			ConcernClusteringRunnerMock.run(arch, serialCrit, stopCrit, lang,
-				"preselected",	SimMeasure.SimMeasureType.JS,
+				"archsizefraction",	SimMeasure.SimMeasureType.JS,
 				outputDirPath));
 
 		/* The expectation here is that this resulting clusters file has the same
@@ -268,12 +269,10 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		Architecture initialArchitecture = new Architecture(runner.getArchitecture());
 		// call computeClustersWithConcernsAndFastClusters()
 		assertDoesNotThrow(() -> {
-			// copied from BatchClusteringEngine
-			int numClusters = (int) ((double) runner.getArchitecture().size() * .20);
 			// USING THE CLONE THAT TAKES IN THE VERSION NAME HERE
 			runner.computeArchitecture(
-				new PreSelectedStoppingCriterion(numClusters),
-				"preselected", SimMeasure.SimMeasureType.JS);
+				new ArchSizeFractionStoppingCriterion(runner.getArchitecture(), .2),
+				"archsizefraction", SimMeasure.SimMeasureType.JS);
 		});
 
 		// ------------------------- Generate Oracles ------------------------------

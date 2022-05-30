@@ -41,14 +41,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
 			language, serialCrit, arch);
 
-		// Overwrite numClusters with docTopicfied architecture
-		int numClusters = (int) (runner.getArchitecture().size() * .20);
-		if (stopCrit instanceof PreSelectedStoppingCriterion)
-			((PreSelectedStoppingCriterion) stopCrit).setNumClusters(numClusters);
-
 		try {
-			runner.computeArchitecture(stopCrit, stoppingCriterionName,
-				simMeasure);
+			runner.computeArchitecture(stopCrit, stoppingCriterionName,	simMeasure);
 		} catch (DistributionSizeMismatchException e) {
 			e.printStackTrace(); //TODO Handle it
 		}
