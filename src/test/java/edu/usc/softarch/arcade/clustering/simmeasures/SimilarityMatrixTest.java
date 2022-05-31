@@ -63,9 +63,9 @@ public class SimilarityMatrixTest extends BaseTest {
 		assertNotNull(builderffVecs,
 			"failed to deserialize FastFeatureVectors from builder object");
 
-		ConcernArchitecture concernArch = new ConcernArchitecture(versionName,
-			outputDirPath, builderffVecs, language,
-			artifactsDir + "/base", packagePrefix);
+		ConcernArchitecture concernArch = assertDoesNotThrow(() ->
+			new ConcernArchitecture(versionName, outputDirPath, builderffVecs,
+				language, artifactsDir + "/base", packagePrefix));
 
 		SimilarityMatrix simMatrix = assertDoesNotThrow(() ->
 			new SimilarityMatrix(SimMeasure.SimMeasureType.JS, concernArch) );

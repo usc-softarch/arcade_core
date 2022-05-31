@@ -1,10 +1,7 @@
-package edu.usc.softarch.arcade.clustering.techniques;
+package edu.usc.softarch.arcade.clustering;
 
 import edu.usc.softarch.arcade.BaseTest;
-import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
-import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -19,7 +16,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class LimboRunnerTest extends BaseTest {
+public class LimboTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "Limbo";
 	private final String factsDir = resourcesBase + fs + "Facts";
 	private final String outputDirPath = outputBase + fs + "Limbo";
@@ -68,7 +65,7 @@ public class LimboRunnerTest extends BaseTest {
 			"preselected", 100);
 
 		assertDoesNotThrow(() ->
-			LimboRunner.run(arch, serialCrit, stopCrit, lang,
+			Clusterer.run(ClusteringAlgorithmType.LIMBO, arch, serialCrit, stopCrit, lang,
 				"preselected", SimMeasure.SimMeasureType.IL));
 
 		// Load results

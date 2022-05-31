@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.clustering;
 
-import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
@@ -18,7 +17,7 @@ public class ConcernArchitecture extends Architecture {
 	//region CONSTRUCTORS
 	public ConcernArchitecture(String projectName, String projectPath,
 			FeatureVectors vectors, String language, String artifactsDir,
-			String packagePrefix) {
+			String packagePrefix) throws UnmatchingDocTopicItemsException {
 		super(projectName, projectPath, vectors, language, packagePrefix);
 
 		try	{
@@ -40,12 +39,14 @@ public class ConcernArchitecture extends Architecture {
 	}
 
 	public ConcernArchitecture(String projectName, String projectPath,
-			FeatureVectors vectors, String language, String artifactsDir) {
+			FeatureVectors vectors, String language, String artifactsDir)
+			throws UnmatchingDocTopicItemsException {
 		this(projectName, projectPath, vectors, language,
 			artifactsDir, "");
 	}
 
-	protected void initializeClusterDocTopics() {
+	protected void initializeClusterDocTopics()
+			throws UnmatchingDocTopicItemsException {
 		// Set the DocTopics of each Cluster
 		for (Cluster c : super.values())
 			this.docTopics.setClusterDocTopic(c, super.language);
@@ -84,12 +85,14 @@ public class ConcernArchitecture extends Architecture {
 	}
 
 	//TODO Change this to the correct format
-	private void removeInnerClasses(Map<String, String> parentClassMap) {
+	private void removeInnerClasses(Map<String, String> parentClassMap)
+			throws UnmatchingDocTopicItemsException {
 		for (Map.Entry<String, String> entry : parentClassMap.entrySet()) {
 			Cluster nestedCluster = super.get(entry.getKey());
 			if (nestedCluster == null) continue; // was already removed by WithoutDTI
 			Cluster parentCluster = super.get(entry.getValue());
-			Cluster mergedCluster = mergeClustersUsingTopics(nestedCluster, parentCluster);
+			Cluster mergedCluster =
+				new Cluster(ClusteringAlgorithmType.ARC, nestedCluster, parentCluster);
 			super.remove(parentCluster.getName());
 			super.remove(nestedCluster.getName());
 			super.put(mergedCluster.getName(), mergedCluster);
@@ -115,19 +118,6 @@ public class ConcernArchitecture extends Architecture {
 		// Remove them from the analysis
 		super.removeAll(excessClusters);
 		super.removeAll(excessInners);
-	}
-
-	public static Cluster mergeClustersUsingTopics(Cluster cluster, Cluster otherCluster) {
-		Cluster newCluster =
-			new Cluster(ClusteringAlgorithmType.ARC, cluster, otherCluster);
-
-		try {
-			newCluster.setDocTopicItem(new DocTopicItem(cluster, otherCluster));
-		} catch (UnmatchingDocTopicItemsException e) {
-			e.printStackTrace(); //TODO handle it
-		}
-
-		return newCluster;
 	}
 	//endregion
 }

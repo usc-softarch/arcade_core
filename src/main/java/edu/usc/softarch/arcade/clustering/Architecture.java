@@ -17,7 +17,6 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import edu.usc.softarch.arcade.clustering.techniques.ClusteringAlgoRunner;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
@@ -133,7 +132,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 			addClusterConditionally(cluster, language, packagePrefix);
 		}
 
-		ClusteringAlgoRunner.numberOfEntitiesToBeClustered = this.size();
+		Clusterer.numberOfEntitiesToBeClustered = this.size();
 	}
 
 	/**
@@ -225,6 +224,17 @@ public class Architecture extends TreeMap<String, Cluster> {
 	//endregion
 
 	//region PROCESSING
+	public double computeClusterGain(ClusteringAlgorithmType algorithm) {
+		switch(algorithm) {
+			case WCA:
+			case LIMBO:
+				return computeStructuralClusterGain();
+			case ARC:
+				return computeTopicClusterGain();
+			default:
+				throw new IllegalArgumentException();
+		}
+	}
 
 	/**
 	 * TODO

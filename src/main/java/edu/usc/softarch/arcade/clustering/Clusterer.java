@@ -1,21 +1,18 @@
-package edu.usc.softarch.arcade.clustering.techniques;
+package edu.usc.softarch.arcade.clustering;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import edu.usc.softarch.arcade.clustering.Cluster;
-import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.ConcernArchitecture;
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimData;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
+import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
-public abstract class ClusteringAlgoRunner {
+public class Clusterer {
 	//region INTERFACE
 	/**
 	 * Primary entry point for all clustering algorithms. Arguments are:
@@ -34,34 +31,19 @@ public abstract class ClusteringAlgoRunner {
 	 * 11: Path to directory containing auxiliary artifacts.
 	 */
 	public static void main(String[] args)
-			throws IOException, DistributionSizeMismatchException {
+			throws IOException, DistributionSizeMismatchException,
+			UnmatchingDocTopicItemsException {
 		ClusteringAlgoArguments parsedArguments =
 			new ClusteringAlgoArguments(args);
 
-		switch (args[0].toLowerCase()) {
-			case "arc":
-				runArc(parsedArguments);
-				break;
-			case "limbo":
-				runLimbo(parsedArguments);
-				break;
-			case "wca":
-				runWca(parsedArguments);
-				break;
-			default:
-				throw new IllegalArgumentException(
-					"Unknown clustering algorithm " + args[0]);
-		}
+		run(parsedArguments);
 	}
 
-	private static void runArc(ClusteringAlgoArguments parsedArguments)
-			throws IOException, DistributionSizeMismatchException {
-		ConcernClusteringRunner.run(parsedArguments);
-	}
-
-	private static void runLimbo(ClusteringAlgoArguments parsedArguments)
-			throws IOException, DistributionSizeMismatchException {
-		LimboRunner.run(
+	public static Architecture run(ClusteringAlgoArguments parsedArguments)
+			throws IOException, DistributionSizeMismatchException,
+			UnmatchingDocTopicItemsException {
+		return run(
+			parsedArguments.algorithm,
 			parsedArguments.arch,
 			parsedArguments.serialCrit,
 			parsedArguments.stopCrit,
@@ -70,35 +52,40 @@ public abstract class ClusteringAlgoRunner {
 			parsedArguments.simMeasure);
 	}
 
-	private static void runWca(ClusteringAlgoArguments parsedArguments)
-			throws IOException, DistributionSizeMismatchException {
-		WcaRunner.run(
-			parsedArguments.arch,
-			parsedArguments.serialCrit,
-			parsedArguments.stopCrit,
-			parsedArguments.language,
-			parsedArguments.stoppingCriterion,
-			parsedArguments.simMeasure);
+	public static Architecture run(ClusteringAlgorithmType algorithm,
+			Architecture arch, SerializationCriterion serialCrit,
+			StoppingCriterion stopCrit, String language, String stoppingCriterionName,
+			SimMeasure.SimMeasureType simMeasure)
+			throws IOException, DistributionSizeMismatchException,
+			UnmatchingDocTopicItemsException {
+		// Create the runner object
+		Clusterer runner = new Clusterer(
+			language, serialCrit, arch, algorithm);
+		// Compute the clustering algorithm and return the resulting architecture
+		return runner.computeArchitecture(stopCrit, stoppingCriterionName,
+			simMeasure);
 	}
 
 	public static class ClusteringAlgoArguments {
+		public final ClusteringAlgorithmType algorithm;
 		public final String language;
 		public final Architecture arch;
-		public final ConcernArchitecture concernArch;
 		public final SerializationCriterion serialCrit;
 		public final StoppingCriterion stopCrit;
 		public final String stoppingCriterion;
 		public final SimMeasure.SimMeasureType simMeasure;
 
-		public ClusteringAlgoArguments(String[] args) throws IOException {
+		public ClusteringAlgoArguments(String[] args)
+				throws IOException, UnmatchingDocTopicItemsException {
+			this.algorithm = ClusteringAlgorithmType.valueOf(args[0]);
 			this.language = args[1];
-			this.arch = new Architecture(args[8], args[9],
-				FeatureVectors.deserializeFFVectors(args[2]),	this.language, args[10]);
 			if (args.length > 11)
-				this.concernArch = new ConcernArchitecture(args[8], args[9],
+				this.arch = new ConcernArchitecture(args[8], args[9],
 					FeatureVectors.deserializeFFVectors(args[2]),	this.language, args[11],
 					args[10]);
-			else this.concernArch = null;
+			else
+				this.arch = new Architecture(args[8], args[9],
+					FeatureVectors.deserializeFFVectors(args[2]),	this.language, args[10]);
 			this.serialCrit = SerializationCriterion.makeSerializationCriterion(
 				args[6], Double.parseDouble(args[7]), arch);
 			this.stopCrit = StoppingCriterion.makeStoppingCriterion(
@@ -117,14 +104,17 @@ public abstract class ClusteringAlgoRunner {
 	public static int numberOfEntitiesToBeClustered = 0;
 	protected final String language;
 	protected final SerializationCriterion serializationCriterion;
+	protected final ClusteringAlgorithmType algorithm;
 	//endregion ATTRIBUTES
 
 	//region CONTRUCTORS
-	protected ClusteringAlgoRunner(String language,
-			SerializationCriterion serializationCriterion, Architecture arch) {
+	protected Clusterer(String language,
+			SerializationCriterion serializationCriterion, Architecture arch,
+			ClusteringAlgorithmType algorithm) {
 		this.language = language;
 		this.serializationCriterion = serializationCriterion;
 		this.architecture = arch;
+		this.algorithm = algorithm;
 	}
 	//endregion
 
@@ -197,8 +187,29 @@ public abstract class ClusteringAlgoRunner {
 		return toReturn;
 	}
 
-	public abstract Architecture computeArchitecture(
-		StoppingCriterion stoppingCriterion, String stopCriterion,
-		SimMeasure.SimMeasureType simMeasure)
-		throws DistributionSizeMismatchException, FileNotFoundException;
+	public Architecture computeArchitecture(StoppingCriterion stopCriterion,
+		String stoppingCriterion, SimMeasure.SimMeasureType simMeasure)
+		throws DistributionSizeMismatchException, FileNotFoundException,
+		UnmatchingDocTopicItemsException {
+		SimilarityMatrix simMatrix = new SimilarityMatrix(
+			simMeasure, this.architecture);
+
+		while (stopCriterion.notReadyToStop(this.architecture)) {
+			if (stoppingCriterion.equalsIgnoreCase("clustergain"))
+				checkAndUpdateClusterGain(architecture.computeClusterGain(algorithm));
+
+			SimData data = identifyMostSimClusters(simMatrix);
+			Cluster newCluster = new Cluster(this.algorithm,
+				data.c1, data.c2);
+
+			updateFastClustersAndSimMatrixToReflectMergedCluster(
+				data, newCluster, simMatrix);
+
+			if (this.serializationCriterion != null
+				&& this.serializationCriterion.shouldSerialize())
+				this.architecture.writeToRsf();
+		}
+
+		return this.architecture;
+	}
 }

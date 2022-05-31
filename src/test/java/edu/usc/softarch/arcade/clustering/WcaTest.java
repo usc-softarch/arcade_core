@@ -1,10 +1,7 @@
-package edu.usc.softarch.arcade.clustering.techniques;
+package edu.usc.softarch.arcade.clustering;
 
 import edu.usc.softarch.arcade.BaseTest;
-import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
-import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -19,7 +16,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class WcaRunnerTest extends BaseTest {
+public class WcaTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "WCA";
 	private final String factsDir = resourcesBase + fs + "Facts";
 	private final String outputDirPath = outputBase + fs + "WCA";
@@ -79,11 +76,11 @@ public class WcaRunnerTest extends BaseTest {
 			"preselected", 100);
 
 		assertDoesNotThrow(() ->
-			WcaRunner.run(archUem, serialCritUem, stopCrit, lang,
+			Clusterer.run(ClusteringAlgorithmType.WCA, archUem, serialCritUem, stopCrit, lang,
 				"preselected", SimMeasure.SimMeasureType.UEM));
 
 		assertDoesNotThrow(() ->
-			WcaRunner.run(archUemnm, serialCritUemnm, stopCrit, lang,
+			Clusterer.run(ClusteringAlgorithmType.WCA, archUemnm, serialCritUemnm, stopCrit, lang,
 				"preselected",	SimMeasure.SimMeasureType.UEMNM));
 
 		// Load uem results

@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.clustering.techniques;
+package edu.usc.softarch.arcade.clustering;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,8 +15,6 @@ import java.util.Arrays;
 import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
-import edu.usc.softarch.arcade.clustering.ConcernArchitecture;
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
@@ -29,7 +27,7 @@ import edu.usc.softarch.util.EnhancedSet;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-public class ConcernClusteringRunnerTest extends BaseTest {
+public class ArcTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "ARC";
 	private final String factsDir = resourcesBase + fs + "Facts";
 	private final String outputDirPath = outputBase + fs + "ConcernClusteringRunnerTest";
@@ -89,7 +87,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 				"archsizefraction", 0.2, arch);
 
 		assertDoesNotThrow(() ->
-			ConcernClusteringRunner.run(arch, serialCrit, stopCrit, lang,
+			Clusterer.run(ClusteringAlgorithmType.ARC, arch, serialCrit, stopCrit, lang,
 				"archsizefraction",	SimMeasure.SimMeasureType.JS));
 
 		/* The expectation here is that this resulting clusters file has the same

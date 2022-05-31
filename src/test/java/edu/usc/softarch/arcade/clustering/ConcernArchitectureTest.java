@@ -72,9 +72,10 @@ public class ConcernArchitectureTest extends BaseTest {
 		if (builderffVecs == null)
 			fail("failed to deserialize FastFeatureVectors from builder object");
 
-		ConcernArchitectureMock arch = new ConcernArchitectureMock(versionName,
-			outputDirPath, builderffVecs, language, artifactsDir + "/base",
-			packagePrefix);
+		FeatureVectors finalBuilderffVecs = builderffVecs;
+		ConcernArchitectureMock arch = assertDoesNotThrow(() ->
+			new ConcernArchitectureMock(versionName, outputDirPath, finalBuilderffVecs,
+				language, artifactsDir + "/base", packagePrefix));
 
 		// ------------------------- Generate Oracles ------------------------------
 

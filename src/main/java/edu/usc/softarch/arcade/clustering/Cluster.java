@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import edu.usc.softarch.arcade.topics.DocTopicItem;
+import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 /**
  * Represents a cluster of entities in the subject system.
@@ -69,7 +70,8 @@ public class Cluster implements Serializable {
 	/**
 	 * Merge constructor.
 	 */
-	public Cluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2) {
+	public Cluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2)
+			throws UnmatchingDocTopicItemsException {
 		Set<Integer> indices = new HashSet<>(c1.getFeatureMap().keySet());
 		indices.addAll(c2.getFeatureMap().keySet());
 
@@ -89,6 +91,9 @@ public class Cluster implements Serializable {
 			this.name = c1.getName() + ',' + c2.getName();
 
 		this.numEntities = c1.getNumEntities() + c2.getNumEntities();
+
+		if (cat.equals(ClusteringAlgorithmType.ARC))
+			this.dti = new DocTopicItem(c1, c2);
 	}
 	//endregion
 

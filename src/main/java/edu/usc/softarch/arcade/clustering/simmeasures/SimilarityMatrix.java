@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.TreeSet;
 
-import static edu.usc.softarch.arcade.clustering.techniques.ClusteringAlgoRunner.numberOfEntitiesToBeClustered;
+import static edu.usc.softarch.arcade.clustering.Clusterer.numberOfEntitiesToBeClustered;
 
 /**
  * A matrix of similarity values between pairs of clusters. This implementation
