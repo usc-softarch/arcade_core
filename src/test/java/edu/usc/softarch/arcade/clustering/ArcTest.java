@@ -44,25 +44,25 @@ public class ArcTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_181_clusters.rsf,"
+			+ "_js_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_163_clusters.rsf,"
+			+ "_js_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_71_clusters.rsf,"
+			+ "_js_clusters.rsf,"
 			+ "",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_82_clusters.rsf,"
+			+ "_js_clusters.rsf,"
 			+ ""
 	})
 	public void ARCRecoveryTest(String systemVersion, String lang,
@@ -76,8 +76,9 @@ public class ArcTest extends BaseTest {
 
 		ConcernArchitecture arch = assertDoesNotThrow(() ->
 			new ConcernArchitecture(systemVersion, outputDirPath,
-			FeatureVectors.deserializeFFVectors(ffVecs),
-			lang,	artifactsDir, packagePrefix));
+				SimMeasure.SimMeasureType.JS,
+				FeatureVectors.deserializeFFVectors(ffVecs), lang,
+				artifactsDir, packagePrefix));
 
 		SerializationCriterion serialCrit =
 			SerializationCriterion.makeSerializationCriterion(
@@ -136,22 +137,22 @@ public class ArcTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_181_",
+			+ "_js_",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_163_",
+			+ "_js_",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_71_",
+			+ "_js_",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_82_"
+			+ "_js_"
 	})
 	public void asdWithConcernsTest(String systemVersion, String lang, String arcFileSuffix) {
 		// Creating relevant path Strings

@@ -21,7 +21,7 @@ public class Clusterer {
 	 * 1 : Subject system language.
 	 * 2 : Path to feature vectors file.
 	 * 3 : Stopping criterion.
-	 * 4 : Number of clusters to stop at, if using preselected. 0 otherwise.
+	 * 4 : Stopping criterion parameter.
 	 * 5 : Similarity measure desired. Check compatibility in each algorithm.
 	 * 6 : Serialization criterion.
 	 * 7 : Parameter value of the serialization criterion.
@@ -79,20 +79,20 @@ public class Clusterer {
 				throws IOException, UnmatchingDocTopicItemsException {
 			this.algorithm = ClusteringAlgorithmType.valueOf(args[0]);
 			this.language = args[1];
+			this.simMeasure =
+				SimMeasure.SimMeasureType.valueOf(args[5].toUpperCase());
 			if (args.length > 11)
-				this.arch = new ConcernArchitecture(args[8], args[9],
+				this.arch = new ConcernArchitecture(args[8], args[9], this.simMeasure,
 					FeatureVectors.deserializeFFVectors(args[2]),	this.language, args[11],
 					args[10]);
 			else
-				this.arch = new Architecture(args[8], args[9],
+				this.arch = new Architecture(args[8], args[9], this.simMeasure,
 					FeatureVectors.deserializeFFVectors(args[2]),	this.language, args[10]);
 			this.serialCrit = SerializationCriterion.makeSerializationCriterion(
 				args[6], Double.parseDouble(args[7]), arch);
 			this.stopCrit = StoppingCriterion.makeStoppingCriterion(
 				args[3], Double.parseDouble(args[4]), arch);
 			this.stoppingCriterion = args[3];
-			this.simMeasure =
-				SimMeasure.SimMeasureType.valueOf(args[5].toUpperCase());
 		}
 	}
 	//endregion

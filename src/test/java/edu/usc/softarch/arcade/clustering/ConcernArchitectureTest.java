@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.clustering;
 
 import edu.usc.softarch.arcade.BaseTest;
+import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -74,8 +75,9 @@ public class ConcernArchitectureTest extends BaseTest {
 
 		FeatureVectors finalBuilderffVecs = builderffVecs;
 		ConcernArchitectureMock arch = assertDoesNotThrow(() ->
-			new ConcernArchitectureMock(versionName, outputDirPath, finalBuilderffVecs,
-				language, artifactsDir + "/base", packagePrefix));
+			new ConcernArchitectureMock(versionName, outputDirPath,
+				SimMeasure.SimMeasureType.IL, finalBuilderffVecs, language,
+				artifactsDir + "/base", packagePrefix));
 
 		// ------------------------- Generate Oracles ------------------------------
 

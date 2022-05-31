@@ -50,10 +50,11 @@ public class LimboTest extends BaseTest {
 		String oraclePath = resourcesDir + fs + systemVersion
 			+ "_limbo_clusters.rsf";
 		String resultPath = outputDirPath + fs + systemVersion
-			+ "_limbo_100_clusters.rsf";
+			+ "_limbo_il_clusters.rsf";
 
 		Architecture arch = assertDoesNotThrow(() ->
 			new Architecture(systemVersion + "_limbo", outputDirPath,
+				SimMeasure.SimMeasureType.IL,
 				FeatureVectors.deserializeFFVectors(fVecsPath),
 				lang,	packagePrefix));
 

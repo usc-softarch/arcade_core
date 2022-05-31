@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering;
 
+import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
@@ -16,9 +17,11 @@ public class ConcernArchitecture extends Architecture {
 
 	//region CONSTRUCTORS
 	public ConcernArchitecture(String projectName, String projectPath,
-			FeatureVectors vectors, String language, String artifactsDir,
-			String packagePrefix) throws UnmatchingDocTopicItemsException {
-		super(projectName, projectPath, vectors, language, packagePrefix);
+			SimMeasure.SimMeasureType simMeasure, FeatureVectors vectors,
+			String language, String artifactsDir, String packagePrefix)
+			throws UnmatchingDocTopicItemsException {
+		super(projectName, projectPath, simMeasure,
+			vectors, language, packagePrefix);
 
 		try	{
 			this.docTopics = DocTopics.deserializeDocTopics(artifactsDir
@@ -39,9 +42,10 @@ public class ConcernArchitecture extends Architecture {
 	}
 
 	public ConcernArchitecture(String projectName, String projectPath,
-			FeatureVectors vectors, String language, String artifactsDir)
+			SimMeasure.SimMeasureType simMeasure, FeatureVectors vectors,
+			String language, String artifactsDir)
 			throws UnmatchingDocTopicItemsException {
-		this(projectName, projectPath, vectors, language,
+		this(projectName, projectPath, simMeasure, vectors, language,
 			artifactsDir, "");
 	}
 

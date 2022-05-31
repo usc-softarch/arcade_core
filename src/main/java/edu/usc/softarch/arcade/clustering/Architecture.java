@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
@@ -42,6 +43,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 	 * The path to where this data structure should be serialized.
 	 */
 	private final String projectPath;
+	private final SimMeasure.SimMeasureType simMeasure;
 	/**
 	 * The total number of features that can exist in any clusters of this
 	 * architecture. For architectures constructed from structural data such as
@@ -64,6 +66,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 
 		this.projectName = arch.projectName;
 		this.projectPath = arch.projectPath;
+		this.simMeasure = arch.simMeasure;
 		this.numFeatures = arch.numFeatures;
 		this.language = arch.language;
 	}
@@ -83,9 +86,11 @@ public class Architecture extends TreeMap<String, Cluster> {
 	 *                      Java systems.
 	 */
 	public Architecture(String projectName, String projectPath,
-			FeatureVectors vectors, String language, String packagePrefix) {
+			SimMeasure.SimMeasureType simMeasure, FeatureVectors vectors,
+			String language, String packagePrefix) {
 		this.projectName = projectName;
 		this.projectPath = projectPath;
+		this.simMeasure = simMeasure;
 		this.numFeatures = vectors.getNamesInFeatureSet().size();
 		this.language = language;
 		initializeClusters(vectors, language, packagePrefix);
@@ -104,8 +109,9 @@ public class Architecture extends TreeMap<String, Cluster> {
 	 * @param language The language of the subject system.
 	 */
 	public Architecture(String projectName, String projectPath,
-			FeatureVectors vectors, String language) {
-		this(projectName, projectPath, vectors, language, "");
+			SimMeasure.SimMeasureType simMeasure, FeatureVectors vectors,
+			String language) {
+		this(projectName, projectPath, simMeasure, vectors, language, "");
 	}
 
 	/**
@@ -308,7 +314,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 	public void writeToRsf() throws FileNotFoundException {
 		String fs = File.separator;
 		String path = this.projectPath + fs + this.projectName + "_"
-			+ this.size() + "_clusters.rsf";
+			+ this.simMeasure + "_clusters.rsf";
 		this.writeToRsf(path);
 	}
 

@@ -51,16 +51,18 @@ public class WcaTest extends BaseTest {
 		String uemOraclePath = oracleFilePathBase + "_uem_clusters.rsf";
 		String uemnmOraclePath = oracleFilePathBase + "_uemnm_clusters.rsf";
 		String resultFilePathBase = outputDirPath + fs + systemVersion;
-		String uemResultPath = resultFilePathBase + "_uem_100_clusters.rsf";
-		String uemnmResultPath = resultFilePathBase + "_uemnm_100_clusters.rsf";
+		String uemResultPath = resultFilePathBase + "_uem_clusters.rsf";
+		String uemnmResultPath = resultFilePathBase + "_uemnm_clusters.rsf";
 
 		Architecture archUem = assertDoesNotThrow(() ->
-			new Architecture(systemVersion + "_uem", outputDirPath,
+			new Architecture(systemVersion, outputDirPath,
+				SimMeasure.SimMeasureType.UEM,
 				FeatureVectors.deserializeFFVectors(fVecsPath),
 				lang,	packagePrefix));
 
 		Architecture archUemnm = assertDoesNotThrow(() ->
-			new Architecture(systemVersion + "_uemnm", outputDirPath,
+			new Architecture(systemVersion, outputDirPath,
+				SimMeasure.SimMeasureType.UEMNM,
 				FeatureVectors.deserializeFFVectors(fVecsPath),
 				lang,	packagePrefix));
 
