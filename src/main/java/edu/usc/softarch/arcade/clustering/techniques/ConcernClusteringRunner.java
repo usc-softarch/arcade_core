@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.Cluster;
-import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 import edu.usc.softarch.arcade.clustering.ConcernArchitecture;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimData;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
@@ -13,11 +12,9 @@ import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
-import edu.usc.softarch.arcade.topics.DocTopicItem;
-import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
-	// #region INTERFACE ---------------------------------------------------------
+	//region INTERFACE
 	public static Architecture run(ClusteringAlgoArguments parsedArguments)
 			throws IOException, DistributionSizeMismatchException {
 		return run(
@@ -34,44 +31,42 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 			String language, String stoppingCriterionName,
 			SimMeasure.SimMeasureType simMeasure)
 			throws IOException, DistributionSizeMismatchException {
+		// Create the runner object
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
 			language, serialCrit, arch);
-
-		runner.computeArchitecture(stopCrit, stoppingCriterionName,	simMeasure);
-
-		return runner.getArchitecture();
+		// Compute the clustering algorithm and return the resulting architecture
+		return runner.computeArchitecture(stopCrit, stoppingCriterionName,
+			simMeasure);
 	}
-	// #endregion INTERFACE ------------------------------------------------------
+	//endregion INTERFACE
 
-	// #region CONSTRUCTORS ------------------------------------------------------
+	//region CONSTRUCTORS
 	public ConcernClusteringRunner(String language,
 			SerializationCriterion serializationCriterion, ConcernArchitecture arch) {
 		super(language, serializationCriterion, arch);
 	}
-	// #endregion CONSTRUCTORS ---------------------------------------------------
+	//endregion CONSTRUCTORS
 
 	@Override
-	public Architecture computeArchitecture(
-			StoppingCriterion stoppingCriterion, String stopCriterion,
-			SimMeasure.SimMeasureType simMeasure)
+	public Architecture computeArchitecture(StoppingCriterion stopCriterion,
+			String stoppingCriterion, SimMeasure.SimMeasureType simMeasure)
 			throws DistributionSizeMismatchException, FileNotFoundException {
 		SimilarityMatrix simMatrix = initializeSimMatrix(simMeasure);
 
-		while (stoppingCriterion.notReadyToStop(super.architecture)) {
-			if (stopCriterion.equalsIgnoreCase("clustergain")) {
-				double clusterGain = architecture.computeTopicClusterGain();
-				checkAndUpdateClusterGain(clusterGain);
-			}
+		while (stopCriterion.notReadyToStop(super.architecture)) {
+			if (stoppingCriterion.equalsIgnoreCase("clustergain"))
+				checkAndUpdateClusterGain(architecture.computeTopicClusterGain());
 
 			SimData data = identifyMostSimClusters(simMatrix);
-			Cluster newCluster = mergeClustersUsingTopics(data);
+			Cluster newCluster = ConcernArchitecture.mergeClustersUsingTopics(
+				data.c1, data.c2);
+
 			updateFastClustersAndSimMatrixToReflectMergedCluster(
 				data, newCluster, simMatrix);
 
 			if (super.serializationCriterion != null
-				&& super.serializationCriterion.shouldSerialize()) {
+					&& super.serializationCriterion.shouldSerialize())
 				super.architecture.writeToRsf();
-			}
 		}
 
 		return super.architecture;
@@ -80,24 +75,6 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	protected SimilarityMatrix initializeSimMatrix(
 			SimMeasure.SimMeasureType simMeasure)
 			throws DistributionSizeMismatchException {
-		return new SimilarityMatrix(simMeasure, this.architecture);	}
-
-	private Cluster mergeClustersUsingTopics(SimData data) {
-		Cluster cluster = data.c1;
-		Cluster otherCluster = data.c2;
-		return mergeClustersUsingTopics(cluster, otherCluster);
-	}
-
-	private Cluster mergeClustersUsingTopics(Cluster cluster, Cluster otherCluster) {
-		Cluster newCluster =
-			new Cluster(ClusteringAlgorithmType.ARC, cluster, otherCluster);
-		
-		try {
-			newCluster.setDocTopicItem(new DocTopicItem(cluster, otherCluster));
-		} catch (UnmatchingDocTopicItemsException e) {
-			e.printStackTrace(); //TODO handle it
-		}
-
-		return newCluster;
+		return new SimilarityMatrix(simMeasure, this.architecture);
 	}
 }

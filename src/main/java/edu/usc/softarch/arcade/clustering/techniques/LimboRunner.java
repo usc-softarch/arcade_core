@@ -15,14 +15,25 @@ import java.io.IOException;
 
 public class LimboRunner extends ClusteringAlgoRunner {
 	//region INTERFACE
+	public static Architecture run(ClusteringAlgoArguments parsedArguments)
+			throws IOException, DistributionSizeMismatchException {
+		return run(
+			parsedArguments.concernArch,
+			parsedArguments.serialCrit,
+			parsedArguments.stopCrit,
+			parsedArguments.language,
+			parsedArguments.stoppingCriterion,
+			parsedArguments.simMeasure);
+	}
+
 	public static Architecture run(Architecture arch,
 			SerializationCriterion serialCrit, StoppingCriterion stopCrit,
 			String language, String stoppingCriterionName,
 			SimMeasure.SimMeasureType simMeasure)
 			throws IOException, DistributionSizeMismatchException {
 		// Create the runner object
-		ClusteringAlgoRunner runner = new LimboRunner(language,
-			serialCrit, arch);
+		ClusteringAlgoRunner runner = new LimboRunner(
+			language,	serialCrit, arch);
 		// Compute the clustering algorithm and return the resulting architecture
 		return runner.computeArchitecture(stopCrit, stoppingCriterionName,
 			simMeasure);
@@ -45,22 +56,18 @@ public class LimboRunner extends ClusteringAlgoRunner {
 
 		while (stoppingCriterion.notReadyToStop(super.architecture)) {
 			if (stopCriterion.equalsIgnoreCase("clustergain"))
-				checkAndUpdateClusterGain(
-					super.architecture.computeStructuralClusterGain());
+				checkAndUpdateClusterGain(architecture.computeStructuralClusterGain());
 
 			SimData data = identifyMostSimClusters(simMatrix);
+			Cluster newCluster = new Cluster(ClusteringAlgorithmType.LIMBO,
+				data.c1, data.c2);
 
-			Cluster cluster = data.c1;
-			Cluster otherCluster = data.c2;
-			Cluster newCluster = new Cluster(ClusteringAlgorithmType.LIMBO, cluster, otherCluster);
-
-			updateFastClustersAndSimMatrixToReflectMergedCluster(data,
-				newCluster, simMatrix);
+			updateFastClustersAndSimMatrixToReflectMergedCluster(
+				data, newCluster, simMatrix);
 
 			if (super.serializationCriterion != null
-					&& super.serializationCriterion.shouldSerialize()) {
+					&& super.serializationCriterion.shouldSerialize())
 				super.architecture.writeToRsf();
-			}
 		}
 
 		return super.architecture;

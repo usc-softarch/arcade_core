@@ -148,22 +148,22 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_arc_",
+			+ "_181_",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_arc_",
+			+ "_163_",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_arc_",
+			+ "_71_",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_arc_"
+			+ "_82_"
 	})
 	public void asdWithConcernsTest(String systemVersion, String lang, String arcFileSuffix) {
 		// Creating relevant path Strings

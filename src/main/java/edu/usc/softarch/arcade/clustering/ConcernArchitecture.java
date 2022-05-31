@@ -117,7 +117,7 @@ public class ConcernArchitecture extends Architecture {
 		super.removeAll(excessInners);
 	}
 
-	private Cluster mergeClustersUsingTopics(Cluster cluster, Cluster otherCluster) {
+	public static Cluster mergeClustersUsingTopics(Cluster cluster, Cluster otherCluster) {
 		Cluster newCluster =
 			new Cluster(ClusteringAlgorithmType.ARC, cluster, otherCluster);
 

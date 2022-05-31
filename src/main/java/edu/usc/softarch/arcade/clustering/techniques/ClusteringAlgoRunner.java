@@ -145,8 +145,8 @@ public abstract class ClusteringAlgoRunner {
 	}
 
 	protected void updateFastClustersAndSimMatrixToReflectMergedCluster(
-		SimData data, Cluster newCluster,	SimilarityMatrix simMatrix)
-		throws DistributionSizeMismatchException {
+			SimData data, Cluster newCluster,	SimilarityMatrix simMatrix)
+			throws DistributionSizeMismatchException {
 		// Sanity check
 		if (data.c1.getName().equals(data.c2.getName()))
 			throw new IllegalArgumentException("data.c1: " + data.c1

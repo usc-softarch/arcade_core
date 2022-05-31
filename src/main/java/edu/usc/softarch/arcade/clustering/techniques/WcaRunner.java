@@ -15,14 +15,25 @@ import java.io.IOException;
 
 public class WcaRunner extends ClusteringAlgoRunner {
 	//region INTERFACE
+	public static Architecture run(ClusteringAlgoArguments parsedArguments)
+			throws IOException, DistributionSizeMismatchException {
+		return run(
+			parsedArguments.concernArch,
+			parsedArguments.serialCrit,
+			parsedArguments.stopCrit,
+			parsedArguments.language,
+			parsedArguments.stoppingCriterion,
+			parsedArguments.simMeasure);
+	}
+
 	public static Architecture run(Architecture arch,
 			SerializationCriterion serialCrit, StoppingCriterion stopCrit,
 			String language, String stoppingCriterionName,
 			SimMeasure.SimMeasureType simMeasure)
 			throws IOException, DistributionSizeMismatchException {
 		// Create the runner object
-		ClusteringAlgoRunner runner = new WcaRunner(language,
-			serialCrit, arch);
+		ClusteringAlgoRunner runner = new WcaRunner(
+			language,	serialCrit, arch);
 		// Compute the clustering algorithm and return the resulting architecture
 		return runner.computeArchitecture(stopCrit, stoppingCriterionName,
 			simMeasure);
@@ -37,32 +48,26 @@ public class WcaRunner extends ClusteringAlgoRunner {
 	//endregion
 
 	@Override
-	public Architecture computeArchitecture(
-			StoppingCriterion stopCriterion, String stoppingCriterion,
-			SimMeasure.SimMeasureType simMeasure)
+	public Architecture computeArchitecture(StoppingCriterion stopCriterion,
+			String stoppingCriterion, SimMeasure.SimMeasureType simMeasure)
 			throws DistributionSizeMismatchException, FileNotFoundException {
-		SimilarityMatrix simMatrix = new SimilarityMatrix(simMeasure, this.architecture);
+		SimilarityMatrix simMatrix = new SimilarityMatrix(
+			simMeasure, this.architecture);
 
 		while (stopCriterion.notReadyToStop(super.architecture)) {
-			if (stoppingCriterion.equalsIgnoreCase("clustergain")) {
-				double clusterGain = 0;
-				clusterGain = super.architecture.computeStructuralClusterGain();
-				checkAndUpdateClusterGain(clusterGain);
-			}
+			if (stoppingCriterion.equalsIgnoreCase("clustergain"))
+				checkAndUpdateClusterGain(architecture.computeStructuralClusterGain());
 
 			SimData data = identifyMostSimClusters(simMatrix);
-
-			Cluster cluster = data.c1;
-			Cluster otherCluster = data.c2;
 			Cluster newCluster = new Cluster(ClusteringAlgorithmType.WCA,
-				cluster, otherCluster);
+				data.c1, data.c2);
 
-			updateFastClustersAndSimMatrixToReflectMergedCluster(data, newCluster, simMatrix);
+			updateFastClustersAndSimMatrixToReflectMergedCluster(
+				data, newCluster, simMatrix);
 
 			if (super.serializationCriterion != null
-					&& super.serializationCriterion.shouldSerialize()) {
+					&& super.serializationCriterion.shouldSerialize())
 				super.architecture.writeToRsf();
-			}
 		}
 
 		return super.architecture;
