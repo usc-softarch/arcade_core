@@ -51,7 +51,8 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	public Architecture computeArchitecture(StoppingCriterion stopCriterion,
 			String stoppingCriterion, SimMeasure.SimMeasureType simMeasure)
 			throws DistributionSizeMismatchException, FileNotFoundException {
-		SimilarityMatrix simMatrix = initializeSimMatrix(simMeasure);
+		SimilarityMatrix simMatrix =
+			new SimilarityMatrix(simMeasure, this.architecture);
 
 		while (stopCriterion.notReadyToStop(super.architecture)) {
 			if (stoppingCriterion.equalsIgnoreCase("clustergain"))
@@ -70,11 +71,5 @@ public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 		}
 
 		return super.architecture;
-	}
-
-	protected SimilarityMatrix initializeSimMatrix(
-			SimMeasure.SimMeasureType simMeasure)
-			throws DistributionSizeMismatchException {
-		return new SimilarityMatrix(simMeasure, this.architecture);
 	}
 }

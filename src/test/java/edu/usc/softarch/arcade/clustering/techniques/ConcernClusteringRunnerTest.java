@@ -3,10 +3,8 @@ package edu.usc.softarch.arcade.clustering.techniques;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,18 +12,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.clustering.ConcernArchitecture;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
-import edu.usc.softarch.arcade.clustering.criteria.ArchSizeFractionStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
-import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DocTopics;
@@ -36,8 +28,6 @@ import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import edu.usc.softarch.arcade.clustering.Architecture;
 
 public class ConcernClusteringRunnerTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "ARC";
@@ -99,7 +89,7 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 				"archsizefraction", 0.2, arch);
 
 		assertDoesNotThrow(() ->
-			ConcernClusteringRunnerMock.run(arch, serialCrit, stopCrit, lang,
+			ConcernClusteringRunner.run(arch, serialCrit, stopCrit, lang,
 				"archsizefraction",	SimMeasure.SimMeasureType.JS));
 
 		/* The expectation here is that this resulting clusters file has the same
@@ -200,103 +190,5 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 
 		// SmellCollection extends HashSet, so we can use equals() to compare the result to the oracle
 		assertEquals(oracleSmells, resultSmells);
-	}
-
-	/**
-	 * Checks whether fastClusters is modified by
-	 * updateFastClustersAndSimMatrixToReflectMergedCluster.
-	 * stopCriterion = clustergain is not currently in use.
-	 *
-	 * @param versionName System version.
-	 * @param language System language.
-	 */
-	@ParameterizedTest
-	@CsvSource({
-		// struts 2.3.30
-		"struts-2.3.30,"
-			+ "java,"
-			+ "org.apache.struts2",
-
-		// struts 2.5.2
-		"struts-2.5.2,"
-			+ "java,"
-			+ "org.apache.struts2",
-
-		// httpd-2.3.8
-		"httpd-2.3.8,"
-			+ "c,"
-			+ "",
-
-		// httpd-2.4.26
-		"httpd-2.4.26,"
-			+ "c,"
-			+ ""
-	})
-	public void computeArchitectureTest(String versionName,	String language,
-			String packagePrefix) {
-		String artifactsDir = resourcesDir + fs + versionName;
-		String oracleSimMatrixPath = artifactsDir + fs + "sim_matrix_oracle.json";
-		(new File(outputDirPath)).mkdirs();
-		
-		// Deserialize FastFeatureVectors oracle
-		String ffVecsFilePath = factsDir + fs + versionName + "_fVectors.json";
-		FeatureVectors builderffVecs = null;
-
-		try {
-			builderffVecs = FeatureVectors.deserializeFFVectors(ffVecsFilePath);
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-
-		if (builderffVecs == null){
-			fail("failed to deserialize FastFeatureVectors from builder object");
-		}
-
-		ConcernArchitecture concernArch = new ConcernArchitecture(versionName,
-			outputDirPath, builderffVecs, language,
-			artifactsDir + "/base", packagePrefix);
-
-		SerializationCriterion serializationCriterion =
-			SerializationCriterion.makeSerializationCriterion(
-				"archsize", 0, concernArch);
-		
-		// Construct a ConcernClusteringRunner object
-		ConcernClusteringRunnerMock runner = new ConcernClusteringRunnerMock(
-			language, serializationCriterion, concernArch);
-		Architecture initialArchitecture = new Architecture(runner.getArchitecture());
-		// call computeClustersWithConcernsAndFastClusters()
-		assertDoesNotThrow(() -> {
-			// USING THE CLONE THAT TAKES IN THE VERSION NAME HERE
-			runner.computeArchitecture(
-				new ArchSizeFractionStoppingCriterion(runner.getArchitecture(), .2),
-				"archsizefraction", SimMeasure.SimMeasureType.JS);
-		});
-
-		// ------------------------- Generate Oracles ------------------------------
-
-		if (generateOracles) {
-			JsonFactory factory = new JsonFactory();
-			assertDoesNotThrow(() -> {
-				JsonGenerator generator = factory.createGenerator(
-					new File(oracleSimMatrixPath), JsonEncoding.UTF8);
-				generator.writeStartObject();
-				runner.getInitialSimMatrix().serialize(generator);
-				generator.writeEndObject();
-				generator.close();
-			});
-		}
-
-		// ------------------------- Generate Oracles ------------------------------
-
-		SimilarityMatrix oracleSimMatrix = assertDoesNotThrow(() -> {
-			JsonFactory factory = new JsonFactory();
-			JsonParser parser = factory.createParser(new File(oracleSimMatrixPath));
-			parser.nextToken();
-			return SimilarityMatrix.deserialize(parser, initialArchitecture);
-		});
-		SimilarityMatrix initialSimMatrix = runner.getInitialSimMatrix();
-
-		assertEquals(oracleSimMatrix, initialSimMatrix);
 	}
 }
