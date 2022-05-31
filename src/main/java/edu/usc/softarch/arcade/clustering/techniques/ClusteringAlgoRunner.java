@@ -40,7 +40,7 @@ public abstract class ClusteringAlgoRunner {
 
 		switch (args[0].toLowerCase()) {
 			case "arc":
-				runArc(parsedArguments, args);
+				runArc(parsedArguments);
 				break;
 			case "limbo":
 				runLimbo(parsedArguments);
@@ -54,11 +54,9 @@ public abstract class ClusteringAlgoRunner {
 		}
 	}
 
-	private static void runArc(ClusteringAlgoArguments parsedArguments,
-			String[] args) throws IOException {
-		String outputDirPath = args[9];
-
-		ConcernClusteringRunner.run(parsedArguments, outputDirPath);
+	private static void runArc(ClusteringAlgoArguments parsedArguments)
+			throws IOException, DistributionSizeMismatchException {
+		ConcernClusteringRunner.run(parsedArguments);
 	}
 
 	private static void runLimbo(ClusteringAlgoArguments parsedArguments)
@@ -102,9 +100,9 @@ public abstract class ClusteringAlgoRunner {
 					args[10]);
 			else this.concernArch = null;
 			this.serialCrit = SerializationCriterion.makeSerializationCriterion(
-				args[6], Integer.parseInt(args[7]), arch);
+				args[6], Double.parseDouble(args[7]), arch);
 			this.stopCrit = StoppingCriterion.makeStoppingCriterion(
-				args[3], Integer.parseInt(args[4]), arch);
+				args[3], Double.parseDouble(args[4]), arch);
 			this.stoppingCriterion = args[3];
 			this.simMeasure =
 				SimMeasure.SimMeasureType.valueOf(args[5].toUpperCase());

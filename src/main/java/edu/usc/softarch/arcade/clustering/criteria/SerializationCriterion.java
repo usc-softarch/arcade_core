@@ -6,15 +6,17 @@ public abstract class SerializationCriterion {
 	public abstract boolean shouldSerialize();
 
 	public static SerializationCriterion makeSerializationCriterion(
-		String serializationCriterion, int criterionValue,
+		String serializationCriterion, double criterionValue,
 		Architecture arch) {
 		switch (serializationCriterion.toLowerCase()) {
 			case "archsize":
-				return new ArchSizeSerializationCriterion(arch, criterionValue);
+				return new ArchSizeSerializationCriterion(arch, (int)criterionValue);
 			case "archsizemod":
-				return new ArchSizeModSerializationCriterion(arch, criterionValue);
+				return new ArchSizeModSerializationCriterion(arch, (int)criterionValue);
 			case "stepcount":
-				return new StepCountSerializationCriterion(criterionValue);
+				return new StepCountSerializationCriterion((int)criterionValue);
+			case "archsizefraction":
+				return new ArchSizeFractionSerializationCriterion(arch, criterionValue);
 			default:
 				throw new IllegalArgumentException(
 					"Unknown serialization criterion " + serializationCriterion);

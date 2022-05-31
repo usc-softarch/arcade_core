@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.clustering.techniques;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -11,7 +10,6 @@ import edu.usc.softarch.arcade.clustering.ConcernArchitecture;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimData;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
-import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
@@ -20,38 +18,26 @@ import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ConcernClusteringRunner extends ClusteringAlgoRunner {
 	// #region INTERFACE ---------------------------------------------------------
-	public static Architecture run(ClusteringAlgoArguments parsedArguments,
-			String outputDirPath)
-			throws IOException {
+	public static Architecture run(ClusteringAlgoArguments parsedArguments)
+			throws IOException, DistributionSizeMismatchException {
 		return run(
 			parsedArguments.concernArch,
 			parsedArguments.serialCrit,
 			parsedArguments.stopCrit,
 			parsedArguments.language,
 			parsedArguments.stoppingCriterion,
-			parsedArguments.simMeasure,
-			outputDirPath);
+			parsedArguments.simMeasure);
 	}
 
 	public static Architecture run(ConcernArchitecture arch,
 			SerializationCriterion serialCrit, StoppingCriterion stopCrit,
 			String language, String stoppingCriterionName,
-			SimMeasure.SimMeasureType simMeasure, String outputDirPath)
-			throws IOException {
+			SimMeasure.SimMeasureType simMeasure)
+			throws IOException, DistributionSizeMismatchException {
 		ConcernClusteringRunner runner = new ConcernClusteringRunner(
 			language, serialCrit, arch);
 
-		try {
-			runner.computeArchitecture(stopCrit, stoppingCriterionName,	simMeasure);
-		} catch (DistributionSizeMismatchException e) {
-			e.printStackTrace(); //TODO Handle it
-		}
-
-		String prefix = outputDirPath + File.separator
-			+ runner.getArchitecture().projectName;
-		String arcClustersFilename = prefix	+ "_arc_clusters.rsf";
-
-		runner.getArchitecture().writeToRsf(arcClustersFilename);
+		runner.computeArchitecture(stopCrit, stoppingCriterionName,	simMeasure);
 
 		return runner.getArchitecture();
 	}

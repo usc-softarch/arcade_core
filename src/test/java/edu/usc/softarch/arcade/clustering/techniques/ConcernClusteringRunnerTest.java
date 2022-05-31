@@ -26,7 +26,6 @@ import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import edu.usc.softarch.arcade.clustering.criteria.ArchSizeFractionStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
-import edu.usc.softarch.arcade.clustering.criteria.PreSelectedStoppingCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DocTopics;
@@ -57,25 +56,25 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_arc_clusters.rsf,"
+			+ "_181_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_arc_clusters.rsf,"
+			+ "_163_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_arc_clusters.rsf,"
+			+ "_71_clusters.rsf,"
 			+ "",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_arc_clusters.rsf,"
+			+ "_82_clusters.rsf,"
 			+ ""
 	})
 	public void ARCRecoveryTest(String systemVersion, String lang,
@@ -94,15 +93,14 @@ public class ConcernClusteringRunnerTest extends BaseTest {
 
 		SerializationCriterion serialCrit =
 			SerializationCriterion.makeSerializationCriterion(
-			"archsize", 100, arch);
+			"archsizefraction", 0.2, arch);
 
 		StoppingCriterion stopCrit = StoppingCriterion.makeStoppingCriterion(
 				"archsizefraction", 0.2, arch);
 
 		assertDoesNotThrow(() ->
 			ConcernClusteringRunnerMock.run(arch, serialCrit, stopCrit, lang,
-				"archsizefraction",	SimMeasure.SimMeasureType.JS,
-				outputDirPath));
+				"archsizefraction",	SimMeasure.SimMeasureType.JS));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of
