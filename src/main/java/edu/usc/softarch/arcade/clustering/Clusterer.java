@@ -77,7 +77,7 @@ public class Clusterer {
 
 		public ClusteringAlgoArguments(String[] args)
 				throws IOException, UnmatchingDocTopicItemsException {
-			this.algorithm = ClusteringAlgorithmType.valueOf(args[0]);
+			this.algorithm = ClusteringAlgorithmType.valueOf(args[0].toUpperCase());
 			this.language = args[1];
 			this.simMeasure =
 				SimMeasure.SimMeasureType.valueOf(args[5].toUpperCase());
