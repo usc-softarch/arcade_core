@@ -7,7 +7,7 @@ public class ArcUemMeasure extends SimMeasure {
 	private static SimMeasure singleton;
 
 	public static SimMeasure getSingleton() {
-		if (singleton == null) singleton = new JsMeasure();
+		if (singleton == null) singleton = new ArcUemMeasure();
 		return singleton;
 	}
 
