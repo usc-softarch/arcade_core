@@ -4,11 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 
 import cc.mallet.topics.TopicInferencer;
 import cc.mallet.types.InstanceList;
+import com.fasterxml.jackson.core.JsonToken;
 import edu.usc.softarch.arcade.clustering.Cluster;
 
 /**
@@ -17,10 +23,17 @@ import edu.usc.softarch.arcade.clustering.Cluster;
 public class DocTopics {
 	// #region FIELDS ------------------------------------------------------------
 	private List<DocTopicItem> dtItemList;
+	private Map<Integer, List<String>> topicWordLists;
 	// #endregion FIELDS ---------------------------------------------------------
 	
 	// #region CONSTRUCTORS ------------------------------------------------------
-	public DocTopics() { dtItemList = new ArrayList<>(); }
+	/**
+	 * Deserialization constructor.
+	 */
+	public DocTopics() {
+		this.dtItemList = new ArrayList<>();
+		this.topicWordLists = new TreeMap<>();
+	}
 	
 	/**
 	 * Clone constructor.
@@ -28,11 +41,12 @@ public class DocTopics {
 	public DocTopics(DocTopics docTopics) {
 		this();
 		for (DocTopicItem docTopicItem : docTopics.dtItemList)
-			dtItemList.add(new DocTopicItem(docTopicItem));
+			this.dtItemList.add(new DocTopicItem(docTopicItem));
+		for (Map.Entry<Integer, List<String>> topic : topicWordLists.entrySet())
+			this.topicWordLists.put(topic.getKey(), new ArrayList<>(topic.getValue()));
 	}
 
-	public DocTopics(String artifactsDir)
-			throws Exception {
+	public DocTopics(String artifactsDir)	throws Exception {
 		this();
 		// Begin by importing documents from text to feature sequences
 		char fs = File.separatorChar;
@@ -45,6 +59,7 @@ public class DocTopics {
 		TopicInferencer inferencer = TopicInferencer.read(
 			new File(artifactsDir + fs + "infer.mallet"));
 
+		// Load TopicItems
 		for (int instIndex = 0; instIndex < previousInstances.size(); instIndex++) {
 			DocTopicItem dtItem = new DocTopicItem(
 				(String) previousInstances.get(instIndex).getName());
@@ -59,6 +74,10 @@ public class DocTopics {
 			}
 			dtItemList.add(dtItem);
 		}
+
+		// Load WordLists
+		TopicCompositionParser parser = new TopicCompositionParser(inferencer);
+		this.topicWordLists = parser.run();
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
@@ -133,6 +152,14 @@ public class DocTopics {
 		}
 		return null;
 	}
+
+	public List<Concern> getConcerns() {
+		List<Concern> concernList = new ArrayList<>();
+		for (DocTopicItem dti : dtItemList)
+			concernList.add(dti.computeConcern(this.topicWordLists));
+
+		return concernList;
+	}
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region PROCESSING --------------------------------------------------------
@@ -159,13 +186,69 @@ public class DocTopics {
 	// #endregion PROCESSING -----------------------------------------------------
 
 	// #region SERIALIZATION -----------------------------------------------------
-	public void serializeDocTopics(String filePath) throws IOException {
-		(new ObjectMapper()).writeValue(new File(filePath), this);
+	public void serialize(String filePath) throws IOException {
+		JsonFactory factory = new JsonFactory();
+		try (JsonGenerator generator = factory.createGenerator(
+				new File(filePath), JsonEncoding.UTF8)) {
+			generator.writeStartObject();
+			this.serialize(generator);
+			generator.writeEndObject();
+		}
 	}
 
-	public static DocTopics deserializeDocTopics(String filePath)
-			throws IOException {
-		return (new ObjectMapper()).readValue(new File(filePath), DocTopics.class);
+	public void serialize(JsonGenerator generator) throws IOException {
+		generator.writeArrayFieldStart("dtItemList");
+		for (DocTopicItem dti : dtItemList) {
+			generator.writeStartObject();
+			dti.serialize(generator);
+			generator.writeEndObject();
+		}
+		generator.writeEndArray();
+
+		generator.writeArrayFieldStart("topicWordLists");
+		for (List<String> wordList : topicWordLists.values()) {
+			generator.writeStartObject();
+			generator.writeFieldName("wordList");
+			generator.writeArray(wordList.toArray(new String[0]), 0, wordList.size());
+			generator.writeEndObject();
+		}
+		generator.writeEndArray();
+	}
+
+	public static DocTopics deserialize(String filePath) throws IOException {
+		JsonFactory factory = new JsonFactory();
+
+		try (JsonParser parser = factory.createParser(new File(filePath))) {
+			parser.nextToken(); // skip start object
+			return deserialize(parser);
+		}
+	}
+
+	public static DocTopics deserialize(JsonParser parser) throws IOException {
+		DocTopics toReturn = new DocTopics();
+
+		parser.nextToken(); // skip field name dtItemList
+		parser.nextToken(); // skip start array
+		while (parser.nextToken().equals(JsonToken.START_OBJECT)) {
+			DocTopicItem dti = DocTopicItem.deserialize(parser);
+			toReturn.dtItemList.add(dti);
+			parser.nextToken(); // skip end object
+		}
+
+		parser.nextToken(); // skip field name topicWordLists
+		parser.nextToken(); // skip start array
+		int i = 0;
+		while (parser.nextToken().equals(JsonToken.START_OBJECT)) {
+			parser.nextToken(); // skip field name wordList
+			List<String> wordList = new ArrayList<>();
+			parser.nextToken(); // skip start array
+			while (!parser.nextToken().equals(JsonToken.END_ARRAY))
+				wordList.add(parser.getText());
+			toReturn.topicWordLists.put(i++, wordList);
+			parser.nextToken(); // skip end object
+		}
+
+		return toReturn;
 	}
 	// #endregion SERIALIZATION --------------------------------------------------
 }

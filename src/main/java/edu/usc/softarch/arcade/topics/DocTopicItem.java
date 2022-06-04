@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.topics;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -7,22 +8,19 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import cc.mallet.util.Maths;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import edu.usc.softarch.arcade.clustering.Cluster;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
  * The set of {@link TopicItem}s in a document. A document represents a cluster.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class DocTopicItem implements Serializable {
 	//region ATTRIBUTES
 	private static final long serialVersionUID = 5162975838519632395L;
@@ -35,6 +33,10 @@ public class DocTopicItem implements Serializable {
 	 * Set of {@link TopicItem}s in this document.
 	 */
 	private Map<Integer, TopicItem> topics;
+	/**
+	 * Set of the most important words related to this "concern".
+	 */
+	private transient Concern concern; //TODO fix transient
 	//endregion
 	
 	//region CONSTRUCTORS
@@ -43,10 +45,9 @@ public class DocTopicItem implements Serializable {
 	 *
 	 * @param source The source entity of this DocTopicItem.
 	 */
-	@JsonCreator
-	public DocTopicItem(@JsonProperty("source") String source) {
+	public DocTopicItem(String source) {
 		this.source = source;
-		this.topics = new HashMap<>();
+		this.topics = new TreeMap<>();
 	}
 	
 	/**
@@ -54,6 +55,7 @@ public class DocTopicItem implements Serializable {
 	 */
 	public DocTopicItem(DocTopicItem dti) {
 		this.source = dti.source;
+		this.concern = dti.concern;
 		initialize(dti);
 	}
 
@@ -87,7 +89,7 @@ public class DocTopicItem implements Serializable {
 				"In mergeDocTopicItems, nonmatching docTopicItems");
 
 		this.source = dti1.source;
-		this.topics = new HashMap<>();
+		this.topics = new TreeMap<>();
 		Set<Integer> topicNumbers = dti1.getTopicNumbers();
 
 		for (Integer i : topicNumbers) {
@@ -101,29 +103,18 @@ public class DocTopicItem implements Serializable {
 	 * Initializes a clone.
 	 */
 	public void initialize(DocTopicItem dti) {
-		this.topics = new HashMap<>();
+		this.topics = new TreeMap<>();
 		for (TopicItem topicItem : dti.getTopics())
 			addTopic(new TopicItem(topicItem));
 	}
 	//endregion
 
 	//region ACCESSORS
-
 	/**
 	 * Gets a copy of the {@link TopicItem}s in this DocTopicItem.
 	 */
-	@JsonIgnore
 	public List<TopicItem> getTopics() {
 		return new ArrayList<>(topics.values()); }
-
-	/**
-	 * Gets the original map of {@link TopicItem}s in this DocTopicItem. Meant
-	 * ONLY for use with Jackson JSON serialization.
-	 */
-	public Map<Integer, TopicItem> getTopicsForJackson() {
-		//TODO Find a better way to do this
-		return this.topics;
-	}
 
 	/**
 	 * Get the quantity of {@link TopicItem}s in this DocTopicItem.
@@ -144,7 +135,6 @@ public class DocTopicItem implements Serializable {
 	 * Gets the {@link TopicItem#topicNum}s of all {@link TopicItem}s in this
 	 * DocTopicItem.
 	 */
-	@JsonIgnore
 	public Set<Integer> getTopicNumbers() { return this.topics.keySet(); }
 
 	/**
@@ -156,7 +146,6 @@ public class DocTopicItem implements Serializable {
 	/**
 	 * Verifies whether this DocTopicItem is based on a C source entity.
 	 */
-	@JsonIgnore
 	public boolean isCSourced() {
 		return source.endsWith(".c") || source.endsWith(".h")
 			|| source.endsWith(".tbl") || source.endsWith(".p")
@@ -211,6 +200,14 @@ public class DocTopicItem implements Serializable {
 	}
 	//endregion
 
+	//region PROCESSING
+	public Concern computeConcern(Map<Integer, List<String>> wordBags) {
+		if (this.concern == null)
+			this.concern = new Concern(wordBags, this.topics);
+		return new Concern(this.concern);
+	}
+	//endregion
+
 	//region OBJECT METHODS
 	public String toString() {
 		List<TopicItem> values =
@@ -238,5 +235,34 @@ public class DocTopicItem implements Serializable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(source, topics); }
+	//endregion
+
+	//region SERIALIZATION
+	public void serialize(JsonGenerator generator) throws IOException {
+		generator.writeStringField("source", this.source);
+
+		generator.writeArrayFieldStart("topics");
+		for (TopicItem topicItem : topics.values()) {
+			generator.writeStartObject();
+			topicItem.serialize(generator);
+			generator.writeEndObject();
+		}
+		generator.writeEndArray();
+	}
+
+	public static DocTopicItem deserialize(JsonParser parser) throws IOException {
+		parser.nextToken(); // skip field name source
+		DocTopicItem toReturn = new DocTopicItem(parser.nextTextValue());
+
+		parser.nextToken(); // skip field name topics
+		parser.nextToken(); // skip start array
+		while (parser.nextToken().equals(JsonToken.START_OBJECT)) {
+			TopicItem topicItem = TopicItem.deserialize(parser);
+			toReturn.topics.put(topicItem.topicNum, topicItem);
+			parser.nextToken(); // skip end object
+		}
+
+		return toReturn;
+	}
 	//endregion
 }

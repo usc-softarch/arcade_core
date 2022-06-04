@@ -1,9 +1,10 @@
 package edu.usc.softarch.arcade.topics;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import edu.usc.softarch.arcade.clustering.Cluster;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -54,10 +55,7 @@ public class TopicItem implements Serializable, Comparable<TopicItem> {
 	 * 									 {@link DocTopicItem}.
 	 * @param weight Weight of (number of entities represented by) this TopicItem.
 	 */
-	@JsonCreator
-	public TopicItem(@JsonProperty("topicNum") int topicNum,
-									 @JsonProperty("proportion") double proportion,
-									 @JsonProperty("weight") int weight) {
+	public TopicItem(int topicNum, double proportion, int weight) {
 		this.weight = weight;
 		this.topicNum = topicNum;
 		this.proportion = proportion;
@@ -111,5 +109,24 @@ public class TopicItem implements Serializable, Comparable<TopicItem> {
 	@Override
 	public int compareTo(TopicItem o) {
 		return Double.compare(this.proportion, o.proportion);	}
+	//endregion
+
+	//region SERIALIZATION
+	public void serialize(JsonGenerator generator) throws IOException {
+		generator.writeNumberField("topicNum", this.topicNum);
+		generator.writeNumberField("weight", this.weight);
+		generator.writeNumberField("proportion", this.proportion);
+	}
+
+	public static TopicItem deserialize(JsonParser parser) throws IOException {
+		parser.nextToken(); // skip field name topicNum
+		int topicNum = parser.nextIntValue(0);
+		parser.nextToken(); // skip field name weight
+		int weight = parser.nextIntValue(1);
+		parser.nextToken(); // skip field name proportion
+		parser.nextToken(); // move to value
+		double proportion = parser.getDoubleValue();
+		return new TopicItem(topicNum, proportion, weight);
+	}
 	//endregion
 }

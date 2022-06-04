@@ -27,23 +27,13 @@ import java.util.*;
  * of 127).
  */
 public class TopicCompositionParser {
+	//region PUBLIC INTERFACE
 	public static void main(String[] args)
 			throws Exception {
-		// Load the desired TopicInferencer file
-		TopicInferencer inferencer = TopicInferencer.read(new File(args[0]));
-
-		// Get the relevant attributes by reflection
-		int[][] typeTopicCounts = getTypeTopicCounts(inferencer);
-		List entries = getAlphabetEntries(inferencer);
-		int numTopics = getNumTopics(inferencer);
-		int topicMask = getTopicMask(inferencer);
-
-		// Reverse the data in TopicInferencer so it suits our needs
-		long[][] topicTypeCounts =
-			reverseTypeTopicCounts(typeTopicCounts, entries.size(), numTopics, topicMask);
+		TopicCompositionParser parser = new TopicCompositionParser(args[0]);
 
 		// Get the 20 most prominent words of each topic
-		Map<Integer, List<String>> mostProminentWords = getMostProminentWords(entries, topicTypeCounts);
+		Map<Integer, List<String>> mostProminentWords = parser.run();
 
 		try(PrintWriter writer = new PrintWriter(args[1])) {
 			for (int topicIndex = 0; topicIndex < mostProminentWords.size(); topicIndex++) {
@@ -60,10 +50,38 @@ public class TopicCompositionParser {
 		}
 	}
 
-	private static Map<Integer, List<String>> getMostProminentWords(List entries, long[][] topicTypeCounts) {
-		// Instantiate the result map
-		Map<Integer, List<String>> mostProminentWords = new HashMap<>();
+	public Map<Integer, List<String>> run() throws Exception {
+		// Get the relevant attributes by reflection
+		int[][] typeTopicCounts = getTypeTopicCounts(this.inferencer);
+		List entries = getAlphabetEntries(this.inferencer);
+		int numTopics = getNumTopics(this.inferencer);
+		int topicMask = getTopicMask(this.inferencer);
 
+		// Reverse the data in TopicInferencer so it suits our needs
+		long[][] topicTypeCounts =
+			reverseTypeTopicCounts(typeTopicCounts, entries.size(), numTopics, topicMask);
+
+		return getMostProminentWords(entries, topicTypeCounts);
+	}
+	//endregion
+
+	//region ATTRIBUTES
+	private final Map<Integer, List<String>> wordBags;
+	private final TopicInferencer inferencer;
+	//endregion
+
+	//region CONSTRUCTORS
+	public TopicCompositionParser(String inferPath) throws Exception {
+		this(TopicInferencer.read(new File(inferPath))); }
+
+	public TopicCompositionParser(TopicInferencer inferencer) {
+		this.inferencer = inferencer;
+		this.wordBags = new HashMap<>();
+	}
+	//endregion
+
+	private Map<Integer, List<String>> getMostProminentWords(
+			List entries, long[][] topicTypeCounts) {
 		// Get the mask for extracting typeIndices from typeCountIndex
 		int typeMask = getTypeMask(entries.size());
 
@@ -81,27 +99,27 @@ public class TopicCompositionParser {
 			// Instantiate list to hold the most prominent words of the topic
 			List<String> topicProminentWords = new ArrayList<>();
 
-			// Get the 20 most prominent words of the topic
-			for (int typeCountCell = 0; typeCountCell < 20; typeCountCell++) {
+			// Get the 100 most prominent words of the topic
+			for (int typeCountCell = 0; typeCountCell < 100; typeCountCell++) {
 				Long typeCountIndex = topicTypeCountList.get(typeCountCell);
 				long typeIndex = typeCountIndex & typeMask;
 				topicProminentWords.add(entries.get((int) typeIndex).toString());
 			}
 
-			mostProminentWords.put(topic, topicProminentWords);
+			this.wordBags.put(topic, topicProminentWords);
 		}
 
-		return mostProminentWords;
+		return this.wordBags;
 	}
 
-	private static int getTypeMask(int alphabetSize) {
+	private int getTypeMask(int alphabetSize) {
 		if (Integer.bitCount(alphabetSize) == 1)
 			return alphabetSize - 1;
 		else
 			return Integer.highestOneBit(alphabetSize) * 2 - 1;
 	}
 
-	private static long[][] reverseTypeTopicCounts(
+	private long[][] reverseTypeTopicCounts(
 			int[][] typeTopicCounts, int alphabetSize, int numTopics, int topicMask) {
 		// Setting up auxiliary variables
 		int topicMaskBitLength = Integer.SIZE - Integer.numberOfLeadingZeros(topicMask);
@@ -135,7 +153,7 @@ public class TopicCompositionParser {
 	}
 
 	//region REFLECTION ACCESSORS
-	private static int getTopicMask(TopicInferencer inferencer)
+	private int getTopicMask(TopicInferencer inferencer)
 			throws NoSuchFieldException, IllegalAccessException {
 		Class topicInferencerClass = inferencer.getClass();
 		Field topicMaskField = topicInferencerClass.getDeclaredField("topicMask");
@@ -143,7 +161,7 @@ public class TopicCompositionParser {
 		return (int) topicMaskField.get(inferencer);
 	}
 
-	private static int getNumTopics(TopicInferencer inferencer)
+	private int getNumTopics(TopicInferencer inferencer)
 			throws NoSuchFieldException, IllegalAccessException {
 		Class topicInferencerClass = inferencer.getClass();
 		Field numTopicsField = topicInferencerClass.getDeclaredField("numTopics");
@@ -151,7 +169,7 @@ public class TopicCompositionParser {
 		return (int) numTopicsField.get(inferencer);
 	}
 
-	private static int[][] getTypeTopicCounts(TopicInferencer inferencer)
+	private int[][] getTypeTopicCounts(TopicInferencer inferencer)
 			throws NoSuchFieldException, IllegalAccessException {
 		Class topicInferencerClass = inferencer.getClass();
 		Field typeTopicCountsField = topicInferencerClass.getDeclaredField("typeTopicCounts");
@@ -159,7 +177,7 @@ public class TopicCompositionParser {
 		return (int[][]) typeTopicCountsField.get(inferencer);
 	}
 
-	private static List getAlphabetEntries(TopicInferencer inferencer)
+	private List getAlphabetEntries(TopicInferencer inferencer)
 			throws NoSuchFieldException, IllegalAccessException {
 		Class topicInferencerClass = inferencer.getClass();
 		Field alphabetField = topicInferencerClass.getDeclaredField("alphabet");

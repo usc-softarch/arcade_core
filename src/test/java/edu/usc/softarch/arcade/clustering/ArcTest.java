@@ -158,13 +158,13 @@ public class ArcTest extends BaseTest {
 		// Creating relevant path Strings
 		String sysResources = resourcesDir + fs + systemVersion;
 		String depsRsfFile = factsDir + fs + systemVersion + "_deps.rsf";
-		String docTopicsPath = sysResources + fs + systemVersion + arcFileSuffix + "docTopics.json";
+		String docTopicsPath = sysResources + fs + "base" + fs + "docTopics.json";
 		String oracleFilePath = sysResources + fs + systemVersion + "_arc_smells.ser";
 		String clusterFile = sysResources + fs + systemVersion + arcFileSuffix + "clusters.rsf";
 		String resultFile = outputDirPath + fs + systemVersion + "_arc_smells.ser";
 
 		assertDoesNotThrow(() -> {
-			TopicUtil.docTopics = DocTopics.deserializeDocTopics(docTopicsPath);
+			TopicUtil.docTopics = DocTopics.deserialize(docTopicsPath);
 			ArchSmellDetector asd = new ArchSmellDetector(
 				depsRsfFile, clusterFile, resultFile, lang,
 				TopicModelExtractionMethod.MALLET_API, TopicUtil.docTopics);

@@ -1,6 +1,8 @@
 package edu.usc.softarch.arcade.clustering;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
+import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
@@ -8,10 +10,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ConcernArchitecture extends Architecture {
 	//region ATTRIBUTES
+	@JsonIgnore
 	private transient DocTopics docTopics;
 	//endregion
 
@@ -24,14 +28,14 @@ public class ConcernArchitecture extends Architecture {
 			vectors, language, packagePrefix);
 
 		try	{
-			this.docTopics = DocTopics.deserializeDocTopics(artifactsDir
+			this.docTopics = DocTopics.deserialize(artifactsDir
 				+ File.separator + "docTopics.json");
 		} catch (IOException e) {
 			System.out.println("No DocTopics file found, generating new one.");
 			// Initialize DocTopics from files
 			try {
 				this.docTopics = new DocTopics(artifactsDir);
-				this.docTopics.serializeDocTopics(artifactsDir
+				this.docTopics.serialize(artifactsDir
 					+ File.separator + "docTopics.json");
 			} catch (Exception f) {
 				f.printStackTrace();
@@ -123,5 +127,10 @@ public class ConcernArchitecture extends Architecture {
 		super.removeAll(excessClusters);
 		super.removeAll(excessInners);
 	}
+	//endregion
+
+	//region PROCESSING
+	public List<Concern> computeConcernWordBags() {
+		return this.docTopics.getConcerns(); }
 	//endregion
 }

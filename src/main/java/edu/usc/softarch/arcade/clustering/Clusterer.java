@@ -59,11 +59,14 @@ public class Clusterer {
 			throws IOException, DistributionSizeMismatchException,
 			UnmatchingDocTopicItemsException {
 		// Create the runner object
-		Clusterer runner = new Clusterer(
-			language, serialCrit, arch, algorithm);
+		Clusterer runner = new Clusterer(language, serialCrit, arch, algorithm);
 		// Compute the clustering algorithm and return the resulting architecture
-		return runner.computeArchitecture(stopCrit, stoppingCriterionName,
-			simMeasure);
+		runner.computeArchitecture(stopCrit, stoppingCriterionName,	simMeasure);
+		// Compute DTI word bags if concern-based technique is used
+		if (runner.architecture instanceof ConcernArchitecture)
+			((ConcernArchitecture) runner.architecture).computeConcernWordBags();
+
+		return runner.architecture;
 	}
 
 	public static class ClusteringAlgoArguments {
@@ -206,7 +209,7 @@ public class Clusterer {
 				data, newCluster, simMatrix);
 
 			if (this.serializationCriterion != null
-				&& this.serializationCriterion.shouldSerialize())
+					&& this.serializationCriterion.shouldSerialize())
 				this.architecture.writeToRsf();
 		}
 

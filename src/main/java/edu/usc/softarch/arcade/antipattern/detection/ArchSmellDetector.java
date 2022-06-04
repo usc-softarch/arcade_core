@@ -101,7 +101,7 @@ public class ArchSmellDetector {
 		String isArc = args[5];
 
 		if (isArc.equals("true")) {
-			TopicUtil.docTopics = DocTopics.deserializeDocTopics(docTopicsPath);
+			TopicUtil.docTopics = DocTopics.deserialize(docTopicsPath);
 			ArchSmellDetector asd = new ArchSmellDetector(depsRsfFilename,
 				clustersRsfFilename, detectedSmellsFilename, language,
 				TopicModelExtractionMethod.MALLET_API, TopicUtil.docTopics);
