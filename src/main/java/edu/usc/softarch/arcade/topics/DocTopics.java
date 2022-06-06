@@ -153,13 +153,8 @@ public class DocTopics {
 		return null;
 	}
 
-	public List<Concern> getConcerns() {
-		List<Concern> concernList = new ArrayList<>();
-		for (DocTopicItem dti : dtItemList)
-			concernList.add(dti.computeConcern(this.topicWordLists));
-
-		return concernList;
-	}
+	public Map<Integer, List<String>> getTopicWordLists() {
+		return topicWordLists; }
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region PROCESSING --------------------------------------------------------

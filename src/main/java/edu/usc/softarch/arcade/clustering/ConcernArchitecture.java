@@ -3,11 +3,18 @@ package edu.usc.softarch.arcade.clustering;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.topics.Concern;
+import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -127,10 +134,40 @@ public class ConcernArchitecture extends Architecture {
 		super.removeAll(excessClusters);
 		super.removeAll(excessInners);
 	}
+
+	public List<Concern> computeConcernWordBags() {
+		List<Concern> concernList = new ArrayList<>();
+		for (Cluster cluster : this.values())
+			concernList.add(cluster.computeConcern(this.docTopics.getTopicWordLists()));
+
+		return concernList;
+	}
 	//endregion
 
-	//region PROCESSING
-	public List<Concern> computeConcernWordBags() {
-		return this.docTopics.getConcerns(); }
+	//region SERIALIZATION
+	public void serializeBagOfWords() throws FileNotFoundException {
+		String fs = File.separator;
+		String path = this.projectPath + fs + this.projectName + "_"
+			+ this.simMeasure + "_concerns.txt";
+		File outputFile = new File(path);
+		outputFile.getParentFile().mkdirs();
+
+		Map<Integer, String> architectureIndex = computeArchitectureIndex();
+
+		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
+				new FileOutputStream(outputFile), StandardCharsets.UTF_8))) {
+			StringBuilder output = new StringBuilder();
+
+			for (Map.Entry<Integer, String> cluster : architectureIndex.entrySet()) {
+				DocTopicItem dti = this.get(cluster.getValue()).getDocTopicItem();
+				Concern concernWords = dti.getConcern();
+				output.append(cluster.getKey());
+				output.append(concernWords);
+				output.append(System.lineSeparator());
+			}
+
+			out.print(output);
+		}
+	}
 	//endregion
 }

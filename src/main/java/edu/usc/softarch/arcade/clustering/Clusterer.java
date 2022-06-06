@@ -63,8 +63,10 @@ public class Clusterer {
 		// Compute the clustering algorithm and return the resulting architecture
 		runner.computeArchitecture(stopCrit, stoppingCriterionName,	simMeasure);
 		// Compute DTI word bags if concern-based technique is used
-		if (runner.architecture instanceof ConcernArchitecture)
+		if (runner.architecture instanceof ConcernArchitecture) {
 			((ConcernArchitecture) runner.architecture).computeConcernWordBags();
+			((ConcernArchitecture) runner.architecture).serializeBagOfWords();
+		}
 
 		return runner.architecture;
 	}

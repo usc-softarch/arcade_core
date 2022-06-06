@@ -42,8 +42,8 @@ public class Architecture extends TreeMap<String, Cluster> {
 	/**
 	 * The path to where this data structure should be serialized.
 	 */
-	private final String projectPath;
-	private final SimMeasure.SimMeasureType simMeasure;
+	public final String projectPath;
+	public final SimMeasure.SimMeasureType simMeasure;
 	/**
 	 * The total number of features that can exist in any clusters of this
 	 * architecture. For architectures constructed from structural data such as
@@ -330,8 +330,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 
 		Map<Integer, String> architectureIndex = computeArchitectureIndex();
 
-		try (PrintWriter out = new PrintWriter(
-			new OutputStreamWriter(
+		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
 				new FileOutputStream(rsfFile), StandardCharsets.UTF_8))) {
 			for (Map.Entry<Integer, String> cluster : architectureIndex.entrySet()) {
 				Integer clusterIndex = cluster.getKey();
@@ -351,7 +350,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 	 * a unique identifier. The names of the entities are broken down into
 	 * separate entries by the serialization method.
 	 */
-	private Map<Integer, String> computeArchitectureIndex() {
+	protected Map<Integer, String> computeArchitectureIndex() {
 		List<String> orderedClusterNames = this.values().stream()
 			.map(Cluster::getName).sorted().collect(Collectors.toList());
 

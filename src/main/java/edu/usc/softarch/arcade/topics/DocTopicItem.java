@@ -198,6 +198,14 @@ public class DocTopicItem implements Serializable {
 		
 		return Maths.jensenShannonDivergence(sortedP, sortedQ);
 	}
+
+	//TODO make this less horrible
+	public Concern getConcern() {
+		if (this.concern == null)
+			throw new IllegalStateException("Attempted to get concern before " +
+				"it was computed");
+		return new Concern(this.concern);
+	}
 	//endregion
 
 	//region PROCESSING

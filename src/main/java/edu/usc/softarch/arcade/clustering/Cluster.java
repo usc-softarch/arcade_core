@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
@@ -211,6 +213,9 @@ public class Cluster implements Serializable {
 
 		return centroidAvg / getNumEntities();
 	}
+
+	public Concern computeConcern(Map<Integer, List<String>> wordBags) {
+		return this.dti.computeConcern(wordBags); }
 	//endregion
 
 	//region OBJECT METHODS
