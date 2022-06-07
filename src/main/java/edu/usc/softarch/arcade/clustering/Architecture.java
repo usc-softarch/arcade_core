@@ -314,7 +314,7 @@ public class Architecture extends TreeMap<String, Cluster> {
 	public void writeToRsf() throws FileNotFoundException {
 		String fs = File.separator;
 		String path = this.projectPath + fs + this.projectName + "_"
-			+ this.simMeasure + "_clusters.rsf";
+			+ this.simMeasure + "_" + this.size() + "_clusters.rsf";
 		this.writeToRsf(path);
 	}
 

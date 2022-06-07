@@ -51,8 +51,8 @@ public class WcaTest extends BaseTest {
 		String uemOraclePath = oracleFilePathBase + "_uem_clusters.rsf";
 		String uemnmOraclePath = oracleFilePathBase + "_uemnm_clusters.rsf";
 		String resultFilePathBase = outputDirPath + fs + systemVersion;
-		String uemResultPath = resultFilePathBase + "_uem_clusters.rsf";
-		String uemnmResultPath = resultFilePathBase + "_uemnm_clusters.rsf";
+		String uemResultPath = resultFilePathBase + "_uem_100_clusters.rsf";
+		String uemnmResultPath = resultFilePathBase + "_uemnm_100_clusters.rsf";
 
 		Architecture archUem = assertDoesNotThrow(() ->
 			new Architecture(systemVersion, outputDirPath,

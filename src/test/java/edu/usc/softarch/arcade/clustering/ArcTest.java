@@ -44,25 +44,25 @@ public class ArcTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_js_clusters.rsf,"
+			+ "_js_181_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_js_clusters.rsf,"
+			+ "_js_163_clusters.rsf,"
 			+ "org.apache.struts2",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_js_clusters.rsf,"
+			+ "_js_71_clusters.rsf,"
 			+ "",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_js_clusters.rsf,"
+			+ "_js_82_clusters.rsf,"
 			+ ""
 	})
 	public void ARCRecoveryTest(String systemVersion, String lang,
@@ -137,22 +137,22 @@ public class ArcTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_js_",
+			+ "_js_181_",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_js_",
+			+ "_js_163_",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_js_",
+			+ "_js_71_",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_js_"
+			+ "_js_82_"
 	})
 	public void asdWithConcernsTest(String systemVersion, String lang, String arcFileSuffix) {
 		// Creating relevant path Strings
