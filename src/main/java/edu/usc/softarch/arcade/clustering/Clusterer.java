@@ -62,11 +62,6 @@ public class Clusterer {
 		Clusterer runner = new Clusterer(language, serialCrit, arch, algorithm);
 		// Compute the clustering algorithm and return the resulting architecture
 		runner.computeArchitecture(stopCrit, stoppingCriterionName,	simMeasure);
-		// Compute DTI word bags if concern-based technique is used
-		if (runner.architecture instanceof ConcernArchitecture) {
-			((ConcernArchitecture) runner.architecture).computeConcernWordBags();
-			((ConcernArchitecture) runner.architecture).serializeBagOfWords();
-		}
 
 		return runner.architecture;
 	}
@@ -211,8 +206,14 @@ public class Clusterer {
 				data, newCluster, simMatrix);
 
 			if (this.serializationCriterion != null
-					&& this.serializationCriterion.shouldSerialize())
+					&& this.serializationCriterion.shouldSerialize()) {
 				this.architecture.writeToRsf();
+				// Compute DTI word bags if concern-based technique is used
+				if (this.architecture instanceof ConcernArchitecture) {
+					((ConcernArchitecture) this.architecture).computeConcernWordBags();
+					((ConcernArchitecture) this.architecture).serializeBagOfWords();
+				}
+			}
 		}
 
 		return this.architecture;

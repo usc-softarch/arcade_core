@@ -148,7 +148,7 @@ public class ConcernArchitecture extends Architecture {
 	public void serializeBagOfWords() throws FileNotFoundException {
 		String fs = File.separator;
 		String path = this.projectPath + fs + this.projectName + "_"
-			+ this.simMeasure + "_concerns.txt";
+			+ this.simMeasure + "_" + this.size() + "_concerns.txt";
 		File outputFile = new File(path);
 		outputFile.getParentFile().mkdirs();
 
