@@ -308,27 +308,38 @@ public class FileUtil {
 	 * Recursively walk a directory tree and return a List of all
 	 * Files found; the List is sorted using File.compareTo().
 	 *
-	 * @param aStartingDir is a valid directory, which can be read.
+	 * @param dir is a valid directory, which can be read.
 	 */
-	public static List<File> getFileListing(File aStartingDir)
+	public static List<File> getFileListing(File dir)
 		throws FileNotFoundException {
-		validateDirectory(aStartingDir);
-		List<File> result = getFileListingNoSort(aStartingDir, null);
+		validateDirectory(dir);
+		List<File> result = getFileListingNoSort(dir, null);
 		Collections.sort(result);
 		return result;
+	}
+
+	/**
+	 * Recursively walk a directory tree and return a List of all
+	 * Files found; the List is sorted using File.compareTo().
+	 *
+	 * @param dirPath is a valid path to a directory, which can be read.
+	 */
+	public static List<File> getFileListing(String dirPath)
+			throws FileNotFoundException {
+		return getFileListing(new File(dirPath));
 	}
 
 	/**
 	 * Recursively walk a directory tree and return a List of files matching the
 	 * FilenameFilter; the List is sorted using File.compareTo().
 	 *
-	 * @param aStartingDir is a valid directory, which can be read.
+	 * @param dir is a valid directory, which can be read.
 	 * @param extension Which file extensions to consider.
 	 */
-	public static List<File> getFileListing(File aStartingDir, String extension)
+	public static List<File> getFileListing(File dir, String extension)
 		throws FileNotFoundException {
-		validateDirectory(aStartingDir);
-		List<File> result = getFileListingNoSort(aStartingDir, extension);
+		validateDirectory(dir);
+		List<File> result = getFileListingNoSort(dir, extension);
 		Collections.sort(result);
 		return result;
 	}
@@ -338,13 +349,12 @@ public class FileUtil {
 	 * the provided {@link File}. Traverses symbolic links and verifies that
 	 * they are live.
 	 *
-	 * @param aStartingDir is a valid directory, which can be read.
+	 * @param dir is a valid directory, which can be read.
 	 * @param extension Which file extensions to consider.
 	 */
-	private static List<File> getFileListingNoSort(File aStartingDir,
-		String extension) {
+	private static List<File> getFileListingNoSort(File dir, String extension) {
 		List<File> result = new ArrayList<>();
-		File[] filesAndDirs = aStartingDir.listFiles();
+		File[] filesAndDirs = dir.listFiles();
 
 		for(File file : filesAndDirs) {
 			// Catch to ignore the taint from evil Mac users
