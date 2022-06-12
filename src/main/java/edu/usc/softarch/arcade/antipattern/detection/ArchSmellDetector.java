@@ -308,23 +308,6 @@ public class ArchSmellDetector {
 			}
 		}
 
-		//Added for creating test oracles, uncomment to produce new test oracles
-		/*
-		char fs = File.separatorChar;
-		try{
-			String resources_dir = "src///test///resources///ArchSmellDetectorTest_resources///runConcernDetectionAlgs_resources///";
-			resources_dir = resources_dir.replace("///", File.separator);
-
-			ObjectOutputStream oosDSmells2 = new ObjectOutputStream(new FileOutputStream(resources_dir + version + "_output_smellClusterMap_after.txt"));
-			oosDSmells2.writeObject(smellClustersMap);
-			oosDSmells2.flush();
-			oosDSmells2.close();
-
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		*/
-
 		return smellClustersMap;
 	}
 
