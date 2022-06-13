@@ -31,7 +31,6 @@ import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicItem;
 import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
-import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ArchSmellDetector {
@@ -101,10 +100,10 @@ public class ArchSmellDetector {
 		String isArc = args[5];
 
 		if (isArc.equals("true")) {
-			TopicUtil.docTopics = DocTopics.deserialize(docTopicsPath);
+			DocTopics docTopics = DocTopics.deserialize(docTopicsPath);
 			ArchSmellDetector asd = new ArchSmellDetector(depsRsfFilename,
 				clustersRsfFilename, detectedSmellsFilename, language,
-				TopicModelExtractionMethod.MALLET_API, TopicUtil.docTopics);
+				TopicModelExtractionMethod.MALLET_API, docTopics);
 			asd.run(true, true, true);
 		} else {
 			ArchSmellDetector asd = new ArchSmellDetector(depsRsfFilename,

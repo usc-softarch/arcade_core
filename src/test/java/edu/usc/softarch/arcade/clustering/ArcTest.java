@@ -13,14 +13,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 
 import edu.usc.softarch.arcade.BaseTest;
-import edu.usc.softarch.arcade.antipattern.SmellCollection;
-import edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
-import edu.usc.softarch.arcade.topics.DocTopics;
-import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
-import edu.usc.softarch.arcade.topics.TopicUtil;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
@@ -89,7 +84,7 @@ public class ArcTest extends BaseTest {
 
 		assertDoesNotThrow(() ->
 			Clusterer.run(ClusteringAlgorithmType.ARC, arch, serialCrit, stopCrit, lang,
-				"archsizefraction",	SimMeasure.SimMeasureType.JS));
+				"archsizefraction", SimMeasure.SimMeasureType.JS));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of
