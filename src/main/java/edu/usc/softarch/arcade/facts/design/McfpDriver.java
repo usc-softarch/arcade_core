@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.facts.design;
 
-import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
@@ -9,49 +8,34 @@ import org.jgrapht.alg.flow.mincost.MinimumCostFlowProblem;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class McfpDriver {
-	//region PUBLIC INTERFACE
-	public static void main(String[] args) throws IOException {
-		McfpDriver driver = new McfpDriver(args[0], args[1]);
-
-		System.out.println(driver.changeSet);
-	}
-	//endregion
-
+/**
+ * Minimum-cost flow problem. Serves as a driver for resolving MCFP using
+ * the JGraphT library, which in turn provides the input for the Change
+ * Analyzer component of RecovAr.
+ */
+class McfpDriver {
 	//region ATTRIBUTES
-	List<DefaultWeightedEdge> changeSet;
+	private final List<DefaultWeightedEdge> changeSet;
 	//endregion
 
 	//region CONSTRUCTORS
-	public McfpDriver(String path1, String path2) throws IOException {
-		Map<String, EnhancedSet<String>> arch1 = readArchitectureRsf(path1);
-		Map<String, EnhancedSet<String>> arch2 = readArchitectureRsf(path2);
-
-		balanceArchitectures(arch1, arch2);
+	McfpDriver(Map<String, EnhancedSet<String>> arch1,
+			Map<String, EnhancedSet<String>> arch2) {
 		this.changeSet = solve(arch1, arch2);
 	}
 	//endregion
 
+	//region ACCESSORS
+	List<DefaultWeightedEdge> getChangeSet() {
+		return new ArrayList<>(this.changeSet);	}
+	//endregion
+
 	//region PROCESSING
-	private void balanceArchitectures(
-		Map<String, EnhancedSet<String>> arch1,
-		Map<String, EnhancedSet<String>> arch2) {
-		int dummyCount = Math.abs(arch1.size() - arch2.size());
-		Map<String, EnhancedSet<String>> smallerArch =
-			arch1.size() < arch2.size() ? arch1 : arch2;
-
-		for (int i = 0; i < dummyCount; i++)
-			smallerArch.put("dummy" + i, new EnhancedHashSet<>());
-	}
-
 	private Graph<String, DefaultWeightedEdge> makeGraph(
 		Map<String, EnhancedSet<String>> arch1,
 		Map<String, EnhancedSet<String>> arch2) {
@@ -126,24 +110,6 @@ public class McfpDriver {
 			// Get only the edge information
 			.map(Map.Entry::getKey)
 			.collect(Collectors.toList());
-	}
-	//endregion
-
-	//region SERIALIZATION
-	private Map<String, EnhancedSet<String>> readArchitectureRsf(String path)
-			throws IOException {
-		Map<String, EnhancedSet<String>> architecture = new HashMap<>();
-
-		try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-			for (String line = br.readLine(); line != null; line = br.readLine()) {
-				String[] splitLine = line.split(" ");
-				architecture.putIfAbsent(splitLine[1], new EnhancedHashSet<>());
-				EnhancedSet<String> cluster = architecture.get(splitLine[1]);
-				cluster.add(splitLine[2]);
-			}
-		}
-
-		return architecture;
 	}
 	//endregion
 }
