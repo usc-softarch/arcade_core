@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class GitLabRestHandler {
 	//region EXCEPTION HANDLING
-	class GitLabRestHandlerException extends RuntimeException {
+	class GitLabRestHandlerException extends Exception {
 		GitLabRestHandlerException(String message, int requestCounter,
 				int issueCounter, String projectId) {
 			super("GitLabRestHandler failed to recover issues "
@@ -40,12 +40,14 @@ public class GitLabRestHandler {
 		}
 	}
 
-	private void throwLocalException(String message) {
+	private void throwLocalException(String message)
+			throws GitLabRestHandlerException {
 		throw new GitLabRestHandlerException(message, this.requestCounter,
 			this.issueCounter, this.projectId);
 	}
 
-	private void throwLocalException(String message, Exception cause) {
+	private void throwLocalException(String message, Exception cause)
+			throws GitLabRestHandlerException {
 		throw new GitLabRestHandlerException(message, this.requestCounter,
 			this.issueCounter, this.projectId, cause);
 	}
@@ -72,26 +74,46 @@ public class GitLabRestHandler {
 	}
 	//endregion
 
-	public static void main(String args[])
-			throws IOException, InterruptedException {
+	public static void main(String args[]) {
 		GitLabRestHandler handler =
-			new GitLabRestHandler("4207231", true);
-		Collection<IssueRecord> issues = handler.getIssueRecords();
-		return;
+			new GitLabRestHandler(args[0], true);
+		Collection<IssueRecord> issues = null;
+		try {
+			issues = handler.getIssueRecords();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+
+		int issueCount = issues.size();
+		long issuesWithLinkedCommits = issues.stream()
+			.filter(is -> is.getLinkedCommits().isEmpty()).count();
+
+		System.out.println("Found " + issueCount + " issues, of which "
+			+ issuesWithLinkedCommits + " had a linked commit.");
 	}
 
 	//region ACCESSORS
 	public Collection<IssueRecord> getIssueRecords()
-			throws IOException, InterruptedException {
-		if (this.issueRecords == null)
+			throws IOException, InterruptedException, GitLabRestHandlerException {
+		if (this.issueRecords == null) {
+			if (this.verbose) {
+				DateTimeFormatter dtf =
+					DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+				LocalDateTime now = LocalDateTime.now();
+				System.out.println(dtf.format(now) + ": Started processing issues for "
+					+ "project ID " + this.projectId);
+			}
 			this.issueRecords = processIssues(getRawIssues());
+		}
 		return new ArrayList<>(issueRecords);
 	}
 	//endregion
 
 	//region HTTP
 	private Collection<String> getRawIssues()
-			throws IOException, InterruptedException {
+			throws IOException, InterruptedException, GitLabRestHandlerException {
 		// Create URI and result collection
 		String baseUri = "https://gitlab.com/api/v4/projects/" + this.projectId
 			+ "/issues?per_page=100&page=";
@@ -113,28 +135,28 @@ public class GitLabRestHandler {
 	}
 
 	private String getRawCommits(String issueId)
-			throws IOException, InterruptedException {
+			throws IOException, InterruptedException, GitLabRestHandlerException {
 		String baseUri = "https://gitlab.com/api/v4/projects/" + this.projectId
 			+ "/issues/" + issueId + "/related_merge_requests";
 		return runHttpRequest(baseUri, 0);
 	}
 
 	private String getRawCommitChanges(String commitId)
-			throws IOException, InterruptedException {
+			throws IOException, InterruptedException, GitLabRestHandlerException {
 		String baseUri = "https://gitlab.com/api/v4/projects/" + this.projectId
 			+ "/merge_requests/" + commitId + "/changes";
 		return runHttpRequest(baseUri, 0);
 	}
 
 	private String getRawCommitTags(String commitSha)
-			throws IOException, InterruptedException {
+			throws IOException, InterruptedException, GitLabRestHandlerException {
 		String baseUri = "https://gitlab.com/api/v4/projects/" + this.projectId
 			+ "/repository/commits/" + commitSha + "/refs?type=tag&per_page=100";
 		return runHttpRequest(baseUri, 0);
 	}
 
 	private String runHttpRequest(String uri, int counter)
-			throws IOException, InterruptedException {
+		throws IOException, InterruptedException, GitLabRestHandlerException {
 		this.requestCounter++;
 
 		HttpRequest request = HttpRequest.newBuilder()
@@ -167,7 +189,7 @@ public class GitLabRestHandler {
 
 	//region ISSUE PARSER
 	private Collection<IssueRecord> processIssues(Collection<String> rawIssues)
-			throws IOException, InterruptedException {
+			throws IOException, InterruptedException, GitLabRestHandlerException {
 		JsonFactory factory = new JsonFactory();
 		Collection<IssueRecord> result = new ArrayList<>();
 
@@ -184,7 +206,7 @@ public class GitLabRestHandler {
 	}
 
 	private IssueRecord parseIssue(JsonParser parser)
-			throws IOException, InterruptedException {
+			throws IOException, InterruptedException, GitLabRestHandlerException {
 		IssueRecordBuilder issueBuilder =
 			new IssueRecordBuilder(DateTimeFormatter.ISO_INSTANT);
 
@@ -307,7 +329,7 @@ public class GitLabRestHandler {
 
 	//region COMMIT PARSER
 	private Collection<Commit> processCommits(String rawCommits)
-			throws IOException, InterruptedException {
+			throws IOException, InterruptedException, GitLabRestHandlerException {
 		JsonFactory factory = new JsonFactory();
 		Collection<Commit> result = new ArrayList<>();
 
@@ -322,7 +344,7 @@ public class GitLabRestHandler {
 	}
 
 	private Commit parseCommit(JsonParser parser)
-			throws IOException, InterruptedException {
+			throws IOException, InterruptedException, GitLabRestHandlerException {
 		boolean externalProject = false;
 		CommitBuilder commitBuilder =
 			new CommitBuilder(DateTimeFormatter.ISO_INSTANT);
@@ -439,7 +461,8 @@ public class GitLabRestHandler {
 
 	//region CHANGES PARSER
 	private Collection<Map.Entry<String, String>> processChanges(
-			String rawChanges, String idForError) throws IOException {
+			String rawChanges, String idForError)
+			throws IOException, GitLabRestHandlerException {
 		JsonFactory factory = new JsonFactory();
 		Collection<Map.Entry<String, String>> result = new ArrayList<>();
 
@@ -462,7 +485,8 @@ public class GitLabRestHandler {
 	}
 
 	private Map.Entry<String, String> parseChange(
-			JsonParser parser, String idForError) throws IOException {
+			JsonParser parser, String idForError)
+			throws IOException, GitLabRestHandlerException {
 		String oldPath = "";
 		String newPath = "";
 
@@ -500,7 +524,7 @@ public class GitLabRestHandler {
 
 	//region TAGS PARSER
 	private Collection<String> processTags(String rawTags, String shaForError)
-			throws IOException {
+			throws IOException, GitLabRestHandlerException {
 		JsonFactory factory = new JsonFactory();
 		Collection<String> result = new ArrayList<>();
 
@@ -515,7 +539,7 @@ public class GitLabRestHandler {
 	}
 
 	private String parseTag(JsonParser parser, String shaForError)
-			throws IOException {
+			throws IOException, GitLabRestHandlerException {
 		String result = null;
 
 		while (parser.nextToken().equals(JsonToken.FIELD_NAME)) {
