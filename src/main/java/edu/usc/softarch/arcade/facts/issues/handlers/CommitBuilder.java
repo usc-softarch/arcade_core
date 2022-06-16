@@ -1,8 +1,6 @@
 package edu.usc.softarch.arcade.facts.issues.handlers;
 
 import edu.usc.softarch.arcade.facts.issues.Commit;
-import edu.usc.softarch.arcade.facts.issues.IssueComment;
-import edu.usc.softarch.arcade.facts.issues.IssueRecord;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -10,50 +8,45 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
-public class IssueRecordBuilder {
+public class CommitBuilder {
 	//region ATTRIBUTES
 	private final DateTimeFormatter formatter;
 	public String id;
-	public String url;
 	public String summary;
 	public String description;
-	public String type;
-	public String priority;
 	public String status;
-	public String resolution;
+	public String url;
+	public String sha;
 	public String created;
-	public String resolved;
+	public String merged;
 	public Collection<String> labels;
-	public Collection<String> versions;
-	public Collection<String> fixVersions;
-	public Collection<IssueComment> comments;
-	public Collection<Commit> linkedCommits;
+	public Collection<String> tags;
+	public Collection<Map.Entry<String, String>> changes;
 	//endregion
 
 	//region CONSTRUCTORS
-	public IssueRecordBuilder(String dateFormat) {
+	public CommitBuilder(String dateFormat) {
 		this(DateTimeFormatter.ofPattern(dateFormat)); }
 
-	public IssueRecordBuilder(DateTimeFormatter formatter) {
+	public CommitBuilder(DateTimeFormatter formatter) {
 		this.formatter = formatter;
 		this.labels = new ArrayList<>();
-		this.versions = new ArrayList<>();
-		this.fixVersions = new ArrayList<>();
-		this.comments = new ArrayList<>();
+		this.changes = new ArrayList<>();
 	}
 	//endregion
 
 	//region PROCESSING
-	public IssueRecord build() {
-		ZonedDateTime resolvedLocal = null;
+	public Commit build() {
+		ZonedDateTime mergedLocal = null;
 		ZonedDateTime createdLocal;
 
-		if (this.resolved != null) {
+		if (this.merged != null) {
 			try {
-				resolvedLocal = ZonedDateTime.parse(this.resolved, this.formatter);
+				mergedLocal = ZonedDateTime.parse(this.merged, this.formatter);
 			} catch (DateTimeParseException e) {
-				resolvedLocal = ZonedDateTime.parse(this.resolved,
+				mergedLocal = ZonedDateTime.parse(this.merged,
 					this.formatter.withZone(ZoneId.of("Universal")));
 			}
 		}
@@ -65,10 +58,9 @@ public class IssueRecordBuilder {
 				this.formatter.withZone(ZoneId.of("Universal")));
 		}
 
-		return new IssueRecord(this.id, this.url, this.summary, this.description,
-			this.type, this.priority, this.status, this.resolution, createdLocal,
-			resolvedLocal, this.labels, this.versions,
-			this.fixVersions, this.comments, this.linkedCommits);
+		return new Commit(this.id, this.summary, this.description, this.status,
+			this.url, this.sha, createdLocal, mergedLocal,
+			this.labels, this.tags, this.changes);
 	}
 	//endregion
 }
