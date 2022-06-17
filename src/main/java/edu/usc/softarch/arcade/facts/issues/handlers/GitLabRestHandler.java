@@ -74,7 +74,8 @@ public class GitLabRestHandler {
 	}
 	//endregion
 
-	public static void main(String args[]) {
+	//region PUBLIC INTERFACE
+	public static void main(String[] args) {
 		GitLabRestHandler handler =
 			new GitLabRestHandler(args[0], true);
 		Collection<IssueRecord> issues = null;
@@ -93,6 +94,7 @@ public class GitLabRestHandler {
 		System.out.println("Found " + issueCount + " issues, of which "
 			+ issuesWithLinkedCommits + " had a linked commit.");
 	}
+	//region PUBLIC INTERFACE
 
 	//region ACCESSORS
 	public Collection<IssueRecord> getIssueRecords()
