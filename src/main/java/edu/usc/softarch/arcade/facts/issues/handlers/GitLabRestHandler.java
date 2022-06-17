@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class GitLabRestHandler {
 	//region EXCEPTION HANDLING
-	class GitLabRestHandlerException extends Exception {
+	public class GitLabRestHandlerException extends Exception {
 		GitLabRestHandlerException(String message, int requestCounter,
 				int issueCounter, String projectId) {
 			super("GitLabRestHandler failed to recover issues "

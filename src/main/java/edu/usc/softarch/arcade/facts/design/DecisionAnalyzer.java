@@ -21,16 +21,22 @@ public class DecisionAnalyzer {
 	//endregion
 
 	//region PROCESSING
-	public Collection<Decision> getDecisionList(Collection<Change> changes) {
+	public Collection<Decision> getDecisionList(String version,
+			Collection<Change> changes) {
 		Collection<Decision> result = new ArrayList<>();
 
-		for (IssueRecord issue : this.issues)
-			result.add(getDecision(issue, changes));
+		for (IssueRecord issue : this.issues) {
+			if (issue.getFixVersions().contains(version)) {
+				Decision decision = getDecision(version, issue, changes);
+				if (!decision.isEmpty()) result.add(decision);
+			}
+		}
 
 		return result;
 	}
 
-	private Decision getDecision(IssueRecord issue, Collection<Change> changes) {
+	private Decision getDecision(String version, IssueRecord issue,
+			Collection<Change> changes) {
 		Collection<String> addedElements = new HashSet<>();
 		Collection<String> removedElements = new HashSet<>();
 
@@ -50,7 +56,7 @@ public class DecisionAnalyzer {
 			removedElements.addAll(removedFiles.intersection(removedChanges));
 		}
 
-		return new Decision(issue.description, issue.id,
+		return new Decision(issue.description, issue.id, version,
 			addedElements, removedElements);
 	}
 	//endregion

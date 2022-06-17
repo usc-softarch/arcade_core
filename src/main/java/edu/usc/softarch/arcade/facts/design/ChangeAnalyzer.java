@@ -5,6 +5,7 @@ import edu.usc.softarch.util.EnhancedSet;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -27,9 +28,12 @@ public class ChangeAnalyzer {
 
 	//region CONSTRUCTORS
 	public ChangeAnalyzer(String path1, String path2) throws IOException {
+		this(new File(path1), new File(path2));	}
+
+	public ChangeAnalyzer(File file1, File file2) throws IOException {
 		// Read the architectures in
-		this.arch1 = readArchitectureRsf(path1);
-		this.arch2 = readArchitectureRsf(path2);
+		this.arch1 = readArchitectureRsf(file1);
+		this.arch2 = readArchitectureRsf(file2);
 
 		// Balance the architectures
 		balanceArchitectures(arch1, arch2);
@@ -105,11 +109,11 @@ public class ChangeAnalyzer {
 	//endregion
 
 	//region IO
-	private Map<String, EnhancedSet<String>> readArchitectureRsf(String path)
-		throws IOException {
+	private Map<String, EnhancedSet<String>> readArchitectureRsf(File file)
+			throws IOException {
 		Map<String, EnhancedSet<String>> architecture = new HashMap<>();
 
-		try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 			for (String line = br.readLine(); line != null; line = br.readLine()) {
 				String[] splitLine = line.split(" ");
 				architecture.putIfAbsent(splitLine[1], new EnhancedHashSet<>());
