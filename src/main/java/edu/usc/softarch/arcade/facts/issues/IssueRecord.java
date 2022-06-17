@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.facts.issues;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 public class IssueRecord {
 	//region ATTRIBUTES
@@ -58,5 +59,12 @@ public class IssueRecord {
 		return new ArrayList<>(this.comments); }
 	public Collection<Commit> getLinkedCommits() {
 		return new ArrayList<>(this.linkedCommits); }
+	public Collection<Map.Entry<String, String>> getFileChanges() {
+		Collection<Map.Entry<String, String>> fileChanges = new ArrayList<>();
+		for (Commit commit : this.linkedCommits)
+			fileChanges.addAll(commit.getChanges());
+
+		return fileChanges;
+	}
 	//endregion
 }
