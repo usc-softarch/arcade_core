@@ -4,9 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.usc.softarch.arcade.BaseTest;
+import edu.usc.softarch.arcade.topics.MalletRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -14,10 +20,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 
-public class PipeExtractorTest {
-	// // Save the present working directory (i.e. the root of the repository)
-	// String pwd = System.getProperty("user.dir");
-
+public class PipeExtractorTest extends BaseTest {
 	@BeforeEach
 	public void setUp(){
 		char fs = File.separatorChar;
@@ -58,21 +61,36 @@ public class PipeExtractorTest {
 		+ ".///src///test///resources///PipeExtractorTest_resources///httpd///arc///base///httpd-2.4.26///output.pipe,"
 		+ "c",
 	})
-	public void mainTest(String versionDir, String outputDir, String oracleFile, String language){
+	public void mainTest(String versionDir, String outputDir, String oracleFile,
+			String language) {
 		String fs = File.separator;
 		/** Integration test for PipeExtractor **/
 		String classesDir = versionDir.replace("///", File.separator);
 		String resultDir = outputDir.replace("///", File.separator);
 		// Path to oracle pipe file
 		String oraclePath = oracleFile.replace("///", File.separator);
-		String stopWordsDir = "src" + fs + "main" + fs + "resources";
+		String stopWordsDir = "src" + fs + "main" + fs + "resources" + fs + "res";
 		(new File(resultDir)).mkdirs();
-		
+
 		// Call PipeExtractor.main() 
 		// (arguments: sys version dir, output dir, selected language)
-		assertDoesNotThrow( () -> {
-			PipeExtractor.main(new String[] {classesDir, resultDir, language, stopWordsDir});
-		});
+		MalletRunner runner = new MalletRunner(classesDir, language, "",
+			resultDir, stopWordsDir);
+		assertDoesNotThrow(runner::copySource);
+		assertDoesNotThrow(runner::runPipeExtractor);
+		runner.cleanUp();
+
+		// ------------------------- Generate Oracles ------------------------------
+
+		if (super.generateOracles) {
+			assertDoesNotThrow(() -> {
+				Path result = Paths.get(resultDir + fs + "output.pipe");
+				Path oracle = Paths.get(oraclePath);
+				Files.copy(result, oracle, StandardCopyOption.REPLACE_EXISTING);
+			});
+		}
+
+		// ------------------------- Generate Oracles ------------------------------
 
 		// Read result instances into a set
 		InstanceList resultInstances = InstanceList.load(new File(resultDir + File.separatorChar + "output.pipe"));

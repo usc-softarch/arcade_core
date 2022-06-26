@@ -345,6 +345,16 @@ public class FileUtil {
 	}
 
 	/**
+	 * Deletes a non-empty directory. Use with care.
+	 */
+	public static void deleteNonEmptyDirectory(File dir) {
+		if (dir.isDirectory())
+			for (File file : dir.listFiles())
+				deleteNonEmptyDirectory(file);
+		dir.delete();
+	}
+
+	/**
 	 * Returns a list of all files and directories in the directory tree below
 	 * the provided {@link File}. Traverses symbolic links and verifies that
 	 * they are live.

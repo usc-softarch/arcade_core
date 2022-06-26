@@ -42,7 +42,7 @@ public class TopicCompositionParser {
 				writer.println(topicIndex);
 				writer.println();
 				for (String topicWord : topicWords) {
-					writer.println(topicWord);
+					writer.print(topicWord + " ");
 				}
 
 				writer.println();
