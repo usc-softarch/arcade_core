@@ -139,3 +139,33 @@ main functionalities of ARCADE, not to supplant it.
   resolving it (usually not viable in ARCADE, as most Exceptions are due to 
   input errors). If it does not alter the execution of the system, why did 
   it happen in the first place?
+- **Use of regions** - I use regions in most code to separate large classes 
+  and clearly identify where what is. I try to use these regions in a more 
+  or less consistent way, but if you find anything that looks inconsistent, 
+  please let me know. They are listed here in the order they typically appear.
+  - **PUBLIC INTERFACE** - If the class has a main method or a façade, the 
+    methods related to it will go here. It will sometimes contain private 
+    methods which are strictly called by the façade, but ideally those 
+    should go in PROCESSING if it makes sense.
+  - **ATTRIBUTES** - Self-explanatory. All attribute declarations are at the 
+    top of the file, unless there is a PUBLIC INTERFACE to go above it. And 
+    yes, I know Java calls them Fields. It's the same thing, language 
+    traditions are meaningless and I judge you for thinking otherwise.
+  - **CONSTRUCTORS** - Aside from constructors, also contains any private 
+    methods that are used strictly for initialization. These methods are 
+    typically used when multiple constructors have large shared blocks of code.
+  - **ACCESSORS** - Getters and setters. Also includes any complex methods 
+    which can be construed as a getter.
+  - **PROCESSING** - Most methods which execute complex functionality. This 
+    is the catch-all region, and the rule of thumb for it is: if it's 
+    restricted to the façade, PUBLIC INTERFACE; if it's restricted to 
+    constructors, CONSTRUCTORS; if it's a getter, ACCESSORS; anything else 
+    is PROCESSING.
+  - **OBJECT METHODS** - If the class overrides any basic Java interface 
+    methods, those will go here. Examples include equals, hashCode, toString 
+    and compareTo.
+  - **SERIALIZATION** - If the class is a serializable data structure, then 
+    any IO methods go here. It goes at the bottom primarily because IO is 
+    boring, but also because my serialization methods use customized parsing 
+    rather than any of the available crappy automated JSON/XML libraries for 
+    Java, so it can get rather long and difficult to read.
