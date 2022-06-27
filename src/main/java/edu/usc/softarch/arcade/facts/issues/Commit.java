@@ -16,14 +16,14 @@ public class Commit {
 	public final ZonedDateTime created;
 	public final ZonedDateTime merged;
 	private final Collection<String> labels;
-	private final Collection<String> tags;
+	private final Collection<String> versionTags;
 	private final Collection<Map.Entry<String, String>> changes;
 	//endregion
 
 	//region CONSTRUCTORS
 	public Commit(String id, String summary, String description, String status,
 			String url, String sha, ZonedDateTime created, ZonedDateTime merged,
-			Collection<String> labels, Collection<String> tags,
+			Collection<String> labels, Collection<String> versionTags,
 			Collection<Map.Entry<String, String>> changes) {
 		this.id = id;
 		this.summary = summary;
@@ -34,14 +34,15 @@ public class Commit {
 		this.created = created;
 		this.merged = merged;
 		this.labels = labels;
-		this.tags = tags;
+		this.versionTags = versionTags;
 		this.changes = changes;
 	}
 	//endregion
 
 	//region ACCESSORS
 	public Collection<String> getLabels() { return new ArrayList<>(this.labels); }
-	public Collection<String> getTags() { return new ArrayList<>(this.tags); }
+	public Collection<String> getVersionTags() {
+		return new ArrayList<>(this.versionTags); }
 	public Collection<Map.Entry<String, String>> getChanges() {
 		return new ArrayList<>(this.changes); }
 	//endregion

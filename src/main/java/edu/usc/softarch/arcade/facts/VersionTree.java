@@ -29,6 +29,14 @@ public class VersionTree {
 	public void addChild(String node) {
 		this.children.add(new VersionTree(node)); }
 	public void addChild(VersionTree node) { this.children.add(node); }
+	public boolean containsVersion(String version) {
+		if (this.node.equals(version)) return true;
+		boolean found = false;
+		for (VersionTree child : getChildren()) {
+			found = child.containsVersion(version);
+		}
+		return found;
+	}
 	//endregion
 
 	//region SERIALIZATION

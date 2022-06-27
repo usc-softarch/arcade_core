@@ -22,7 +22,7 @@ public class CommitBuilder {
 	public String created;
 	public String merged;
 	public Collection<String> labels;
-	public Collection<String> tags;
+	public Collection<String> versionTags;
 	public Collection<Map.Entry<String, String>> changes;
 	//endregion
 
@@ -33,6 +33,7 @@ public class CommitBuilder {
 	public CommitBuilder(DateTimeFormatter formatter) {
 		this.formatter = formatter;
 		this.labels = new ArrayList<>();
+		this.versionTags = new ArrayList<>();
 		this.changes = new ArrayList<>();
 	}
 	//endregion
@@ -60,7 +61,7 @@ public class CommitBuilder {
 
 		return new Commit(this.id, this.summary, this.description, this.status,
 			this.url, this.sha, createdLocal, mergedLocal,
-			this.labels, this.tags, this.changes);
+			this.labels, this.versionTags, this.changes);
 	}
 	//endregion
 }

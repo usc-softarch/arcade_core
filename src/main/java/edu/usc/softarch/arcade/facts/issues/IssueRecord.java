@@ -3,7 +3,9 @@ package edu.usc.softarch.arcade.facts.issues;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class IssueRecord {
 	//region ATTRIBUTES
@@ -19,7 +21,7 @@ public class IssueRecord {
 	public final ZonedDateTime resolved;
 	private final Collection<String> labels;
 	private final Collection<String> versions;
-	private final Collection<String> fixVersions;
+	private final Set<String> fixVersions;
 	private final Collection<IssueComment> comments;
 	private final Collection<Commit> linkedCommits;
 	//endregion
@@ -42,7 +44,7 @@ public class IssueRecord {
 		this.resolved = resolved;
 		this.labels = labels;
 		this.versions = version;
-		this.fixVersions = fixVersions;
+		this.fixVersions = new HashSet<>(fixVersions);
 		this.comments = comments;
 		this.linkedCommits = linkedCommits;
 	}
@@ -54,7 +56,12 @@ public class IssueRecord {
 	public Collection<String> getVersions() {
 		return new ArrayList<>(this.versions); }
 	public Collection<String> getFixVersions() {
-		return new ArrayList<>(this.fixVersions); }
+		if (this.fixVersions.isEmpty()) {
+			for (Commit commit : this.linkedCommits)
+				this.fixVersions.addAll(commit.getVersionTags());
+		}
+		return new ArrayList<>(this.fixVersions);
+	}
 	public Collection<IssueComment> getComments() {
 		return new ArrayList<>(this.comments); }
 	public Collection<Commit> getLinkedCommits() {

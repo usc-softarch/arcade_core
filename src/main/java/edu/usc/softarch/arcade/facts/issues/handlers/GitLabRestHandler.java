@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.facts.issues.handlers;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import edu.usc.softarch.arcade.facts.VersionTree;
 import edu.usc.softarch.arcade.facts.issues.Commit;
 import edu.usc.softarch.arcade.facts.issues.IssueRecord;
 
@@ -56,6 +57,7 @@ public class GitLabRestHandler {
 	//region ATTRIBUTES
 	private final String projectId;
 	private final HttpClient gitlabClient;
+	private final VersionTree versionTree;
 	private Collection<IssueRecord> issueRecords;
 	private int requestCounter;
 	private int issueCounter;
@@ -63,21 +65,22 @@ public class GitLabRestHandler {
 	//endregion
 
 	//region CONSTRUCTORS
-	public GitLabRestHandler(String projectId) {
-		this(projectId, false);
-	}
+	public GitLabRestHandler(String projectId, VersionTree versionTree) {
+		this(projectId, versionTree, false);	}
 
-	public GitLabRestHandler(String projectId, boolean verbose) {
+	public GitLabRestHandler(String projectId, VersionTree versionTree,
+			boolean verbose) {
 		this.projectId = projectId;
 		this.gitlabClient = HttpClient.newHttpClient();
+		this.versionTree = versionTree;
 		this.verbose = verbose;
 	}
 	//endregion
 
 	//region PUBLIC INTERFACE
-	public static void main(String[] args) {
-		GitLabRestHandler handler =
-			new GitLabRestHandler(args[0], true);
+	public static void main(String[] args) throws IOException {
+		GitLabRestHandler handler = new GitLabRestHandler(
+			args[0], VersionTree.deserialize(args[1]), true);
 		Collection<IssueRecord> issues = null;
 		try {
 			issues = handler.getIssueRecords();
@@ -165,7 +168,7 @@ public class GitLabRestHandler {
 			.uri(URI.create(uri)).build();
 		HttpResponse<String> response =
 			this.gitlabClient.send(request, HttpResponse.BodyHandlers.ofString());
-		if (response.statusCode() != 200 && counter < 5) {
+		if (response.statusCode() != 200 && counter < 10) {
 			switch (response.statusCode()) {
 				case 524:
 					if (verbose)
@@ -173,7 +176,7 @@ public class GitLabRestHandler {
 							+ " with status code " + response.statusCode()
 							+ " and body " + response.body() + ". This was "
 							+ "attempt number " + counter + ". Trying again in 5 seconds.");
-					Thread.sleep(5000);
+					Thread.sleep(10000L * counter);
 					return runHttpRequest(uri, ++counter);
 				default:
 					throwLocalException("Error running HTTP Request: " + uri
@@ -453,7 +456,7 @@ public class GitLabRestHandler {
 		if (!externalProject) {
 			commitBuilder.changes =
 				processChanges(getRawCommitChanges(commitBuilder.id), commitBuilder.id);
-			commitBuilder.tags =
+			commitBuilder.versionTags =
 				processTags(getRawCommitTags(commitBuilder.sha), commitBuilder.sha);
 		}
 
@@ -533,8 +536,11 @@ public class GitLabRestHandler {
 		try (JsonParser parser = factory.createParser(rawTags)) {
 			parser.nextToken(); // skip start array
 
-			while (parser.nextToken().equals(JsonToken.START_OBJECT))
-				result.add(parseTag(parser, shaForError));
+			while (parser.nextToken().equals(JsonToken.START_OBJECT)) {
+				String tagValue = parseTag(parser, shaForError);
+				if (versionTree.containsVersion(tagValue))
+					result.add(tagValue);
+			}
 		}
 
 		return result;

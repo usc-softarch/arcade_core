@@ -1,5 +1,8 @@
 package edu.usc.softarch.arcade.facts.design;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import edu.usc.softarch.arcade.facts.VersionTree;
 import edu.usc.softarch.arcade.facts.issues.IssueRecord;
 import edu.usc.softarch.arcade.facts.issues.handlers.GitLabRestHandler;
@@ -17,6 +20,27 @@ import java.util.regex.Pattern;
 
 public class RecovArEngine {
 	//region PUBLIC INTERFACE
+	public static void main(String[] args)
+			throws GitLabRestHandler.GitLabRestHandlerException, IOException,
+			InterruptedException {
+		Collection<Decision> result =
+			runWithGitLab(args[0], args[1], args[2], args[3]);
+
+		JsonFactory factory = new JsonFactory();
+		try (JsonGenerator generator = factory.createGenerator(
+				new File(args[4]), JsonEncoding.UTF8)) {
+			generator.writeStartObject();
+			generator.writeArrayFieldStart("decisions");
+			for (Decision decision : result) {
+				generator.writeStartObject();
+				decision.serialize(generator);
+				generator.writeEndObject();
+			}
+			generator.writeEndArray();
+			generator.writeEndObject();
+		}
+	}
+
 	public static Collection<Decision> runWithGitLab(String clusterDirPath,
 			String versionTreePath, String projectId, String versionScheme)
 			throws IOException, GitLabRestHandler.GitLabRestHandlerException,
@@ -43,7 +67,8 @@ public class RecovArEngine {
 		this.versionTree = VersionTree.deserialize(versionTreePath);
 		this.versionMap = initializeVersionMap(versionScheme, clusterDirPath);
 
-		GitLabRestHandler gitLabIssueGrabber = new GitLabRestHandler(projectId);
+		GitLabRestHandler gitLabIssueGrabber =
+			new GitLabRestHandler(projectId, versionTree, true);
 		Collection<IssueRecord> issues = gitLabIssueGrabber.getIssueRecords();
 		this.decisionAnalyzer = new DecisionAnalyzer(issues);
 	}
@@ -57,6 +82,7 @@ public class RecovArEngine {
 
 		for (File clusterFile : clusterFiles) {
 			String clusterFileName = clusterFile.getName();
+			if (!clusterFileName.contains(".rsf")) continue;
 			Matcher versionMatcher = versionPattern.matcher(clusterFileName);
 			if (!versionMatcher.find())
 				throw new IllegalArgumentException("Could not match version scheme "
@@ -65,7 +91,7 @@ public class RecovArEngine {
 				throw new IllegalArgumentException("Found multiple matches for "
 					+ "version scheme " + versionScheme + " in the name of cluster file "
 					+ clusterFileName);
-			String version = versionMatcher.group(1);
+			String version = versionMatcher.group(0);
 			versionMapLoader.put(version, clusterFile);
 		}
 
@@ -86,7 +112,7 @@ public class RecovArEngine {
 			throws IOException {
 		Collection<Decision> result = new ArrayList<>();
 
-		for (VersionTree nextVersion : versionTree.getChildren()) {
+		for (VersionTree nextVersion : currentVersion.getChildren()) {
 			File currentVersionFile = this.versionMap.get(currentVersion.node);
 			File nextVersionFile = this.versionMap.get(nextVersion.node);
 
