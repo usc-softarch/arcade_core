@@ -169,3 +169,11 @@ main functionalities of ARCADE, not to supplant it.
     boring, but also because my serialization methods use customized parsing 
     rather than any of the available crappy automated JSON/XML libraries for 
     Java, so it can get rather long and difficult to read.
+- **It's not very honorable, but it works** - Tales tell of an old martial 
+  arts master who uttered these words on being questioned by his pupils 
+  regarding his biting off the ear of an opponent in combat. All the 
+  philosophy above is valid only where it is sufficient. Sometimes, usually 
+  because of restrictions of the language, all the best practices in the 
+  world can't really resolve a problem well enough. In those cases, ugly 
+  mechanisms like reflection and inner switches might be justifiable. Just 
+  remember, even though it works, it's still not very honorable.
