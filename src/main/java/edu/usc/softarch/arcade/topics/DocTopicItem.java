@@ -9,10 +9,10 @@ import java.util.Objects;
 import java.util.Set;
 
 import cc.mallet.util.Maths;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
+import edu.usc.softarch.arcade.util.json.JsonSerializable;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * The set of {@link TopicItem}s in a document. A document represents a cluster.
  */
-public class DocTopicItem implements Serializable {
+public class DocTopicItem implements Serializable, JsonSerializable {
 	//region ATTRIBUTES
 	private static final long serialVersionUID = 5162975838519632395L;
 
@@ -246,29 +246,19 @@ public class DocTopicItem implements Serializable {
 	//endregion
 
 	//region SERIALIZATION
-	public void serialize(JsonGenerator generator) throws IOException {
-		generator.writeStringField("source", this.source);
-
-		generator.writeArrayFieldStart("topics");
-		for (TopicItem topicItem : topics.values()) {
-			generator.writeStartObject();
-			topicItem.serialize(generator);
-			generator.writeEndObject();
-		}
-		generator.writeEndArray();
+	@Override
+	public void serialize(EnhancedJsonGenerator generator) throws IOException {
+		generator.writeField("source", this.source);
+		generator.writeField("topics", this.topics.values());
 	}
 
-	public static DocTopicItem deserialize(JsonParser parser) throws IOException {
-		parser.nextToken(); // skip field name source
-		DocTopicItem toReturn = new DocTopicItem(parser.nextTextValue());
+	public static DocTopicItem deserialize(EnhancedJsonParser parser)
+			throws IOException {
+		DocTopicItem toReturn = new DocTopicItem(parser.parseString());
+		Collection<TopicItem> topicItems = parser.parseCollection(TopicItem.class);
 
-		parser.nextToken(); // skip field name topics
-		parser.nextToken(); // skip start array
-		while (parser.nextToken().equals(JsonToken.START_OBJECT)) {
-			TopicItem topicItem = TopicItem.deserialize(parser);
+		for (TopicItem topicItem : topicItems)
 			toReturn.topics.put(topicItem.topicNum, topicItem);
-			parser.nextToken(); // skip end object
-		}
 
 		return toReturn;
 	}

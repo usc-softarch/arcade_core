@@ -150,7 +150,7 @@ public class EnhancedJsonGenerator implements AutoCloseable {
 
 	//region OBJECT METHODS
 	@Override
-	public void close() throws Exception {
+	public void close() throws IOException {
 		this.generator.writeEndObject();
 		this.generator.close();
 	}

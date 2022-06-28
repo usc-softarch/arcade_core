@@ -1,8 +1,9 @@
 package edu.usc.softarch.arcade.topics;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
+import edu.usc.softarch.arcade.util.json.JsonSerializable;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -11,7 +12,8 @@ import java.util.Objects;
 /**
  * Represents a topic's prevalence in a document.
  */
-public class TopicItem implements Serializable, Comparable<TopicItem> {
+public class TopicItem
+		implements JsonSerializable, Serializable, Comparable<TopicItem> {
 	//region ATTRIBUTES
 	private static final long serialVersionUID = 4599518018739063447L;
 
@@ -112,20 +114,18 @@ public class TopicItem implements Serializable, Comparable<TopicItem> {
 	//endregion
 
 	//region SERIALIZATION
-	public void serialize(JsonGenerator generator) throws IOException {
-		generator.writeNumberField("topicNum", this.topicNum);
-		generator.writeNumberField("weight", this.weight);
-		generator.writeNumberField("proportion", this.proportion);
+	@Override
+	public void serialize(EnhancedJsonGenerator generator) throws IOException {
+		generator.writeField("topicNum", this.topicNum);
+		generator.writeField("weight", this.weight);
+		generator.writeField("proportion", this.proportion);
 	}
 
-	public static TopicItem deserialize(JsonParser parser) throws IOException {
-		parser.nextToken(); // skip field name topicNum
-		int topicNum = parser.nextIntValue(0);
-		parser.nextToken(); // skip field name weight
-		int weight = parser.nextIntValue(1);
-		parser.nextToken(); // skip field name proportion
-		parser.nextToken(); // move to value
-		double proportion = parser.getDoubleValue();
+	public static TopicItem deserialize(EnhancedJsonParser parser)
+			throws IOException {
+		int topicNum = parser.parseInt();
+		int weight = parser.parseInt();
+		double proportion = parser.parseDouble();
 		return new TopicItem(topicNum, proportion, weight);
 	}
 	//endregion

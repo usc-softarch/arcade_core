@@ -215,7 +215,7 @@ public class EnhancedJsonParser implements AutoCloseable {
 
 	//region OBJECT METHODS
 	@Override
-	public void close() throws Exception {
+	public void close() throws IOException {
 		this.parser.close();
 	}
 	//endregion
