@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.JsonToken;
 import edu.usc.softarch.arcade.facts.VersionTree;
 import edu.usc.softarch.arcade.facts.issues.Commit;
 import edu.usc.softarch.arcade.facts.issues.IssueRecord;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 public class GitLabRestHandler {
@@ -42,13 +45,13 @@ public class GitLabRestHandler {
 	}
 
 	private void throwLocalException(String message)
-			throws GitLabRestHandlerException {
+			throws GitLabRestHandlerException, IOException {
 		throw new GitLabRestHandlerException(message, this.requestCounter,
 			this.issueCounter, this.projectId);
 	}
 
 	private void throwLocalException(String message, Exception cause)
-			throws GitLabRestHandlerException {
+			throws GitLabRestHandlerException, IOException {
 		throw new GitLabRestHandlerException(message, this.requestCounter,
 			this.issueCounter, this.projectId, cause);
 	}
@@ -56,21 +59,24 @@ public class GitLabRestHandler {
 
 	//region ATTRIBUTES
 	private final String projectId;
+	private final String filePath;
 	private final HttpClient gitlabClient;
 	private final VersionTree versionTree;
-	private Collection<IssueRecord> issueRecords;
+	private Map<Integer, IssueRecord> issueRecords;
 	private int requestCounter;
 	private int issueCounter;
 	private final boolean verbose;
 	//endregion
 
 	//region CONSTRUCTORS
-	public GitLabRestHandler(String projectId, VersionTree versionTree) {
-		this(projectId, versionTree, false);	}
+	public GitLabRestHandler(String projectId, VersionTree versionTree,
+			String filePath) {
+		this(projectId, versionTree, filePath, false);	}
 
 	public GitLabRestHandler(String projectId, VersionTree versionTree,
-			boolean verbose) {
+			String filePath, boolean verbose) {
 		this.projectId = projectId;
+		this.filePath = filePath;
 		this.gitlabClient = HttpClient.newHttpClient();
 		this.versionTree = versionTree;
 		this.verbose = verbose;
@@ -80,7 +86,7 @@ public class GitLabRestHandler {
 	//region PUBLIC INTERFACE
 	public static void main(String[] args) throws IOException {
 		GitLabRestHandler handler = new GitLabRestHandler(
-			args[0], VersionTree.deserialize(args[1]), true);
+			args[0], VersionTree.deserialize(args[1]), args[2], true);
 		Collection<IssueRecord> issues = null;
 		try {
 			issues = handler.getIssueRecords();
@@ -110,9 +116,16 @@ public class GitLabRestHandler {
 				System.out.println(dtf.format(now) + ": Started processing issues for "
 					+ "project ID " + this.projectId);
 			}
-			this.issueRecords = processIssues(getRawIssues());
+
+			recover();
+
+			if (this.issueRecords.size() % 100 == 0) {
+				this.issueRecords.putAll(processIssues(getRawIssues()));
+				checkpoint();
+			}
 		}
-		return new ArrayList<>(issueRecords);
+
+		return new ArrayList<>(issueRecords.values());
 	}
 	//endregion
 
@@ -131,9 +144,10 @@ public class GitLabRestHandler {
 		HttpResponse<Void> headers =
 			this.gitlabClient.send(head, HttpResponse.BodyHandlers.discarding());
 		int pageLimit = Integer.parseInt(headers.headers().map().get("x-total-pages").get(0));
+		int pageStart = (this.issueRecords.size() / 100) + 1;
 
 		// Get the issues
-		for (int i = 1; i <= pageLimit; i++)
+		for (int i = pageStart; i <= pageLimit; i++)
 			issuesJson.add(runHttpRequest(baseUri + i, 0));
 
 		return issuesJson;
@@ -193,21 +207,23 @@ public class GitLabRestHandler {
 	//endregion
 
 	//region ISSUE PARSER
-	private Collection<IssueRecord> processIssues(Collection<String> rawIssues)
+	private Map<Integer, IssueRecord> processIssues(Collection<String> rawIssues)
 			throws IOException, InterruptedException, GitLabRestHandlerException {
 		JsonFactory factory = new JsonFactory();
-		Collection<IssueRecord> result = new ArrayList<>();
 
 		for (String rawIssueArray : rawIssues) {
 			try (JsonParser parser = factory.createParser(rawIssueArray)) {
 				parser.nextToken(); // skip start array
 
-				while (parser.nextToken().equals(JsonToken.START_OBJECT))
-					result.add(parseIssue(parser));
+				while (parser.nextToken().equals(JsonToken.START_OBJECT)) {
+					IssueRecord issueRecord = parseIssue(parser);
+					if (issueRecord != null)
+						this.issueRecords.put(Integer.parseInt(issueRecord.id), issueRecord);
+				}
 			}
 		}
 
-		return result;
+		return this.issueRecords;
 	}
 
 	private IssueRecord parseIssue(JsonParser parser)
@@ -321,11 +337,14 @@ public class GitLabRestHandler {
 		issueBuilder.linkedCommits = processCommits(getRawCommits(issueBuilder.id));
 		this.issueCounter++;
 
-		if (this.verbose && this.issueCounter % 100 == 0) {
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-			LocalDateTime now = LocalDateTime.now();
-			System.out.println(dtf.format(now) + ": Finished processing "
-				+ this.issueCounter + " issues.");
+		if (this.issueCounter % 100 == 0) {
+			checkpoint();
+			if (this.verbose) {
+				DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+				LocalDateTime now = LocalDateTime.now();
+				System.out.println(dtf.format(now) + ": Finished processing "
+					+ this.issueCounter + " issues.");
+			}
 		}
 
 		return issueBuilder.build();
@@ -593,6 +612,27 @@ public class GitLabRestHandler {
 		String text = parser.getText();
 		if (text.equals("null")) text = null;
 		return text;
+	}
+	//endregion
+
+	//region SERIALIZATION
+	private void checkpoint() throws IOException {
+		try (EnhancedJsonGenerator generator =
+				new EnhancedJsonGenerator(this.filePath)) {
+			generator.writeField("issues", this.issueRecords, true,
+				"id", "record");
+		}
+	}
+
+	private void recover() {
+		try (EnhancedJsonParser parser =
+				new EnhancedJsonParser(this.filePath)) {
+			this.issueRecords = parser.parseMap(Integer.class, IssueRecord.class);
+		} catch (IOException e) {
+			this.issueRecords = new HashMap<>();
+			if (verbose)
+				System.out.println("No record located, running full scan.");
+		}
 	}
 	//endregion
 }

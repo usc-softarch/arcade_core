@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 public class IssueCommentBuilder {
 	//region ATTRIBUTES
-	private final String dateFormat;
+	private final DateTimeFormatter formatter;
 	public String id;
 	public String author;
 	public String created;
@@ -16,15 +16,17 @@ public class IssueCommentBuilder {
 
 	//region CONSTRUCTORS
 	public IssueCommentBuilder(String dateFormat) {
-		this.dateFormat = dateFormat;	}
+		this(DateTimeFormatter.ofPattern(dateFormat));	}
+
+	public IssueCommentBuilder(DateTimeFormatter formatter) {
+		this.formatter = formatter;
+	}
 	//endregion
 
 	//region PROCESSING
 	public IssueComment build() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(this.dateFormat);
-
 		return new IssueComment(this.id, this.author,
-			ZonedDateTime.parse(this.created, formatter), this.text);
+			ZonedDateTime.parse(this.created, this.formatter), this.text);
 	}
 	//endregion
 }

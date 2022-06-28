@@ -43,7 +43,7 @@ public class CommitBuilder {
 		ZonedDateTime mergedLocal = null;
 		ZonedDateTime createdLocal;
 
-		if (this.merged != null) {
+		if (this.merged != null && !this.merged.isEmpty()) {
 			try {
 				mergedLocal = ZonedDateTime.parse(this.merged, this.formatter);
 			} catch (DateTimeParseException e) {

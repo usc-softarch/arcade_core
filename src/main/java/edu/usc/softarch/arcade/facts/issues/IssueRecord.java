@@ -1,13 +1,20 @@
 package edu.usc.softarch.arcade.facts.issues;
 
+import edu.usc.softarch.arcade.facts.issues.handlers.IssueRecordBuilder;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
+import edu.usc.softarch.arcade.util.json.JsonSerializable;
+
+import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class IssueRecord {
+public class IssueRecord implements JsonSerializable {
 	//region ATTRIBUTES
 	public final String id;
 	public final String url;
@@ -72,6 +79,57 @@ public class IssueRecord {
 			fileChanges.addAll(commit.getChanges());
 
 		return fileChanges;
+	}
+	//endregion
+
+	//region SERIALIZATION
+	@Override
+	public void serialize(EnhancedJsonGenerator generator) throws IOException {
+		generator.writeField("id", id);
+		generator.writeField("url", url);
+		generator.writeField("summary", summary);
+		generator.writeField("description", description);
+		generator.writeField("type", type);
+		generator.writeField("priority", priority);
+		generator.writeField("status", status);
+		generator.writeField("resolution", resolution);
+		generator.writeField("created",
+			created.toString().replace("[Universal]", ""));
+		if (resolved != null)
+			generator.writeField("resolved",
+				resolved.toString().replace("[Universal]", ""));
+		else
+			generator.writeField("resolved", "");
+		generator.writeField("labels", labels);
+		generator.writeField("versions", versions);
+		generator.writeField("fixVersions", fixVersions);
+		generator.writeField("comments", comments);
+		generator.writeField("linkedCommits", linkedCommits);
+	}
+
+	public static IssueRecord deserialize(EnhancedJsonParser parser)
+			throws IOException {
+		IssueRecordBuilder issueBuilder =
+			new IssueRecordBuilder(DateTimeFormatter.ISO_INSTANT);
+
+		issueBuilder.id = parser.parseString();
+		issueBuilder.url = parser.parseString();
+		issueBuilder.summary = parser.parseString();
+		issueBuilder.description = parser.parseString();
+		issueBuilder.type = parser.parseString();
+		issueBuilder.priority = parser.parseString();
+		issueBuilder.status = parser.parseString();
+		issueBuilder.resolution = parser.parseString();
+		issueBuilder.created = parser.parseString();
+		issueBuilder.resolved = parser.parseString();
+		issueBuilder.labels = parser.parseCollection(String.class);
+		issueBuilder.versions = parser.parseCollection(String.class);
+		issueBuilder.fixVersions = new HashSet<>(
+			parser.parseCollection(String.class));
+		issueBuilder.comments = parser.parseCollection(IssueComment.class);
+		issueBuilder.linkedCommits = parser.parseCollection(Commit.class);
+
+		return issueBuilder.build();
 	}
 	//endregion
 }

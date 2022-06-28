@@ -1,12 +1,14 @@
 package edu.usc.softarch.arcade.facts.design;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
+import edu.usc.softarch.arcade.util.json.JsonSerializable;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Decision {
+public class Decision implements JsonSerializable {
 	//region ATTRIBUTES
 	public final String description;
 	public final String id;
@@ -36,18 +38,25 @@ public class Decision {
 	//endregion
 
 	//region SERIALIZATION
-	public void serialize(JsonGenerator generator) throws IOException {
-		generator.writeStringField("description", this.description);
-		generator.writeStringField("id", this.id);
-		generator.writeStringField("version", this.version);
+	@Override
+	public void serialize(EnhancedJsonGenerator generator) throws IOException {
+		generator.writeField("description", this.description);
+		generator.writeField("id", this.id);
+		generator.writeField("version", this.version);
+		generator.writeField("addedElements", this.addedElements);
+		generator.writeField("removedElements", this.removedElements);
+	}
 
-		generator.writeFieldName("addedElements");
-		generator.writeArray(addedElements.toArray(new String[0]),
-			0, addedElements.size());
+	public static Decision deserialize(EnhancedJsonParser parser)
+			throws IOException {
+		String description = parser.parseString();
+		String id = parser.parseString();
+		String version = parser.parseString();
+		Collection<String> addedElements = parser.parseCollection(String.class);
+		Collection<String> removedElements = parser.parseCollection(String.class);
 
-		generator.writeFieldName("removedElements");
-		generator.writeArray(removedElements.toArray(new String[0]),
-			0, removedElements.size());
+		return new Decision(
+			description, id, version, addedElements, removedElements);
 	}
 	//endregion
 }

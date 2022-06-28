@@ -49,7 +49,7 @@ public class IssueRecordBuilder {
 		ZonedDateTime resolvedLocal = null;
 		ZonedDateTime createdLocal;
 
-		if (this.resolved != null) {
+		if (this.resolved != null && !this.resolved.isEmpty()) {
 			try {
 				resolvedLocal = ZonedDateTime.parse(this.resolved, this.formatter);
 			} catch (DateTimeParseException e) {
@@ -61,8 +61,14 @@ public class IssueRecordBuilder {
 		try {
 			createdLocal = ZonedDateTime.parse(this.created, this.formatter);
 		} catch (DateTimeParseException e) {
-			createdLocal = ZonedDateTime.parse(this.created,
-				this.formatter.withZone(ZoneId.of("Universal")));
+			try {
+				createdLocal = ZonedDateTime.parse(this.created,
+					this.formatter.withZone(ZoneId.of("Universal")));
+			} catch (DateTimeParseException f) {
+				createdLocal = ZonedDateTime.parse(this.created,
+					DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmX")
+						.withZone(ZoneId.of("Universal")));
+			}
 		}
 
 		return new IssueRecord(this.id, this.url, this.summary, this.description,

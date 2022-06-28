@@ -1,8 +1,15 @@
 package edu.usc.softarch.arcade.facts.issues;
 
-import java.time.ZonedDateTime;
+import edu.usc.softarch.arcade.facts.issues.handlers.IssueCommentBuilder;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
+import edu.usc.softarch.arcade.util.json.JsonSerializable;
 
-public class IssueComment {
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class IssueComment implements JsonSerializable {
 	//region ATTRIBUTES
 	public final String id;
 	public final String author;
@@ -17,6 +24,30 @@ public class IssueComment {
 		this.author = author;
 		this.created = created;
 		this.text = text;
+	}
+	//endregion
+
+	//region SERIALIZATION
+	@Override
+	public void serialize(EnhancedJsonGenerator generator) throws IOException {
+		generator.writeField("id", id);
+		generator.writeField("author", author);
+		generator.writeField("created",
+			created.toString().replace("[Universal]", ""));
+		generator.writeField("text", text);
+	}
+
+	public static IssueComment deserialize(EnhancedJsonParser parser)
+			throws IOException {
+		IssueCommentBuilder commentBuilder =
+			new IssueCommentBuilder(DateTimeFormatter.ISO_INSTANT);
+
+		commentBuilder.id = parser.parseString();
+		commentBuilder.author = parser.parseString();
+		commentBuilder.created = parser.parseString();
+		commentBuilder.text = parser.parseString();
+
+		return commentBuilder.build();
 	}
 	//endregion
 }

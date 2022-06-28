@@ -43,6 +43,14 @@ public class EnhancedJsonGenerator implements AutoCloseable {
 		this.generator.writeNumberField(name, value);
 	}
 
+	public void writeField(String name, JsonSerializable value)
+			throws IOException {
+		this.generator.writeFieldName(name);
+		this.generator.writeStartObject();
+		value.serialize(this);
+		this.generator.writeEndObject();
+	}
+
 	/**
 	 * This method can ONLY take collections of base types or JsonSerializable
 	 * objects. Attempting to give it anything else will cause the program to
@@ -50,6 +58,13 @@ public class EnhancedJsonGenerator implements AutoCloseable {
 	 * provided for every level of depth.
 	 */
 	public void writeField(String name, Collection<?> values) throws IOException {
+		if (values.isEmpty()) {
+			this.generator.writeFieldName(name);
+			this.generator.writeStartArray();
+			this.generator.writeEndArray();
+			return;
+		}
+
 		String type = JsonSerializable.ascertainSerializableType(
 			values.iterator().next().getClass());
 
@@ -105,6 +120,9 @@ public class EnhancedJsonGenerator implements AutoCloseable {
 				break;
 			case "Double":
 				writeField(name, (Double) value);
+				break;
+			case "JsonSerializable":
+				writeField(name, (JsonSerializable) value);
 				break;
 			case "Collection":
 				writeField(name, (Collection<?>) value);
