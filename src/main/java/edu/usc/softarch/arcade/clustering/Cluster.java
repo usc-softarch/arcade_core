@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -12,11 +13,14 @@ import java.util.Set;
 import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
+import edu.usc.softarch.arcade.util.json.JsonSerializable;
 
 /**
  * Represents a cluster of entities in the subject system.
  */
-public class Cluster implements Serializable {
+public class Cluster implements Serializable, JsonSerializable {
 	//region ATTRIBUTES
 	private static final long serialVersionUID = 1L;
 
@@ -41,6 +45,14 @@ public class Cluster implements Serializable {
 	//endregion
 
 	//region CONSTRUCTORS
+	private Cluster(String name, int numEntities,
+			Map<Integer, Double> featureMap, DocTopicItem dti) {
+		this.name = name;
+		this.numEntities = numEntities;
+		this.featureMap = featureMap;
+		this.dti = dti;
+	}
+
 	/**
 	 * Default constructor for new Clusters.
 	 *
@@ -240,6 +252,28 @@ public class Cluster implements Serializable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(name, numEntities, featureMap, dti);
+	}
+	//endregion
+
+	//region SERIALIZATION
+	@Override
+	public void serialize(EnhancedJsonGenerator generator) throws IOException {
+		generator.writeField("name", name);
+		generator.writeField("numEntities", numEntities);
+		generator.writeField("featureMap", featureMap,
+			true, "featureIndex", "featureValue");
+		generator.writeField("dti", dti);
+	}
+
+	public static Cluster deserialize(EnhancedJsonParser parser)
+			throws IOException {
+		String name = parser.parseString();
+		int numEntities = parser.parseInt();
+		Map<Integer, Double> featureMap =
+			parser.parseMap(Integer.class, Double.class);
+		DocTopicItem dti = parser.parseObject(DocTopicItem.class);
+
+		return new Cluster(name, numEntities, featureMap, dti);
 	}
 	//endregion
 }

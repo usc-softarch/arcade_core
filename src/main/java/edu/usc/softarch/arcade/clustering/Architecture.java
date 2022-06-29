@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.clustering;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -22,6 +23,9 @@ import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
+import edu.usc.softarch.arcade.util.json.JsonSerializable;
 
 /**
  * Represents an architecture of clustered entities. An Architecture is a
@@ -31,7 +35,8 @@ import edu.usc.softarch.arcade.topics.DocTopics;
  * the same order, regardless of the order in which the Architecture was
  * constructed, i.e. the order of the clustering algorithm's inputs.
  */
-public class Architecture extends TreeMap<String, Cluster> {
+public class Architecture extends TreeMap<String, Cluster>
+		implements JsonSerializable {
 	//region ATTRIBUTES
 	private static final long serialVersionUID = 1L;
 	/**
@@ -57,6 +62,18 @@ public class Architecture extends TreeMap<String, Cluster> {
 	//endregion
 
 	//region CONSTRUCTORS
+	private Architecture(String projectName, String projectPath,
+			SimMeasure.SimMeasureType simMeasure, int numFeatures, String language,
+			Map<String, Cluster> architecture) {
+		super();
+		this.projectName = projectName;
+		this.projectPath = projectPath;
+		this.simMeasure = simMeasure;
+		this.numFeatures = numFeatures;
+		this.language = language;
+		this.putAll(architecture);
+	}
+
 	/**
 	 * Clone constructor.
 	 */
@@ -359,6 +376,32 @@ public class Architecture extends TreeMap<String, Cluster> {
 			architectureIndex.put(i, orderedClusterNames.get(i));
 
 		return architectureIndex;
+	}
+
+	@Override
+	public void serialize(EnhancedJsonGenerator generator) throws IOException {
+		generator.writeField("projectName", projectName);
+		generator.writeField("projectPath", projectPath);
+		generator.writeField("simMeasure", simMeasure.toString());
+		generator.writeField("numFeatures", numFeatures);
+		generator.writeField("language", language);
+		generator.writeField("architecture", this, true,
+			"clusterName", "cluster");
+	}
+
+	public static Architecture deserialize(EnhancedJsonParser parser)
+			throws IOException {
+		String projectName = parser.parseString();
+		String projectPath = parser.parseString();
+		SimMeasure.SimMeasureType simMeasure =
+			SimMeasure.SimMeasureType.valueOf(parser.parseString());
+		int numFeatures = parser.parseInt();
+		String language = parser.parseString();
+		Map<String, Cluster> architecture =
+			parser.parseMap(String.class, Cluster.class, true);
+
+		return new Architecture(projectName, projectPath, simMeasure,
+			numFeatures, language, architecture);
 	}
 	//endregion
 }

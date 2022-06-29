@@ -53,7 +53,7 @@ public class EnhancedJsonParser implements AutoCloseable {
 		return this.parser.getDoubleValue();
 	}
 
-	public <T> T parserObject(Class<T> type) throws IOException {
+	public <T> T parseObject(Class<T> type) throws IOException {
 		this.parser.nextToken(); // skip field name
 		this.parser.nextToken(); // skip start object
 		T result = this.deserializeObject(type);
@@ -201,7 +201,7 @@ public class EnhancedJsonParser implements AutoCloseable {
 			case "Double":
 				return this.parseDouble();
 			case "JsonSerializable":
-				return this.parserObject(type);
+				return this.parseObject(type);
 			case "Collection":
 				return this.parseCollection(subType);
 			default:
