@@ -36,7 +36,7 @@ public class ReadOnlyCluster {
 		this.entities = new EnhancedHashSet<>(entities);
 	}
 
-	public ReadOnlyCluster(Cluster c) {
+	public ReadOnlyCluster(ReadOnlyCluster c) {
 		this.name = c.name;
 		this.entities = new EnhancedHashSet<>(c.entities);
 	}
@@ -57,6 +57,8 @@ public class ReadOnlyCluster {
 	//region ACCESSORS
 	public Collection<String> getEntities() { return new HashSet<>(entities); }
 	void addEntity(String entity) { this.entities.add(entity); }
+	public void removeEntities(Set<String> entities) {
+		this.entities.removeAll(entities); }
 
 	public Set<String> union(ReadOnlyCluster c) {
 		return this.entities.union(c.entities); }

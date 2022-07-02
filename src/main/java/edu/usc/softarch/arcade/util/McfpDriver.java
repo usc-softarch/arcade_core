@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class McfpDriver {
 	//region ATTRIBUTES
 	private final List<DefaultWeightedEdge> changeSet;
+	private int cost;
 	//endregion
 
 	//region CONSTRUCTORS
@@ -32,6 +33,7 @@ public class McfpDriver {
 	}
 
 	public McfpDriver(ReadOnlyArchitecture arch1, ReadOnlyArchitecture arch2) {
+		balanceArchitectures(arch1, arch2);
 		this.changeSet = solve(arch1, arch2);
 	}
 	//endregion
@@ -39,6 +41,7 @@ public class McfpDriver {
 	//region ACCESSORS
 	public List<DefaultWeightedEdge> getChangeSet() {
 		return new ArrayList<>(this.changeSet);	}
+	public int getCost() { return this.cost; }
 	//endregion
 
 	//region PROCESSING
@@ -102,7 +105,7 @@ public class McfpDriver {
 				e -> 1);
 		CapacityScalingMinimumCostFlow<String, DefaultWeightedEdge> mcfAlgorithm =
 			new CapacityScalingMinimumCostFlow<>();
-		mcfAlgorithm.getMinimumCostFlow(problem);
+		this.cost = (int) mcfAlgorithm.getMinimumCostFlow(problem).getCost();
 
 		return mcfAlgorithm.getFlowMap().entrySet().stream()
 			// Remove all edges that were unselected by the algorithm
@@ -114,6 +117,16 @@ public class McfpDriver {
 			// Get only the edge information
 			.map(Map.Entry::getKey)
 			.collect(Collectors.toList());
+	}
+
+	private void balanceArchitectures(
+			ReadOnlyArchitecture arch1, ReadOnlyArchitecture arch2) {
+		int dummyCount = Math.abs(arch1.size() - arch2.size());
+		ReadOnlyArchitecture smallerArch =
+			arch1.size() < arch2.size() ? arch1 : arch2;
+
+		for (int i = 0; i < dummyCount; i++)
+			smallerArch.put("dummy" + i, new ReadOnlyCluster("dummy" + i));
 	}
 	//endregion
 }

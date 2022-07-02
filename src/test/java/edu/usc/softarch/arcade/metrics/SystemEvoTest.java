@@ -58,7 +58,7 @@ public class SystemEvoTest extends BaseTest {
 		String clustersDir = resourcesDir + fs + clusterAlgo + fs + projectName;
 
 		DescriptiveStatistics outputStats =
-			assertDoesNotThrow(() -> BatchSystemEvo.run(clustersDir));
+			assertDoesNotThrow(() -> SystemEvo.runBatch(clustersDir));
     
     try (BufferedReader br = new BufferedReader(new FileReader(oraclePath))) {
       Map<String, Double> oracleMap = new HashMap<>();
@@ -69,14 +69,22 @@ public class SystemEvoTest extends BaseTest {
       }
 
       assertAll(
-        () -> assertEquals(oracleMap.get("n"), (double)(outputStats.getN()),"N does not match the oracle"),
-        () -> assertEquals(oracleMap.get("min"), outputStats.getMin(),"Min does not match the oracle"),
-        () -> assertEquals(oracleMap.get("max"), outputStats.getMax(),"Max does not match the oracle"),
-        () -> assertEquals(oracleMap.get("mean"), outputStats.getMean(),"Mean does not match the oracle"),
-        () -> assertEquals(oracleMap.get("std dev"), outputStats.getStandardDeviation(),"StandardDeviation does not match the oracle"),
-        () -> assertEquals(oracleMap.get("median"), outputStats.getPercentile(50),"Median does not match the oracle"),
-        () -> assertEquals(oracleMap.get("skewness"), outputStats.getSkewness(),"Skewness does not match the oracle"),
-        () -> assertEquals(oracleMap.get("kurtosis"), outputStats.getKurtosis(),"Kurtosis does not match the oracle")
+        () -> assertEquals(oracleMap.get("n"),
+					(double)(outputStats.getN()),"N does not match the oracle"),
+        () -> assertEquals(oracleMap.get("min"),
+					outputStats.getMin(),"Min does not match the oracle"),
+        () -> assertEquals(oracleMap.get("max"),
+					outputStats.getMax(),"Max does not match the oracle"),
+        () -> assertEquals(oracleMap.get("mean"),
+					outputStats.getMean(),"Mean does not match the oracle"),
+        () -> assertEquals(oracleMap.get("std dev"),
+					outputStats.getStandardDeviation(),"StandardDeviation does not match the oracle"),
+        () -> assertEquals(oracleMap.get("median"),
+					outputStats.getPercentile(50),"Median does not match the oracle"),
+        () -> assertEquals(oracleMap.get("skewness"),
+					outputStats.getSkewness(),"Skewness does not match the oracle"),
+        () -> assertEquals(oracleMap.get("kurtosis"),
+					outputStats.getKurtosis(),"Kurtosis does not match the oracle")
       );
     } catch(IOException e) {
       e.printStackTrace();

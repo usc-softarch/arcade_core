@@ -1,7 +1,6 @@
 package edu.usc.softarch.arcade.facts.design;
 
 import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
-import edu.usc.softarch.arcade.clustering.ReadOnlyCluster;
 import edu.usc.softarch.arcade.util.McfpDriver;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
@@ -32,9 +31,6 @@ public class ChangeAnalyzer {
 		this.arch1 = ReadOnlyArchitecture.readFromRsf(file1);
 		this.arch2 = ReadOnlyArchitecture.readFromRsf(file2);
 
-		// Balance the architectures
-		balanceArchitectures(arch1, arch2);
-
 		// Solve the MCFP to get the bipartite match
 		this.mcfpDriver = new McfpDriver(arch1, arch2);
 
@@ -42,16 +38,6 @@ public class ChangeAnalyzer {
 		this.changeList = new ArrayList<>();
 		jailbreakEdge();
 		initializeChangeList();
-	}
-
-	private void balanceArchitectures(
-			ReadOnlyArchitecture arch1, ReadOnlyArchitecture arch2) {
-		int dummyCount = Math.abs(arch1.size() - arch2.size());
-		ReadOnlyArchitecture smallerArch =
-			arch1.size() < arch2.size() ? arch1 : arch2;
-
-		for (int i = 0; i < dummyCount; i++)
-			smallerArch.put("dummy" + i, new ReadOnlyCluster("dummy" + i));
 	}
 
 	private void initializeChangeList() {
