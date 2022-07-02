@@ -209,10 +209,8 @@ public class Clusterer {
 					&& this.serializationCriterion.shouldSerialize()) {
 				this.architecture.writeToRsf();
 				// Compute DTI word bags if concern-based technique is used
-				if (this.architecture instanceof ConcernArchitecture) {
-					((ConcernArchitecture) this.architecture).computeConcernWordBags();
+				if (this.architecture instanceof ConcernArchitecture)
 					((ConcernArchitecture) this.architecture).serializeBagOfWords();
-				}
 			}
 		}
 

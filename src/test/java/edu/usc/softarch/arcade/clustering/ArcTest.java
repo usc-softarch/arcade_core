@@ -39,25 +39,25 @@ public class ArcTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_js_181_clusters.rsf,"
+			+ "_JS_181_,"
 			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_js_163_clusters.rsf,"
+			+ "_JS_163_,"
 			+ "org.apache.struts2",
 
 		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_js_71_clusters.rsf,"
+			+ "_JS_71_,"
 			+ "",
 
 		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_js_82_clusters.rsf,"
+			+ "_JS_82_,"
 			+ ""
 	})
 	public void ARCRecoveryTest(String systemVersion, String lang,
@@ -65,9 +65,16 @@ public class ArcTest extends BaseTest {
 		// Creating relevant path Strings
 		String sysResources = resourcesDir + fs + systemVersion;
 		String artifactsDir = sysResources + fs + "base";
-		String oracleFilePath = sysResources + fs + systemVersion + arcFileSuffix;
+		String arcFileBase = systemVersion + arcFileSuffix;
+		String oracleClustersPath =
+			sysResources + fs + arcFileBase + "clusters.rsf";
+		String oracleConcernsPath =
+			sysResources + fs + arcFileBase + "concerns.txt";
 		String ffVecs = factsDir + fs + systemVersion + "_fVectors.json";
-		String resultClustersFile = outputDirPath + fs + systemVersion + arcFileSuffix;
+		String resultClustersFile =
+			outputDirPath + fs + arcFileBase + "clusters.rsf";
+		String resultConcernsFile =
+			outputDirPath + fs + arcFileBase + "concerns.txt";
 
 		ConcernArchitecture arch = assertDoesNotThrow(() ->
 			new ConcernArchitecture(systemVersion, outputDirPath,
@@ -91,17 +98,22 @@ public class ArcTest extends BaseTest {
 		 * clusters and topics. */
 		assertTrue(new File(resultClustersFile).exists(),
 			"resulting clusters file name does not match oracle clusters file name:"
-				+ resultClustersFile);
+				+ arcFileBase + "clusters.rsf");
+		assertTrue(new File(resultConcernsFile).exists(),
+			"resulting concerns file name does not match oracle concerns file name:"
+				+ arcFileBase + "concerns.rsf");
 
 		String result = assertDoesNotThrow(() ->
 			FileUtil.readFile(resultClustersFile, StandardCharsets.UTF_8));
+		String concerns = assertDoesNotThrow(() ->
+			FileUtil.readFile(resultConcernsFile, StandardCharsets.UTF_8));
 
 		// ------------------------- Generate Oracles ------------------------------
 
 		if (generateOracles) {
 			assertDoesNotThrow(() -> {
 				Path resultPath = Paths.get(resultClustersFile);
-				Path oraclePath = Paths.get(oracleFilePath);
+				Path oraclePath = Paths.get(oracleClustersPath);
 				Files.copy(resultPath, oraclePath, StandardCopyOption.REPLACE_EXISTING);
 			});
 		}
@@ -110,7 +122,9 @@ public class ArcTest extends BaseTest {
 
 		// Load oracle
 		String oracle = assertDoesNotThrow(() ->
-			FileUtil.readFile((oracleFilePath), StandardCharsets.UTF_8));
+			FileUtil.readFile((oracleClustersPath), StandardCharsets.UTF_8));
+		String concernsOracle = assertDoesNotThrow(() ->
+			FileUtil.readFile((oracleConcernsPath), StandardCharsets.UTF_8));
 
 		// RsfCompare.equals() to compare contents of oracle and result files
 		EnhancedSet<String> resultRsf = new EnhancedHashSet<>(
@@ -118,5 +132,6 @@ public class ArcTest extends BaseTest {
 		EnhancedSet<String> oracleRsf = new EnhancedHashSet<>(
 			Arrays.asList(oracle.split("\\r?\\n")));
 		assertEquals(oracleRsf, resultRsf);
+		assertEquals(concernsOracle, concerns);
 	}
 }

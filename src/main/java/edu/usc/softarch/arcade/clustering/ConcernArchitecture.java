@@ -146,6 +146,8 @@ public class ConcernArchitecture extends Architecture {
 
 	//region SERIALIZATION
 	public void serializeBagOfWords() throws FileNotFoundException {
+		computeConcernWordBags();
+
 		String fs = File.separator;
 		String path = this.projectPath + fs + this.projectName + "_"
 			+ this.simMeasure + "_" + this.size() + "_concerns.txt";
