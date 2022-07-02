@@ -1,8 +1,8 @@
 package edu.usc.softarch.arcade.facts.design;
 
+import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.clustering.ReadOnlyCluster;
 import edu.usc.softarch.arcade.util.McfpDriver;
-import edu.usc.softarch.util.EnhancedHashSet;
-import edu.usc.softarch.util.EnhancedSet;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.io.File;
@@ -11,15 +11,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 public class ChangeAnalyzer {
 	//region ATTRIBUTES
 	private final McfpDriver mcfpDriver;
 	private final Collection<Change> changeList;
-	private final Map<String, EnhancedSet<String>> arch1;
-	private final Map<String, EnhancedSet<String>> arch2;
+	private final ReadOnlyArchitecture arch1;
+	private final ReadOnlyArchitecture arch2;
 	private Method getSource;
 	private Method getTarget;
 	//endregion
@@ -30,8 +29,8 @@ public class ChangeAnalyzer {
 
 	public ChangeAnalyzer(File file1, File file2) throws IOException {
 		// Read the architectures in
-		this.arch1 = McfpDriver.readArchitectureRsf(file1);
-		this.arch2 = McfpDriver.readArchitectureRsf(file2);
+		this.arch1 = ReadOnlyArchitecture.readFromRsf(file1);
+		this.arch2 = ReadOnlyArchitecture.readFromRsf(file2);
 
 		// Balance the architectures
 		balanceArchitectures(arch1, arch2);
@@ -46,14 +45,13 @@ public class ChangeAnalyzer {
 	}
 
 	private void balanceArchitectures(
-			Map<String, EnhancedSet<String>> arch1,
-			Map<String, EnhancedSet<String>> arch2) {
+			ReadOnlyArchitecture arch1, ReadOnlyArchitecture arch2) {
 		int dummyCount = Math.abs(arch1.size() - arch2.size());
-		Map<String, EnhancedSet<String>> smallerArch =
+		ReadOnlyArchitecture smallerArch =
 			arch1.size() < arch2.size() ? arch1 : arch2;
 
 		for (int i = 0; i < dummyCount; i++)
-			smallerArch.put("dummy" + i, new EnhancedHashSet<>());
+			smallerArch.put("dummy" + i, new ReadOnlyCluster("dummy" + i));
 	}
 
 	private void initializeChangeList() {
@@ -71,8 +69,8 @@ public class ChangeAnalyzer {
 					+ "JGraphT library's DefaultWeightedEdge class.", e);
 			}
 
-			Set<String> addedClasses = arch2.get(c2).difference(arch1.get(c1));
-			Set<String> removedClasses = arch1.get(c1).difference(arch2.get(c2));
+			Set<String> addedClasses = arch2.get(c2).difference(arch2.get(c1));
+			Set<String> removedClasses = arch2.get(c1).difference(arch2.get(c2));
 
 			// If nothing changed, move on to the next match
 			if (addedClasses.size() + removedClasses.size() == 0) continue;

@@ -1,9 +1,16 @@
 package edu.usc.softarch.arcade.clustering;
 
+import edu.usc.softarch.util.EnhancedHashSet;
+import edu.usc.softarch.util.EnhancedSet;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Cluster object which cannot be used for further clustering, i.e. is already
+ * the result of a clustering technique. Used for post-processing components.
+ */
 public class ReadOnlyCluster {
 	//region ATTRIBUTES
 	/**
@@ -15,28 +22,28 @@ public class ReadOnlyCluster {
 	/**
 	 * Set of code-level entities contained by this cluster.
 	 */
-	protected final Set<String> entities;
+	protected final EnhancedSet<String> entities;
 	//endregion
 
 	//region CONSTRUCTORS
-	protected ReadOnlyCluster(String name) {
+	public ReadOnlyCluster(String name) {
 		this.name = name;
-		this.entities = new HashSet<>();
+		this.entities = new EnhancedHashSet<>();
 	}
 
-	protected ReadOnlyCluster(String name, Collection<String> entities) {
+	public ReadOnlyCluster(String name, Collection<String> entities) {
 		this.name = name;
-		this.entities = new HashSet<>(entities);
+		this.entities = new EnhancedHashSet<>(entities);
 	}
 
 	public ReadOnlyCluster(Cluster c) {
 		this.name = c.name;
-		this.entities = new HashSet<>(c.entities);
+		this.entities = new EnhancedHashSet<>(c.entities);
 	}
 
 	protected ReadOnlyCluster(
 			ClusteringAlgorithmType cat, Cluster c1, Cluster c2) {
-		this.entities = new HashSet<>(c2.getEntities());
+		this.entities = new EnhancedHashSet<>(c2.getEntities());
 
 		if (cat.equals(ClusteringAlgorithmType.ARC) && c1.name.contains("$"))
 			this.name = c2.name;
@@ -50,5 +57,14 @@ public class ReadOnlyCluster {
 	//region ACCESSORS
 	public Collection<String> getEntities() { return new HashSet<>(entities); }
 	void addEntity(String entity) { this.entities.add(entity); }
+
+	public Set<String> union(ReadOnlyCluster c) {
+		return this.entities.union(c.entities); }
+	public Set<String> intersection(ReadOnlyCluster c) {
+		return this.entities.intersection(c.entities); }
+	public Set<String> difference(ReadOnlyCluster c) {
+		return this.entities.difference(c.entities); }
+	public Set<String> symmetricDifference(ReadOnlyCluster c) {
+		return this.entities.symmetricDifference(c.entities); }
 	//endregion
 }

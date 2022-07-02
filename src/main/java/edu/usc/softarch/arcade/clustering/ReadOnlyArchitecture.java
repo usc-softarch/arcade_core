@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.clustering;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
@@ -21,9 +22,14 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 	//region SERIALIZATION
 	public static ReadOnlyArchitecture readFromRsf(String path)
 			throws IOException {
+		return readFromRsf(new File(path));
+	}
+
+	public static ReadOnlyArchitecture readFromRsf(File file)
+			throws IOException {
 		ReadOnlyArchitecture result = new ReadOnlyArchitecture();
 
-		try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 			String line;
 
 			while ((line = br.readLine()) != null) {
