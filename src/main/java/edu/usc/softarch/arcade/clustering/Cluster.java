@@ -20,18 +20,9 @@ import edu.usc.softarch.arcade.util.json.JsonSerializable;
 /**
  * Represents a cluster of entities in the subject system.
  */
-public class Cluster implements JsonSerializable, Comparable<Cluster> {
+public class Cluster extends ReadOnlyCluster
+		implements JsonSerializable, Comparable<Cluster> {
 	//region ATTRIBUTES
-	/**
-	 * Name of the Cluster, typically given by the union of the names of its
-	 * comprising entities. Can also be a related, representative name of all
-	 * entities.
-	 */
-	private final String name;
-	/**
-	 * Set of code-level entities contained by this cluster.
-	 */
-	private final Set<String> entities;
 	//TODO numEntities should probably be in Architecture instead
 	/**
 	 * Total number of entities in the architecture to which this cluster belongs.
@@ -50,8 +41,7 @@ public class Cluster implements JsonSerializable, Comparable<Cluster> {
 	//region CONSTRUCTORS
 	private Cluster(String name, Collection<String> entities, int numEntities,
 			Map<Integer, Double> featureMap, DocTopicItem dti) {
-		this.name = name;
-		this.entities = new HashSet<>(entities);
+		super(name, entities);
 		this.numEntities = numEntities;
 		this.featureMap = featureMap;
 		this.dti = dti;
@@ -64,10 +54,9 @@ public class Cluster implements JsonSerializable, Comparable<Cluster> {
 	 * @param featureSet Set of the new Cluster's entities.
 	 */
 	public Cluster(String name, BitSet featureSet, int numFeatures) {
-		this.name = name;
+		super(name);
 
-		this.entities = new HashSet<>();
-		this.entities.add(name);
+		super.entities.add(name);
 
 		this.featureMap = new HashMap<>();
 		for (int i = 0; i < numFeatures; i++)
@@ -82,8 +71,7 @@ public class Cluster implements JsonSerializable, Comparable<Cluster> {
 	 * Clone constructor.
 	 */
 	public Cluster(Cluster c1) {
-		this.name = c1.getName();
-		this.entities = new HashSet<>(c1.getEntities());
+		super(c1.name, c1.getEntities());
 		this.numEntities = c1.getNumEntities();
 		this.featureMap = c1.getFeatureMap();
 		this.dti = c1.dti;
@@ -94,7 +82,7 @@ public class Cluster implements JsonSerializable, Comparable<Cluster> {
 	 */
 	public Cluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2)
 			throws UnmatchingDocTopicItemsException {
-		this.entities = new HashSet<>(c2.getEntities());
+		super(cat, c1, c2);
 
 		this.featureMap = new HashMap<>();
 
@@ -111,13 +99,6 @@ public class Cluster implements JsonSerializable, Comparable<Cluster> {
 				setWcaFeatureMap(c1, c2, indices);
 		}
 
-		if (cat.equals(ClusteringAlgorithmType.ARC) && c1.getName().contains("$"))
-			this.name = c2.getName();
-		else {
-			this.name = c1.getName() + ',' + c2.getName();
-			this.entities.addAll(c1.getEntities());
-		}
-
 		this.numEntities = c1.getNumEntities() + c2.getNumEntities();
 
 		if (cat.equals(ClusteringAlgorithmType.ARC))
@@ -130,13 +111,6 @@ public class Cluster implements JsonSerializable, Comparable<Cluster> {
 	 * Returns the {@link #featureMap} of this Cluster itself, NOT a copy.
 	 */
 	public Map<Integer, Double> getFeatureMap() { return featureMap; }
-
-	public Collection<String> getEntities() { return new HashSet<>(entities); }
-
-	/**
-	 * Returns the name of this Cluster.
-	 */
-	public String getName() {	return name; }
 
 	/**
 	 * Returns the number of entities represented by this Cluster.
@@ -296,6 +270,6 @@ public class Cluster implements JsonSerializable, Comparable<Cluster> {
 
 	@Override
 	public int compareTo(Cluster o) {
-		return this.getName().compareTo(o.getName());	}
+		return this.name.compareTo(o.name);	}
 	//endregion
 }

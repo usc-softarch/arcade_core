@@ -122,9 +122,9 @@ public class Clusterer {
 	public Architecture getArchitecture() { return architecture; }
 
 	protected void removeCluster(Cluster cluster) {
-		architecture.remove(cluster.getName());	}
+		architecture.remove(cluster.name);	}
 	protected void addCluster(Cluster cluster) {
-		architecture.put(cluster.getName(), cluster); }
+		architecture.put(cluster.name, cluster); }
 	// #endregion ACCESSORS ------------------------------------------------------
 	
 	protected void checkAndUpdateClusterGain(double clusterGain) {
@@ -138,7 +138,7 @@ public class Clusterer {
 			SimData data, Cluster newCluster,	SimilarityMatrix simMatrix)
 			throws DistributionSizeMismatchException {
 		// Sanity check
-		if (data.c1.getName().equals(data.c2.getName()))
+		if (data.c1.name.equals(data.c2.name))
 			throw new IllegalArgumentException("data.c1: " + data.c1
 				+ " should not be the same as data.c2: " + data.c2);
 

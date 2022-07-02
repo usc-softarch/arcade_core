@@ -110,8 +110,8 @@ public class SimilarityMatrix {
 				if (cellData.cellValue == 0
 						&& simMeasureType == SimMeasure.SimMeasureType.JS)
 					throw new IllegalArgumentException("Two clusters found with the " +
-						"same topic distribution: " + cellData.c1.getName() + " ; " +
-						cellData.c2.getName());
+						"same topic distribution: " + cellData.c1.name + " ; " +
+						cellData.c2.name);
 				this.fastSimMatrix.add(cellData);
 			}
 		}

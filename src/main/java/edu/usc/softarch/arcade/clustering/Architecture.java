@@ -181,23 +181,23 @@ public class Architecture extends TreeMap<String, Cluster>
 			// Second condition to be assumed true
 			// Third condition checks whether the cluster is based on a valid C entity
 			if (Config.getClusteringGranule().equals(Config.Granule.file) &&
-				!cluster.getName().startsWith("/") &&
-				p.matcher(cluster.getName()).find())
-				this.put(cluster.getName(), cluster);
+				!cluster.name.startsWith("/") &&
+				p.matcher(cluster.name).find())
+				this.put(cluster.name, cluster);
 		}
 
 		// This block is used only for certain older modules, disregard
 		if (Config.getClusteringGranule().equals(Config.Granule.func)) {
-			if (cluster.getName().equals("\"##\""))
+			if (cluster.name.equals("\"##\""))
 				return;
-			this.put(cluster.getName(), cluster);
+			this.put(cluster.name, cluster);
 		}
 
 		// If the source language is Java, add all clusters that match prefix
 		if (language.equalsIgnoreCase("java")
 			&& (packagePrefix.isEmpty()
-			|| cluster.getName().startsWith(packagePrefix)))
-			this.put(cluster.getName(), cluster);
+			|| cluster.name.startsWith(packagePrefix)))
+			this.put(cluster.name, cluster);
 	}
 	//endregion
 
@@ -227,7 +227,7 @@ public class Architecture extends TreeMap<String, Cluster>
 	 * Adds the given {@link Cluster} to this architecture.
 	 */
 	public void add(Cluster c) {
-		this.put(c.getName(), c);
+		this.put(c.name, c);
 	}
 
 	/**

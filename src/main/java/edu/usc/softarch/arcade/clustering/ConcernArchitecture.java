@@ -69,17 +69,17 @@ public class ConcernArchitecture extends Architecture {
 		// Map inner classes to their parents
 		Map<String,String> oldParentClassMap = new HashMap<>();
 		for (Cluster c : super.values()) {
-			if (c.getName().contains("$")) {
-				String[] tokens = c.getName().split("\\$");
+			if (c.name.contains("$")) {
+				String[] tokens = c.name.split("\\$");
 				String parentClassName = tokens[0];
-				oldParentClassMap.put(c.getName(), parentClassName);
+				oldParentClassMap.put(c.name, parentClassName);
 			}
 		}
 
 		Map<Cluster, Cluster> parentClassMap = new LinkedHashMap<>();
 		for (Cluster c : super.values()) {
-			if (c.getName().contains("$")) {
-				String[] tokens = c.getName().split("\\$");
+			if (c.name.contains("$")) {
+				String[] tokens = c.name.split("\\$");
 				String parentClassName = tokens[0];
 				parentClassMap.put(c, super.get(parentClassName));
 			}
@@ -91,12 +91,12 @@ public class ConcernArchitecture extends Architecture {
 		Map<String, Cluster> clustersWithMissingDocTopics =	new HashMap<>();
 		for (Cluster c : super.values())
 			if (!c.hasDocTopicItem())
-				clustersWithMissingDocTopics.put(c.getName(), c);
+				clustersWithMissingDocTopics.put(c.name, c);
 
 		super.removeAll(clustersWithMissingDocTopics);
 
 		for (Cluster c : clustersWithMissingDocTopics.values())
-			super.remove(c.getName());
+			super.remove(c.name);
 	}
 
 	//TODO Change this to the correct format
@@ -108,9 +108,9 @@ public class ConcernArchitecture extends Architecture {
 			Cluster parentCluster = super.get(entry.getValue());
 			Cluster mergedCluster =
 				new Cluster(ClusteringAlgorithmType.ARC, nestedCluster, parentCluster);
-			super.remove(parentCluster.getName());
-			super.remove(nestedCluster.getName());
-			super.put(mergedCluster.getName(), mergedCluster);
+			super.remove(parentCluster.name);
+			super.remove(nestedCluster.name);
+			super.put(mergedCluster.name, mergedCluster);
 		}
 	}
 
@@ -118,16 +118,16 @@ public class ConcernArchitecture extends Architecture {
 		// Locate non-inner classes without DTI
 		Map<String, Cluster> excessClusters = new HashMap<>();
 		for (Cluster c : super.values())
-			if (!c.hasDocTopicItem() && !c.getName().contains("$"))
-				excessClusters.put(c.getName(), c);
+			if (!c.hasDocTopicItem() && !c.name.contains("$"))
+				excessClusters.put(c.name, c);
 
 		Map<String, Cluster> excessInners = new HashMap<>();
 		// For each Child/Parent pair, if the parent is marked, mark the child
 		for (Map.Entry<Cluster, Cluster> entry : parentClassMap.entrySet()) {
 			Cluster child = entry.getKey();
 			Cluster parent = entry.getValue();
-			if (excessClusters.containsKey(parent.getName()))
-				excessInners.put(child.getName(), child);
+			if (excessClusters.containsKey(parent.name))
+				excessInners.put(child.name, child);
 		}
 
 		// Remove them from the analysis

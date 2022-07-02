@@ -20,7 +20,7 @@ public class SimData implements Comparable<SimData> {
 		this.c2 = c2;
 		this.cellValue = cellValue;
 		this.clusterSize = clusterSize;
-		this.cellName = c1.getName() + c2.getName();
+		this.cellName = c1.name + c2.name;
 	}
 
 	//region OBJECT METHODS
@@ -53,8 +53,8 @@ public class SimData implements Comparable<SimData> {
 
 	//region SERIALIZATION
 	public void serialize(JsonGenerator generator) throws IOException {
-		generator.writeNumberField("c1", c1.getName().hashCode());
-		generator.writeNumberField("c2", c2.getName().hashCode());
+		generator.writeNumberField("c1", c1.name.hashCode());
+		generator.writeNumberField("c2", c2.name.hashCode());
 		generator.writeNumberField("val", cellValue);
 		generator.writeNumberField("size", clusterSize);
 	}
