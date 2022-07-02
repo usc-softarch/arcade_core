@@ -69,4 +69,20 @@ public class ReadOnlyCluster {
 	public Set<String> symmetricDifference(ReadOnlyCluster c) {
 		return this.entities.symmetricDifference(c.entities); }
 	//endregion
+
+	//region OBJECT METHODS
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) return false;
+		if (o == this) return true;
+		if (!(o instanceof ReadOnlyCluster)) return false;
+
+		ReadOnlyCluster toCompare = (ReadOnlyCluster) o;
+
+		return this.name.equals(toCompare.name);
+	}
+
+	@Override
+	public int hashCode() { return this.name.hashCode(); }
+	//endregion
 }

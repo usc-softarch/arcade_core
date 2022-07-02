@@ -57,60 +57,7 @@ public class ClusterUtil {
 		return clusterMap;
 		
 	}
-	
-	public static Map<String,Set<MutablePair<String,String>>> buildInternalEdgesPerCluster(Map<String,Set<String>> clusterMap, List<List<String>> depFacts) {
-		Map<String,Set<MutablePair<String,String>>> map = new HashMap<>();
 
-		for (String clusterName : clusterMap.keySet()) { // for each cluster name
-			Set<MutablePair<String,String>> edges = new HashSet<>();
-			for (List<String> depFact : depFacts) {
-				String source = depFact.get(1);
-				String target = depFact.get(2);
-				if (clusterMap.get(clusterName).contains(source) && clusterMap.get(clusterName).contains(target)) { // check if the source and target is in the cluster
-					// Add internal edge 
-					MutablePair<String, String> edge = new MutablePair<>();
-					edge.setLeft(source);
-					edge.setRight(target);
-					edges.add(edge);
-				}
-			}
-			map.put(clusterName, edges);
-		}
-
-
-		return map;
-	}
-	
-	public static Map<String,Set<MutablePair<String,String>>> buildExternalEdgesPerCluster(Map<String,Set<String>> clusterMap, List<List<String>> depFacts) {
-		Map<String,Set<MutablePair<String,String>>> map = new HashMap<>();
-
-		for (String clusterName : clusterMap.keySet()) { // for each cluster name
-			Set<MutablePair<String,String>> edges = new HashSet<>();
-			for (List<String> depFact : depFacts) {
-				String source = depFact.get(1);
-				String target = depFact.get(2);
-				if (clusterMap.get(clusterName).contains(source) && !(clusterMap.get(clusterName).contains(target)) ) { // source is in cluster, but target is not
-					// Add external edge 
-					MutablePair<String, String> edge = new MutablePair<>();
-					edge.setLeft(source);
-					edge.setRight(target);
-					edges.add(edge);
-				}
-				if (!(clusterMap.get(clusterName).contains(source)) && clusterMap.get(clusterName).contains(target)) { // target is in cluster, but source is not
-					// Add external edge 
-					MutablePair<String, String> edge = new MutablePair<>();
-					edge.setLeft(source);
-					edge.setRight(target);
-					edges.add(edge);
-				}
-			}
-			map.put(clusterName, edges);
-		}
-
-
-		return map;
-	}
-	
 	public static Set<List<String>> buildClusterEdges(Map<String,Set<String>> clusterMap, List<List<String>> depFacts) {
 		Set<List<String>> edges = new HashSet<>();
 

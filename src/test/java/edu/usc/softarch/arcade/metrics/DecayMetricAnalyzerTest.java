@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,8 +38,6 @@ public class DecayMetricAnalyzerTest extends BaseTest {
 			() -> FileUtil.getFileListing(new File(clusterDir)));
     List<File> depsFiles = assertDoesNotThrow(
 			() -> FileUtil.getFileListing(new File(depDir)));
-  
-    clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
 
 		// Map files to their versions
 		Map<String, File> clusterFilesMap = new HashMap<>();
@@ -53,13 +53,8 @@ public class DecayMetricAnalyzerTest extends BaseTest {
 			File clusterFile = clusterFilesMap.get(version);
 			File depsFile = depFilesMap.get(version);
 
-			String[] dmaArgs =
-				{ clusterFile.getAbsolutePath(), depsFile.getAbsolutePath() };
-			DecayMetricAnalyzer.main(dmaArgs);
-
-			double[] values =
-				{ DecayMetricAnalyzer.rciVal, DecayMetricAnalyzer.twoWayPairRatio,
-					DecayMetricAnalyzer.avgStability, DecayMetricAnalyzer.mqRatio };
+			double[] values = assertDoesNotThrow(() -> DecayMetricAnalyzer.run(
+					clusterFile.getAbsolutePath(), depsFile.getAbsolutePath()));
 
 			resultStats.put(version.replace(".rsf", ""), values);
 		}
@@ -107,6 +102,24 @@ public class DecayMetricAnalyzerTest extends BaseTest {
 			+ "decay_metrics_oracle_" + projectName + "_" + clusteringAlgo + ".txt";
 
     Map<String, double[]> resultStats = getResults(clusteringAlgo);
+
+		// ------------------------- Generate Oracles ------------------------------
+
+		if (generateOracles) {
+			assertDoesNotThrow(() -> {
+				try (PrintWriter writer =
+						new PrintWriter(oraclesPath, StandardCharsets.UTF_8)) {
+					for (Map.Entry<String, double[]> entry : resultStats.entrySet()) {
+						double[] values = entry.getValue();
+						writer.println(entry.getKey() + ", " + values[0] + ", "
+							+ values[1] + ", " + values[2] + ", " + values[3]);
+					}
+				}
+			});
+		}
+
+		// ------------------------- Generate Oracles ------------------------------
+
     Map<String, double[]> oracleStats = readOracle(oraclesPath);
 
 		for (String version : oracleStats.keySet())
