@@ -12,13 +12,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
-
-import edu.usc.softarch.arcade.util.FileUtil;
-
 public class RsfReader {
-
-	private static Logger logger = Logger.getLogger(RsfReader.class);
 	public static Set<List<String>> untypedEdgesSet;
 	public static Set<String> startNodesSet;
 	public static Iterable<List<String>> filteredRoutineFacts;
@@ -30,14 +24,10 @@ public class RsfReader {
 		// List of facts extracted from RSF File
 		List<List<String>> facts = new ArrayList<>();
 
-		logger.debug("Attempting to read " + rsfFilename);
-		
 		try (BufferedReader in = new BufferedReader(new FileReader(rsfFilename))) {
 			String line;
 
 			while ((line = in.readLine()) != null) {
-				logger.debug(line);
-				
 				if (line.trim().isEmpty())
 					continue;
 
@@ -48,12 +38,10 @@ public class RsfReader {
 				String startNode = s.findInLine(expr);
 				String endNode = s.findInLine(expr);
 				List<String> fact = Arrays.asList(arcType, startNode, endNode);
-				logger.debug(fact);
 				facts.add(fact);
 
 				if (s.findInLine(expr) != null) {
-					logger.error("Found non-triple in file: " + line);
-					System.exit(1); //TODO Remove
+					throw new RuntimeException("Found non-triple in file: " + line);
 				}
 				s.close();
 			}
@@ -66,46 +54,19 @@ public class RsfReader {
 	public static void loadRsfDataFromFile(String rsfFilename) {
 		unfilteredFaCtS = extractFactsFromRSF(rsfFilename);
 
-		List<String> unfilteredFactsText =
-			FileUtil.collectionToString(unfilteredFaCtS);
-		logger.debug("Printing stored facts...");
-		logger.debug(String.join("\n", unfilteredFactsText));
-		
 		filteredRoutineFacts = unfilteredFaCtS;
 
 		List<List<String>> untypedEdges = convertFactsToUntypedEdges(unfilteredFaCtS);
 		untypedEdgesSet = new HashSet<>(untypedEdges);
 
-		List<String> untypedEdgesText = FileUtil.collectionToString(untypedEdges);
-		logger.debug("Printing untyped edges....");
-		logger.debug("number of untyped edges as list: " + untypedEdges.size());
-		logger.debug("number of untyped edges as set: "	+ untypedEdgesSet.size());
-		logger.debug(String.join("\n", untypedEdgesText));
-
 		List<String> startNodesList = convertFactsToStartNodesList(unfilteredFaCtS);
 		HashSet<String> rawStartNodesSet = new HashSet<>(startNodesList);
 
-		List<String> rawStartNodesSetText =
-			FileUtil.collectionToString(rawStartNodesSet);
-		logger.debug("Printing raw start nodes...");
-		logger.debug("number of raw start nodes: " + rawStartNodesSet.size());
-		logger.debug(String.join("\n", rawStartNodesSetText));
-
 		List<String> endNodesList = convertFactsToEndNodesList(unfilteredFaCtS);
 		endNodesSet = new HashSet<>(endNodesList);
-		
-		List<String> endNodesSetText = FileUtil.collectionToString(endNodesSet);
-		logger.debug("Printing end nodes...");
-		logger.debug("number of end nodes: " + endNodesSet.size());
-		logger.debug(String.join("\n", endNodesSetText));
-		
+
 		startNodesSet = new TreeSet<>(rawStartNodesSet);
 
-		List<String> startNodesSetText = FileUtil.collectionToString(startNodesSet);
-		logger.debug("Printing start nodes...");
-		logger.debug("number of start nodes: " + startNodesSet.size());
-		logger.debug(String.join("\n", startNodesSetText));
-		
 		allNodesSet = new HashSet<>(startNodesSet);
 		allNodesSet.addAll(endNodesSet);
 	}

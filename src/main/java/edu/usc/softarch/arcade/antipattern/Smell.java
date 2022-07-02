@@ -9,17 +9,17 @@ import edu.usc.softarch.arcade.facts.ConcernCluster;
 
 public class Smell implements Serializable {
 	private static final long serialVersionUID = 1L;
-	// #region FIELDS ------------------------------------------------------------
+	//region ATTRIBUTES
 	public enum SmellType {
 		bco, bdc, buo, spf
 	}
 
-	private ConcernClusterArchitecture clusters;
+	private final ConcernClusterArchitecture clusters;
 	private final SmellType smellType;
 	private final int topicNum;
-	// #endregion FIELDS ---------------------------------------------------------
+	//endregion
 
-	// #region CONSTRUCTORS ------------------------------------------------------
+	//region CONSTRUCTORS
 	public Smell(SmellType smellType) {
 		this.smellType = smellType;
 		this.topicNum = -1;
@@ -31,9 +31,9 @@ public class Smell implements Serializable {
 		this.topicNum = topicNum;
 		this.clusters = new ConcernClusterArchitecture();
 	}
-	// #endregion CONSTRUCTORS ---------------------------------------------------
+	//endregion
 
-	// #region ACCESSORS ---------------------------------------------------------
+	//region ACCESSORS
 	public ConcernClusterArchitecture getClusters() {
 		return new ConcernClusterArchitecture(this.clusters); }
 	public SmellType getSmellType() { return this.smellType; }
@@ -43,8 +43,9 @@ public class Smell implements Serializable {
 		return this.clusters.add(cluster); }
 	public boolean removeCluster(ConcernCluster cluster) {
 		return this.clusters.remove(cluster); }
-	// #endregion ACCESSORS ------------------------------------------------------
-	
+	//endregion
+
+	//region OBJECT METHODS
 	public String toString() {
 		// Makes a list by calling "toString" on every ConcernCluster in clusters
 		List<String> clusterTexts =
@@ -69,4 +70,5 @@ public class Smell implements Serializable {
 	public int hashCode() {
 		return this.getClusters().hashCode();
 	}
+	//endregion
 }

@@ -13,12 +13,15 @@ import com.thoughtworks.xstream.XStream;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class SmellCollection extends HashSet<Smell> {
+	//region ATTRIBUTES
   private static final long serialVersionUID = 1L;
-  
+	//endregion
+
+	//region CONSTRUCTORS
   public SmellCollection() { super(); }
   public SmellCollection(String smellFile) throws IOException {
     XStream xstream = new XStream();
-		String xml = null;
+		String xml;
 		xml = FileUtil.readFile(smellFile, StandardCharsets.UTF_8);
     Object result = xstream.fromXML(xml);
     if (!(result instanceof Set<?>))
@@ -30,7 +33,9 @@ public class SmellCollection extends HashSet<Smell> {
       .map(Smell.class::cast)
       .collect(Collectors.toSet()));
   }
+	//endregion
 
+	//region SERIALIZATION
   /**
 	 * Serializes the results of a smell analysis.
 	 * 
@@ -46,4 +51,5 @@ public class SmellCollection extends HashSet<Smell> {
 	    writer.println(xml);
 		}
   }
+	//endregion
 }

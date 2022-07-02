@@ -11,13 +11,13 @@ import edu.usc.softarch.arcade.topics.DocTopicItem;
  */
 public class ConcernCluster implements Serializable {
 	private static final long serialVersionUID = 1L;
-	// #region FIELDS ------------------------------------------------------------
+	//region ATTRIBUTES
 	private String name;
 	private Set<String> entities = new HashSet<>();
 	private DocTopicItem docTopicItem = null;
-	// #endregion FIELDS ---------------------------------------------------------
+	//endregion
 	
-	// #region ACCESSORS ---------------------------------------------------------
+	//region ACCESSORS
 	public String getName() {	return name; }
 	public Set<String> getEntities() { return entities;	}
 	public DocTopicItem getDocTopicItem() { return docTopicItem; }
@@ -27,8 +27,9 @@ public class ConcernCluster implements Serializable {
 	public void setName(String name) { this.name = name; }
 	public void setDocTopicItem(DocTopicItem docTopicItem) {
 		this.docTopicItem = docTopicItem; }
-	// #endregion ACCESSORS ------------------------------------------------------
-	
+	//endregion
+
+	//region OBJECT METHODS
 	public boolean equals(Object obj) {
 		if (obj instanceof ConcernCluster) {
 			ConcernCluster cluster = (ConcernCluster) obj;
@@ -45,4 +46,5 @@ public class ConcernCluster implements Serializable {
 	
 	public int hashCode() { return this.name.hashCode(); }
 	public String toString() { return this.name; }
+	//endregion
 }
