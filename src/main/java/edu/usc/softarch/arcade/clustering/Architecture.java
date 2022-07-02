@@ -8,12 +8,10 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -38,7 +36,6 @@ import edu.usc.softarch.arcade.util.json.JsonSerializable;
 public class Architecture extends TreeMap<String, Cluster>
 		implements JsonSerializable {
 	//region ATTRIBUTES
-	private static final long serialVersionUID = 1L;
 	/**
 	 * The name of the subject system represented by this architecture. Used in
 	 * serialization.
@@ -345,17 +342,15 @@ public class Architecture extends TreeMap<String, Cluster>
 		File rsfFile = new File(path);
 		rsfFile.getParentFile().mkdirs();
 
-		Map<Integer, String> architectureIndex = computeArchitectureIndex();
+		Map<Integer, Cluster> architectureIndex = computeArchitectureIndex();
 
 		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
 				new FileOutputStream(rsfFile), StandardCharsets.UTF_8))) {
-			for (Map.Entry<Integer, String> cluster : architectureIndex.entrySet()) {
+			for (Map.Entry<Integer, Cluster> cluster : architectureIndex.entrySet()) {
 				Integer clusterIndex = cluster.getKey();
-				String[] entities = cluster.getValue().split(",");
-				Set<String> entitiesSet = new HashSet<>(Arrays.asList(entities));
-				for (String entity : entitiesSet) {
+				Collection<String> entities = cluster.getValue().getEntities();
+				for (String entity : entities)
 					out.println("contain " + clusterIndex + " " + entity);
-				}
 			}
 		}
 	}
@@ -367,15 +362,21 @@ public class Architecture extends TreeMap<String, Cluster>
 	 * a unique identifier. The names of the entities are broken down into
 	 * separate entries by the serialization method.
 	 */
-	protected Map<Integer, String> computeArchitectureIndex() {
-		List<String> orderedClusterNames = this.values().stream()
-			.map(Cluster::getName).sorted().collect(Collectors.toList());
+	protected Map<Integer, Cluster> computeArchitectureIndex() {
+		List<Cluster> orderedClusters = this.values().stream()
+			.sorted().collect(Collectors.toList());
 
-		Map<Integer, String> architectureIndex = new TreeMap<>();
+		Map<Integer, Cluster> architectureIndex = new TreeMap<>();
 		for (int i = 0; i < this.size(); i++)
-			architectureIndex.put(i, orderedClusterNames.get(i));
+			architectureIndex.put(i, orderedClusters.get(i));
 
 		return architectureIndex;
+	}
+
+	public void serialize(String path) throws IOException {
+		try (EnhancedJsonGenerator generator = new EnhancedJsonGenerator(path)) {
+			serialize(generator);
+		}
 	}
 
 	@Override
@@ -387,6 +388,12 @@ public class Architecture extends TreeMap<String, Cluster>
 		generator.writeField("language", language);
 		generator.writeField("architecture", this, true,
 			"clusterName", "cluster");
+	}
+
+	public static Architecture deserialize(String path) throws IOException {
+		try (EnhancedJsonParser parser = new EnhancedJsonParser(path)) {
+			return deserialize(parser);
+		}
 	}
 
 	public static Architecture deserialize(EnhancedJsonParser parser)

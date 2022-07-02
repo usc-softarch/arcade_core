@@ -5,11 +5,7 @@ import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -55,9 +51,9 @@ public class ConcernArchitectureTest extends BaseTest {
 	public void constructorTest(String versionName, String language,
 			String packagePrefix) {
 		String artifactsDir = resourcesDir + fs + versionName;
-		String initialArchitecturePath = artifactsDir + fs + "initial_architecture.txt";
+		String initialArchitecturePath = artifactsDir + fs + "initial_architecture.json";
 		String architectureWithDocTopicsPath =
-			artifactsDir + fs + "architecture_with_doc_topics.txt";
+			artifactsDir + fs + "architecture_with_doc_topics.json";
 
 		// Deserialize FastFeatureVectors oracle
 		String ffVecsFilePath = factsDir + fs + versionName + "_fVectors.json";
@@ -83,13 +79,8 @@ public class ConcernArchitectureTest extends BaseTest {
 
 		if (generateOracles) {
 			assertDoesNotThrow(() -> {
-				ObjectOutputStream out =
-					new ObjectOutputStream(new FileOutputStream(initialArchitecturePath));
-				out.writeObject(arch.initialArchitecture);
-				out.close();
-				out = new ObjectOutputStream(new FileOutputStream(architectureWithDocTopicsPath));
-				out.writeObject(arch.architectureWithDocTopics);
-				out.close();
+				arch.initialArchitecture.serialize(initialArchitecturePath);
+				arch.architectureWithDocTopics.serialize(architectureWithDocTopicsPath);
 			});
 		}
 
@@ -107,16 +98,10 @@ public class ConcernArchitectureTest extends BaseTest {
 		);
 
 		// check the integrity of both data structures, before and after docTopics
-		Architecture initialArchitectureOracle = assertDoesNotThrow(() -> {
-			ObjectInputStream in =
-				new ObjectInputStream(new FileInputStream(initialArchitecturePath));
-			return (Architecture) in.readObject();
-		});
-		Architecture architectureWithDocTopicsOracle = assertDoesNotThrow(() -> {
-			ObjectInputStream in =
-				new ObjectInputStream(new FileInputStream(architectureWithDocTopicsPath));
-			return (Architecture) in.readObject();
-		});
+		Architecture initialArchitectureOracle = assertDoesNotThrow(
+			() -> Architecture.deserialize(initialArchitecturePath));
+		Architecture architectureWithDocTopicsOracle = assertDoesNotThrow(
+			() -> Architecture.deserialize(architectureWithDocTopicsPath));
 
 		assertAll(
 			() -> assertEquals(initialArchitectureOracle, arch.initialArchitecture,

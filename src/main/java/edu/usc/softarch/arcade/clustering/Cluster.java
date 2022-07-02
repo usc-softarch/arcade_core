@@ -1,8 +1,8 @@
 package edu.usc.softarch.arcade.clustering;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,10 +20,8 @@ import edu.usc.softarch.arcade.util.json.JsonSerializable;
 /**
  * Represents a cluster of entities in the subject system.
  */
-public class Cluster implements Serializable, JsonSerializable {
+public class Cluster implements JsonSerializable, Comparable<Cluster> {
 	//region ATTRIBUTES
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * Name of the Cluster, typically given by the union of the names of its
 	 * comprising entities. Can also be a related, representative name of all
@@ -31,13 +29,18 @@ public class Cluster implements Serializable, JsonSerializable {
 	 */
 	private final String name;
 	/**
-	 * Count of how many entities are represented by this Cluster.
+	 * Set of code-level entities contained by this cluster.
+	 */
+	private final Set<String> entities;
+	//TODO numEntities should probably be in Architecture instead
+	/**
+	 * Total number of entities in the architecture to which this cluster belongs.
 	 */
 	private final int numEntities;
 	/**
 	 * Map of the values of each non-zero feature in this Cluster.
 	 */
-	private Map<Integer, Double> featureMap = new HashMap<>();
+	private final Map<Integer, Double> featureMap;
 	/**
 	 * {@link DocTopicItem} related to this Cluster, if one exists.
 	 */
@@ -45,9 +48,10 @@ public class Cluster implements Serializable, JsonSerializable {
 	//endregion
 
 	//region CONSTRUCTORS
-	private Cluster(String name, int numEntities,
+	private Cluster(String name, Collection<String> entities, int numEntities,
 			Map<Integer, Double> featureMap, DocTopicItem dti) {
 		this.name = name;
+		this.entities = new HashSet<>(entities);
 		this.numEntities = numEntities;
 		this.featureMap = featureMap;
 		this.dti = dti;
@@ -61,6 +65,9 @@ public class Cluster implements Serializable, JsonSerializable {
 	 */
 	public Cluster(String name, BitSet featureSet, int numFeatures) {
 		this.name = name;
+
+		this.entities = new HashSet<>();
+		this.entities.add(name);
 
 		this.featureMap = new HashMap<>();
 		for (int i = 0; i < numFeatures; i++)
@@ -76,6 +83,7 @@ public class Cluster implements Serializable, JsonSerializable {
 	 */
 	public Cluster(Cluster c1) {
 		this.name = c1.getName();
+		this.entities = new HashSet<>(c1.getEntities());
 		this.numEntities = c1.getNumEntities();
 		this.featureMap = c1.getFeatureMap();
 		this.dti = c1.dti;
@@ -86,6 +94,10 @@ public class Cluster implements Serializable, JsonSerializable {
 	 */
 	public Cluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2)
 			throws UnmatchingDocTopicItemsException {
+		this.entities = new HashSet<>(c2.getEntities());
+
+		this.featureMap = new HashMap<>();
+
 		Set<Integer> indices = new HashSet<>(c1.getFeatureMap().keySet());
 		indices.addAll(c2.getFeatureMap().keySet());
 
@@ -101,8 +113,10 @@ public class Cluster implements Serializable, JsonSerializable {
 
 		if (cat.equals(ClusteringAlgorithmType.ARC) && c1.getName().contains("$"))
 			this.name = c2.getName();
-		else
+		else {
 			this.name = c1.getName() + ',' + c2.getName();
+			this.entities.addAll(c1.getEntities());
+		}
 
 		this.numEntities = c1.getNumEntities() + c2.getNumEntities();
 
@@ -116,6 +130,8 @@ public class Cluster implements Serializable, JsonSerializable {
 	 * Returns the {@link #featureMap} of this Cluster itself, NOT a copy.
 	 */
 	public Map<Integer, Double> getFeatureMap() { return featureMap; }
+
+	public Collection<String> getEntities() { return new HashSet<>(entities); }
 
 	/**
 	 * Returns the name of this Cluster.
@@ -259,6 +275,7 @@ public class Cluster implements Serializable, JsonSerializable {
 	@Override
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
 		generator.writeField("name", name);
+		generator.writeField("entities", entities);
 		generator.writeField("numEntities", numEntities);
 		generator.writeField("featureMap", featureMap,
 			true, "featureIndex", "featureValue");
@@ -268,12 +285,17 @@ public class Cluster implements Serializable, JsonSerializable {
 	public static Cluster deserialize(EnhancedJsonParser parser)
 			throws IOException {
 		String name = parser.parseString();
+		Collection<String> entities = parser.parseCollection(String.class);
 		int numEntities = parser.parseInt();
 		Map<Integer, Double> featureMap =
 			parser.parseMap(Integer.class, Double.class);
-		DocTopicItem dti = parser.parseObject(DocTopicItem.class);
+		DocTopicItem dti = parser.parseObject(DocTopicItem.class, "dti");
 
-		return new Cluster(name, numEntities, featureMap, dti);
+		return new Cluster(name, entities, numEntities, featureMap, dti);
 	}
+
+	@Override
+	public int compareTo(Cluster o) {
+		return this.getName().compareTo(o.getName());	}
 	//endregion
 }

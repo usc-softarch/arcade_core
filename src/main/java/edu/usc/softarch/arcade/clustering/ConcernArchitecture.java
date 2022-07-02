@@ -152,14 +152,14 @@ public class ConcernArchitecture extends Architecture {
 		File outputFile = new File(path);
 		outputFile.getParentFile().mkdirs();
 
-		Map<Integer, String> architectureIndex = computeArchitectureIndex();
+		Map<Integer, Cluster> architectureIndex = computeArchitectureIndex();
 
 		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
 				new FileOutputStream(outputFile), StandardCharsets.UTF_8))) {
 			StringBuilder output = new StringBuilder();
 
-			for (Map.Entry<Integer, String> cluster : architectureIndex.entrySet()) {
-				DocTopicItem dti = this.get(cluster.getValue()).getDocTopicItem();
+			for (Map.Entry<Integer, Cluster> cluster : architectureIndex.entrySet()) {
+				DocTopicItem dti = cluster.getValue().getDocTopicItem();
 				Concern concernWords = dti.getConcern();
 				output.append(cluster.getKey());
 				output.append(concernWords);
