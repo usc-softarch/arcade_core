@@ -1,206 +1,139 @@
 package edu.usc.softarch.arcade.metrics;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
 
 import edu.usc.softarch.arcade.clustering.ConcernClusterArchitecture;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
+import edu.usc.softarch.arcade.util.McfpDriver;
 
 public class SystemEvo {
-	private static Logger logger = LogManager.getLogger(SystemEvo.class);
-	
-	public static double sysEvo = 0;
-	
+	//region PUBLIC INTERFACE
 	public static void main(String[] args) {
-		sysEvo = 0;
-		SystemEvoOptions options = new SystemEvoOptions();
-		JCommander jcmd = new JCommander(options);
-		
-		try {
-			jcmd.parse(args); 
-		}
-		catch (ParameterException e) {
-			logger.debug(e.getMessage());
-			jcmd.usage();
-			System.exit(1);
-		}
-		
-		logger.debug(options.parameters);
-		logger.debug("\n");
-		
-		String sourceRsf = options.parameters.get(0);
-		String targetRsf = options.parameters.get(1);
-		
+		run(args[0], args[1]); }
+
+	public static double run(String sourceRsf, String targetRsf) {
 		ConcernClusterArchitecture sourceClusters =
 			ConcernClusterArchitecture.loadFromRsf(sourceRsf);
 		ConcernClusterArchitecture targetClusters =
 			ConcernClusterArchitecture.loadFromRsf(targetRsf);
-		
-		logger.debug("Source clusters: ");
-		logger.debug(clustersToString(sourceClusters));
-		logger.debug("Target clusters: ");
-		logger.debug(clustersToString(targetClusters));
-		
-		double numClustersToRemove = sourceClusters.size() >  targetClusters.size() ? sourceClusters.size() - targetClusters.size() : 0;
-		double numClustersToAdd = targetClusters.size() > sourceClusters.size() ? targetClusters.size() - sourceClusters.size() : 0;
-		
-		logger.debug("\n");
-		logger.debug("number of clusters to remove: " + numClustersToRemove);
-		logger.debug("number of clusters to add: " + numClustersToAdd);
-		
+
+		// Determine the larger architecture
+		double numClustersToRemove =
+			sourceClusters.size() > targetClusters.size()
+				? sourceClusters.size() - targetClusters.size() : 0;
+		double numClustersToAdd =
+			targetClusters.size() > sourceClusters.size()
+				? targetClusters.size() - sourceClusters.size() : 0;
+
+		// Get all the existing entities in the two architectures
 		Set<String> sourceEntities = getAllEntitiesInClusters(sourceClusters);
 		Set<String> targetEntities = getAllEntitiesInClusters(targetClusters);
-		
-		logger.debug("\n");
-		logger.debug("source entities: " + sourceEntities);
-		logger.debug("target entities: " + targetEntities);
-		
+
+		// Remove the intersection from each set
 		Set<String> entitiesToRemove = new HashSet<>(sourceEntities);
 		entitiesToRemove.removeAll(targetEntities);
 		Set<String> entitiesToAdd = new HashSet<>(targetEntities);
 		entitiesToAdd.removeAll(sourceEntities);
-		
-		logger.debug("\n");
-		logger.debug("entities to remove: " + entitiesToRemove);
-		logger.debug("entities to add: " + entitiesToAdd);
 
-		// We need to determine the  intersection of entities between clusters in the source and target to help us minimize the number of moves
-		// Pooyan!: We are maping this problem to a problem of Maximum Weighted Matching, and we use Hungurian Algorithm to solve it. 
-		
+		// We need to determine the intersection of entities between clusters
+		// in the source and target to help us minimize the number of moves
+		// We are mapping this problem to a problem of Maximum Weighted Matching,
+		// and we use Hungurian Algorithm to solve it.
+
+		// Map source architecture to indices and back
 		int ns = sourceClusters.size();
 		int nt = targetClusters.size();
-		Map<Integer,ConcernCluster> sourceNumToCluster = new HashMap<>(); // Pooyan! It maps every source_cluster to a number from 0 to ns-1
-		Map<ConcernCluster,Integer> sourceClusterToNum = new HashMap<>(); // Pooyan! It maps every target_cluster to a number from 0 to nm-1
-		int counter = 0 ;
-		for (ConcernCluster source:sourceClusters){
-			sourceNumToCluster.put(counter, source);
-			sourceClusterToNum.put(source,  counter);
+		Map<Integer, ConcernCluster> sourceIndex = new HashMap<>();
+		Map<ConcernCluster, Integer> sourceReverseIndex = new HashMap<>();
+		int counter = 0;
+		for (ConcernCluster source: sourceClusters){
+			sourceIndex.put(counter, source);
+			sourceReverseIndex.put(source, counter);
 			counter++;
 		}
 
-		Map<Integer,ConcernCluster> targetNumToCluster = new HashMap<>();
-		Map<ConcernCluster,Integer> targetClusterToNum = new HashMap<>();
+		// Map target architecture to indices and back
+		Map<Integer,ConcernCluster> targetIndex = new HashMap<>();
+		Map<ConcernCluster,Integer> targetReverseIndex = new HashMap<>();
 		counter = 0;
 		for (ConcernCluster target:targetClusters){
-			targetNumToCluster.put(counter,  target);
-			targetClusterToNum.put(target, counter);
+			targetIndex.put(counter, target);
+			targetReverseIndex.put(target, counter);
 			counter++;
 		}
-		
-		MWBMatchingAlgorithm ma = new MWBMatchingAlgorithm(ns,nt);// Pooyan! Initiating the mathching
-		for (int i=0;i<ns;i++)
-			for (int j=0;j<nt;j++)
+
+		// Create this matrix thing and set all weights to 0
+		MWBMatchingAlgorithm ma = new MWBMatchingAlgorithm(ns, nt);
+		for (int i = 0; i < ns; i++)
+			for (int j = 0; j < nt; j++)
 				ma.setWeight(i, j, 0);
-		
-		for (ConcernCluster sourceCluster : sourceClusters) {
-			for (ConcernCluster targetCluster : targetClusters) {
-				Set<String> entitiesIntersection = new HashSet<>(sourceCluster.getEntities());
-				entitiesIntersection.retainAll(targetCluster.getEntities());
-				ma.setWeight(sourceClusterToNum.get(sourceCluster), targetClusterToNum.get(targetCluster), entitiesIntersection.size()); // Pooyan the weight of (source,target) as the interesection between them
-			}	
-		}
-		
-		Map<ConcernCluster,Set<String>> sourceClusterMatchEntities = new HashMap<>(); //Pooyan! It keeps the source Cluster Match Entities, not necessarily the max match 
-		Map<ConcernCluster,ConcernCluster> matchOfSourceInTarget = new HashMap<>();//Pooyan! It keeps the matched cluster in target for every source
-		Map<ConcernCluster,ConcernCluster> matchOfTargetInSource = new HashMap<>();//Pooyan! It keeps the matched cluster in source for every target
-		
-		int[] match = ma.getMatching(); // Pooyan! calculates the max weighted match
-		
-		for (int i=0;i<match.length;i++){
 
-			ConcernCluster source = sourceNumToCluster.get(i);
-			ConcernCluster target = new ConcernCluster();
-			target.setName("-1"); // Pooyan! dummy, in case that the cluster is not matched to any cluster, to avoid null pointer exceptions
-			if (match[i]!=-1)
-				target=targetNumToCluster.get(match[i]) ;					
-			matchOfSourceInTarget.put(source, target); // Pooyan! set the match of source
-			matchOfTargetInSource.put(target, source); // Pooyan! set the match of target
-			Set<String> entitiesIntersection = new HashSet<>(source.getEntities());
-			entitiesIntersection.retainAll(target.getEntities());
-			sourceClusterMatchEntities.put(source, entitiesIntersection);	
-			logger.debug(source.getName() +" is matched to "+target.getName()+ " - the interesection size is " + entitiesIntersection.size() );
-		}
-		
-		logger.debug("\n");
-		logger.debug("cluster -> intersecting entities in the matched source clusters");
-		Map<ConcernCluster, Set<String>> sourceClusterMatchEntitiesPrintable =
-			new HashMap<>(sourceClusterMatchEntities);
-		logger.debug(String.join("\n", sourceClusterMatchEntitiesPrintable
-			.keySet().stream()
-			.map(key -> key + "->" + sourceClusterMatchEntitiesPrintable.get(key))
-			.collect(Collectors.toList())));
-
-		logger.debug("cluster -> matched clusters in target cluster for every source cluster");
-		Map<ConcernCluster, ConcernCluster> matchOfSourceInTargetPrintable =
-			new HashMap<>(matchOfSourceInTarget);
-		logger.debug(String.join("\n", matchOfSourceInTargetPrintable
-			.keySet().stream()
-			// This one is complicated: the map will result in a list of strings
-			// of the form "key->value", but it is replacing null ConcernClusters
-			// with the string "null".
-			.map(key -> {
-				String result = "";
-				result += (key != null) ? key : "null";
-				result += "->";
-				ConcernCluster value = matchOfSourceInTargetPrintable.get(key);
-				result += (value != null) ? value : "null";
-				return result;
-			}).collect(Collectors.toList())));
-		
-		ConcernClusterArchitecture removedSourceClusters = new ConcernClusterArchitecture() ;
-		
-		//Pooyan! unmatched clusters must be removed
-		for (ConcernCluster source:sourceClusters){
-			ConcernCluster matched = matchOfSourceInTarget.get(source);
-			if (matched.getName().equals("-1")){
-				removedSourceClusters.add(source);
+		for (ConcernCluster source : sourceClusters) {
+			for (ConcernCluster target : targetClusters) {
+				Set<String> intersection = new HashSet<>(source.getEntities());
+				intersection.retainAll(target.getEntities());
+				ma.setWeight(sourceReverseIndex.get(source),
+					targetReverseIndex.get(target), intersection.size());
 			}
 		}
-		logger.debug("Removed source clusters:");
-		List<String> removedSourceClustersPrintable =
-			removedSourceClusters.stream().map(ConcernCluster::toString)
-			.collect(Collectors.toList());
-		logger.debug(String.join(",", removedSourceClustersPrintable));
-		
-		Set<String> entitiesToMoveInRemovedSourceClusters = new HashSet<>(); // Pooyan! These are the entities in the removed source clusters which exists in the target clusters and have to be moved 
-		logger.debug("Entities of removed clusters:");
+
+		Map<ConcernCluster, Set<String>> sourceClusterMatchEntities = new HashMap<>();
+		Map<ConcernCluster, ConcernCluster> matchOfSourceInTarget = new HashMap<>();
+		Map<ConcernCluster, ConcernCluster> matchOfTargetInSource = new HashMap<>();
+
+		int[] match = ma.getMatching();
+
+		for (int i = 0; i < match.length; i++){
+			ConcernCluster source = sourceIndex.get(i);
+			ConcernCluster target = new ConcernCluster();
+			target.setName("-1"); // dummy, in case that the cluster is not matched to any cluster, to avoid null pointer exceptions
+			if (match[i] != -1)
+				target = targetIndex.get(match[i]);
+			matchOfSourceInTarget.put(source, target);
+			matchOfTargetInSource.put(target, source);
+			Set<String> entitiesIntersection = new HashSet<>(source.getEntities());
+			entitiesIntersection.retainAll(target.getEntities());
+			sourceClusterMatchEntities.put(source, entitiesIntersection);
+		}
+
+		ConcernClusterArchitecture removedSourceClusters = new ConcernClusterArchitecture() ;
+
+		// Remove unmatched clusters
+		for (ConcernCluster source: sourceClusters) {
+			ConcernCluster matched = matchOfSourceInTarget.get(source);
+			if (matched.getName().equals("-1"))
+				removedSourceClusters.add(source);
+		}
+
+		Set<String> entitiesToMoveInRemovedSourceClusters = new HashSet<>(); // Pooyan! These are the entities in the removed source clusters which exists in the target clusters and have to be moved
 		for (ConcernCluster source : removedSourceClusters) {
 			Set<String> entities = source.getEntities();
 			entities.removeAll(entitiesToRemove); // Make sure we are not trying to move entities that no longer exist in the target cluster
-			logger.debug("these in enitities in: "+ source.getName() + " will be moved: " + entities);
 			entitiesToMoveInRemovedSourceClusters.addAll(entities);
 		}
-		
-		// The clusters that remain after removal of clusters 
+
+		// The clusters that remain after removal of clusters
 		ConcernClusterArchitecture remainingSourceClusters = new ConcernClusterArchitecture(sourceClusters);
 		remainingSourceClusters.removeAll(removedSourceClusters);
-		
+
 		// for each cluster, the map gives the set of entities that may be moved (not including added or
 		// removed entities)
-		Map<ConcernCluster,Set<String>> entitiesToMoveInCluster = new HashMap<>(); 
+		Map<ConcernCluster,Set<String>> entitiesToMoveInCluster = new HashMap<>();
 		for (ConcernCluster remainingCluster : remainingSourceClusters) {
 			Set<String> matchedIntersectionEntities = sourceClusterMatchEntities.get(remainingCluster);
 			Set<String> currEntitiesToMove = new HashSet<>( remainingCluster.getEntities() );
 			if (matchOfSourceInTarget.get(remainingCluster) != null && matchOfTargetInSource.get(matchOfSourceInTarget.get(remainingCluster)).equals(remainingCluster))// Pooyan! if the ramaining cluster is  the base cluster, it is entity should not be removed, otherwise they should be in the current entity to move
 				currEntitiesToMove.removeAll(matchedIntersectionEntities); // the problem is here!!! It should move the maxIntersecting Entities since the cluster in the other arc is assigned to another cluster
-			
+
 			currEntitiesToMove.removeAll(entitiesToAdd);
 			currEntitiesToMove.removeAll(entitiesToRemove);
 			entitiesToMoveInCluster.put(remainingCluster,currEntitiesToMove);
-			for (String e:currEntitiesToMove)
-				logger.debug("remaining cluster " + remainingCluster.getName() + ", adn current entity to move :" +e);
 		}
-		
+
 		Set<String> allEntitiesToMove = new HashSet<>();
 		for (Set<String> currEntitiesToMove : entitiesToMoveInCluster.values()) {
 			allEntitiesToMove.addAll(currEntitiesToMove); // entities to move in clusters not removed
@@ -208,81 +141,41 @@ public class SystemEvo {
 		allEntitiesToMove.addAll(entitiesToMoveInRemovedSourceClusters); // entities to move in removed clusters (i.e., all the entities in those clusters)
 		allEntitiesToMove.addAll(entitiesToAdd);
 		allEntitiesToMove.addAll(entitiesToRemove);
-		
-		for (String e:allEntitiesToMove)
-			logger.debug("enitity to be moved: " +e); 
-		logger.debug("entities to move in each cluster: ");
-		logger.debug(String.join("\n", entitiesToMoveInCluster.keySet().stream()
-			.map(key -> key + "->" + entitiesToMoveInCluster.get(key))
-			.collect(Collectors.toList())));
-		
-		int movesForAddedEntities = entitiesToAdd.size();
-		int movesForRemovedEntities = entitiesToRemove.size();
-		
-		logger.debug("\n");
-		logger.debug("moves for added entities: " + movesForAddedEntities);
-		logger.debug("moves for removed entities: " + movesForRemovedEntities);
-		
-		
-		// Don't think I need this block for actual sysevo computation
-		Map<String,ConcernCluster> entityToTargetCluster = new HashMap<>(); 		
-		for (ConcernCluster sourceCluster : sourceClusters) {
-			Set<String> sourceEntitiesToMove = new HashSet<>( sourceCluster.getEntities() ); // entities that exist already and might be moved
-			sourceEntitiesToMove.removeAll(entitiesToAdd); // so you need to ignore added entities
-			sourceEntitiesToMove.removeAll(entitiesToRemove); // and removed entities.
-			for (ConcernCluster targetCluster : targetClusters) {
-				Set<String> currTargetEntitites = targetCluster.getEntities();
-				Set<String> intersectingEntities = new HashSet<>(sourceEntitiesToMove); // entities in both the current source and target cluster
-				intersectingEntities.retainAll(currTargetEntitites);
-				logger.debug("intersecting entities: ");
-				logger.debug(intersectingEntities);
-				for (String entity : intersectingEntities) { // mark that these source entities belong to this target cluster
-					entityToTargetCluster.put(entity,targetCluster);
-				}
-			}
-		}
-		
-		logger.debug("numClustersToRemove: " +numClustersToRemove);
-		logger.debug("numClustersToAdd: " + numClustersToAdd);
-		logger.debug("entitiesToRemove.size(): " + entitiesToRemove.size());
-		logger.debug("entitiesToAdd.size(): " + entitiesToAdd.size() ) ;
-		logger.debug("allEntitiesToMove.size(): " + allEntitiesToMove.size() );
-		logger.debug("Show which target cluster each entity (not added or removed) belongs to");
-		
-		logger.debug(String.join("\n", entityToTargetCluster.keySet().stream()
-			.map(key -> key + "->" + entityToTargetCluster.get(key))
-			.collect(Collectors.toList())));
-			
-		double numer = numClustersToRemove + numClustersToAdd + (double)( entitiesToRemove.size() ) + (double)( entitiesToAdd.size() ) + (double)( allEntitiesToMove.size() );
-		double denom = (double)( sourceClusters.size() ) + 2*(double)( sourceEntities.size() ) + (double)( targetClusters.size() ) + 2*(double)( targetEntities.size() );
-		logger.debug("denum: " + denom);
-		
-		double localSysEvo = (1-numer/denom)*100;
-		
-		logger.debug("sysevo: " + localSysEvo);
-		
-		sysEvo = localSysEvo;
-			
-	}
 
-	private static String clustersToString(ConcernClusterArchitecture sourceClusters) {
-		String output = "";
-		for (ConcernCluster cluster : sourceClusters) {
-			output += cluster.getName() +  ": ";
-			for (String entity : cluster.getEntities()) {
-				output += entity + " ";
-			}
-			output += "\n";
-		}
-		return output;
+		double numer = numClustersToRemove + numClustersToAdd + entitiesToRemove.size()
+			+ entitiesToAdd.size() + allEntitiesToMove.size();
+		double denom = sourceClusters.size() + 2.0 * sourceEntities.size()
+			+ targetClusters.size() + 2.0 * targetEntities.size();
+
+		double localSysEvo = (1 - numer / denom) * 100;
+
+		System.out.println("A2A: " + localSysEvo);
+
+		sysEvo = localSysEvo;
+
+		return sysEvo;
 	}
+	//endregion
+
+	//region ATTRIBUTES
+	public static double sysEvo = 0;
+	private final McfpDriver mcfpDriver;
+//	private final Architecture sourceClusters;
+//	private final Architecture targetClusters;
+	//endregion
+
+	//region CONSTRUCTORS
+	public SystemEvo(String sourceRsf, String targetRsf) throws IOException {
+		this.mcfpDriver = new McfpDriver(sourceRsf, targetRsf);
+//		this.sourceClusters = Architecture
+	}
+	//endregion
 
 	private static Set<String> getAllEntitiesInClusters(
 			ConcernClusterArchitecture clusters) {
 		Set<String> entities = new HashSet<>();
-		for (ConcernCluster cluster : clusters) {
-			entities.addAll( cluster.getEntities() );
-		}
+		for (ConcernCluster cluster : clusters)
+			entities.addAll(cluster.getEntities());
 		return entities;
 	}
 }

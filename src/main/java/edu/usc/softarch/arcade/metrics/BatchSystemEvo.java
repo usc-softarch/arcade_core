@@ -3,146 +3,60 @@ package edu.usc.softarch.arcade.metrics;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
 
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class BatchSystemEvo {
-	private static Logger logger = LogManager.getLogger(BatchSystemEvo.class);
-	private static DescriptiveStatistics stats;
-	
+	//region PUBLIC INTERFACE
 	public static void main(String[] args) throws FileNotFoundException {
-		BatchSystemEvoOptions options = new BatchSystemEvoOptions();
-		JCommander jcmd = new JCommander(options);
+		run(args[0]);	}
 
-		try {
-			jcmd.parse(args);
-		} catch (ParameterException e) {
-			logger.debug(e.getMessage());
-			jcmd.usage();
-			System.exit(1);
-		}
-
-		logger.debug(options.parameters);
-		logger.debug("\n");
-		
-		// File containing only containing recovered architectures stored as rsf files
-		String clusterFilesDir = options.parameters.get(0);
-
-		List<File> clusterFiles = FileUtil.getFileListing(new File(FileUtil
-				.tildeExpandPath(clusterFilesDir)));
-		// FileUtil.sortFileListByVersion sorts the list by the versioning
-		// scheme found in the filename
+	public static DescriptiveStatistics run(String path)
+			throws FileNotFoundException {
+		List<File> clusterFiles = FileUtil.getFileListing(
+			new File(FileUtil.tildeExpandPath(path)));
 		clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
 
-		if (options.distopt == 1) {
-			compareOverDistanceOfOne(clusterFiles);
-		}	else if (options.distopt == 2) {
-			compareWithVdistGt1ForAll(clusterFiles);
-		}	else if (options.distopt == 3) {
-			compareWithVdistGt1ForSubset(clusterFiles);
-		}	else {
-			throw new RuntimeException("Unknown value for option distopt: " + options.distopt);
-		}
-	}
+		System.out.println("Computing A2A with distance 1");
+		DescriptiveStatistics result = compareOverDistanceOfOne(clusterFiles);
+		System.out.println(result);
 
-	public static DescriptiveStatistics getStats(){
-		return stats;
+		return result;
 	}
-	
-	private static void compareOverDistanceOfOne(List<File> clusterFiles) {
-			File prevFile = null;
-			List<Double> sysEvoValues = new ArrayList<>();
-			int comparisonDistance = 1;
-			System.out.println("Comparison distance is: " + comparisonDistance);
-			for (int i = 0; i < clusterFiles.size(); i += comparisonDistance) {
-				File currFile = clusterFiles.get(i);
-				// exclude annoying .ds_store files from OSX
-				if (!currFile.getName().equals(".DS_Store")) {
-					if (prevFile != null && currFile != null) {
-						double sysEvoValue = computeSysEvo(prevFile, currFile);
-						sysEvoValues.add(sysEvoValue);
-					}
-					prevFile = currFile;
-				}
-			}
-			Double[] sysEvoArr = new Double[sysEvoValues.size()];
-			sysEvoValues.toArray(sysEvoArr);
-			
-			stats = new DescriptiveStatistics(ArrayUtils.toPrimitive(sysEvoArr));
+	//endregion
 
-			System.out.println(stats);
-			System.out.println();
-	}
-
-	private static void compareWithVdistGt1ForAll(
+	//region PROCESSING
+	private static DescriptiveStatistics compareOverDistanceOfOne(
 			List<File> clusterFiles) {
-			for (int i = 0; i < clusterFiles.size(); i++) {
-				List<Double> sysEvoValues = new ArrayList<>();
-				System.out.println("start index is: " + i);
-				for (int j = i+1; j < clusterFiles.size(); j ++) {
-					File file1 = clusterFiles.get(i);
-					File file2 = clusterFiles.get(j);
-					// exclude annoying .ds_store files from OSX
-					if (!file1.getName().equals(".DS_Store")) {
-						double sysEvoValue = computeSysEvo(file1,
-								file2);
-						sysEvoValues.add(sysEvoValue);
-					}
-				}
-				Double[] sysEvoArr = new Double[sysEvoValues.size()];
-				sysEvoValues.toArray(sysEvoArr);
+		File prevFile = null;
+		Collection<Double> sysEvoValues = new ArrayList<>();
 
-				DescriptiveStatistics stats = new DescriptiveStatistics(
-						ArrayUtils.toPrimitive(sysEvoArr));
-
-				System.out.println(stats);
-				System.out.println();
+		for (File currFile : clusterFiles) {
+			if (prevFile != null) {
+				double sysEvoValue = computeSysEvo(prevFile, currFile);
+				sysEvoValues.add(sysEvoValue);
 			}
-	}
-	
-	private static void compareWithVdistGt1ForSubset(
-			List<File> clusterFiles) {
-		for (int comparisonDistance = 1; comparisonDistance < clusterFiles
-				.size(); comparisonDistance++) {
-			File prevFile = null;
-			List<Double> sysEvoValues = new ArrayList<>();
-			System.out.println("Comparison distance is: " + comparisonDistance);
-			for (int i = 0; i < clusterFiles.size(); i += comparisonDistance) {
-				File currFile = clusterFiles.get(i);
-				// exclude annoying .ds_store files from OSX
-				if (!currFile.getName().equals(".DS_Store")) {
-					if (prevFile != null && currFile != null) {
-						double sysEvoValue = computeSysEvo(prevFile, currFile);
-						sysEvoValues.add(sysEvoValue);
-					}
-					prevFile = currFile;
-				}
-			}
-			Double[] sysEvoArr = new Double[sysEvoValues.size()];
-			sysEvoValues.toArray(sysEvoArr);
-			
-			DescriptiveStatistics stats = new DescriptiveStatistics(ArrayUtils.toPrimitive(sysEvoArr));
-
-			System.out.println(stats);
-			System.out.println();
+			prevFile = currFile;
 		}
+
+		Double[] sysEvoArr = new Double[sysEvoValues.size()];
+		sysEvoValues.toArray(sysEvoArr);
+
+		return new DescriptiveStatistics(
+			Stream.of(sysEvoArr).mapToDouble(Double::doubleValue).toArray());
 	}
 
 	public static double computeSysEvo(File prevFile, File currFile) {
-		String[] sysEvoArgs = {prevFile.getAbsolutePath(),currFile.getAbsolutePath()};
-		SystemEvo.main(sysEvoArgs);
-		double sysEvoValue = SystemEvo.sysEvo;
-		System.out.println("SysEvo from " + prevFile.getName()
+		double sysEvoValue = SystemEvo.run(
+			prevFile.getAbsolutePath(), currFile.getAbsolutePath());
+		System.out.println("A2A from " + prevFile.getName()
 				+ " to " + currFile.getName() + ": " + sysEvoValue);
 		return sysEvoValue;
 	}
+	//endregion
 }
