@@ -77,7 +77,7 @@ public class SystemEvo {
 
 	//region PROCESSING
 	private int numerator() {
-		int numClustersToChange =
+		int numClusterDifference =
 			Math.abs(this.sourceClusters.size() - this.targetClusters.size());
 
 		EnhancedSet<String> sourceEntities = sourceClusters.getEntities();
@@ -103,7 +103,7 @@ public class SystemEvo {
 		// the source and once for the target
 		int numMovedEntities = mcfpDriver.getCost() / 2;
 
-		return numClustersToChange + 2 * numAddedEntities
+		return numClusterDifference + 2 * numAddedEntities
 			+ 2 * numRemovedEntities + numMovedEntities;
 	}
 
@@ -112,9 +112,6 @@ public class SystemEvo {
 		int numTargetClusters = this.targetClusters.size();
 		int numSourceEntities = this.sourceClusters.countEntities();
 		int numTargetEntities = this.targetClusters.countEntities();
-
-		System.out.println(numSourceClusters + " " + numSourceEntities
-			+ " " + numTargetClusters + " " + numTargetEntities);
 
 		return numSourceClusters + 2.0 * numSourceEntities
 			+ numTargetClusters + 2.0 * numTargetEntities;

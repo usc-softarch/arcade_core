@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.decay;
+package edu.usc.softarch.arcade.metrics;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

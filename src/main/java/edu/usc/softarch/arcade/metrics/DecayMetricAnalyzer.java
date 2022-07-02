@@ -1,6 +1,5 @@
-package edu.usc.softarch.arcade.decay;
+package edu.usc.softarch.arcade.metrics;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
