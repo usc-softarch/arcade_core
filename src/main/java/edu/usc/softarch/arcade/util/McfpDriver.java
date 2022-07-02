@@ -1,5 +1,6 @@
-package edu.usc.softarch.arcade.facts.design;
+package edu.usc.softarch.arcade.util;
 
+import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
@@ -8,7 +9,12 @@ import org.jgrapht.alg.flow.mincost.MinimumCostFlowProblem;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,20 +24,28 @@ import java.util.stream.Collectors;
  * the JGraphT library, which in turn provides the input for the Change
  * Analyzer component of RecovAr.
  */
-class McfpDriver {
+public class McfpDriver {
 	//region ATTRIBUTES
 	private final List<DefaultWeightedEdge> changeSet;
 	//endregion
 
 	//region CONSTRUCTORS
-	McfpDriver(Map<String, EnhancedSet<String>> arch1,
+	public McfpDriver(String arch1Path, String arch2Path) throws IOException {
+		this(new File(arch1Path), new File(arch2Path));
+	}
+
+	public McfpDriver(File arch1, File arch2) throws IOException {
+		this(readArchitectureRsf(arch1), readArchitectureRsf(arch2));
+	}
+
+	public McfpDriver(Map<String, EnhancedSet<String>> arch1,
 			Map<String, EnhancedSet<String>> arch2) {
 		this.changeSet = solve(arch1, arch2);
 	}
 	//endregion
 
 	//region ACCESSORS
-	List<DefaultWeightedEdge> getChangeSet() {
+	public List<DefaultWeightedEdge> getChangeSet() {
 		return new ArrayList<>(this.changeSet);	}
 	//endregion
 
@@ -110,6 +124,22 @@ class McfpDriver {
 			// Get only the edge information
 			.map(Map.Entry::getKey)
 			.collect(Collectors.toList());
+	}
+
+	public static Map<String, EnhancedSet<String>> readArchitectureRsf(File file)
+		throws IOException {
+		Map<String, EnhancedSet<String>> architecture = new HashMap<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+			for (String line = br.readLine(); line != null; line = br.readLine()) {
+				String[] splitLine = line.split(" ");
+				architecture.putIfAbsent(splitLine[1], new EnhancedHashSet<>());
+				EnhancedSet<String> cluster = architecture.get(splitLine[1]);
+				cluster.add(splitLine[2]);
+			}
+		}
+
+		return architecture;
 	}
 	//endregion
 }

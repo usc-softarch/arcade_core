@@ -1,18 +1,16 @@
 package edu.usc.softarch.arcade.facts.design;
 
+import edu.usc.softarch.arcade.util.McfpDriver;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,8 +30,8 @@ public class ChangeAnalyzer {
 
 	public ChangeAnalyzer(File file1, File file2) throws IOException {
 		// Read the architectures in
-		this.arch1 = readArchitectureRsf(file1);
-		this.arch2 = readArchitectureRsf(file2);
+		this.arch1 = McfpDriver.readArchitectureRsf(file1);
+		this.arch2 = McfpDriver.readArchitectureRsf(file2);
 
 		// Balance the architectures
 		balanceArchitectures(arch1, arch2);
@@ -106,23 +104,5 @@ public class ChangeAnalyzer {
 	//region ACCESSORS
 	public Collection<Change> getChangeList() {
 		return new ArrayList<>(this.changeList); }
-	//endregion
-
-	//region IO
-	private Map<String, EnhancedSet<String>> readArchitectureRsf(File file)
-			throws IOException {
-		Map<String, EnhancedSet<String>> architecture = new HashMap<>();
-
-		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-			for (String line = br.readLine(); line != null; line = br.readLine()) {
-				String[] splitLine = line.split(" ");
-				architecture.putIfAbsent(splitLine[1], new EnhancedHashSet<>());
-				EnhancedSet<String> cluster = architecture.get(splitLine[1]);
-				cluster.add(splitLine[2]);
-			}
-		}
-
-		return architecture;
-	}
 	//endregion
 }
