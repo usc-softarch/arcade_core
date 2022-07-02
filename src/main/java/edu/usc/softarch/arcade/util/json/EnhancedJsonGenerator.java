@@ -45,6 +45,8 @@ public class EnhancedJsonGenerator implements AutoCloseable {
 
 	public void writeField(String name, JsonSerializable value)
 			throws IOException {
+		if (value == null) return;
+
 		this.generator.writeFieldName(name);
 		this.generator.writeStartObject();
 		value.serialize(this);

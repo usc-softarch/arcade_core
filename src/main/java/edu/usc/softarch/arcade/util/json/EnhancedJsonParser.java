@@ -20,45 +20,50 @@ import java.util.TreeMap;
 public class EnhancedJsonParser implements AutoCloseable {
 	//region ATTRIBUTES
 	public final JsonParser parser;
+	public final JsonParser peekParser;
 	//endregion
 
 	//region CONSTRUCTORS
 	public EnhancedJsonParser(String filePath) throws IOException {
 		JsonFactory factory = new JsonFactory();
 		this.parser = factory.createParser(new File(filePath));
-		this.parser.nextToken(); // skip start object
-	}
+		this.peekParser = factory.createParser(new File(filePath));
 
-	public EnhancedJsonParser(JsonParser parser) {
-		this.parser = parser;
+		this.peekParser.nextToken(); // initialize peeker
+		this.nextToken(); // skip start object
 	}
 	//endregion
 
 	//region PROCESSING
 	public String parseString() throws IOException {
-		this.parser.nextToken(); // skip field name
-		this.parser.nextToken(); // move to value
+		this.nextToken(); // skip field name
+		this.nextToken(); // move to value
 		return this.parser.getText();
 	}
 
 	public Integer parseInt() throws IOException {
-		this.parser.nextToken(); // skip field name
-		this.parser.nextToken(); // move to value
+		this.nextToken(); // skip field name
+		this.nextToken(); // move to value
 		return this.parser.getIntValue();
 	}
 
 	public Double parseDouble() throws IOException {
-		this.parser.nextToken(); //skip field name
-		this.parser.nextToken(); // move to value
+		this.nextToken(); //skip field name
+		this.nextToken(); // move to value
 		return this.parser.getDoubleValue();
 	}
 
 	public <T> T parseObject(Class<T> type) throws IOException {
-		this.parser.nextToken(); // skip field name
-		this.parser.nextToken(); // skip start object
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start object
 		T result = this.deserializeObject(type);
-		this.parser.nextToken(); // skip end object
+		this.nextToken(); // skip end object
 		return result;
+	}
+
+	public <T> T parseObject(Class<T> type, String fieldName) throws IOException {
+		if (this.peekText().equals(fieldName)) return parseObject(type);
+		return null;
 	}
 
 	public <T> Collection<T> parseCollection(Class<T> type)
@@ -93,16 +98,16 @@ public class EnhancedJsonParser implements AutoCloseable {
 		if (useTreeMap)
 			result = new TreeMap<>();
 
-		this.parser.nextToken(); // skip field name
-		this.parser.nextToken(); // skip start array
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
 
 		int i = 0;
 
-		while (this.parser.nextToken().equals(JsonToken.START_OBJECT)) {
+		while (this.nextToken().equals(JsonToken.START_OBJECT)) {
 			T value = (T) parseFieldUnknownType(type, subType);
 			result.put(i++, value);
 
-			this.parser.nextToken(); // skip end object
+			this.nextToken(); // skip end object
 		}
 
 		return result;
@@ -125,15 +130,15 @@ public class EnhancedJsonParser implements AutoCloseable {
 		if (useTreeMap)
 			result = new TreeMap<>();
 
-		this.parser.nextToken(); // skip field name
-		this.parser.nextToken(); // skip start array
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
 
-		while (this.parser.nextToken().equals(JsonToken.START_OBJECT)) {
+		while (this.nextToken().equals(JsonToken.START_OBJECT)) {
 			T key = (T) this.parseFieldUnknownType(typeA, subTypeA);
 			G value = (G) this.parseFieldUnknownType(typeB, subTypeB);
 			result.put(key, value);
 
-			this.parser.nextToken(); // skip end object
+			this.nextToken(); // skip end object
 		}
 
 		return result;
@@ -142,11 +147,11 @@ public class EnhancedJsonParser implements AutoCloseable {
 	private Collection<String> parseStringCollection() throws IOException {
 		Collection<String> result = new ArrayList<>();
 
-		this.parser.nextToken(); // skip field name
-		this.parser.nextToken(); // skip start array
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
 
-		while (!this.parser.nextToken().equals(JsonToken.END_ARRAY))
-			result.add(parser.getText());
+		while (!this.nextToken().equals(JsonToken.END_ARRAY))
+			result.add(this.parser.getText());
 
 		return result;
 	}
@@ -154,11 +159,11 @@ public class EnhancedJsonParser implements AutoCloseable {
 	private Collection<Integer> parseIntCollection() throws IOException {
 		Collection<Integer> result = new ArrayList<>();
 
-		this.parser.nextToken(); // skip field name
-		this.parser.nextToken(); // skip start array
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
 
-		while (!this.parser.nextToken().equals(JsonToken.END_ARRAY))
-			result.add(parser.getIntValue());
+		while (!this.nextToken().equals(JsonToken.END_ARRAY))
+			result.add(this.parser.getIntValue());
 
 		return result;
 	}
@@ -166,11 +171,11 @@ public class EnhancedJsonParser implements AutoCloseable {
 	private Collection<Double> parseDoubleCollection() throws IOException {
 		Collection<Double> result = new ArrayList<>();
 
-		this.parser.nextToken(); // skip field name
-		this.parser.nextToken(); // skip start array
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
 
-		while (!this.parser.nextToken().equals(JsonToken.END_ARRAY))
-			result.add(parser.getDoubleValue());
+		while (!this.nextToken().equals(JsonToken.END_ARRAY))
+			result.add(this.parser.getDoubleValue());
 
 		return result;
 	}
@@ -179,13 +184,13 @@ public class EnhancedJsonParser implements AutoCloseable {
 		throws IOException {
 		Collection<T> result = new ArrayList<>();
 
-		this.parser.nextToken(); // skip field name
-		this.parser.nextToken(); // skip start array
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
 
-		while (this.parser.nextToken().equals(JsonToken.START_OBJECT)) {
+		while (this.nextToken().equals(JsonToken.START_OBJECT)) {
 			T value = this.deserializeObject(type);
 			result.add(value);
-			parser.nextToken(); // skip end object
+			this.nextToken(); // skip end object
 		}
 
 		return result;
@@ -221,6 +226,15 @@ public class EnhancedJsonParser implements AutoCloseable {
 			throw new RuntimeException("Class " + type + " not deserializable.", e);
 		}
 	}
+
+	private JsonToken nextToken() throws IOException {
+		this.peekParser.nextToken();
+		return this.parser.nextToken();
+	}
+
+	private JsonToken peekToken() { return this.peekParser.currentToken(); }
+	private String peekText() throws IOException {
+		return this.peekParser.getText(); }
 	//endregion
 
 	//region OBJECT METHODS
