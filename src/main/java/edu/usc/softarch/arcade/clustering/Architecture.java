@@ -355,6 +355,12 @@ public class Architecture extends TreeMap<String, Cluster>
 		}
 	}
 
+	public void writeToDot(String depsPath, String outputPath)
+			throws IOException {
+		ReadOnlyArchitecture roArch = new ReadOnlyArchitecture(this);
+		roArch.writeToDot(depsPath, outputPath);
+	}
+
 	/**
 	 * Returns a map indexing the {@link Cluster}s of this architecture. Used in
 	 * serialization: as a {@link Cluster}'s name typically represents the names

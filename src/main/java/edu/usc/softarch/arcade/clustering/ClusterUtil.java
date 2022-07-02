@@ -1,17 +1,10 @@
 package edu.usc.softarch.arcade.clustering;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
-
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 import edu.usc.softarch.arcade.facts.driver.RsfReader;
 
@@ -19,71 +12,6 @@ import edu.usc.softarch.arcade.facts.driver.RsfReader;
  * @author joshua
  */
 public class ClusterUtil {
-	private static Logger logger = LogManager.getLogger(ClusterUtil.class);
-	
-	/**
-	 * Creates a map of a cluster name to its entities
-	 * 
-	 * @param clusterFacts
-	 * @return
-	 */
-	public static Map<String,Set<String>> buildClusterMap(List<List<String>> clusterFacts ) {
-		
-		Map<String,Set<String>> clusterMap = new HashMap<>();
-		
-		for (List<String> fact : clusterFacts) {
-			String clusterName = fact.get(1);
-			String entity = fact.get(2);
-			if (clusterMap.get(clusterName) == null) {
-				Set<String> entities = new HashSet<>();
-				entities.add(entity);
-				clusterMap.put(clusterName,entities);
-			}
-			else {
-				Set<String> entities = clusterMap.get(clusterName);
-				entities.add(entity);
-				clusterMap.put(clusterName,entities);
-			}
-		}
-		
-		logger.trace("Resulting clusterMap:");
-		for (Entry<String,Set<String>> entry : clusterMap.entrySet()) {
-			logger.trace(entry.getKey());
-			for (String entity : entry.getValue()) {
-				logger.trace("\t" + entity);
-			}
-		}
-		
-		return clusterMap;
-		
-	}
-
-	public static Set<List<String>> buildClusterEdges(Map<String,Set<String>> clusterMap, List<List<String>> depFacts) {
-		Set<List<String>> edges = new HashSet<>();
-
-		for (List<String> depFact : depFacts) {
-			String source = depFact.get(1);
-			String target = depFact.get(2);
-
-			for (String clusterNameSource : clusterMap.keySet()) {
-				if (clusterMap.get(clusterNameSource).contains(source)) {
-					for (String clusterNameTarget : clusterMap.keySet()) {
-						if (clusterMap.get(clusterNameTarget).contains(target)) {
-							if (!clusterNameSource.equals(clusterNameTarget)) {
-								List<String> edge = new ArrayList<>();
-								edge.add(clusterNameSource);
-								edge.add(clusterNameTarget);
-								edges.add(edge);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return edges;
-	}
-	
 	public static Map<String, Set<String>> buildDependenciesMap(String depsRsfFilename) {
 		RsfReader.loadRsfDataFromFile(depsRsfFilename);
 		Iterable<List<String>> depFacts = RsfReader.filteredRoutineFacts;

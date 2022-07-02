@@ -9,6 +9,7 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -184,6 +185,26 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 		}
 
 		return result;
+	}
+
+	public void writeToDot(String depsPath, String outputPath)
+			throws IOException {
+		try (FileWriter writer = new FileWriter(outputPath)) {
+			SimpleDirectedGraph<String, DefaultEdge> graph = buildGraph(depsPath);
+
+			writer.write("digraph G {\n");
+
+			for (ReadOnlyCluster cluster : this.values())
+				writer.write("\t\"" + cluster.name + "\"" + ";\n");
+
+			for (DefaultEdge edge : graph.edgeSet()) {
+				String source = graph.getEdgeSource(edge);
+				String target = graph.getEdgeTarget(edge);
+				writer.write("\t\"" + source + "\" -> \"" + target + "\";\n");
+			}
+
+			writer.write("}\n");
+		}
 	}
 	//endregion
 }
