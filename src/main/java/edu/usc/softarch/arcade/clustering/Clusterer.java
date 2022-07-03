@@ -10,6 +10,7 @@ import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
+import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class Clusterer {
@@ -82,7 +83,7 @@ public class Clusterer {
 			this.simMeasure =
 				SimMeasure.SimMeasureType.valueOf(args[5].toUpperCase());
 			if (args.length > 11)
-				this.arch = new ConcernArchitecture(args[8], args[9], this.simMeasure,
+				this.arch = new Architecture(args[8], args[9], this.simMeasure,
 					FeatureVectors.deserializeFFVectors(args[2]),	this.language, args[11],
 					args[10]);
 			else
@@ -188,9 +189,9 @@ public class Clusterer {
 	}
 
 	public Architecture computeArchitecture(StoppingCriterion stopCriterion,
-		String stoppingCriterion, SimMeasure.SimMeasureType simMeasure)
-		throws DistributionSizeMismatchException, FileNotFoundException,
-		UnmatchingDocTopicItemsException {
+			String stoppingCriterion, SimMeasure.SimMeasureType simMeasure)
+			throws DistributionSizeMismatchException, FileNotFoundException,
+			UnmatchingDocTopicItemsException {
 		SimilarityMatrix simMatrix = new SimilarityMatrix(
 			simMeasure, this.architecture);
 
@@ -209,8 +210,8 @@ public class Clusterer {
 					&& this.serializationCriterion.shouldSerialize()) {
 				this.architecture.writeToRsf();
 				// Compute DTI word bags if concern-based technique is used
-				if (this.architecture instanceof ConcernArchitecture)
-					((ConcernArchitecture) this.architecture).serializeBagOfWords();
+				if (DocTopics.isReady())
+					this.architecture.serializeBagOfWords();
 			}
 		}
 

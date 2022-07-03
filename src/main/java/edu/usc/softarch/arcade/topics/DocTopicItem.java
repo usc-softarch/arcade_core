@@ -45,31 +45,22 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 	 *
 	 * @param source The source entity of this DocTopicItem.
 	 */
-	public DocTopicItem(String source) {
+	DocTopicItem(String source) {
 		this.source = source;
 		this.topics = new TreeMap<>();
-	}
-	
-	/**
-	 * Clone contructor.
-	 */
-	public DocTopicItem(DocTopicItem dti) {
-		this.source = dti.source;
-		this.concern = dti.concern;
-		initialize(dti);
 	}
 
 	/**
 	 * Merge constructor.
 	 */
-	public DocTopicItem(Cluster c1, Cluster c2)
+	DocTopicItem(Cluster c1, Cluster c2)
 			throws UnmatchingDocTopicItemsException {
 		this(c1.getDocTopicItem(), c2.getDocTopicItem()); }
 
 	/**
 	 * Merge constructor.
 	 */
-	public DocTopicItem(DocTopicItem dti1, DocTopicItem dti2)
+	DocTopicItem(DocTopicItem dti1, DocTopicItem dti2)
 			throws UnmatchingDocTopicItemsException {
 		// If either argument is null, then return the non-null argument
 		if (dti1 == null) {
@@ -102,7 +93,7 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 	/**
 	 * Initializes a clone.
 	 */
-	public void initialize(DocTopicItem dti) {
+	void initialize(DocTopicItem dti) {
 		this.topics = new TreeMap<>();
 		for (TopicItem topicItem : dti.getTopics())
 			addTopic(new TopicItem(topicItem));

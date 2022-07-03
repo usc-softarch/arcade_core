@@ -76,8 +76,8 @@ public class ArcTest extends BaseTest {
 		String resultConcernsFile =
 			outputDirPath + fs + arcFileBase + "concerns.txt";
 
-		ConcernArchitecture arch = assertDoesNotThrow(() ->
-			new ConcernArchitecture(systemVersion, outputDirPath,
+		Architecture arch = assertDoesNotThrow(() ->
+			new Architecture(systemVersion, outputDirPath,
 				SimMeasure.SimMeasureType.JS,
 				FeatureVectors.deserializeFFVectors(ffVecs), lang,
 				artifactsDir, packagePrefix));

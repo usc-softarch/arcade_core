@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import edu.usc.softarch.arcade.BaseTest;
-import edu.usc.softarch.arcade.clustering.ConcernArchitecture;
+import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -63,8 +63,8 @@ public class SimilarityMatrixTest extends BaseTest {
 		assertNotNull(builderffVecs,
 			"failed to deserialize FastFeatureVectors from builder object");
 
-		ConcernArchitecture concernArch = assertDoesNotThrow(() ->
-			new ConcernArchitecture(versionName, outputDirPath,
+		Architecture concernArch = assertDoesNotThrow(() ->
+			new Architecture(versionName, outputDirPath,
 				SimMeasure.SimMeasureType.JS, builderffVecs,
 				language, artifactsDir + "/base", packagePrefix));
 

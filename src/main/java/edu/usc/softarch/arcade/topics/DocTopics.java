@@ -19,6 +19,7 @@ import edu.usc.softarch.arcade.util.json.JsonSerializable;
  */
 public class DocTopics implements JsonSerializable {
 	// #region FIELDS ------------------------------------------------------------
+	private static DocTopics singleton;
 	private List<DocTopicItem> dtItemList;
 	private Map<Integer, List<String>> topicWordLists;
 	// #endregion FIELDS ---------------------------------------------------------
@@ -27,23 +28,12 @@ public class DocTopics implements JsonSerializable {
 	/**
 	 * Deserialization constructor.
 	 */
-	public DocTopics() {
+	private DocTopics() {
 		this.dtItemList = new ArrayList<>();
 		this.topicWordLists = new TreeMap<>();
 	}
-	
-	/**
-	 * Clone constructor.
-	 */
-	public DocTopics(DocTopics docTopics) {
-		this();
-		for (DocTopicItem docTopicItem : docTopics.dtItemList)
-			this.dtItemList.add(new DocTopicItem(docTopicItem));
-		for (Map.Entry<Integer, List<String>> topic : topicWordLists.entrySet())
-			this.topicWordLists.put(topic.getKey(), new ArrayList<>(topic.getValue()));
-	}
 
-	public DocTopics(String artifactsDir)	throws Exception {
+	private DocTopics(String artifactsDir)	throws Exception {
 		this();
 		// Begin by importing documents from text to feature sequences
 		char fs = File.separatorChar;
@@ -75,6 +65,21 @@ public class DocTopics implements JsonSerializable {
 		// Load WordLists
 		TopicCompositionParser parser = new TopicCompositionParser(inferencer);
 		this.topicWordLists = parser.run();
+	}
+
+	public static DocTopics getSingleton() {
+		if (singleton == null)
+			throw new IllegalStateException("DocTopics must be initialized.");
+
+		return singleton;
+	}
+
+	public static void initializeSingleton(String artifactsDir) throws Exception {
+		singleton = new DocTopics(artifactsDir);
+	}
+
+	public static boolean isReady() {
+		return singleton != null;
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
@@ -152,6 +157,21 @@ public class DocTopics implements JsonSerializable {
 
 	public Map<Integer, List<String>> getTopicWordLists() {
 		return topicWordLists; }
+
+	public DocTopicItem mergeDocTopicItems(Cluster c1, Cluster c2)
+			throws UnmatchingDocTopicItemsException {
+		return mergeDocTopicItems(c1.getDocTopicItem(), c2.getDocTopicItem());
+	}
+
+	public DocTopicItem mergeDocTopicItems(DocTopicItem dti1, DocTopicItem dti2)
+			throws UnmatchingDocTopicItemsException {
+		DocTopicItem newDti = new DocTopicItem(dti1, dti2);
+		singleton.dtItemList.remove(dti1);
+		singleton.dtItemList.remove(dti2);
+		singleton.dtItemList.add(newDti);
+
+		return newDti;
+	}
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region PROCESSING --------------------------------------------------------
@@ -161,8 +181,7 @@ public class DocTopics implements JsonSerializable {
 		for (; docTopicItems.get(firstNonNullDocTopicItemIndex) == null
 				&& firstNonNullDocTopicItemIndex < docTopicItems.size(); firstNonNullDocTopicItemIndex++) {
 		}
-		DocTopicItem mergedDocTopicItem = new DocTopicItem(
-			docTopicItems.get(firstNonNullDocTopicItemIndex));
+		DocTopicItem mergedDocTopicItem = docTopicItems.get(firstNonNullDocTopicItemIndex);
 		for (int i = firstNonNullDocTopicItemIndex; i < docTopicItems.size(); i++) {
 			if (docTopicItems.get(i) == null)
 				continue;
@@ -200,15 +219,15 @@ public class DocTopics implements JsonSerializable {
 
 	public static DocTopics deserialize(EnhancedJsonParser parser)
 			throws IOException {
-		DocTopics toReturn = new DocTopics();
-		toReturn.dtItemList.addAll(parser.parseCollection(DocTopicItem.class));
+		singleton = new DocTopics();
+		singleton.dtItemList.addAll(parser.parseCollection(DocTopicItem.class));
 
 		Map<Integer, List> topicWordLists = parser.parseMap(
 			List.class, false, String.class);
 		for (Map.Entry<Integer, List> entry : topicWordLists.entrySet())
-			toReturn.topicWordLists.put(entry.getKey(), entry.getValue());
+			singleton.topicWordLists.put(entry.getKey(), entry.getValue());
 
-		return toReturn;
+		return singleton;
 	}
 	// #endregion SERIALIZATION --------------------------------------------------
 }

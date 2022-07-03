@@ -194,7 +194,7 @@ public class ArchSmellDetector {
 					DocTopicItem mergedDocTopicItem = null;
 
 					try {
-						mergedDocTopicItem = new DocTopicItem(
+						mergedDocTopicItem = DocTopics.getSingleton().mergeDocTopicItems(
 							cluster.getDocTopicItem(), entityDocTopicItem);
 					} catch (UnmatchingDocTopicItemsException e) {
 						e.printStackTrace(); //TODO handle it
@@ -227,7 +227,7 @@ public class ArchSmellDetector {
 					DocTopicItem mergedDocTopicItem = null;
 
 					try {
-						mergedDocTopicItem = new DocTopicItem(
+						mergedDocTopicItem = DocTopics.getSingleton().mergeDocTopicItems(
 							cluster.getDocTopicItem(), entityDocTopicItem);
 					} catch (UnmatchingDocTopicItemsException e) {
 						e.printStackTrace(); //TODO handle it

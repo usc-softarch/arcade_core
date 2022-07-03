@@ -14,14 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class ConcernArchitectureTest extends BaseTest {
+public class ArchitectureTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "ARC";
 	private final String factsDir = resourcesBase + fs + "Facts";
 	private final String outputDirPath = outputBase + fs + "ConcernClusteringRunnerTest";
 
 	/**
-	 * This test verifies that {@link Architecture} and
-	 * {@link ConcernArchitecture} are being initialized correctly.
+	 * This test verifies that {@link Architecture} is being initialized correctly.
 	 *
 	 * @param versionName System version.
 	 * @param language System language.
@@ -70,8 +69,8 @@ public class ConcernArchitectureTest extends BaseTest {
 			fail("failed to deserialize FastFeatureVectors from builder object");
 
 		FeatureVectors finalBuilderffVecs = builderffVecs;
-		ConcernArchitectureMock arch = assertDoesNotThrow(() ->
-			new ConcernArchitectureMock(versionName, outputDirPath,
+		ArchitectureMock arch = assertDoesNotThrow(() ->
+			new ArchitectureMock(versionName, outputDirPath,
 				SimMeasure.SimMeasureType.IL, finalBuilderffVecs, language,
 				artifactsDir + "/base", packagePrefix));
 

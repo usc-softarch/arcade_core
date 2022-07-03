@@ -12,6 +12,7 @@ import java.util.Set;
 
 import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
+import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
@@ -102,7 +103,7 @@ public class Cluster extends ReadOnlyCluster
 		this.numEntities = c1.getNumEntities() + c2.getNumEntities();
 
 		if (cat.equals(ClusteringAlgorithmType.ARC))
-			this.dti = new DocTopicItem(c1, c2);
+			this.dti = DocTopics.getSingleton().mergeDocTopicItems(c1, c2);
 	}
 	//endregion
 
@@ -122,7 +123,7 @@ public class Cluster extends ReadOnlyCluster
 	 */
 	public DocTopicItem getDocTopicItem() {
 		if (hasDocTopicItem())
-			return new DocTopicItem(this.dti);
+			return this.dti;
 		return null;
 	}
 
