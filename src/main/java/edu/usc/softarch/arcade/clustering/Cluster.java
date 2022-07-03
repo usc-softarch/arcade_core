@@ -33,23 +33,17 @@ public class Cluster extends ReadOnlyCluster
 	 * Map of the values of each non-zero feature in this Cluster.
 	 */
 	private final Map<Integer, Double> featureMap;
-	/**
-	 * {@link DocTopicItem} related to this Cluster, if one exists.
-	 */
-	private DocTopicItem dti;
 	//endregion
 
 	//region CONSTRUCTORS
-
 	/**
 	 * Deserialization constructor.
 	 */
 	private Cluster(String name, Collection<String> entities, int numEntities,
 			Map<Integer, Double> featureMap, DocTopicItem dti) {
-		super(name, entities);
+		super(name, entities, dti);
 		this.numEntities = numEntities;
 		this.featureMap = featureMap;
-		this.dti = dti;
 	}
 
 	/**
@@ -76,10 +70,9 @@ public class Cluster extends ReadOnlyCluster
 	 * Clone constructor.
 	 */
 	public Cluster(Cluster c1) {
-		super(c1.name, c1.getEntities());
+		super(c1.name, c1.getEntities(), c1.getDocTopicItem());
 		this.numEntities = c1.getNumEntities();
 		this.featureMap = c1.getFeatureMap();
-		this.dti = c1.dti;
 	}
 
 	/**
@@ -105,9 +98,6 @@ public class Cluster extends ReadOnlyCluster
 		}
 
 		this.numEntities = c1.getNumEntities() + c2.getNumEntities();
-
-		if (cat.equals(ClusteringAlgorithmType.ARC))
-			this.dti = DocTopics.getSingleton().mergeDocTopicItems(c1, c2, super.name);
 	}
 	//endregion
 
@@ -121,27 +111,6 @@ public class Cluster extends ReadOnlyCluster
 	 * Returns the number of entities represented by this Cluster.
 	 */
 	public int getNumEntities() { return numEntities; }
-
-	/**
-	 * Returns a copy of this Cluster's {@link DocTopicItem}.
-	 */
-	public DocTopicItem getDocTopicItem() {
-		if (hasDocTopicItem())
-			return this.dti;
-		return null;
-	}
-
-	/**
-	 * Sets this Cluster's {@link DocTopicItem}.
-	 */
-	public void setDocTopicItem(DocTopicItem dti) { this.dti = dti; }
-
-	/**
-	 * Checks whether this Cluster's {@link DocTopicItem} is null.
-	 *
-	 * @return False if {@link DocTopicItem} is null, true otherwise.
-	 */
-	public boolean hasDocTopicItem() { return this.dti != null; }
 	//endregion
 
 	//region PROCESSING
@@ -203,26 +172,6 @@ public class Cluster extends ReadOnlyCluster
 			featureMap.put(index, newFeatureValue);
 		}
 	}
-
-	/**
-	 * TODO
-	 * @param numFeatures
-	 * @return
-	 */
-	public double computeStructuralCentroid(int numFeatures) {
-		double centroidSum = 0;
-		Set<Integer> clusterKeys = getFeatureMap().keySet();
-
-		for (Integer key : clusterKeys)
-			centroidSum += getFeatureMap().get(key);
-
-		double centroidAvg = centroidSum / numFeatures;
-
-		return centroidAvg / getNumEntities();
-	}
-
-	public Concern computeConcern(Map<Integer, List<String>> wordBags) {
-		return this.dti.computeConcern(wordBags); }
 	//endregion
 
 	//region OBJECT METHODS
@@ -238,7 +187,8 @@ public class Cluster extends ReadOnlyCluster
 
 		boolean condition1 = Objects.equals(this.name, toCompare.name);
 		boolean condition2 = this.numEntities == toCompare.numEntities;
-		boolean condition3 = Objects.equals(this.dti, toCompare.dti);
+		boolean condition3 =
+			Objects.equals(super.getDocTopicItem(), toCompare.getDocTopicItem());
 		boolean condition4 = Objects.equals(this.featureMap, toCompare.featureMap);
 
 		return condition1 && condition2	&& condition3	&& condition4;
@@ -246,7 +196,7 @@ public class Cluster extends ReadOnlyCluster
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, numEntities, featureMap, dti);
+		return Objects.hash(name, numEntities, featureMap, super.getDocTopicItem());
 	}
 	//endregion
 
@@ -258,7 +208,7 @@ public class Cluster extends ReadOnlyCluster
 		generator.writeField("numEntities", numEntities);
 		generator.writeField("featureMap", featureMap,
 			true, "featureIndex", "featureValue");
-		generator.writeField("dti", dti);
+		generator.writeField("dti", super.getDocTopicItem());
 	}
 
 	public static Cluster deserialize(EnhancedJsonParser parser)

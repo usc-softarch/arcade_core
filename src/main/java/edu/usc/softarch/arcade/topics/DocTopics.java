@@ -92,6 +92,9 @@ public class DocTopics implements JsonSerializable {
 	public void setClusterDocTopic(Cluster c, String language) {
 		c.setDocTopicItem(this.getDocTopicItem(c.name, language)); }
 
+	void addDocTopicItem(DocTopicItem dti) {
+		this.dtItemList.add(dti); }
+
 	/**
 	 * Gets the DocTopicItem for a given file name or entity.
 	 * 

@@ -245,6 +245,8 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 		for (TopicItem topicItem : topicItems)
 			toReturn.topics.put(topicItem.topicNum, topicItem);
 
+		DocTopics.getSingleton().addDocTopicItem(toReturn);
+
 		return toReturn;
 	}
 	//endregion

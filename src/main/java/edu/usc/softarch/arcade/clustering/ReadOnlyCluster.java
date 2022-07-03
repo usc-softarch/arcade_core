@@ -1,10 +1,16 @@
 package edu.usc.softarch.arcade.clustering;
 
+import edu.usc.softarch.arcade.topics.Concern;
+import edu.usc.softarch.arcade.topics.DocTopicItem;
+import edu.usc.softarch.arcade.topics.DocTopics;
+import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -23,6 +29,10 @@ public class ReadOnlyCluster {
 	 * Set of code-level entities contained by this cluster.
 	 */
 	protected final EnhancedSet<String> entities;
+	/**
+	 * {@link DocTopicItem} related to this Cluster, if one exists.
+	 */
+	private DocTopicItem dti;
 	//endregion
 
 	//region CONSTRUCTORS
@@ -36,13 +46,20 @@ public class ReadOnlyCluster {
 		this.entities = new EnhancedHashSet<>(entities);
 	}
 
+	protected ReadOnlyCluster(String name, Collection<String> entities,
+			DocTopicItem dti) {
+		this(name, entities);
+		this.dti = dti;
+	}
+
 	public ReadOnlyCluster(ReadOnlyCluster c) {
 		this.name = c.name;
 		this.entities = new EnhancedHashSet<>(c.entities);
+		this.dti = c.dti;
 	}
 
-	protected ReadOnlyCluster(
-			ClusteringAlgorithmType cat, Cluster c1, Cluster c2) {
+	protected ReadOnlyCluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2)
+			throws UnmatchingDocTopicItemsException {
 		this.entities = new EnhancedHashSet<>(c2.getEntities());
 
 		if (cat.equals(ClusteringAlgorithmType.ARC) && c1.name.contains("$"))
@@ -51,6 +68,9 @@ public class ReadOnlyCluster {
 			this.name = c1.name + ',' + c2.name;
 			this.entities.addAll(c1.getEntities());
 		}
+
+		if (cat.equals(ClusteringAlgorithmType.ARC))
+			this.dti = DocTopics.getSingleton().mergeDocTopicItems(c1, c2, name);
 	}
 	//endregion
 
@@ -60,6 +80,27 @@ public class ReadOnlyCluster {
 	public void removeEntities(Set<String> entities) {
 		this.entities.removeAll(entities); }
 
+	/**
+	 * Returns a copy of this Cluster's {@link DocTopicItem}.
+	 */
+	public DocTopicItem getDocTopicItem() {
+		if (hasDocTopicItem())
+			return this.dti;
+		return null;
+	}
+
+	/**
+	 * Checks whether this Cluster's {@link DocTopicItem} is null.
+	 *
+	 * @return False if {@link DocTopicItem} is null, true otherwise.
+	 */
+	public boolean hasDocTopicItem() { return this.dti != null; }
+
+	/**
+	 * Sets this Cluster's {@link DocTopicItem}.
+	 */
+	public void setDocTopicItem(DocTopicItem dti) { this.dti = dti; }
+
 	public Set<String> union(ReadOnlyCluster c) {
 		return this.entities.union(c.entities); }
 	public Set<String> intersection(ReadOnlyCluster c) {
@@ -68,6 +109,11 @@ public class ReadOnlyCluster {
 		return this.entities.difference(c.entities); }
 	public Set<String> symmetricDifference(ReadOnlyCluster c) {
 		return this.entities.symmetricDifference(c.entities); }
+	//endregion
+
+	//region PROCESSING
+	public Concern computeConcern(Map<Integer, List<String>> wordBags) {
+		return this.dti.computeConcern(wordBags); }
 	//endregion
 
 	//region OBJECT METHODS
