@@ -30,11 +30,11 @@ public class ArchSmellDetectorTest extends BaseTest {
 	@ParameterizedTest
 	@CsvSource({
 		"struts-2.3.30,"
-		+ "181,"
+		+ "183,"
 		+ "java",
 
 		"struts-2.5.2,"
-		+ "163,"
+		+ "165,"
 		+ "java",
 
 		"httpd-2.3.8,"

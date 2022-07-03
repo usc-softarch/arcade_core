@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.topics;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,6 +12,8 @@ import cc.mallet.topics.TopicInferencer;
 import cc.mallet.types.InstanceList;
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.util.EnhancedHashSet;
+import edu.usc.softarch.util.EnhancedSet;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
 import edu.usc.softarch.util.json.JsonSerializable;
@@ -21,7 +24,7 @@ import edu.usc.softarch.util.json.JsonSerializable;
 public class DocTopics implements JsonSerializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static DocTopics singleton;
-	private final List<DocTopicItem> dtItemList;
+	private final Collection<DocTopicItem> dtItemList;
 	private Map<Integer, List<String>> topicWordLists;
 	// #endregion FIELDS ---------------------------------------------------------
 	
@@ -60,7 +63,7 @@ public class DocTopics implements JsonSerializable {
 				TopicItem t = new TopicItem(topicIdx, topicDistribution[topicIdx]);
 				dtItem.addTopic(t);
 			}
-			dtItemList.add(dtItem);
+			addDocTopicItem(dtItem);
 		}
 
 		// Load WordLists
@@ -79,21 +82,33 @@ public class DocTopics implements JsonSerializable {
 		singleton = new DocTopics(artifactsDir);
 	}
 
-	public static void resetSingleton() { singleton = null; }
+	public static void resetSingleton() { singleton = new DocTopics(); }
 
 	public static boolean isReady() {
-		return singleton != null;
+		return singleton != null && !singleton.dtItemList.isEmpty();
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public List<DocTopicItem> getDocTopicItemList() { return dtItemList; }
+	public Collection<DocTopicItem> getDocTopicItemList() { return dtItemList; }
 
 	public void setClusterDocTopic(Cluster c, String language) {
 		c.setDocTopicItem(this.getDocTopicItem(c.name, language)); }
 
 	void addDocTopicItem(DocTopicItem dti) {
-		this.dtItemList.add(dti); }
+		if (this.dtItemList.contains(dti))
+			throw new IllegalArgumentException("Can't add a DTI twice.");
+		this.dtItemList.add(dti);
+	}
+
+	public void cleanDocTopics(Collection<DocTopicItem> toKeep) {
+		EnhancedSet<DocTopicItem> toKeepSet = new EnhancedHashSet<>(toKeep);
+		EnhancedSet<DocTopicItem> completeSet =
+			new EnhancedHashSet<>(this.dtItemList);
+
+		Collection<DocTopicItem> toRemoveSet = completeSet.difference(toKeepSet);
+		this.dtItemList.removeAll(toRemoveSet);
+	}
 
 	/**
 	 * Gets the DocTopicItem for a given file name or entity.
@@ -147,8 +162,7 @@ public class DocTopics implements JsonSerializable {
 					return dti;
 			} else if (dti.isCSourced()) {
 				//FIXME Make sure this works on Linux and find a permanent fix
-				strippedSource = dti.source.substring(1, dti.source.length());
-				strippedSource = strippedSource.replace("\\", "/");
+				strippedSource = dti.source.replace("\\", "/");
 				if (strippedSource.endsWith(nameWithoutQuotations))
 					return dti;
 			}
@@ -174,9 +188,14 @@ public class DocTopics implements JsonSerializable {
 			DocTopicItem dti1, DocTopicItem dti2, String newName)
 			throws UnmatchingDocTopicItemsException {
 		DocTopicItem newDti = new DocTopicItem(dti1, dti2, newName);
+		if (newDti.equals(dti1))
+			return dti1;
+		if (newDti.equals(dti2))
+			return dti2;
+
 		singleton.dtItemList.remove(dti1);
 		singleton.dtItemList.remove(dti2);
-		singleton.dtItemList.add(newDti);
+		addDocTopicItem(newDti);
 
 		return newDti;
 	}
@@ -209,7 +228,7 @@ public class DocTopics implements JsonSerializable {
 	public static DocTopics deserialize(EnhancedJsonParser parser)
 			throws IOException {
 		singleton = new DocTopics();
-		singleton.dtItemList.addAll(parser.parseCollection(DocTopicItem.class));
+		parser.parseCollection(DocTopicItem.class);
 
 		Map<Integer, List> topicWordLists = parser.parseMap(
 			List.class, false, String.class);

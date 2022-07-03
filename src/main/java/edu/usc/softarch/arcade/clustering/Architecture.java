@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -431,6 +432,8 @@ public class Architecture extends TreeMap<String, Cluster>
 
 	public static Architecture deserialize(EnhancedJsonParser parser)
 			throws IOException {
+		DocTopics.resetSingleton();
+
 		String projectName = parser.parseString();
 		String projectPath = parser.parseString();
 		SimMeasure.SimMeasureType simMeasure =
@@ -484,11 +487,16 @@ public class Architecture extends TreeMap<String, Cluster>
 		String fs = File.separator;
 
 		Map<Integer, Cluster> architectureIndex = computeArchitectureIndex();
+		Collection<DocTopicItem> toKeep = new HashSet<>();
+
 		for (Map.Entry<Integer, Cluster> entry : architectureIndex.entrySet()) {
 			DocTopicItem toRename = entry.getValue().getDocTopicItem();
 			DocTopics.getSingleton().renameDocTopicItem(
 				toRename, entry.getKey().toString());
+			toKeep.add(toRename);
 		}
+
+		DocTopics.getSingleton().cleanDocTopics(toKeep);
 
 		String path = this.projectPath + fs + this.projectName + "_"
 			+ this.simMeasure + "_" + this.size() + "_clusteredDocTopics.json";

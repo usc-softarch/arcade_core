@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.clustering;
 
 import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
+import edu.usc.softarch.arcade.topics.DocTopics;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

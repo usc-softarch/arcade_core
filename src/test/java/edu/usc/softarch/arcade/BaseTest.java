@@ -20,7 +20,7 @@ public class BaseTest {
 	/* ------------------------------------------------------------------------ */
 
 	/* DO NOT TOUCH THIS ATTRIBUTE. It will trigger a procedure to re-generate
-	 * the oracles of every ARC test case. Unless your name is Marcelo, or you
+	 * the oracles of every test case. Unless your name is Marcelo, or you
 	 * have been given express permission by me to touch this, it must remain
 	 * false at all times. */
 	protected final boolean generateOracles = false;

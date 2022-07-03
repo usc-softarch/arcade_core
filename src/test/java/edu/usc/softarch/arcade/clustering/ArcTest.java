@@ -39,13 +39,13 @@ public class ArcTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_JS_181_,"
+			+ "_JS_183_,"
 			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_JS_163_,"
+			+ "_JS_165_,"
 			+ "org.apache.struts2",
 
 		// httpd 2.3.8
