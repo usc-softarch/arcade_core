@@ -11,6 +11,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -87,6 +91,19 @@ public class WcaTest extends BaseTest {
 		String uemResult = assertDoesNotThrow(() ->
 			FileUtil.readFile(uemResultPath, StandardCharsets.UTF_8));
 
+		// ------------------------- Generate Oracles ------------------------------
+
+		if (generateOracles) {
+			assertDoesNotThrow(() -> {
+				Path resultClusterPath = Paths.get(uemResultPath);
+				Path oracleClusterPath = Paths.get(uemOraclePath);
+				Files.copy(resultClusterPath,
+					oracleClusterPath, StandardCopyOption.REPLACE_EXISTING);
+			});
+		}
+
+		// ------------------------- Generate Oracles ------------------------------
+
 		// Load uem oracle
 		String uemOracle = assertDoesNotThrow(() ->
 			FileUtil.readFile((uemOraclePath), StandardCharsets.UTF_8));
@@ -101,6 +118,19 @@ public class WcaTest extends BaseTest {
 		// Load uemnm results
 		String uemnmResult = assertDoesNotThrow(() ->
 			FileUtil.readFile(uemnmResultPath, StandardCharsets.UTF_8));
+
+		// ------------------------- Generate Oracles ------------------------------
+
+		if (generateOracles) {
+			assertDoesNotThrow(() -> {
+				Path resultClusterPath = Paths.get(uemnmResultPath);
+				Path oracleClusterPath = Paths.get(uemnmOraclePath);
+				Files.copy(resultClusterPath,
+					oracleClusterPath, StandardCopyOption.REPLACE_EXISTING);
+			});
+		}
+
+		// ------------------------- Generate Oracles ------------------------------
 
 		// Load uemnm oracle
 		String uemnmOracle = assertDoesNotThrow(() ->

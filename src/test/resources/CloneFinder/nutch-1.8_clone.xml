@@ -1,0 +1,2373 @@
+<?xml version="1.0" encoding="Cp1252"?>
+<pmd-cpd>
+<duplication lines="615" tokens="1188">
+<file line="126" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMBuilder.java"/>
+<file line="126" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMBuilder.java"/>
+<codefragment>
+<![CDATA[
+  java.io.Writer getWriter()
+  {
+    return null;
+  }
+
+  /**
+   * Append a node to the current container.
+   *
+   * @param newNode New node to append
+   */
+  protected void append(Node newNode) throws org.xml.sax.SAXException
+  {
+
+    Node currentNode = m_currentNode;
+
+    if (null != currentNode)
+    {
+      currentNode.appendChild(newNode);
+
+      // System.out.println(newNode.getNodeName());
+    }
+    else if (null != m_docFrag)
+    {
+      m_docFrag.appendChild(newNode);
+    }
+    else
+    {
+      boolean ok = true;
+      short type = newNode.getNodeType();
+
+      if (type == Node.TEXT_NODE)
+      {
+        String data = newNode.getNodeValue();
+
+        if ((null != data) && (data.trim().length() > 0))
+        {
+          throw new org.xml.sax.SAXException("Warning: can't output text before document element!  Ignoring...");
+        }
+
+        ok = false;
+      }
+      else if (type == Node.ELEMENT_NODE)
+      {
+        if (m_doc.getDocumentElement() != null)
+        {
+          throw new org.xml.sax.SAXException("Can't have more than one root on a DOM!");
+        }
+      }
+
+      if (ok)
+        m_doc.appendChild(newNode);
+    }
+  }
+
+  /**
+   * Receive an object for locating the origin of SAX document events.
+   *
+   * <p>SAX parsers are strongly encouraged (though not absolutely
+   * required) to supply a locator: if it does so, it must supply
+   * the locator to the application by invoking this method before
+   * invoking any of the other methods in the ContentHandler
+   * interface.</p>
+   *
+   * <p>The locator allows the application to determine the end
+   * position of any document-related event, even if the parser is
+   * not reporting an error.  Typically, the application will
+   * use this information for reporting its own errors (such as
+   * character content that does not match an application's
+   * business rules).  The information returned by the locator
+   * is probably not sufficient for use with a search engine.</p>
+   *
+   * <p>Note that the locator will return correct information only
+   * during the invocation of the events in this interface.  The
+   * application should not attempt to use it at any other time.</p>
+   *
+   * @param locator An object that can return the location of
+   *                any SAX document event.
+   * @see org.xml.sax.Locator
+   */
+  public void setDocumentLocator(Locator locator)
+  {
+
+    // No action for the moment.
+  }
+
+  /**
+   * Receive notification of the beginning of a document.
+   *
+   * <p>The SAX parser will invoke this method only once, before any
+   * other methods in this interface or in DTDHandler (except for
+   * setDocumentLocator).</p>
+   */
+  public void startDocument() throws org.xml.sax.SAXException
+  {
+
+    // No action for the moment.
+  }
+
+  /**
+   * Receive notification of the end of a document.
+   *
+   * <p>The SAX parser will invoke this method only once, and it will
+   * be the last method invoked during the parse.  The parser shall
+   * not invoke this method until it has either abandoned parsing
+   * (because of an unrecoverable error) or reached the end of
+   * input.</p>
+   */
+  public void endDocument() throws org.xml.sax.SAXException
+  {
+
+    // No action for the moment.
+  }
+
+  /**
+   * Receive notification of the beginning of an element.
+   *
+   * <p>The Parser will invoke this method at the beginning of every
+   * element in the XML document; there will be a corresponding
+   * endElement() event for every startElement() event (even when the
+   * element is empty). All of the element's content will be
+   * reported, in order, before the corresponding endElement()
+   * event.</p>
+   *
+   * <p>If the element name has a namespace prefix, the prefix will
+   * still be attached.  Note that the attribute list provided will
+   * contain only attributes with explicit values (specified or
+   * defaulted): #IMPLIED attributes will be omitted.</p>
+   *
+   *
+   * @param ns The namespace of the node
+   * @param localName The local part of the qualified name
+   * @param name The element name.
+   * @param atts The attributes attached to the element, if any.
+   * @see #endElement
+   * @see org.xml.sax.Attributes
+   */
+  public void startElement(
+          String ns, String localName, String name, Attributes atts)
+            throws org.xml.sax.SAXException
+  {
+
+    Element elem;
+
+	// Note that the namespace-aware call must be used to correctly
+	// construct a Level 2 DOM, even for non-namespaced nodes.
+    if ((null == ns) || (ns.length() == 0))
+      elem = m_doc.createElementNS(null,name);
+    else
+      elem = m_doc.createElementNS(ns, name);
+
+    append(elem);
+
+    try
+    {
+      int nAtts = atts.getLength();
+
+      if (0 != nAtts)
+      {
+        for (int i = 0; i < nAtts; i++)
+        {
+
+          //System.out.println("type " + atts.getType(i) + " name " + atts.getLocalName(i) );
+          // First handle a possible ID attribute
+          if (atts.getType(i).equalsIgnoreCase("ID"))
+            setIDAttribute(atts.getValue(i), elem);
+
+          String attrNS = atts.getURI(i);
+
+          if("".equals(attrNS))
+            attrNS = null; // DOM represents no-namespace as null
+
+          // System.out.println("attrNS: "+attrNS+", localName: "+atts.getQName(i)
+          //                   +", qname: "+atts.getQName(i)+", value: "+atts.getValue(i));
+          // Crimson won't let us set an xmlns: attribute on the DOM.
+          String attrQName = atts.getQName(i);
+
+          // In SAX, xmlns: attributes have an empty namespace, while in DOM they should have the xmlns namespace
+          if (attrQName.startsWith("xmlns:"))
+            attrNS = "http://www.w3.org/2000/xmlns/";
+
+          // ALWAYS use the DOM Level 2 call!
+          elem.setAttributeNS(attrNS,attrQName, atts.getValue(i));
+        }
+      }
+
+      // append(elem);
+
+      m_elemStack.push(elem);
+
+      m_currentNode = elem;
+
+      // append(elem);
+    }
+    catch(java.lang.Exception de)
+    {
+      // de.printStackTrace();
+      throw new org.xml.sax.SAXException(de);
+    }
+
+  }
+
+  /**
+
+
+
+   * Receive notification of the end of an element.
+   *
+   * <p>The SAX parser will invoke this method at the end of every
+   * element in the XML document; there will be a corresponding
+   * startElement() event for every endElement() event (even when the
+   * element is empty).</p>
+   *
+   * <p>If the element name has a namespace prefix, the prefix will
+   * still be attached to the name.</p>
+   *
+   *
+   * @param ns the namespace of the element
+   * @param localName The local part of the qualified name of the element
+   * @param name The element name
+   */
+  public void endElement(String ns, String localName, String name)
+          throws org.xml.sax.SAXException
+  {
+    m_elemStack.pop();
+    m_currentNode = m_elemStack.isEmpty() ? null : (Node)m_elemStack.peek();
+  }
+
+  /**
+   * Set an ID string to node association in the ID table.
+   *
+   * @param id The ID string.
+   * @param elem The associated ID.
+   */
+  public void setIDAttribute(String id, Element elem)
+  {
+
+    // Do nothing. This method is meant to be overiden.
+  }
+
+  /**
+   * Receive notification of character data.
+   *
+   * <p>The Parser will call this method to report each chunk of
+   * character data.  SAX parsers may return all contiguous character
+   * data in a single chunk, or they may split it into several
+   * chunks; however, all of the characters in any single event
+   * must come from the same external entity, so that the Locator
+   * provides useful information.</p>
+   *
+   * <p>The application must not attempt to read from the array
+   * outside of the specified range.</p>
+   *
+   * <p>Note that some parsers will report whitespace using the
+   * ignorableWhitespace() method rather than this one (validating
+   * parsers must do so).</p>
+   *
+   * @param ch The characters from the XML document.
+   * @param start The start position in the array.
+   * @param length The number of characters to read from the array.
+   * @see #ignorableWhitespace
+   * @see org.xml.sax.Locator
+   */
+  public void characters(char ch[], int start, int length) throws org.xml.sax.SAXException
+  {
+    if(isOutsideDocElem()
+       && XMLCharacterRecognizer.isWhiteSpace(ch, start, length))
+      return;  // avoid DOM006 Hierarchy request error
+
+    if (m_inCData)
+    {
+      cdata(ch, start, length);
+
+      return;
+    }
+
+    String s = new String(ch, start, length);
+    Node childNode;
+    childNode =  m_currentNode != null ? m_currentNode.getLastChild(): null;
+    if( childNode != null && childNode.getNodeType() == Node.TEXT_NODE ){
+       ((Text)childNode).appendData(s);
+    }
+    else{
+       Text text = m_doc.createTextNode(s);
+       append(text);
+    }
+  }
+
+  /**
+   * If available, when the disable-output-escaping attribute is used,
+   * output raw text without escaping.  A PI will be inserted in front
+   * of the node with the name "lotusxsl-next-is-raw" and a value of
+   * "formatter-to-dom".
+   *
+   * @param ch Array containing the characters
+   * @param start Index to start of characters in the array
+   * @param length Number of characters in the array
+   */
+  public void charactersRaw(char ch[], int start, int length)
+          throws org.xml.sax.SAXException
+  {
+    if(isOutsideDocElem()
+       && XMLCharacterRecognizer.isWhiteSpace(ch, start, length))
+      return;  // avoid DOM006 Hierarchy request error
+
+
+    String s = new String(ch, start, length);
+
+    append(m_doc.createProcessingInstruction("xslt-next-is-raw",
+                                             "formatter-to-dom"));
+    append(m_doc.createTextNode(s));
+  }
+
+  /**
+   * Report the beginning of an entity.
+   *
+   * The start and end of the document entity are not reported.
+   * The start and end of the external DTD subset are reported
+   * using the pseudo-name "[dtd]".  All other events must be
+   * properly nested within start/end entity events.
+   *
+   * @param name The name of the entity.  If it is a parameter
+   *        entity, the name will begin with '%'.
+   * @see #endEntity
+   * @see org.xml.sax.ext.DeclHandler#internalEntityDecl
+   * @see org.xml.sax.ext.DeclHandler#externalEntityDecl
+   */
+  public void startEntity(String name) throws org.xml.sax.SAXException
+  {
+
+    // Almost certainly the wrong behavior...
+    // entityReference(name);
+  }
+
+  /**
+   * Report the end of an entity.
+   *
+   * @param name The name of the entity that is ending.
+   * @see #startEntity
+   */
+  public void endEntity(String name) throws org.xml.sax.SAXException{}
+
+  /**
+   * Receive notivication of a entityReference.
+   *
+   * @param name name of the entity reference
+   */
+  public void entityReference(String name) throws org.xml.sax.SAXException
+  {
+    append(m_doc.createEntityReference(name));
+  }
+
+  /**
+   * Receive notification of ignorable whitespace in element content.
+   *
+   * <p>Validating Parsers must use this method to report each chunk
+   * of ignorable whitespace (see the W3C XML 1.0 recommendation,
+   * section 2.10): non-validating parsers may also use this method
+   * if they are capable of parsing and using content models.</p>
+   *
+   * <p>SAX parsers may return all contiguous whitespace in a single
+   * chunk, or they may split it into several chunks; however, all of
+   * the characters in any single event must come from the same
+   * external entity, so that the Locator provides useful
+   * information.</p>
+   *
+   * <p>The application must not attempt to read from the array
+   * outside of the specified range.</p>
+   *
+   * @param ch The characters from the XML document.
+   * @param start The start position in the array.
+   * @param length The number of characters to read from the array.
+   * @see #characters
+   */
+  public void ignorableWhitespace(char ch[], int start, int length)
+          throws org.xml.sax.SAXException
+  {
+    if(isOutsideDocElem())
+      return;  // avoid DOM006 Hierarchy request error
+
+    String s = new String(ch, start, length);
+
+    append(m_doc.createTextNode(s));
+  }
+
+  /**
+   * Tell if the current node is outside the document element.
+   *
+   * @return true if the current node is outside the document element.
+   */
+   private boolean isOutsideDocElem()
+   {
+      return (null == m_docFrag) && m_elemStack.size() == 0 && (null == m_currentNode || m_currentNode.getNodeType() == Node.DOCUMENT_NODE);
+   }
+
+  /**
+   * Receive notification of a processing instruction.
+   *
+   * <p>The Parser will invoke this method once for each processing
+   * instruction found: note that processing instructions may occur
+   * before or after the main document element.</p>
+   *
+   * <p>A SAX parser should never report an XML declaration (XML 1.0,
+   * section 2.8) or a text declaration (XML 1.0, section 4.3.1)
+   * using this method.</p>
+   *
+   * @param target The processing instruction target.
+   * @param data The processing instruction data, or null if
+   *        none was supplied.
+   */
+  public void processingInstruction(String target, String data)
+          throws org.xml.sax.SAXException
+  {
+    append(m_doc.createProcessingInstruction(target, data));
+  }
+
+  /**
+   * Report an XML comment anywhere in the document.
+   *
+   * This callback will be used for comments inside or outside the
+   * document element, including comments in the external DTD
+   * subset (if read).
+   *
+   * @param ch An array holding the characters in the comment.
+   * @param start The starting position in the array.
+   * @param length The number of characters to use from the array.
+   */
+  public void comment(char ch[], int start, int length) throws org.xml.sax.SAXException
+  {
+    // tagsoup sometimes submits invalid values here
+    if (ch == null || start < 0 || length >= (ch.length - start) || length < 0) return;
+    append(m_doc.createComment(new String(ch, start, length)));
+  }
+
+  /** Flag indicating that we are processing a CData section          */
+  protected boolean m_inCData = false;
+
+  /**
+   * Report the start of a CDATA section.
+   *
+   * @see #endCDATA
+   */
+  public void startCDATA() throws org.xml.sax.SAXException
+  {
+    m_inCData = true;
+    append(m_doc.createCDATASection(""));
+  }
+
+  /**
+   * Report the end of a CDATA section.
+   *
+   * @see #startCDATA
+   */
+  public void endCDATA() throws org.xml.sax.SAXException
+  {
+    m_inCData = false;
+  }
+
+  /**
+   * Receive notification of cdata.
+   *
+   * <p>The Parser will call this method to report each chunk of
+   * character data.  SAX parsers may return all contiguous character
+   * data in a single chunk, or they may split it into several
+   * chunks; however, all of the characters in any single event
+   * must come from the same external entity, so that the Locator
+   * provides useful information.</p>
+   *
+   * <p>The application must not attempt to read from the array
+   * outside of the specified range.</p>
+   *
+   * <p>Note that some parsers will report whitespace using the
+   * ignorableWhitespace() method rather than this one (validating
+   * parsers must do so).</p>
+   *
+   * @param ch The characters from the XML document.
+   * @param start The start position in the array.
+   * @param length The number of characters to read from the array.
+   * @see #ignorableWhitespace
+   * @see org.xml.sax.Locator
+   */
+  public void cdata(char ch[], int start, int length) throws org.xml.sax.SAXException
+  {
+    if(isOutsideDocElem()
+       && XMLCharacterRecognizer.isWhiteSpace(ch, start, length))
+      return;  // avoid DOM006 Hierarchy request error
+
+    String s = new String(ch, start, length);
+
+    // XXX ab@apache.org: modified from the original, to accomodate TagSoup. 
+    Node n = m_currentNode.getLastChild();
+    if (n instanceof CDATASection)
+      ((CDATASection)n).appendData(s);
+    else if (n instanceof Comment)
+      ((Comment)n).appendData(s);
+  }
+
+  /**
+   * Report the start of DTD declarations, if any.
+   *
+   * Any declarations are assumed to be in the internal subset
+   * unless otherwise indicated.
+   *
+   * @param name The document type name.
+   * @param publicId The declared public identifier for the
+   *        external DTD subset, or null if none was declared.
+   * @param systemId The declared system identifier for the
+   *        external DTD subset, or null if none was declared.
+   * @see #endDTD
+   * @see #startEntity
+   */
+  public void startDTD(String name, String publicId, String systemId)
+          throws org.xml.sax.SAXException
+  {
+
+    // Do nothing for now.
+  }
+
+  /**
+   * Report the end of DTD declarations.
+   *
+   * @see #startDTD
+   */
+  public void endDTD() throws org.xml.sax.SAXException
+  {
+
+    // Do nothing for now.
+  }
+
+  /**
+   * Begin the scope of a prefix-URI Namespace mapping.
+   *
+   * <p>The information from this event is not necessary for
+   * normal Namespace processing: the SAX XML reader will
+   * automatically replace prefixes for element and attribute
+   * names when the http://xml.org/sax/features/namespaces
+   * feature is true (the default).</p>
+   *
+   * <p>There are cases, however, when applications need to
+   * use prefixes in character data or in attribute values,
+   * where they cannot safely be expanded automatically; the
+   * start/endPrefixMapping event supplies the information
+   * to the application to expand prefixes in those contexts
+   * itself, if necessary.</p>
+   *
+   * <p>Note that start/endPrefixMapping events are not
+   * guaranteed to be properly nested relative to each-other:
+   * all startPrefixMapping events will occur before the
+   * corresponding startElement event, and all endPrefixMapping
+   * events will occur after the corresponding endElement event,
+   * but their order is not guaranteed.</p>
+   *
+   * @param prefix The Namespace prefix being declared.
+   * @param uri The Namespace URI the prefix is mapped to.
+   * @see #endPrefixMapping
+   * @see #startElement
+   */
+  public void startPrefixMapping(String prefix, String uri)
+          throws org.xml.sax.SAXException
+  {
+
+    /*
+    // Not sure if this is needed or wanted
+    // Also, it fails in the stree.
+    if((null != m_currentNode)
+       && (m_currentNode.getNodeType() == Node.ELEMENT_NODE))
+    {
+      String qname;
+      if(((null != prefix) && (prefix.length() == 0))
+         || (null == prefix))
+        qname = "xmlns";
+      else
+        qname = "xmlns:"+prefix;
+
+      Element elem = (Element)m_currentNode;
+      String val = elem.getAttribute(qname); // Obsolete, should be DOM2...?
+      if(val == null)
+      {
+        elem.setAttributeNS("http://www.w3.org/XML/1998/namespace",
+                            qname, uri);
+      }
+    }
+    */
+  }
+
+  /**
+   * End the scope of a prefix-URI mapping.
+   *
+   * <p>See startPrefixMapping for details.  This event will
+   * always occur after the corresponding endElement event,
+   * but the order of endPrefixMapping events is not otherwise
+   * guaranteed.</p>
+   *
+   * @param prefix The prefix that was being mapping.
+   * @see #startPrefixMapping
+   * @see #endElement
+   */
+  public void endPrefixMapping(String prefix) throws org.xml.sax.SAXException{}
+
+  /**
+   * Receive notification of a skipped entity.
+   *
+   * <p>The Parser will invoke this method once for each entity
+   * skipped.  Non-validating processors may skip entities if they
+   * have not seen the declarations (because, for example, the
+   * entity was declared in an external DTD subset).  All processors
+   * may skip external entities, depending on the values of the
+   * http://xml.org/sax/features/external-general-entities and the
+   * http://xml.org/sax/features/external-parameter-entities
+   * properties.</p>
+   *
+   * @param name The name of the skipped entity.  If it is a
+   *        parameter entity, the name will begin with '%'.
+   */
+  public void skippedEntity(String name) throws org.xml.sax.SAXException{}
+}
+]]>
+</codefragment>
+</duplication>
+<duplication lines="183" tokens="829">
+<file line="31" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\HTMLMetaProcessor.java"/>
+<file line="31" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\HTMLMetaProcessor.java"/>
+<codefragment>
+<![CDATA[
+public class HTMLMetaProcessor {
+
+  /**
+   * Utility class with indicators for the robots directives "noindex"
+   * and "nofollow", and HTTP-EQUIV/no-cache
+   */
+  
+  /**
+   * Sets the indicators in <code>robotsMeta</code> to appropriate
+   * values, based on any META tags found under the given
+   * <code>node</code>.
+   */
+  public static final void getMetaTags (
+    HTMLMetaTags metaTags, Node node, URL currURL) {
+
+    metaTags.reset();
+    getMetaTagsHelper(metaTags, node, currURL);
+  }
+
+  private static final void getMetaTagsHelper(
+    HTMLMetaTags metaTags, Node node, URL currURL) {
+	  
+    if (node.getNodeType() == Node.ELEMENT_NODE) {
+
+      if ("body".equalsIgnoreCase(node.getNodeName())) {
+        // META tags should not be under body
+        return;
+      }
+
+      if ("meta".equalsIgnoreCase(node.getNodeName())) {
+        NamedNodeMap attrs = node.getAttributes();
+        Node nameNode = null;
+        Node equivNode = null;
+        Node contentNode = null;
+        // Retrieves name, http-equiv and content attribues
+        for (int i=0; i<attrs.getLength(); i++) {
+          Node attr = attrs.item(i);
+          String attrName = attr.getNodeName().toLowerCase();
+          if (attrName.equals("name")) {
+            nameNode = attr;
+          } else if (attrName.equals("http-equiv")) {
+            equivNode = attr;
+          } else if (attrName.equals("content")) {
+            contentNode = attr;
+          }
+        }
+        
+        if (nameNode != null) {
+          if (contentNode != null) {
+            String name = nameNode.getNodeValue().toLowerCase();   
+            metaTags.getGeneralTags().add(name, contentNode.getNodeValue());
+            if ("robots".equals(name)) {
+  
+              if (contentNode != null) {
+                String directives = 
+                  contentNode.getNodeValue().toLowerCase();
+                int index = directives.indexOf("none");
+  
+                if (index >= 0) {
+                  metaTags.setNoIndex();
+                  metaTags.setNoFollow();
+                }
+  
+                index = directives.indexOf("all");
+                if (index >= 0) {
+                  // do nothing...
+                }
+  
+                index = directives.indexOf("noindex");
+                if (index >= 0) {
+                  metaTags.setNoIndex();
+                }
+  
+                index = directives.indexOf("nofollow");
+                if (index >= 0) {
+                  metaTags.setNoFollow();
+                }
+                
+                index = directives.indexOf("noarchive");
+                if (index >= 0) {
+                  metaTags.setNoCache();
+                }
+              } 
+  
+            } // end if (name == robots)
+          }
+        }
+
+        if (equivNode != null) {
+          if (contentNode != null) {
+            String name = equivNode.getNodeValue().toLowerCase();
+            String content = contentNode.getNodeValue();
+            metaTags.getHttpEquivTags().setProperty(name, content);
+            if ("pragma".equals(name)) {
+              content = content.toLowerCase();
+              int index = content.indexOf("no-cache");
+              if (index >= 0) 
+                metaTags.setNoCache();
+            } else if ("refresh".equals(name)) {
+              int idx = content.indexOf(';');
+              String time = null;
+              if (idx == -1) { // just the refresh time
+                time = content;
+              } else time = content.substring(0, idx);
+              try {
+                metaTags.setRefreshTime(Integer.parseInt(time));
+                // skip this if we couldn't parse the time
+                metaTags.setRefresh(true);
+              } catch (Exception e) {
+                ;
+              }
+              URL refreshUrl = null;
+              if (metaTags.getRefresh() && idx != -1) { // set the URL
+                idx = content.toLowerCase().indexOf("url=");
+                if (idx == -1) { // assume a mis-formatted entry with just the url
+                  idx = content.indexOf(';') + 1;
+                } else idx += 4;
+                if (idx != -1) {
+                  String url = content.substring(idx);
+                  try {
+                    refreshUrl = new URL(url);
+                  } catch (Exception e) {
+                    // XXX according to the spec, this has to be an absolute
+                    // XXX url. However, many websites use relative URLs and
+                    // XXX expect browsers to handle that.
+                    // XXX Unfortunately, in some cases this may create a
+                    // XXX infinitely recursive paths (a crawler trap)...
+                    // if (!url.startsWith("/")) url = "/" + url;
+                    try {
+                      refreshUrl = new URL(currURL, url);
+                    } catch (Exception e1) {
+                      refreshUrl = null;
+                    }
+                  }
+                }
+              }
+              if (metaTags.getRefresh()) {
+                if (refreshUrl == null) {
+                  // apparently only refresh time was present. set the URL
+                  // to the same URL.
+                  refreshUrl = currURL;
+                }
+                metaTags.setRefreshHref(refreshUrl);
+              }
+            }
+          }
+        }
+
+      } else if ("base".equalsIgnoreCase(node.getNodeName())) {
+        NamedNodeMap attrs = node.getAttributes();
+        Node hrefNode = attrs.getNamedItem("href");
+
+        if (hrefNode != null) {
+          String urlString = hrefNode.getNodeValue();
+
+          URL url = null;
+          try {
+            if (currURL == null)
+              url = new URL(urlString);
+            else 
+              url = new URL(currURL, urlString);
+          } catch (Exception e) {
+            ;
+          }
+
+          if (url != null) 
+            metaTags.setBaseHref(url);
+        }
+
+      }
+
+    }
+
+    NodeList children = node.getChildNodes();
+    if (children != null) {
+      int len = children.getLength();
+      for (int i = 0; i < len; i++) {
+        getMetaTagsHelper(metaTags, children.item(i), currURL);
+      }
+    }
+  }
+
+}
+]]>
+</codefragment>
+</duplication>
+<duplication lines="134" tokens="678">
+<file line="204" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
+<file line="204" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
+<codefragment>
+<![CDATA[
+  URL getBase(Node node) {
+
+    NodeWalker walker = new NodeWalker(node);
+    
+    while (walker.hasNext()) {
+  
+      Node currentNode = walker.nextNode();
+      String nodeName = currentNode.getNodeName();
+      short nodeType = currentNode.getNodeType();
+      
+      // is this node a BASE tag?
+      if (nodeType == Node.ELEMENT_NODE) {
+  
+        if ("body".equalsIgnoreCase(nodeName)) { // stop after HEAD
+          return null;
+        }
+  
+        if ("base".equalsIgnoreCase(nodeName)) {
+          NamedNodeMap attrs = currentNode.getAttributes();
+          for (int i= 0; i < attrs.getLength(); i++ ) {
+            Node attr = attrs.item(i);
+            if ("href".equalsIgnoreCase(attr.getNodeName())) {
+              try {
+                return new URL(attr.getNodeValue());
+              } catch (MalformedURLException e) {}
+            }
+          }
+        }
+      }
+    }
+
+    // no.
+    return null;
+  }
+
+
+  private boolean hasOnlyWhiteSpace(Node node) {
+    String val= node.getNodeValue();
+    for (int i= 0; i < val.length(); i++) {
+      if (!Character.isWhitespace(val.charAt(i)))
+        return false;
+    }
+    return true;
+  }
+
+  // this only covers a few cases of empty links that are symptomatic
+  // of nekohtml's DOM-fixup process...
+  private boolean shouldThrowAwayLink(Node node, NodeList children, 
+                                              int childLen, LinkParams params) {
+    if (childLen == 0) {
+      // this has no inner structure 
+      if (params.childLen == 0) return false;
+      else return true;
+    } else if ((childLen == 1) 
+               && (children.item(0).getNodeType() == Node.ELEMENT_NODE)
+               && (params.elName.equalsIgnoreCase(children.item(0).getNodeName()))) { 
+      // single nested link
+      return true;
+
+    } else if (childLen == 2) {
+
+      Node c0= children.item(0);
+      Node c1= children.item(1);
+
+      if ((c0.getNodeType() == Node.ELEMENT_NODE)
+          && (params.elName.equalsIgnoreCase(c0.getNodeName()))
+          && (c1.getNodeType() == Node.TEXT_NODE) 
+          && hasOnlyWhiteSpace(c1) ) {
+        // single link followed by whitespace node
+        return true;
+      }
+
+      if ((c1.getNodeType() == Node.ELEMENT_NODE)
+          && (params.elName.equalsIgnoreCase(c1.getNodeName()))
+          && (c0.getNodeType() == Node.TEXT_NODE) 
+          && hasOnlyWhiteSpace(c0) ) {
+        // whitespace node followed by single link
+        return true;
+      }
+
+    } else if (childLen == 3) {
+      Node c0= children.item(0);
+      Node c1= children.item(1);
+      Node c2= children.item(2);
+      
+      if ((c1.getNodeType() == Node.ELEMENT_NODE)
+          && (params.elName.equalsIgnoreCase(c1.getNodeName()))
+          && (c0.getNodeType() == Node.TEXT_NODE) 
+          && (c2.getNodeType() == Node.TEXT_NODE) 
+          && hasOnlyWhiteSpace(c0)
+          && hasOnlyWhiteSpace(c2) ) {
+        // single link surrounded by whitespace nodes
+        return true;
+      }
+    }
+
+    return false;
+  }
+  
+  /**
+   * This method finds all anchors below the supplied DOM
+   * <code>node</code>, and creates appropriate {@link Outlink}
+   * records for each (relative to the supplied <code>base</code>
+   * URL), and adds them to the <code>outlinks</code> {@link
+   * ArrayList}.
+   *
+   * <p>
+   *
+   * Links without inner structure (tags, text, etc) are discarded, as
+   * are links which contain only single nested links and empty text
+   * nodes (this is a common DOM-fixup artifact, at least with
+   * nekohtml).
+   */
+  public void getOutlinks(URL base, ArrayList<Outlink> outlinks, 
+                                       Node node) {
+    
+    NodeWalker walker = new NodeWalker(node);
+    while (walker.hasNext()) {
+      
+      Node currentNode = walker.nextNode();
+      String nodeName = currentNode.getNodeName();
+      short nodeType = currentNode.getNodeType();      
+      NodeList children = currentNode.getChildNodes();
+      int childLen = (children != null) ? children.getLength() : 0; 
+      
+      if (nodeType == Node.ELEMENT_NODE) {
+        
+        nodeName = nodeName.toLowerCase();
+        LinkParams params = (LinkParams)linkParams.get(nodeName);
+        if (params != null) {
+          if (!shouldThrowAwayLink(currentNode, children, childLen, params)) {
+  
+            StringBuffer linkText = new StringBuffer();
+            getText(linkText, currentNode, true);
+]]>
+</codefragment>
+</duplication>
+<duplication lines="150" tokens="579">
+<file line="33" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestRobotsMetaProcessor.java"/>
+<file line="34" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestRobotsMetaProcessor.java"/>
+<codefragment>
+<![CDATA[
+public class TestRobotsMetaProcessor extends TestCase {
+  public TestRobotsMetaProcessor(String name) { 
+    super(name); 
+  }
+
+  /*
+
+  some sample tags:
+
+  <meta name="robots" content="index,follow">
+  <meta name="robots" content="noindex,follow">
+  <meta name="robots" content="index,nofollow">
+  <meta name="robots" content="noindex,nofollow">
+
+  <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+
+  */
+
+
+  public static String[] tests= 
+  {
+    "<html><head><title>test page</title>"
+    + "<META NAME=\"ROBOTS\" CONTENT=\"NONE\"> "
+    + "<META HTTP-EQUIV=\"PRAGMA\" CONTENT=\"NO-CACHE\"> "
+    + "</head><body>"
+    + " some text"
+    + "</body></html>",
+
+    "<html><head><title>test page</title>"
+    + "<meta name=\"robots\" content=\"all\"> "
+    + "<meta http-equiv=\"pragma\" content=\"no-cache\"> "
+    + "</head><body>"
+    + " some text"
+    + "</body></html>",
+
+    "<html><head><title>test page</title>"
+    + "<MeTa NaMe=\"RoBoTs\" CoNtEnT=\"nOnE\"> "
+    + "<MeTa HtTp-EqUiV=\"pRaGmA\" cOnTeNt=\"No-CaChE\"> "
+    + "</head><body>"
+    + " some text"
+    + "</body></html>",
+
+    "<html><head><title>test page</title>"
+    + "<meta name=\"robots\" content=\"none\"> "
+    + "</head><body>"
+    + " some text"
+    + "</body></html>",
+
+    "<html><head><title>test page</title>"
+    + "<meta name=\"robots\" content=\"noindex,nofollow\"> "
+    + "</head><body>"
+    + " some text"
+    + "</body></html>",
+
+    "<html><head><title>test page</title>"
+    + "<meta name=\"robots\" content=\"noindex,follow\"> "
+    + "</head><body>"
+    + " some text"
+    + "</body></html>",
+
+    "<html><head><title>test page</title>"
+    + "<meta name=\"robots\" content=\"index,nofollow\"> "
+    + "</head><body>"
+    + " some text"
+    + "</body></html>",
+
+    "<html><head><title>test page</title>"
+    + "<meta name=\"robots\" content=\"index,follow\"> "
+    + "<base href=\"http://www.nutch.org/\">"
+    + "</head><body>"
+    + " some text"
+    + "</body></html>",
+
+    "<html><head><title>test page</title>"
+    + "<meta name=\"robots\"> "
+    + "<base href=\"http://www.nutch.org/base/\">"
+    + "</head><body>"
+    + " some text"
+    + "</body></html>",
+
+  };
+
+  public static final boolean[][] answers= {
+    {true, true, true},     // NONE
+    {false, false, true},   // all
+    {true, true, true},     // nOnE
+    {true, true, false},    // none
+    {true, true, false},    // noindex,nofollow
+    {true, false, false},   // noindex,follow
+    {false, true, false},   // index,nofollow
+    {false, false, false},  // index,follow
+    {false, false, false},  // missing!
+  };
+
+  private URL[][] currURLsAndAnswers;
+
+  public void testRobotsMetaProcessor() {
+    DOMFragmentParser parser= new DOMFragmentParser();;
+
+    try { 
+      currURLsAndAnswers= new URL[][] {
+        {new URL("http://www.nutch.org"), null},
+        {new URL("http://www.nutch.org"), null},
+        {new URL("http://www.nutch.org"), null},
+        {new URL("http://www.nutch.org"), null},
+        {new URL("http://www.nutch.org"), null},
+        {new URL("http://www.nutch.org"), null},
+        {new URL("http://www.nutch.org"), null},
+        {new URL("http://www.nutch.org/foo/"), 
+         new URL("http://www.nutch.org/")},
+        {new URL("http://www.nutch.org"), 
+         new URL("http://www.nutch.org/base/")}
+      };
+    } catch (Exception e) {
+      assertTrue("couldn't make test URLs!", false);
+    }
+
+    for (int i= 0; i < tests.length; i++) {
+      byte[] bytes= tests[i].getBytes();
+
+      DocumentFragment node = new HTMLDocumentImpl().createDocumentFragment();
+
+      try {
+        parser.parse(new InputSource(new ByteArrayInputStream(bytes)), node);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      HTMLMetaTags robotsMeta= new HTMLMetaTags();
+      HTMLMetaProcessor.getMetaTags(robotsMeta, node, 
+                                                  currURLsAndAnswers[i][0]);
+
+      assertTrue("got index wrong on test " + i,
+                 robotsMeta.getNoIndex() == answers[i][0]);
+      assertTrue("got follow wrong on test " + i,
+                 robotsMeta.getNoFollow() == answers[i][1]);
+      assertTrue("got cache wrong on test " + i,
+                 robotsMeta.getNoCache() == answers[i][2]);
+      assertTrue("got base href wrong on test " + i + " (got "
+                 + robotsMeta.getBaseHref() + ")",
+                 ( (robotsMeta.getBaseHref() == null)
+                    && (currURLsAndAnswers[i][1] == null) )
+                 || ( (robotsMeta.getBaseHref() != null)
+                      && robotsMeta.getBaseHref().equals(
+                        currURLsAndAnswers[i][1]) ) );
+      
+    }
+  }
+
+}
+]]>
+</codefragment>
+</duplication>
+<duplication lines="94" tokens="360">
+<file line="108" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
+<file line="108" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
+<codefragment>
+<![CDATA[
+  private boolean getText(StringBuffer sb, Node node, 
+                                      boolean abortOnNestedAnchors) {
+    if (getTextHelper(sb, node, abortOnNestedAnchors, 0)) {
+      return true;
+    } 
+    return false;
+  }
+
+
+  /**
+   * This is a convinience method, equivalent to {@link
+   * #getText(StringBuffer,Node,boolean) getText(sb, node, false)}.
+   * 
+   */
+  public void getText(StringBuffer sb, Node node) {
+    getText(sb, node, false);
+  }
+
+  // returns true if abortOnNestedAnchors is true and we find nested 
+  // anchors
+  private boolean getTextHelper(StringBuffer sb, Node node, 
+                                             boolean abortOnNestedAnchors,
+                                             int anchorDepth) {
+    boolean abort = false;
+    NodeWalker walker = new NodeWalker(node);
+    
+    while (walker.hasNext()) {
+    
+      Node currentNode = walker.nextNode();
+      String nodeName = currentNode.getNodeName();
+      short nodeType = currentNode.getNodeType();
+      
+      if ("script".equalsIgnoreCase(nodeName)) {
+        walker.skipChildren();
+      }
+      if ("style".equalsIgnoreCase(nodeName)) {
+        walker.skipChildren();
+      }
+      if (abortOnNestedAnchors && "a".equalsIgnoreCase(nodeName)) {
+        anchorDepth++;
+        if (anchorDepth > 1) {
+          abort = true;
+          break;
+        }        
+      }
+      if (nodeType == Node.COMMENT_NODE) {
+        walker.skipChildren();
+      }
+      if (nodeType == Node.TEXT_NODE) {
+        // cleanup and trim the value
+        String text = currentNode.getNodeValue();
+        text = text.replaceAll("\\s+", " ");
+        text = text.trim();
+        if (text.length() > 0) {
+          if (sb.length() > 0) sb.append(' ');
+        	sb.append(text);
+        }
+      }
+    }
+    
+    return abort;
+  }
+
+  /**
+   * This method takes a {@link StringBuffer} and a DOM {@link Node},
+   * and will append the content text found beneath the first
+   * <code>title</code> node to the <code>StringBuffer</code>.
+   *
+   * @return true if a title node was found, false otherwise
+   */
+  public boolean getTitle(StringBuffer sb, Node node) {
+    
+    NodeWalker walker = new NodeWalker(node);
+    
+    while (walker.hasNext()) {
+  
+      Node currentNode = walker.nextNode();
+      String nodeName = currentNode.getNodeName();
+      short nodeType = currentNode.getNodeType();
+      
+      if ("body".equalsIgnoreCase(nodeName)) { // stop after HEAD
+        return false;
+      }
+  
+      if (nodeType == Node.ELEMENT_NODE) {
+        if ("title".equalsIgnoreCase(nodeName)) {
+          getText(sb, currentNode);
+          return true;
+        }
+      }
+    }      
+    
+    return false;
+  }
+]]>
+</codefragment>
+</duplication>
+<duplication lines="44" tokens="327">
+<file line="48" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
+<file line="48" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
+<codefragment>
+<![CDATA[
+	private LinkParams(String elName, String attrName, int childLen) {
+          this.elName = elName;
+          this.attrName = attrName;
+          this.childLen = childLen;
+      }
+      
+	public String toString() {
+          return "LP[el=" + elName + ",attr=" + attrName + ",len=" + childLen + "]";
+      }
+  }
+  
+  private HashMap<String,LinkParams> linkParams = new HashMap<String,LinkParams>();
+  private Configuration conf;
+  
+  public DOMContentUtils(Configuration conf) {
+    setConf(conf);
+  }
+  
+  public void setConf(Configuration conf) {
+    // forceTags is used to override configurable tag ignoring, later on
+    Collection<String> forceTags = new ArrayList<String>(1);
+
+    this.conf = conf;
+    linkParams.clear();
+    linkParams.put("a", new LinkParams("a", "href", 1));
+    linkParams.put("area", new LinkParams("area", "href", 0));
+    if (conf.getBoolean("parser.html.form.use_action", true)) {
+      linkParams.put("form", new LinkParams("form", "action", 1));
+      if (conf.get("parser.html.form.use_action") != null)
+        forceTags.add("form");
+    }
+    linkParams.put("frame", new LinkParams("frame", "src", 0));
+    linkParams.put("iframe", new LinkParams("iframe", "src", 0));
+    linkParams.put("script", new LinkParams("script", "src", 0));
+    linkParams.put("link", new LinkParams("link", "href", 0));
+    linkParams.put("img", new LinkParams("img", "src", 0));
+
+    // remove unwanted link tags from the linkParams map
+    String[] ignoreTags = conf.getStrings("parser.html.outlinks.ignore_tags");
+    for ( int i = 0 ; ignoreTags != null && i < ignoreTags.length ; i++ ) {
+      if ( ! forceTags.contains(ignoreTags[i]) )
+        linkParams.remove(ignoreTags[i]);
+    }
+  }
+]]>
+</codefragment>
+</duplication>
+<duplication lines="44" tokens="325">
+<file line="381" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
+<file line="293" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
+<codefragment>
+<![CDATA[
+      outlinkArr = outlinks.toArray(outlinkArr);
+      compareOutlinks(answerOutlinks[i], outlinkArr);
+    }
+  }
+
+  private static final void appendOutlinks(StringBuffer sb, Outlink[] o) {
+    for (int i = 0; i < o.length; i++) {
+      sb.append(o[i].toString());
+      sb.append(System.getProperty("line.separator"));
+    }
+  }
+
+  private static final String outlinksString(Outlink[] o) {
+    StringBuffer sb = new StringBuffer();
+    appendOutlinks(sb, o);
+    return sb.toString();
+  }
+
+  private static final void compareOutlinks(Outlink[] o1, Outlink[] o2) {
+    if (o1.length != o2.length) {
+      assertTrue(
+          "got wrong number of outlinks (expecting " + o1.length + ", got "
+              + o2.length + ")" + System.getProperty("line.separator")
+              + "answer: " + System.getProperty("line.separator")
+              + outlinksString(o1) + System.getProperty("line.separator")
+              + "got: " + System.getProperty("line.separator")
+              + outlinksString(o2) + System.getProperty("line.separator"),
+          false);
+    }
+
+    for (int i = 0; i < o1.length; i++) {
+      if (!o1[i].equals(o2[i])) {
+        assertTrue(
+            "got wrong outlinks at position " + i
+                + System.getProperty("line.separator") + "answer: "
+                + System.getProperty("line.separator") + "'" + o1[i].getToUrl()
+                + "', anchor: '" + o1[i].getAnchor() + "'"
+                + System.getProperty("line.separator") + "got: "
+                + System.getProperty("line.separator") + "'" + o2[i].getToUrl()
+                + "', anchor: '" + o2[i].getAnchor() + "'", false);
+      }
+    }
+  }
+}
+]]>
+</codefragment>
+</duplication>
+<duplication lines="43" tokens="299">
+<file line="356" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
+<file line="192" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\tools\arc\ArcSegmentCreator.java"/>
+<codefragment>
+<![CDATA[
+        output.collect(key, new NutchWritable(datum));
+        output.collect(key, new NutchWritable(content));
+
+        if (parseResult != null) {
+          for (Entry <Text, Parse> entry : parseResult) {
+            Text url = entry.getKey();
+            Parse parse = entry.getValue();
+            ParseStatus parseStatus = parse.getData().getStatus();
+
+            if (!parseStatus.isSuccess()) {
+              LOG.warn("Error parsing: " + key + ": " + parseStatus);
+              parse = parseStatus.getEmptyParse(getConf());
+            }
+
+            // Calculate page signature. 
+            byte[] signature = SignatureFactory.getSignature(getConf()).calculate(
+              content, parse);
+            // Ensure segment name and score are in parseData metadata
+            parse.getData().getContentMeta().set(Nutch.SEGMENT_NAME_KEY,
+              segmentName);
+            parse.getData().getContentMeta().set(Nutch.SIGNATURE_KEY,
+              StringUtil.toHexString(signature));
+            // Pass fetch time to content meta
+            parse.getData().getContentMeta().set(Nutch.FETCH_TIME_KEY,
+              Long.toString(datum.getFetchTime()));
+            if (url.equals(key))
+              datum.setSignature(signature);
+            try {
+              scfilters.passScoreAfterParsing(url, content, parse);
+            }
+            catch (Exception e) {
+              if (LOG.isWarnEnabled()) {
+                LOG.warn("Couldn't pass score, url " + key + " (" + e + ")");
+              }
+            }
+            output.collect(url, new NutchWritable(new ParseImpl(new ParseText(
+              parse.getText()), parse.getData(), parse.isCanonical())));
+          }
+        }
+      }
+      catch (IOException e) {
+        if (LOG.isErrorEnabled()) {
+          LOG.error("ArcSegmentCreator caught:" + StringUtils.stringifyException(e));
+]]>
+</codefragment>
+</duplication>
+<duplication lines="33" tokens="258">
+<file line="256" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
+<file line="198" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
+<codefragment>
+<![CDATA[
+    answerOutlinks = new Outlink[][] {
+        { new Outlink("http://www.nutch.org", "anchor"), },
+        { new Outlink("http://www.nutch.org/", "home"),
+            new Outlink("http://www.nutch.org/docs/bot.html", "bots"), },
+        { new Outlink("http://www.nutch.org/", "separate this"),
+            new Outlink("http://www.nutch.org/docs/ok", "from this"), },
+        { new Outlink("http://www.nutch.org/", "home"),
+            new Outlink("http://www.nutch.org/docs/1", "1"),
+            new Outlink("http://www.nutch.org/docs/2", "2"), },
+        { new Outlink("http://www.nutch.org/frames/top.html", ""),
+            new Outlink("http://www.nutch.org/frames/left.html", ""),
+            new Outlink("http://www.nutch.org/frames/invalid.html", ""),
+            new Outlink("http://www.nutch.org/frames/right.html", ""), },
+        { new Outlink("http://www.nutch.org/maps/logo.gif", ""),
+            new Outlink("http://www.nutch.org/index.html", ""),
+            new Outlink("http://www.nutch.org/maps/#bottom", ""),
+            new Outlink("http://www.nutch.org/bot.html", ""),
+            new Outlink("http://www.nutch.org/docs/index.html", ""), },
+        { new Outlink("http://www.nutch.org/index.html", "whitespace test"), },
+        {},
+        { new Outlink("http://www.nutch.org/dummy.jsp", "test2"), },
+        {},
+        { new Outlink("http://www.nutch.org/;x", "anchor1"),
+            new Outlink("http://www.nutch.org/g;x", "anchor2"),
+            new Outlink("http://www.nutch.org/g;x?y#s", "anchor3") },
+        {
+            // this is tricky - see RFC3986 section 5.4.1 example 7
+            new Outlink("http://www.nutch.org/g", "anchor1"),
+            new Outlink("http://www.nutch.org/g?y#s", "anchor2"),
+            new Outlink("http://www.nutch.org/;something?y=1", "anchor3"),
+            new Outlink("http://www.nutch.org/;something?y=1#s", "anchor4"),
+            new Outlink("http://www.nutch.org/;something?y=1;somethingelse",
+                "anchor5") } };
+]]>
+</codefragment>
+</duplication>
+<duplication lines="93" tokens="249">
+<file line="40" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
+<file line="40" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
+<codefragment>
+<![CDATA[
+public class TestDOMContentUtils extends TestCase {
+
+  private static final String[] testPages = {
+
+      new String("<html><head><title> title </title><script> script </script>"
+          + "</head><body> body <a href=\"http://www.nutch.org\">"
+          + " anchor </a><!--comment-->" + "</body></html>"),
+
+      new String("<html><head><title> title </title><script> script </script>"
+          + "</head><body> body <a href=\"/\">" + " home </a><!--comment-->"
+          + "<style> style </style>" + " <a href=\"bot.html\">" + " bots </a>"
+          + "</body></html>"),
+
+      new String("<html><head><title> </title>" + "</head><body> "
+          + "<a href=\"/\"> separate this " + "<a href=\"ok\"> from this"
+          + "</a></a>" + "</body></html>"),
+
+      // this one relies on certain neko fixup behavior, possibly
+      // distributing the anchors into the LI's-but not the other
+      // anchors (outside of them, instead)! So you get a tree that
+      // looks like:
+      // ... <li> <a href=/> home </a> </li>
+      // <li> <a href=/> <a href="1"> 1 </a> </a> </li>
+      // <li> <a href=/> <a href="1"> <a href="2"> 2 </a> </a> </a> </li>
+      new String("<html><head><title> my title </title>"
+          + "</head><body> body " + "<ul>" + "<li> <a href=\"/\"> home"
+          + "<li> <a href=\"1\"> 1" + "<li> <a href=\"2\"> 2" + "</ul>"
+          + "</body></html>"),
+
+      // test frameset link extraction. The invalid frame in the middle
+      // will be
+      // fixed to a third standalone frame.
+      new String("<html><head><title> my title </title>"
+          + "</head><frameset rows=\"20,*\"> " + "<frame src=\"top.html\">"
+          + "</frame>" + "<frameset cols=\"20,*\">"
+          + "<frame src=\"left.html\">" + "<frame src=\"invalid.html\"/>"
+          + "</frame>" + "<frame src=\"right.html\">" + "</frame>"
+          + "</frameset>" + "</frameset>" + "</body></html>"),
+
+      // test <area> and <iframe> link extraction + url normalization
+      new String(
+          "<html><head><title> my title </title>"
+              + "</head><body>"
+              + "<img src=\"logo.gif\" usemap=\"#green\" border=\"0\">"
+              + "<map name=\"green\">"
+              + "<area shape=\"polygon\" coords=\"19,44,45,11,87\" href=\"../index.html\">"
+              + "<area shape=\"rect\" coords=\"128,132,241,179\" href=\"#bottom\">"
+              + "<area shape=\"circle\" coords=\"68,211,35\" href=\"../bot.html\">"
+              + "</map>" + "<a name=\"bottom\"/><h1> the bottom </h1> "
+              + "<iframe src=\"../docs/index.html\"/>" + "</body></html>"),
+
+      // test whitespace processing for plain text extraction
+      new String(
+          "<html><head>\n <title> my\t\n  title\r\n </title>\n"
+              + " </head>\n"
+              + " <body>\n"
+              + "    <h1> Whitespace\ttest  </h1> \n"
+              + "\t<a href=\"../index.html\">\n  \twhitespace  test\r\n\t</a>  \t\n"
+              + "    <p> This is<span> a whitespace<span></span> test</span>. Newlines\n"
+              + "should appear as space too.</p><p>Tabs\tare spaces too.\n</p>"
+              + "    This\t<b>is a</b> break -&gt;<br>and the line after<i> break</i>.<br>\n"
+              + "<table>"
+              + "    <tr><td>one</td><td>two</td><td>three</td></tr>\n"
+              + "    <tr><td>space here </td><td> space there</td><td>no space</td></tr>"
+              + "\t<tr><td>one\r\ntwo</td><td>two\tthree</td><td>three\r\tfour</td></tr>\n"
+              + "</table>put some text here<Br>and there."
+              + "<h2>End\tthis\rmadness\n!</h2>\r\n"
+              + "         .        .        .         ." + "</body>  </html>"),
+
+      // test that <a rel=nofollow> links are not returned
+      new String("<html><head></head><body>"
+          + "<a href=\"http://www.nutch.org\" rel=\"nofollow\"> ignore </a>"
+          + "<a rel=\"nofollow\" href=\"http://www.nutch.org\"> ignore </a>"
+          + "</body></html>"),
+      // test that POST form actions are skipped
+      new String("<html><head></head><body>"
+          + "<form method='POST' action='/search.jsp'><input type=text>"
+          + "<input type=submit><p>test1</p></form>"
+          + "<form method='GET' action='/dummy.jsp'><input type=text>"
+          + "<input type=submit><p>test2</p></form></body></html>"),
+      // test that all form actions are skipped
+      new String("<html><head></head><body>"
+          + "<form method='POST' action='/search.jsp'><input type=text>"
+          + "<input type=submit><p>test1</p></form>"
+          + "<form method='GET' action='/dummy.jsp'><input type=text>"
+          + "<input type=submit><p>test2</p></form></body></html>"),
+      new String("<html><head><title> title </title>" + "</head><body>"
+          + "<a href=\";x\">anchor1</a>" + "<a href=\"g;x\">anchor2</a>"
+          + "<a href=\"g;x?y#s\">anchor3</a>" + "</body></html>"),
+      new String("<html><head><title> title </title>" + "</head><body>"
+          + "<a href=\"g\">anchor1</a>" + "<a href=\"g?y#s\">anchor2</a>"
+          + "<a href=\"?y=1\">anchor3</a>" + "<a href=\"?y=1#s\">anchor4</a>"
+          + "<a href=\"?y=1;somethingelse\">anchor5</a>" + "</body></html>"), };
+]]>
+</codefragment>
+</duplication>
+<duplication lines="34" tokens="235">
+<file line="160" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\HtmlParser.java"/>
+<file line="114" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\TikaParser.java"/>
+<codefragment>
+<![CDATA[
+		HTMLMetaProcessor.getMetaTags(metaTags, root, base);
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Meta tags for " + base + ": " + metaTags.toString());
+		}
+
+		// check meta directives
+		if (!metaTags.getNoIndex()) { // okay to index
+			StringBuffer sb = new StringBuffer();
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("Getting text...");
+			}
+			utils.getText(sb, root); // extract text
+			text = sb.toString();
+			sb.setLength(0);
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("Getting title...");
+			}
+			utils.getTitle(sb, root); // extract title
+			title = sb.toString().trim();
+		}
+
+		if (!metaTags.getNoFollow()) { // okay to follow links
+			ArrayList<Outlink> l = new ArrayList<Outlink>(); // extract outlinks
+			URL baseTag = utils.getBase(root);
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("Getting links...");
+			}
+			utils.getOutlinks(baseTag != null ? baseTag : base, l, root);
+			outlinks = l.toArray(new Outlink[l.size()]);
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("found " + outlinks.length + " outlinks in "
+						+ content.getUrl());
+			}
+		}
+]]>
+</codefragment>
+</duplication>
+<duplication lines="42" tokens="235">
+<file line="151" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\crawl\AdaptiveFetchSchedule.java"/>
+<file line="182" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\crawl\MimeAdaptiveFetchSchedule.java"/>
+<codefragment>
+<![CDATA[
+    p.setMetaData(x);
+
+    p.setFetchTime(0);
+    LOG.info(p.toString());
+
+    // let's move the timeline a couple of deltas
+    for (int i = 0; i < 10000; i++) {
+      if (lastModified + update < curTime) {
+        //System.out.println("i=" + i + ", lastModified=" + lastModified + ", update=" + update + ", curTime=" + curTime);
+        changed = true;
+        changeCnt++;
+        lastModified = curTime;
+      }
+
+      LOG.info(i + ". " + changed + "\twill fetch at " + (p.getFetchTime() / delta) + "\tinterval "
+              + (p.getFetchInterval() / SECONDS_PER_DAY ) + " days" + "\t missed " + miss);
+
+      if (p.getFetchTime() <= curTime) {
+        fetchCnt++;
+        fs.setFetchSchedule(new Text("http://www.example.com"), p,
+                p.getFetchTime(), p.getModifiedTime(), curTime, lastModified,
+                changed ? FetchSchedule.STATUS_MODIFIED : FetchSchedule.STATUS_NOTMODIFIED);
+
+        LOG.info("\tfetched & adjusted: " + "\twill fetch at " + (p.getFetchTime() / delta) + "\tinterval "
+                + (p.getFetchInterval() / SECONDS_PER_DAY ) + " days");
+
+        if (!changed) miss++;
+        if (miss > maxMiss) maxMiss = miss;
+        changed = false;
+        totalMiss += miss;
+        miss = 0;
+      }
+
+      if (changed) miss++;
+      curTime += delta;
+    }
+    LOG.info("Total missed: " + totalMiss + ", max miss: " + maxMiss);
+    LOG.info("Page changed " + changeCnt + " times, fetched " + fetchCnt + " times.");
+  }
+
+
+}
+]]>
+</codefragment>
+</duplication>
+<duplication lines="44" tokens="203">
+<file line="144" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
+<file line="144" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\urlfilter-domainblacklist\src\java\org\apache\nutch\urlfilter\domainblacklist\DomainBlacklistURLFilter.java"/>
+<codefragment>
+<![CDATA[
+    String stringRules = conf.get("urlfilter.domainblacklist.rules");
+    if (domainFile != null) {
+      file = domainFile;
+    }
+    else if (attributeFile != null) {
+      file = attributeFile;
+    }
+    Reader reader = null;
+    if (stringRules != null) { // takes precedence over files
+      reader = new StringReader(stringRules);
+    } else {
+      reader = conf.getConfResourceAsReader(file);
+    }
+    try {
+      if (reader == null) {
+        reader = new FileReader(file);
+      }
+      readConfiguration(reader);
+    }
+    catch (IOException e) {
+      LOG.error(org.apache.hadoop.util.StringUtils.stringifyException(e));
+    }
+  }
+
+  public Configuration getConf() {
+    return this.conf;
+  }
+
+  public String filter(String url) {
+    try {
+      // match for suffix, domain, and host in that order.  more general will
+      // override more specific
+      String domain = URLUtil.getDomainName(url).toLowerCase().trim();
+      String host = URLUtil.getHost(url);
+      String suffix = null;
+      DomainSuffix domainSuffix = URLUtil.getDomainSuffix(url);
+      if (domainSuffix != null) {
+        suffix = domainSuffix.getDomain();
+      }
+
+      if (domainSet.contains(suffix) || domainSet.contains(domain)
+        || domainSet.contains(host)) {
+        // Matches, filter!
+        return null;
+]]>
+</codefragment>
+</duplication>
+<duplication lines="35" tokens="199">
+<file line="368" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\java\org\apache\nutch\parse\html\DOMContentUtils.java"/>
+<file line="339" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\java\org\apache\nutch\parse\tika\DOMContentUtils.java"/>
+<codefragment>
+<![CDATA[
+            NamedNodeMap attrs = currentNode.getAttributes();
+            String target = null;
+            boolean noFollow = false;
+            boolean post = false;
+            for (int i= 0; i < attrs.getLength(); i++ ) {
+              Node attr = attrs.item(i);
+              String attrName = attr.getNodeName();
+              if (params.attrName.equalsIgnoreCase(attrName)) {
+                target = attr.getNodeValue();
+              } else if ("rel".equalsIgnoreCase(attrName) &&
+                         "nofollow".equalsIgnoreCase(attr.getNodeValue())) {
+                noFollow = true;
+              } else if ("method".equalsIgnoreCase(attrName) &&
+                         "post".equalsIgnoreCase(attr.getNodeValue())) {
+                post = true;
+              }
+            }
+            if (target != null && !noFollow && !post)
+              try {
+                
+                URL url = URLUtil.resolveURL(base, target);
+                outlinks.add(new Outlink(url.toString(),
+                                         linkText.toString().trim()));
+              } catch (MalformedURLException e) {
+                // don't care
+              }
+          }
+          // this should not have any children, skip them
+          if (params.childLen == 0) continue;
+        }
+      }
+    }
+  }
+
+}
+]]>
+</codefragment>
+</duplication>
+<duplication lines="44" tokens="194">
+<file line="84" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\scoring\webgraph\LoopReader.java"/>
+<file line="81" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\scoring\webgraph\NodeReader.java"/>
+<codefragment>
+<![CDATA[
+    FSUtils.closeReaders(nodeReaders);
+  }
+
+  /**
+   * Runs the NodeReader tool.  The command line arguments must contain a 
+   * webgraphdb path and a url.  The url must match the normalized url that is
+   * contained in the NodeDb of the WebGraph.
+   */
+  public static void main(String[] args)
+    throws Exception {
+
+    Options options = new Options();
+    OptionBuilder.withArgName("help");
+    OptionBuilder.withDescription("show this help message");
+    Option helpOpts = OptionBuilder.create("help");
+    options.addOption(helpOpts);
+    
+    OptionBuilder.withArgName("webgraphdb");
+    OptionBuilder.hasArg();
+    OptionBuilder.withDescription("the webgraphdb to use");
+    Option webGraphOpts = OptionBuilder.create("webgraphdb");
+    options.addOption(webGraphOpts);
+    
+    OptionBuilder.withArgName("url");
+    OptionBuilder.hasOptionalArg();
+    OptionBuilder.withDescription("the url to dump");
+    Option urlOpts = OptionBuilder.create("url");
+    options.addOption(urlOpts);
+
+    CommandLineParser parser = new GnuParser();
+    try {
+
+      // command line must take a webgraphdb and a url
+      CommandLine line = parser.parse(options, args);
+      if (line.hasOption("help") || !line.hasOption("webgraphdb")
+        || !line.hasOption("url")) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("WebGraphReader", options);
+        return;
+      }
+
+      // dump the values to system out and return
+      String webGraphDb = line.getOptionValue("webgraphdb");
+      String url = line.getOptionValue("url");
+]]>
+</codefragment>
+</duplication>
+<duplication lines="24" tokens="172">
+<file line="227" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\test\org\apache\nutch\metadata\TestMetadata.java"/>
+<file line="212" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\test\org\apache\nutch\metadata\TestSpellCheckedMetadata.java"/>
+<codefragment>
+<![CDATA[
+    SpellCheckedMetadata meta2 = new SpellCheckedMetadata();
+    assertFalse(meta1.equals(null));
+    assertFalse(meta1.equals("String"));
+    assertTrue(meta1.equals(meta2));
+    meta1.add("name-one", "value-1.1");
+    assertFalse(meta1.equals(meta2));
+    meta2.add("name-one", "value-1.1");
+    assertTrue(meta1.equals(meta2));
+    meta1.add("name-one", "value-1.2");
+    assertFalse(meta1.equals(meta2));
+    meta2.add("name-one", "value-1.2");
+    assertTrue(meta1.equals(meta2));
+    meta1.add("name-two", "value-2.1");
+    assertFalse(meta1.equals(meta2));
+    meta2.add("name-two", "value-2.1");
+    assertTrue(meta1.equals(meta2));
+    meta1.add("name-two", "value-2.2");
+    assertFalse(meta1.equals(meta2));
+    meta2.add("name-two", "value-2.x");
+    assertFalse(meta1.equals(meta2));
+  }
+
+  /** Test for <code>Writable</code> implementation. */
+  public void testWritable() {
+]]>
+</codefragment>
+</duplication>
+<duplication lines="30" tokens="157">
+<file line="114" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
+<file line="114" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\urlfilter-domainblacklist\src\java\org\apache\nutch\urlfilter\domainblacklist\DomainBlacklistURLFilter.java"/>
+<codefragment>
+<![CDATA[
+    Extension[] extensions = PluginRepository.get(conf).getExtensionPoint(
+      URLFilter.class.getName()).getExtensions();
+    for (int i = 0; i < extensions.length; i++) {
+      Extension extension = extensions[i];
+      if (extension.getDescriptor().getPluginId().equals(pluginName)) {
+        attributeFile = extension.getAttribute("file");
+        break;
+      }
+    }
+
+    // handle blank non empty input
+    if (attributeFile != null && attributeFile.trim().equals("")) {
+      attributeFile = null;
+    }
+
+    if (attributeFile != null) {
+      if (LOG.isInfoEnabled()) {
+        LOG.info("Attribute \"file\" is defined for plugin " + pluginName
+          + " as " + attributeFile);
+      }
+    }
+    else {
+      if (LOG.isWarnEnabled()) {
+        LOG.warn("Attribute \"file\" is not defined in plugin.xml for plugin "
+          + pluginName);
+      }
+    }
+
+    // domain file and attribute "file" take precedence if defined
+    String file = conf.get("urlfilter.domainblacklist.file");    
+]]>
+</codefragment>
+</duplication>
+<duplication lines="26" tokens="155">
+<file line="143" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\test\org\apache\nutch\metadata\TestMetadata.java"/>
+<file line="127" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\test\org\apache\nutch\metadata\TestSpellCheckedMetadata.java"/>
+<codefragment>
+<![CDATA[
+    SpellCheckedMetadata meta = new SpellCheckedMetadata();
+    Properties props = new Properties();
+
+    meta.setAll(props);
+    assertEquals(0, meta.size());
+
+    props.setProperty("name-one", "value1.1");
+    meta.setAll(props);
+    assertEquals(1, meta.size());
+    values = meta.getValues("name-one");
+    assertEquals(1, values.length);
+    assertEquals("value1.1", values[0]);
+
+    props.setProperty("name-two", "value2.1");
+    meta.setAll(props);
+    assertEquals(2, meta.size());
+    values = meta.getValues("name-one");
+    assertEquals(1, values.length);
+    assertEquals("value1.1", values[0]);
+    values = meta.getValues("name-two");
+    assertEquals(1, values.length);
+    assertEquals("value2.1", values[0]);
+  }
+
+  /** Test for <code>get(String)</code> method. */
+  public void testGet() {
+]]>
+</codefragment>
+</duplication>
+<duplication lines="25" tokens="146">
+<file line="967" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\fetcher\Fetcher.java"/>
+<file line="338" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
+<codefragment>
+<![CDATA[
+          }
+
+          if (parseResult == null) {
+            byte[] signature = 
+              SignatureFactory.getSignature(getConf()).calculate(content, 
+                  new ParseStatus().getEmptyParse(conf));
+            datum.setSignature(signature);
+          }
+        }
+        
+        /* Store status code in content So we can read this value during 
+         * parsing (as a separate job) and decide to parse or not.
+         */
+        content.getMetadata().add(Nutch.FETCH_STATUS_KEY, Integer.toString(status));
+      }
+
+      try {
+        output.collect(key, new NutchWritable(datum));
+        if (content != null && storingContent)
+          output.collect(key, new NutchWritable(content));
+        if (parseResult != null) {
+          for (Entry<Text, Parse> entry : parseResult) {
+            Text url = entry.getKey();
+            Parse parse = entry.getValue();
+            ParseStatus parseStatus = parse.getData().getStatus();
+]]>
+</codefragment>
+</duplication>
+<duplication lines="21" tokens="145">
+<file line="205" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\test\org\apache\nutch\metadata\TestMetadata.java"/>
+<file line="190" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\test\org\apache\nutch\metadata\TestSpellCheckedMetadata.java"/>
+<codefragment>
+<![CDATA[
+    SpellCheckedMetadata meta = new SpellCheckedMetadata();
+    meta.remove("name-one");
+    assertEquals(0, meta.size());
+    meta.add("name-one", "value-1.1");
+    meta.add("name-one", "value-1.2");
+    meta.add("name-two", "value-2.2");
+    assertEquals(2, meta.size());
+    assertNotNull(meta.get("name-one"));
+    assertNotNull(meta.get("name-two"));
+    meta.remove("name-one");
+    assertEquals(1, meta.size());
+    assertNull(meta.get("name-one"));
+    assertNotNull(meta.get("name-two"));
+    meta.remove("name-two");
+    assertEquals(0, meta.size());
+    assertNull(meta.get("name-one"));
+    assertNull(meta.get("name-two"));
+  }
+
+  /** Test for <code>equals(Object)</code> method. */
+  public void testObject() {
+]]>
+</codefragment>
+</duplication>
+<duplication lines="29" tokens="142">
+<file line="115" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
+<file line="96" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\urlnormalizer-host\src\java\org\apache\nutch\net\urlnormalizer\host\HostURLNormalizer.java"/>
+<codefragment>
+<![CDATA[
+      URLNormalizer.class.getName()).getExtensions();
+    for (int i = 0; i < extensions.length; i++) {
+      Extension extension = extensions[i];
+      if (extension.getDescriptor().getPluginId().equals(pluginName)) {
+        attributeFile = extension.getAttribute("file");
+        break;
+      }
+    }
+
+    // handle blank non empty input
+    if (attributeFile != null && attributeFile.trim().equals("")) {
+      attributeFile = null;
+    }
+
+    if (attributeFile != null) {
+      if (LOG.isInfoEnabled()) {
+        LOG.info("Attribute \"file\" is defined for plugin " + pluginName
+          + " as " + attributeFile);
+      }
+    }
+    else {
+      if (LOG.isWarnEnabled()) {
+        LOG.warn("Attribute \"file\" is not defined in plugin.xml for plugin "
+          + pluginName);
+      }
+    }
+
+    // domain file and attribute "file" take precedence if defined
+    String file = conf.get("urlnormalizer.hosts.file");
+]]>
+</codefragment>
+</duplication>
+<duplication lines="29" tokens="139">
+<file line="423" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\scoring\webgraph\LinkDumper.java"/>
+<file line="575" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\scoring\webgraph\Loops.java"/>
+<codefragment>
+<![CDATA[
+    int res = ToolRunner.run(NutchConfiguration.create(), new Loops(), args);
+    System.exit(res);
+  }
+
+  /**
+   * Runs the Loops tool.
+   */
+  public int run(String[] args)
+    throws Exception {
+
+    Options options = new Options();
+    OptionBuilder.withArgName("help");
+    OptionBuilder.withDescription("show this help message");
+    Option helpOpts = OptionBuilder.create("help");
+    options.addOption(helpOpts);
+    
+    OptionBuilder.withArgName("webgraphdb");
+    OptionBuilder.hasArg();
+    OptionBuilder.withDescription("the web graph database to use");
+    Option webGraphDbOpts = OptionBuilder.create("webgraphdb");
+    options.addOption(webGraphDbOpts);
+
+    CommandLineParser parser = new GnuParser();
+    try {
+
+      CommandLine line = parser.parse(options, args);
+      if (line.hasOption("help") || !line.hasOption("webgraphdb")) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("Loops", options);
+]]>
+</codefragment>
+</duplication>
+<duplication lines="22" tokens="138">
+<file line="732" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\fetcher\Fetcher.java"/>
+<file line="773" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\fetcher\Fetcher.java"/>
+<codefragment>
+<![CDATA[
+                                 Fetcher.PROTOCOL_REDIR);
+                if (redirUrl != null) {
+                  CrawlDatum newDatum = new CrawlDatum(CrawlDatum.STATUS_DB_UNFETCHED,
+                      fit.datum.getFetchInterval(), fit.datum.getScore());
+                  // transfer existing metadata
+                  newDatum.getMetaData().putAll(fit.datum.getMetaData());
+                  scfilters.initialScore(redirUrl, newDatum);
+                  if (reprUrl != null) {
+                    newDatum.getMetaData().put(Nutch.WRITABLE_REPR_URL_KEY,
+                        new Text(reprUrl));
+                  }
+                  fit = FetchItem.create(redirUrl, newDatum, queueMode);
+                  if (fit != null) {
+                    FetchItemQueue fiq =
+                      fetchQueues.getFetchItemQueue(fit.queueID);
+                    fiq.addInProgressFetchItem(fit);
+                  } else {
+                    // stop redirecting
+                    redirecting = false;
+                    reporter.incrCounter("FetcherStatus", "FetchItem.notCreated.redirect", 1);
+                  }
+                } else {
+]]>
+</codefragment>
+</duplication>
+<duplication lines="21" tokens="137">
+<file line="121" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\urlfilter-prefix\src\java\org\apache\nutch\urlfilter\prefix\PrefixURLFilter.java"/>
+<file line="252" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\urlfilter-suffix\src\java\org\apache\nutch\urlfilter\suffix\SuffixURLFilter.java"/>
+<codefragment>
+<![CDATA[
+    Extension[] extensions = PluginRepository.get(conf).getExtensionPoint(URLFilter.class.getName()).getExtensions();
+    for (int i = 0; i < extensions.length; i++) {
+      Extension extension = extensions[i];
+      if (extension.getDescriptor().getPluginId().equals(pluginName)) {
+        attributeFile = extension.getAttribute("file");
+        break;
+      }
+    }
+    if (attributeFile != null && attributeFile.trim().equals("")) attributeFile = null;
+    if (attributeFile != null) {
+      if (LOG.isInfoEnabled()) {
+        LOG.info("Attribute \"file\" is defined for plugin " + pluginName + " as " + attributeFile);
+      }
+    } else {
+      // if (LOG.isWarnEnabled()) {
+      //   LOG.warn("Attribute \"file\" is not defined in plugin.xml for
+      //   plugin "+pluginName);
+      // }
+    }
+
+    String file = conf.get("urlfilter.suffix.file");
+]]>
+</codefragment>
+</duplication>
+<duplication lines="24" tokens="137">
+<file line="901" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\fetcher\Fetcher.java"/>
+<file line="282" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
+<codefragment>
+<![CDATA[
+          if (reprUrl != null) {
+            newDatum.getMetaData().put(Nutch.WRITABLE_REPR_URL_KEY,
+                new Text(reprUrl));
+          }
+          output(url, newDatum, null, null, CrawlDatum.STATUS_LINKED);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(" - " + redirType + " redirect to " +
+                      url + " (fetching later)");
+          }
+          return null;
+        }
+      } else {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(" - " + redirType + " redirect skipped: " +
+              (newUrl != null ? "to same url" : "filtered"));
+        }
+        return null;
+      }
+    }
+
+    private void logError(Text url, String message) {
+      if (LOG.isInfoEnabled()) {
+        LOG.info("fetch of " + url + " failed with: " + message);
+      }
+]]>
+</codefragment>
+</duplication>
+<duplication lines="25" tokens="125">
+<file line="30" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\test\org\apache\nutch\util\TestPrefixStringMatcher.java"/>
+<file line="30" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\test\org\apache\nutch\util\TestSuffixStringMatcher.java"/>
+<codefragment>
+<![CDATA[
+  private final static int MAX_SUFFIX_LEN= 10;
+  private final static int NUM_TEST_INPUTS_PER_ROUND= 100;
+  private final static int MAX_INPUT_LEN= 20;
+
+  private final static char[] alphabet= 
+    new char[] {
+      'a', 'b', 'c', 'd',
+//      'e', 'f', 'g', 'h', 'i', 'j',
+//      'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+//      'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4',
+//      '5', '6', '7', '8', '9', '0'
+    };
+
+  private String makeRandString(int minLen, int maxLen) {
+    int len= minLen + (int) (Math.random() * (maxLen - minLen));
+    char[] chars= new char[len];
+    
+    for (int pos= 0; pos < len; pos++) {
+      chars[pos]= alphabet[(int) (Math.random() * alphabet.length)];
+    }
+    
+    return new String(chars);
+  }
+  
+  public void testSuffixMatcher() {
+]]>
+</codefragment>
+</duplication>
+<duplication lines="23" tokens="125">
+<file line="311" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\fetcher\OldFetcher.java"/>
+<file line="150" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\tools\arc\ArcSegmentCreator.java"/>
+<codefragment>
+<![CDATA[
+    Text key, CrawlDatum datum, Content content, ProtocolStatus pstatus,
+    int status) {
+
+    // set the fetch status and the fetch time
+    datum.setStatus(status);
+    datum.setFetchTime(System.currentTimeMillis());
+    if (pstatus != null)
+      datum.getMetaData().put(Nutch.WRITABLE_PROTO_STATUS_KEY, pstatus);
+
+    ParseResult parseResult = null;
+    if (content != null) {
+      Metadata metadata = content.getMetadata();
+      // add segment to metadata
+      metadata.set(Nutch.SEGMENT_NAME_KEY, segmentName);
+      // add score to content metadata so that ParseSegment can pick it up.
+      try {
+        scfilters.passScoreBeforeParsing(key, datum, content);
+      }
+      catch (Exception e) {
+        if (LOG.isWarnEnabled()) {
+          LOG.warn("Couldn't pass score, url " + key + " (" + e + ")");
+        }
+      }
+]]>
+</codefragment>
+</duplication>
+<duplication lines="22" tokens="118">
+<file line="252" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\scoring\webgraph\LinkDumper.java"/>
+<file line="382" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\scoring\webgraph\LinkRank.java"/>
+<codefragment>
+<![CDATA[
+      OutputCollector<Text, LinkDatum> output, Reporter reporter)
+      throws IOException {
+
+      String fromUrl = key.toString();
+      List<LinkDatum> outlinks = new ArrayList<LinkDatum>();
+      Node node = null;
+      LoopSet loops = null;
+
+      // aggregate outlinks, assign other values
+      while (values.hasNext()) {
+        ObjectWritable write = values.next();
+        Object obj = write.get();
+        if (obj instanceof Node) {
+          node = (Node)obj;
+        }
+        else if (obj instanceof LinkDatum) {
+          outlinks.add(WritableUtils.clone((LinkDatum)obj, conf));
+        }
+        else if (obj instanceof LoopSet) {
+          loops = (LoopSet)obj;
+        }
+      }
+]]>
+</codefragment>
+</duplication>
+<duplication lines="15" tokens="112">
+<file line="367" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-html\src\test\org\apache\nutch\parse\html\TestDOMContentUtils.java"/>
+<file line="279" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestDOMContentUtils.java"/>
+<codefragment>
+<![CDATA[
+  public void testGetOutlinks() throws Exception {
+    if (testDOMs[0] == null)
+      setup();
+    for (int i = 0; i < testPages.length; i++) {
+      ArrayList<Outlink> outlinks = new ArrayList<Outlink>();
+      if (i == SKIP) {
+        conf.setBoolean("parser.html.form.use_action", false);
+        utils.setConf(conf);
+      } else {
+        conf.setBoolean("parser.html.form.use_action", true);
+        utils.setConf(conf);
+      }
+      utils.getOutlinks(testBaseHrefURLs[i], outlinks, testDOMs[i]);
+      Outlink[] outlinkArr = new Outlink[outlinks.size()];
+      outlinkArr = outlinks.toArray(outlinkArr);
+]]>
+</codefragment>
+</duplication>
+<duplication lines="21" tokens="111">
+<file line="210" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\parse\ParseData.java"/>
+<file line="255" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\protocol\Content.java"/>
+<codefragment>
+<![CDATA[
+    if (argv.length < 3) {
+      System.out.println("usage:" + usage);
+      return;
+    }
+    Options opts = new Options();
+    Configuration conf = NutchConfiguration.create();
+    
+    GenericOptionsParser parser =
+      new GenericOptionsParser(conf, opts, argv);
+    
+    String[] remainingArgs = parser.getRemainingArgs();
+    FileSystem fs = FileSystem.get(conf);
+    
+    try {
+      int recno = Integer.parseInt(remainingArgs[0]);
+      String segment = remainingArgs[1];
+
+      Path file = new Path(segment, DIR_NAME);
+      System.out.println("Reading from file: " + file);
+
+      ArrayFile.Reader contents = new ArrayFile.Reader(fs, file.toString(),
+]]>
+</codefragment>
+</duplication>
+<duplication lines="15" tokens="110">
+<file line="51" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestImageMetadata.java"/>
+<file line="62" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-tika\src\test\org\apache\nutch\tika\TestPdfParser.java"/>
+<codefragment>
+<![CDATA[
+  protected void tearDown() {}
+
+  public void testIt() throws ProtocolException, ParseException {
+    String urlString;
+    Protocol protocol;
+    Content content;
+    Parse parse;
+
+    for (int i = 0; i < sampleFiles.length; i++) {
+      urlString = "file:" + sampleDir + fileSeparator + sampleFiles[i];
+
+      Configuration conf = NutchConfiguration.create();
+      protocol = new ProtocolFactory(conf).getProtocol(urlString);
+      content = protocol.getProtocolOutput(new Text(urlString), new CrawlDatum()).getContent();
+      parse = new ParseUtil(conf).parseByExtensionId("parse-tika", content).get(content.getUrl());
+]]>
+</codefragment>
+</duplication>
+<duplication lines="19" tokens="109">
+<file line="69" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-swf\src\test\org\apache\nutch\parse\swf\TestSWFParser.java"/>
+<file line="56" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\parse-zip\src\test\org\apache\nutch\parse\zip\TestZipParser.java"/>
+<codefragment>
+<![CDATA[
+  }
+
+  protected void setUp() {}
+
+  protected void tearDown() {}
+
+  public void testIt() throws ProtocolException, ParseException {
+    String urlString;
+    Protocol protocol;
+    Content content;
+    Parse parse;
+
+    Configuration conf = NutchConfiguration.create();
+    for (int i = 0; i < sampleFiles.length; i++) {
+      urlString = "file:" + sampleDir + fileSeparator + sampleFiles[i];
+
+      protocol = new ProtocolFactory(conf).getProtocol(urlString);
+      content = protocol.getProtocolOutput(new Text(urlString), new CrawlDatum()).getContent();
+      parse = new ParseUtil(conf).parseByExtensionId("parse-zip",content).get(content.getUrl());
+]]>
+</codefragment>
+</duplication>
+<duplication lines="12" tokens="109">
+<file line="110" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\util\PrefixStringMatcher.java"/>
+<file line="107" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\java\org\apache\nutch\util\SuffixStringMatcher.java"/>
+<codefragment>
+<![CDATA[
+    String[] tests= {"a", "ac", "abcd", "abcdefg", "apple", "aa", "aac",
+                    "aaccca", "abaz", "baz", "bazooka", "fo", "foobar",
+                    "kite", };
+
+    for (int i= 0; i < tests.length; i++) {
+      System.out.println("testing: " + tests[i]);
+      System.out.println("   matches: " + matcher.matches(tests[i]));
+      System.out.println("  shortest: " + matcher.shortestMatch(tests[i]));
+      System.out.println("   longest: " + matcher.longestMatch(tests[i]));
+    }
+  }
+}
+]]>
+</codefragment>
+</duplication>
+<duplication lines="29" tokens="107">
+<file line="109" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\test\org\apache\nutch\crawl\TestCrawlDbFilter.java"/>
+<file line="272" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\test\org\apache\nutch\crawl\TestGenerator.java"/>
+<codefragment>
+<![CDATA[
+    assertEquals(list.size(), fetchList.size());
+
+  }
+
+
+  /**
+   * Read contents of fetchlist.
+   * @param fetchlist  path to Generated fetchlist
+   * @return Generated {@link URLCrawlDatum} objects
+   * @throws IOException
+   */
+  private ArrayList<URLCrawlDatum> readContents(Path fetchlist) throws IOException {
+    // verify results
+    SequenceFile.Reader reader = new SequenceFile.Reader(fs, fetchlist, conf);
+
+    ArrayList<URLCrawlDatum> l = new ArrayList<URLCrawlDatum>();
+
+    READ: do {
+      Text key = new Text();
+      CrawlDatum value = new CrawlDatum();
+      if (!reader.next(key, value)) {
+        break READ;
+      }
+      l.add(new URLCrawlDatum(key, value));
+    } while (true);
+
+    reader.close();
+    return l;
+  }
+]]>
+</codefragment>
+</duplication>
+<duplication lines="26" tokens="105">
+<file line="66" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\urlfilter-domain\src\java\org\apache\nutch\urlfilter\domain\DomainURLFilter.java"/>
+<file line="66" path="C:\Users\Marcelo_Laser\Desktop\Projects\ARCADE_master\arcade_core\src\test\resources\subject_systems\nutch-1.8\src\plugin\urlfilter-domainblacklist\src\java\org\apache\nutch\urlfilter\domainblacklist\DomainBlacklistURLFilter.java"/>
+<codefragment>
+<![CDATA[
+  private static final Logger LOG = LoggerFactory.getLogger(DomainBlacklistURLFilter.class);
+
+  // read in attribute "file" of this plugin.
+  private static String attributeFile = null;
+  private Configuration conf;
+  private String domainFile = null;
+  private Set<String> domainSet = new LinkedHashSet<String>();
+
+  private void readConfiguration(Reader configReader)
+    throws IOException {
+
+    // read the configuration file, line by line
+    BufferedReader reader = new BufferedReader(configReader);
+    String line = null;
+    while ((line = reader.readLine()) != null) {
+      if (StringUtils.isNotBlank(line) && !line.startsWith("#")) {
+        // add non-blank lines and non-commented lines
+        domainSet.add(StringUtils.lowerCase(line.trim()));
+      }
+    }
+  }
+
+  /**
+   * Default constructor.
+   */
+  public DomainBlacklistURLFilter() {
+]]>
+</codefragment>
+</duplication>
+</pmd-cpd>

@@ -65,13 +65,13 @@ public class BatchDepFinderTest {
     // "struts-2.5.2,"
     // + ".///src///test///resources///BatchDepFinderTest_resources///struts-2.5.2_deps.xml",
     // nutch-1.7
-    "nutch1.7,"
+    "nutch-1.7,"
     + ".///src///test///resources///BatchDepFinderTest_resources///nutch-1.7_deps.xml",
     // nutch-1.8
-    "nutch1.8,"
+    "nutch-1.8,"
     + ".///src///test///resources///BatchDepFinderTest_resources///nutch-1.8_deps.xml",
     // nutch-1.8
-    "nutch1.9,"
+    "nutch-1.9,"
     + ".///src///test///resources///BatchDepFinderTest_resources///nutch-1.9_deps.xml",
   })
   public void singleTest(String version, String oracle){

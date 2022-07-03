@@ -47,6 +47,9 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 	 * @param source The source entity of this DocTopicItem.
 	 */
 	DocTopicItem(String source) {
+		if (source.isEmpty())
+			throw new IllegalArgumentException("DocTopicItem source cannot be empty");
+
 		this.source = source;
 		this.topics = new TreeMap<>();
 	}
@@ -221,13 +224,12 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 
 		DocTopicItem that = (DocTopicItem) o;
 
-		return Objects.equals(this.source, that.source)
-			&& Objects.equals(getTopics(), that.getTopics());
+		return this.source.equals(that.source);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(source, topics); }
+		return Objects.hash(source); }
 	//endregion
 
 	//region SERIALIZATION

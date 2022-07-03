@@ -9,6 +9,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,13 +54,12 @@ public class LimboTest extends BaseTest {
 		String oraclePath = resourcesDir + fs + systemVersion
 			+ "_limbo_clusters.rsf";
 		String resultPath = outputDirPath + fs + systemVersion
-			+ "_limbo_il_100_clusters.rsf";
+			+ "_limbo_IL_100_clusters.rsf";
 
 		Architecture arch = assertDoesNotThrow(() ->
 			new Architecture(systemVersion + "_limbo", outputDirPath,
 				SimMeasure.SimMeasureType.IL,
-				FeatureVectors.deserializeFFVectors(fVecsPath),
-				lang,	packagePrefix));
+				FeatureVectors.deserializeFFVectors(fVecsPath), lang, packagePrefix));
 
 		SerializationCriterion serialCrit =
 			SerializationCriterion.makeSerializationCriterion(
@@ -65,21 +68,26 @@ public class LimboTest extends BaseTest {
 		StoppingCriterion stopCrit = StoppingCriterion.makeStoppingCriterion(
 			"preselected", 100);
 
-//		assertDoesNotThrow(() ->
-//			Clusterer.run(ClusteringAlgorithmType.LIMBO, arch, serialCrit, stopCrit,
-//				lang, SimMeasure.SimMeasureType.IL));
-
-		try {
+		assertDoesNotThrow(() ->
 			Clusterer.run(ClusteringAlgorithmType.LIMBO, arch, serialCrit, stopCrit,
-				lang, SimMeasure.SimMeasureType.IL);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+				lang, SimMeasure.SimMeasureType.IL));
 
 		// Load results
 		String result = assertDoesNotThrow(() ->
 			FileUtil.readFile(resultPath, StandardCharsets.UTF_8));
+
+		// ------------------------- Generate Oracles ------------------------------
+
+		if (generateOracles) {
+			assertDoesNotThrow(() -> {
+				Path resultClusterPath = Paths.get(resultPath);
+				Path oracleClusterPath = Paths.get(oraclePath);
+				Files.copy(resultClusterPath,
+					oracleClusterPath, StandardCopyOption.REPLACE_EXISTING);
+			});
+		}
+
+		// ------------------------- Generate Oracles ------------------------------
 
 		// Load oracle
 		String oracle = assertDoesNotThrow(() ->

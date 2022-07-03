@@ -25,7 +25,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 public class ArcTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "ARC";
 	private final String factsDir = resourcesBase + fs + "Facts";
-	private final String outputDirPath = outputBase + fs + "ConcernClusteringRunnerTest";
+	private final String outputDirPath = outputBase + fs + "ARC";
 
 	/**
 	 * Tests ARC recovery for a single version of a system.
@@ -39,13 +39,13 @@ public class ArcTest extends BaseTest {
 		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_JS_183_,"
+			+ "_JS_182_,"
 			+ "org.apache.struts2",
 
 		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_JS_165_,"
+			+ "_JS_164_,"
 			+ "org.apache.struts2",
 
 		// httpd 2.3.8

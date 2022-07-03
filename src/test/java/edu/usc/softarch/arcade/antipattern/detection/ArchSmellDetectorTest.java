@@ -10,6 +10,11 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 /**
  * Tests related to the basic smell detection components of ARCADE:
  * BUO (Brick Use Overload), BDC (Brick Dependency Cycle),
@@ -30,11 +35,11 @@ public class ArchSmellDetectorTest extends BaseTest {
 	@ParameterizedTest
 	@CsvSource({
 		"struts-2.3.30,"
-		+ "183,"
+		+ "182,"
 		+ "java",
 
 		"struts-2.5.2,"
-		+ "165,"
+		+ "164,"
 		+ "java",
 
 		"httpd-2.3.8,"
@@ -63,9 +68,13 @@ public class ArchSmellDetectorTest extends BaseTest {
 		SmellCollection resultSmells = assertDoesNotThrow(
       () -> asd.run(true, true, false));
 
+		// ------------------------- Generate Oracles ------------------------------
+
 		if (super.generateOracles)
 			assertDoesNotThrow(() ->
 				resultSmells.serializeSmellCollection(oraclePath));
+
+		// ------------------------- Generate Oracles ------------------------------
 
 		// Construct SmellCollection objects out of the result and oracle files
 		SmellCollection oracleSmells =

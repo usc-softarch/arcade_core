@@ -7,9 +7,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.usc.softarch.arcade.BaseTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -18,17 +23,17 @@ import edu.usc.softarch.arcade.util.FileUtil;
 /**
  * Tests whether the results of PMD are correct for what ARCADE expects.
  */
-public class BatchCloneFinderTest {
-	private char fs = File.separatorChar;
+public class BatchCloneFinderTest extends BaseTest {
+	private final String resourcesDir = resourcesBase + fs + "CloneFinder";
+	private final String outputDir = outputBase + fs + "CloneFinder";
 
 	/**
 	 * Sets up the CLI command to run PMD.
 	 * 
-	 * @param system The name of the sample system.
 	 * @param version The version of the sample system.
 	 * @return The command and arguments needed to run PMD.
 	 */
-	private List<String> buildArguments(String system, String version) {
+	private List<String> buildArguments(String version) {
 		List<String> command = new ArrayList<>();
 
 		// The actual system being run is ANT. PMD is run through it.
@@ -46,7 +51,7 @@ public class BatchCloneFinderTest {
 			+ version);
 		// This is the path for an output file.
 		command.add("-Dout="+ System.getProperty("user.dir") + fs + "target" + fs
-			+ "test_results" + fs + "BatchCloneFinderTest" + fs + version 
+			+ "test_results" + fs + "CloneFinder" + fs + version
 			+ "_clone.xml");
 
 		return command;
@@ -55,13 +60,12 @@ public class BatchCloneFinderTest {
 	/**
 	 * Sets up and runs the Process object responsible for PMD.
 	 * 
-	 * @param system The name of the sample system.
 	 * @param version The version of the sample system.
 	 */
-	private void setUp(String system, String version) {
-		(new File("target" + fs + "test_results" + fs + "BatchCloneFinderTest"))
-			.mkdirs();
-		List<String> command = buildArguments(system, version);
+	private void setUp(String version) {
+		(new File("target" + fs + "test_results"
+			+ fs + "CloneFinder")).mkdirs();
+		List<String> command = buildArguments(version);
 		ProcessBuilder pb = new ProcessBuilder(command);
 		pb.inheritIO();
 
@@ -95,53 +99,45 @@ public class BatchCloneFinderTest {
 	 * ARCADE, both as a sanity check and as a gatekeeping mechanism if we ever
 	 * opt to use a newer version of PMD, or a different clone detector.
 	 * 
-	 * @param system The name of the sample system.
 	 * @param version The version of the sample system.
-	 * @param oracle The path to the test oracle file.
 	 */
 	@ParameterizedTest
 	@CsvSource({
-		// struts-2.3.30
-		"Struts2,"
-		+ "struts-2.3.30,"
-		+ ".///src///test///resources///BatchCloneFinderTest_resources"
-			+ "///struts-2.3.30_clone.xml",
-		// struts-2.5.2
-		"Struts2,"
-		+ "struts-2.5.2,"
-		+ ".///src///test///resources///BatchCloneFinderTest_resources"
-			+ "///struts-2.5.2_clone.xml",
-		// nutch-1.7
-		"nutch,"
-		+ "nutch1.7,"
-		+ ".///src///test///resources///BatchCloneFinderTest_resources"
-			+ "///nutch-1.7_clone.xml",
-		// nutch-1.8
-		"nutch,"
-		+ "nutch1.8,"
-		+ ".///src///test///resources///BatchCloneFinderTest_resources"
-			+ "///nutch-1.8_clone.xml",
-		// nutch-1.8
-		"nutch,"
-		+ "nutch1.9,"
-		+ ".///src///test///resources///BatchCloneFinderTest_resources"
-			+ "///nutch-1.9_clone.xml",
-	})
-	public void singleTest(String system, String version, String oracle) {
-		// Constructs ProcessBuilder
-		setUp(system, version);
+		"struts-2.3.30",
 
-		String oraclePath = oracle.replace("///", File.separator);
-		String resultPath = "target" + fs + "test_results" + fs
-			+ "BatchCloneFinderTest" + fs + version + "_clone.xml";
+		"struts-2.5.2",
+
+		"nutch-1.7",
+
+		"nutch-1.8",
+
+		"nutch-1.9"
+	})
+	public void singleTest(String version) {
+		// Constructs ProcessBuilder
+		setUp(version);
+
+		String oracleClonesPath = resourcesDir + fs + version + "_clone.xml";
+		String resultClonesPath = outputDir + fs + version + "_clone.xml";
 
 		// Read in xmls as Strings
-		String resultString = assertDoesNotThrow(() -> {
-		  return FileUtil.readFile(resultPath, StandardCharsets.UTF_8);
-		});
-		String oracleString = assertDoesNotThrow(() -> {
-		  return FileUtil.readFile(oraclePath, StandardCharsets.UTF_8);
-		});
+		String resultString = assertDoesNotThrow(
+			() -> FileUtil.readFile(resultClonesPath, StandardCharsets.UTF_8));
+
+		// ------------------------- Generate Oracles ------------------------------
+
+		if (generateOracles) {
+			assertDoesNotThrow(() -> {
+				Path resultPath = Paths.get(resultClonesPath);
+				Path oraclePath = Paths.get(oracleClonesPath);
+				Files.copy(resultPath, oraclePath, StandardCopyOption.REPLACE_EXISTING);
+			});
+		}
+
+		// ------------------------- Generate Oracles ------------------------------
+
+		String oracleString = assertDoesNotThrow(
+			() -> FileUtil.readFile(oracleClonesPath, StandardCharsets.UTF_8));
 
 		assertEquals(cleanAbsolutePaths(oracleString),
 			cleanAbsolutePaths(resultString));

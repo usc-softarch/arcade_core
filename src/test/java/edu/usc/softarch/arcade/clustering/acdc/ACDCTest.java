@@ -4,6 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import edu.usc.softarch.arcade.BaseTest;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -41,6 +45,18 @@ public class ACDCTest extends BaseTest {
 		assertDoesNotThrow(() -> ACDC.run(deps, clusters));
 		String result = assertDoesNotThrow(
 			() -> FileUtil.readFile(clusters, StandardCharsets.UTF_8));
+
+		// ------------------------- Generate Oracles ------------------------------
+
+		if (generateOracles) {
+			assertDoesNotThrow(() -> {
+				Path resultPath = Paths.get(clusters);
+				Path oraclePath = Paths.get(oracle);
+				Files.copy(resultPath, oraclePath, StandardCopyOption.REPLACE_EXISTING);
+			});
+		}
+
+		// ------------------------- Generate Oracles ------------------------------
 
 		// Load oracle
 		String oracleResult = assertDoesNotThrow(

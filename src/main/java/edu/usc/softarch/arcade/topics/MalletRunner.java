@@ -196,7 +196,16 @@ public class MalletRunner {
 					break;
 				}
 			}
+			// No package declaration, because system was made by a mongrel...
+			// ... or something in here failed, but that's less likely unless Java
+			// changes their syntax.
+			if (fullClassName.isEmpty())
+				fullClassName = shortClassName;
 		}
+
+		if (fullClassName.isEmpty())
+			throw new IOException("Could not identify Instance name.");
+
 		String data = FileUtil.readFile(file.getAbsolutePath());
 		return new Instance(data, "X", fullClassName, file.getAbsolutePath());
 	}
@@ -208,6 +217,10 @@ public class MalletRunner {
 		String depsStyleFilename = file.getAbsolutePath().replace(
 			this.targetDir.getAbsolutePath() + fs, "");
 		String data = FileUtil.readFile(file.getAbsolutePath());
+
+		if (depsStyleFilename.isEmpty())
+			throw new IOException("Could not identify Instance name.");
+
 		return new Instance(data, "X", depsStyleFilename,
 			file.getAbsolutePath());
 	}
