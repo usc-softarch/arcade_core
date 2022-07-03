@@ -10,7 +10,7 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.usc.softarch.arcade.classgraphs.StringEdge;
 import edu.usc.softarch.arcade.facts.ConcernCluster;
-import edu.usc.softarch.arcade.facts.driver.RsfReader;
+import edu.usc.softarch.arcade.facts.dependencies.RsfReader;
 
 public class ConcernClusterArchitecture extends HashSet<ConcernCluster> {
 	//region ATTRIBUTES

@@ -8,9 +8,9 @@ import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
-import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
+import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopics;
-import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
 
 public class Clusterer {
 	//region PUBLIC INTERFACE

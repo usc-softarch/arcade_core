@@ -13,10 +13,10 @@ import java.util.Set;
 import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
-import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
-import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
-import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
-import edu.usc.softarch.arcade.util.json.JsonSerializable;
+import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.util.json.EnhancedJsonParser;
+import edu.usc.softarch.util.json.JsonSerializable;
 
 /**
  * Represents a cluster of entities in the subject system.

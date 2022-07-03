@@ -4,13 +4,10 @@ import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
-import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
-import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.arcade.util.FileUtil;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;

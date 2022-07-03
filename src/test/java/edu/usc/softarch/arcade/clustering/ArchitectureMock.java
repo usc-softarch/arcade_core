@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.clustering;
 
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
-import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
 
 public class ArchitectureMock extends Architecture {
 	//region ATTRIBUTES

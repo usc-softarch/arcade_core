@@ -24,7 +24,7 @@ import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicItem;
-import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
 
 public class ArchSmellDetector {
 	//region ATTRIBUTES

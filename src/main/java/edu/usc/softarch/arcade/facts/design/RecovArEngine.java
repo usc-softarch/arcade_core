@@ -1,13 +1,10 @@
 package edu.usc.softarch.arcade.facts.design;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import edu.usc.softarch.arcade.facts.VersionTree;
 import edu.usc.softarch.arcade.facts.issues.IssueRecord;
 import edu.usc.softarch.arcade.facts.issues.handlers.GitLabRestHandler;
 import edu.usc.softarch.arcade.util.FileUtil;
-import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 
 import java.io.File;
 import java.io.FileNotFoundException;

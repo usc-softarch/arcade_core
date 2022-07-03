@@ -1,9 +1,9 @@
 package edu.usc.softarch.arcade.facts.issues;
 
 import edu.usc.softarch.arcade.facts.issues.handlers.IssueRecordBuilder;
-import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
-import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
-import edu.usc.softarch.arcade.util.json.JsonSerializable;
+import edu.usc.softarch.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.util.json.EnhancedJsonParser;
+import edu.usc.softarch.util.json.JsonSerializable;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;

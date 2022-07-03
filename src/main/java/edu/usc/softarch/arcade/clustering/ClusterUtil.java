@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.usc.softarch.arcade.facts.driver.RsfReader;
+import edu.usc.softarch.arcade.facts.dependencies.RsfReader;
 
 /**
  * @author joshua

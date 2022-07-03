@@ -10,9 +10,10 @@ import java.util.TreeMap;
 import cc.mallet.topics.TopicInferencer;
 import cc.mallet.types.InstanceList;
 import edu.usc.softarch.arcade.clustering.Cluster;
-import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
-import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
-import edu.usc.softarch.arcade.util.json.JsonSerializable;
+import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.util.json.EnhancedJsonParser;
+import edu.usc.softarch.util.json.JsonSerializable;
 
 /**
  * @author joshua

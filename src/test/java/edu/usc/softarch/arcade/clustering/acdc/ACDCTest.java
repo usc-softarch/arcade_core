@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import edu.usc.softarch.arcade.util.FileUtil;
-import edu.usc.softarch.arcade.util.RsfCompare;
+import edu.usc.softarch.arcade.RsfCompare;
 
 public class ACDCTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "ACDC";

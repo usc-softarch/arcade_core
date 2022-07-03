@@ -6,8 +6,8 @@ import com.fasterxml.jackson.core.JsonToken;
 import edu.usc.softarch.arcade.facts.VersionTree;
 import edu.usc.softarch.arcade.facts.issues.Commit;
 import edu.usc.softarch.arcade.facts.issues.IssueRecord;
-import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
-import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
+import edu.usc.softarch.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.util.json.EnhancedJsonParser;
 
 import java.io.IOException;
 import java.net.URI;

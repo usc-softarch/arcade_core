@@ -9,6 +9,8 @@ import cc.mallet.pipe.TokenSequence2FeatureSequence;
 import cc.mallet.pipe.TokenSequenceRemoveStopwords;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
+import edu.usc.softarch.arcade.topics.pipes.CamelCaseSeparatorPipe;
+import edu.usc.softarch.arcade.topics.pipes.StemmerPipe;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 import java.io.BufferedReader;
