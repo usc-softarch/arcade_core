@@ -36,25 +36,21 @@ public class ArcTest extends BaseTest {
 	 */
 	@ParameterizedTest
 	@CsvSource({
-		// struts 2.3.30
 		"struts-2.3.30,"
 			+ "java,"
 			+ "_JS_182_,"
 			+ "org.apache.struts2",
 
-		// struts 2.5.2
 		"struts-2.5.2,"
 			+ "java,"
 			+ "_JS_164_,"
 			+ "org.apache.struts2",
 
-		// httpd 2.3.8
 		"httpd-2.3.8,"
 			+ "c,"
 			+ "_JS_71_,"
 			+ "",
 
-		// httpd 2.4.26
 		"httpd-2.4.26,"
 			+ "c,"
 			+ "_JS_82_,"

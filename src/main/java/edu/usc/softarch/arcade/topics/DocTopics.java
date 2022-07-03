@@ -2,8 +2,8 @@ package edu.usc.softarch.arcade.topics;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -24,7 +24,7 @@ import edu.usc.softarch.util.json.JsonSerializable;
 public class DocTopics implements JsonSerializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static DocTopics singleton;
-	private final Collection<DocTopicItem> dtItemList;
+	private final Map<String, DocTopicItem> dtItemList;
 	private Map<Integer, List<String>> topicWordLists;
 	// #endregion FIELDS ---------------------------------------------------------
 	
@@ -33,11 +33,11 @@ public class DocTopics implements JsonSerializable {
 	 * Deserialization constructor.
 	 */
 	private DocTopics() {
-		this.dtItemList = new ArrayList<>();
+		this.dtItemList = new HashMap<>();
 		this.topicWordLists = new TreeMap<>();
 	}
 
-	private DocTopics(String artifactsDir)	throws Exception {
+	private DocTopics(String artifactsDir) throws Exception {
 		this();
 		// Begin by importing documents from text to feature sequences
 		char fs = File.separatorChar;
@@ -55,10 +55,10 @@ public class DocTopics implements JsonSerializable {
 			DocTopicItem dtItem = new DocTopicItem(
 				(String) previousInstances.get(instIndex).getName());
 
-			double[] topicDistribution = 
+			double[] topicDistribution =
 				inferencer.getSampledDistribution(
 					previousInstances.get(instIndex), 1000, 10, 10);
-			
+
 			for (int topicIdx = 0; topicIdx < numTopics; topicIdx++) {
 				TopicItem t = new TopicItem(topicIdx, topicDistribution[topicIdx]);
 				dtItem.addTopic(t);
@@ -90,34 +90,45 @@ public class DocTopics implements JsonSerializable {
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
 	// #region ACCESSORS ---------------------------------------------------------
-	public Collection<DocTopicItem> getDocTopicItemList() { return dtItemList; }
-
 	public void setClusterDocTopic(Cluster c, String language) {
 		c.setDocTopicItem(this.getDocTopicItem(c.name, language)); }
 
 	void addDocTopicItem(DocTopicItem dti) {
-		if (this.dtItemList.contains(dti))
+		if (this.dtItemList.containsKey(dti.source))
 			throw new IllegalArgumentException("Can't add a DTI twice.");
-		this.dtItemList.add(dti);
+		this.dtItemList.put(dti.source, dti);
 	}
 
 	public void cleanDocTopics(Collection<DocTopicItem> toKeep) {
 		EnhancedSet<DocTopicItem> toKeepSet = new EnhancedHashSet<>(toKeep);
 		EnhancedSet<DocTopicItem> completeSet =
-			new EnhancedHashSet<>(this.dtItemList);
+			new EnhancedHashSet<>(this.dtItemList.values());
 
 		Collection<DocTopicItem> toRemoveSet = completeSet.difference(toKeepSet);
-		this.dtItemList.removeAll(toRemoveSet);
+
+		for (DocTopicItem dti : toRemoveSet)
+			this.dtItemList.remove(dti.source);
 	}
+
+	/**
+	 * Gets the DocTopicItem of a given name. Use this when reloading DocTopics
+	 * from a previous execution, where the DocTopicItems have already been
+	 * correctly renamed.
+	 *
+	 * @param name Name of the DocTopicItem to recover.
+	 * @return Associated DocTopicItem.
+	 */
+	public DocTopicItem getDocTopicItem(String name) {
+		return dtItemList.get(name); }
 
 	/**
 	 * Gets the DocTopicItem for a given file name or entity.
 	 * 
 	 * @param name Name of the file or entity.
 	 * @param language Source language of the file.
-	 * @return Associated DocTopicItem
+	 * @return Associated DocTopicItem.
 	 */
-	public DocTopicItem getDocTopicItem(String name, String language) {
+	private DocTopicItem getDocTopicItem(String name, String language) {
 		if (language.equalsIgnoreCase("java"))
 			return getDocTopicItemForJava(name);
 		if (language.equalsIgnoreCase("c"))
@@ -135,11 +146,12 @@ public class DocTopics implements JsonSerializable {
 	public DocTopicItem getDocTopicItemForJava(String name) {
 		String altName = name.replace("/", ".").replace(".java", "").trim();
 
-		for (DocTopicItem dti : dtItemList) {
-			if (dti.source.endsWith(name)
-					|| altName.equals(dti.source.trim()))
-				return dti;
+		for (Map.Entry<String, DocTopicItem> entry : dtItemList.entrySet()) {
+			if (entry.getKey().endsWith(name)
+				|| altName.equals(entry.getKey().trim()))
+				return entry.getValue();
 		}
+
 		return null;
 	}
 
@@ -150,8 +162,8 @@ public class DocTopics implements JsonSerializable {
 	 * @return Associated DocTopicItem.
 	 */
 	public DocTopicItem getDocTopicItemForC(String name) {
-		for (DocTopicItem dti : dtItemList) {
-			String strippedSource = null;
+		for (DocTopicItem dti : dtItemList.values()) {
+			String strippedSource;
 			String nameWithoutQuotations = name.replace("\"", "");
 
 			if (dti.source.endsWith(".func")) {
@@ -193,8 +205,8 @@ public class DocTopics implements JsonSerializable {
 		if (newDti.equals(dti2))
 			return dti2;
 
-		singleton.dtItemList.remove(dti1);
-		singleton.dtItemList.remove(dti2);
+		singleton.dtItemList.remove(dti1.source);
+		singleton.dtItemList.remove(dti2.source);
 		addDocTopicItem(newDti);
 
 		return newDti;
@@ -214,7 +226,7 @@ public class DocTopics implements JsonSerializable {
 
 	@Override
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
-		generator.writeField("dtItemList", dtItemList);
+		generator.writeField("dtItemList", dtItemList.values());
 		generator.writeField(
 			"topicWordLists", topicWordLists, false, "wordList");
 	}

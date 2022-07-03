@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering;
 
+import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
 import edu.usc.softarch.util.LabeledEdge;
@@ -156,6 +157,14 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 		for (ReadOnlyCluster cluster : this.values())
 			for (String entity : cluster.getEntities())
 				this.entityLocationMap.put(entity, cluster);
+	}
+
+	public void loadDocTopics(String path) throws IOException {
+		DocTopics.deserialize(path);
+
+		for (ReadOnlyCluster cluster : this.values())
+			cluster.setDocTopicItem(
+				DocTopics.getSingleton().getDocTopicItem(cluster.name));
 	}
 	//endregion
 
