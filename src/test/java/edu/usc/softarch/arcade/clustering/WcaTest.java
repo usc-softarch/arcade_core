@@ -57,14 +57,12 @@ public class WcaTest extends BaseTest {
 		Architecture archUem = assertDoesNotThrow(() ->
 			new Architecture(systemVersion, outputDirPath,
 				SimMeasure.SimMeasureType.UEM,
-				FeatureVectors.deserializeFFVectors(fVecsPath),
-				lang,	packagePrefix));
+				FeatureVectors.deserializeFFVectors(fVecsPath), lang, packagePrefix));
 
 		Architecture archUemnm = assertDoesNotThrow(() ->
 			new Architecture(systemVersion, outputDirPath,
 				SimMeasure.SimMeasureType.UEMNM,
-				FeatureVectors.deserializeFFVectors(fVecsPath),
-				lang,	packagePrefix));
+				FeatureVectors.deserializeFFVectors(fVecsPath), lang, packagePrefix));
 
 		SerializationCriterion serialCritUem =
 			SerializationCriterion.makeSerializationCriterion(
@@ -78,12 +76,12 @@ public class WcaTest extends BaseTest {
 			"preselected", 100);
 
 		assertDoesNotThrow(() ->
-			Clusterer.run(ClusteringAlgorithmType.WCA, archUem, serialCritUem, stopCrit, lang,
-				"preselected", SimMeasure.SimMeasureType.UEM));
+			Clusterer.run(ClusteringAlgorithmType.WCA, archUem, serialCritUem,
+				stopCrit, lang, SimMeasure.SimMeasureType.UEM));
 
 		assertDoesNotThrow(() ->
-			Clusterer.run(ClusteringAlgorithmType.WCA, archUemnm, serialCritUemnm, stopCrit, lang,
-				"preselected",	SimMeasure.SimMeasureType.UEMNM));
+			Clusterer.run(ClusteringAlgorithmType.WCA, archUemnm, serialCritUemnm,
+				stopCrit, lang, SimMeasure.SimMeasureType.UEMNM));
 
 		// Load uem results
 		String uemResult = assertDoesNotThrow(() ->

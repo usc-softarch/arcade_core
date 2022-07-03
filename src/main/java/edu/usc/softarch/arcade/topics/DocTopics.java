@@ -20,7 +20,7 @@ import edu.usc.softarch.arcade.util.json.JsonSerializable;
 public class DocTopics implements JsonSerializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static DocTopics singleton;
-	private List<DocTopicItem> dtItemList;
+	private final List<DocTopicItem> dtItemList;
 	private Map<Integer, List<String>> topicWordLists;
 	// #endregion FIELDS ---------------------------------------------------------
 	
@@ -77,6 +77,8 @@ public class DocTopics implements JsonSerializable {
 	public static void initializeSingleton(String artifactsDir) throws Exception {
 		singleton = new DocTopics(artifactsDir);
 	}
+
+	public static void resetSingleton() { singleton = null; }
 
 	public static boolean isReady() {
 		return singleton != null;
@@ -158,43 +160,26 @@ public class DocTopics implements JsonSerializable {
 	public Map<Integer, List<String>> getTopicWordLists() {
 		return topicWordLists; }
 
-	public DocTopicItem mergeDocTopicItems(Cluster c1, Cluster c2)
+	public DocTopicItem mergeDocTopicItems(
+			Cluster c1, Cluster c2, String newName)
 			throws UnmatchingDocTopicItemsException {
-		return mergeDocTopicItems(c1.getDocTopicItem(), c2.getDocTopicItem());
+		return mergeDocTopicItems(c1.getDocTopicItem(), c2.getDocTopicItem(), newName);
 	}
 
-	public DocTopicItem mergeDocTopicItems(DocTopicItem dti1, DocTopicItem dti2)
+	public DocTopicItem mergeDocTopicItems(
+			DocTopicItem dti1, DocTopicItem dti2, String newName)
 			throws UnmatchingDocTopicItemsException {
-		DocTopicItem newDti = new DocTopicItem(dti1, dti2);
+		DocTopicItem newDti = new DocTopicItem(dti1, dti2, newName);
 		singleton.dtItemList.remove(dti1);
 		singleton.dtItemList.remove(dti2);
 		singleton.dtItemList.add(newDti);
 
 		return newDti;
 	}
-	// #endregion ACCESSORS ------------------------------------------------------
 
-	// #region PROCESSING --------------------------------------------------------
-	public static DocTopicItem computeGlobalCentroidUsingTopics(
-			List<DocTopicItem> docTopicItems) {
-		int firstNonNullDocTopicItemIndex = 0;
-		for (; docTopicItems.get(firstNonNullDocTopicItemIndex) == null
-				&& firstNonNullDocTopicItemIndex < docTopicItems.size(); firstNonNullDocTopicItemIndex++) {
-		}
-		DocTopicItem mergedDocTopicItem = docTopicItems.get(firstNonNullDocTopicItemIndex);
-		for (int i = firstNonNullDocTopicItemIndex; i < docTopicItems.size(); i++) {
-			if (docTopicItems.get(i) == null)
-				continue;
-			DocTopicItem currDocTopicItem = docTopicItems.get(i);
-			try {
-				mergedDocTopicItem = new DocTopicItem(mergedDocTopicItem, currDocTopicItem);
-			} catch (UnmatchingDocTopicItemsException e) {
-				e.printStackTrace(); //TODO handle it
-			}
-		}
-		return mergedDocTopicItem;
-	}
-	// #endregion PROCESSING -----------------------------------------------------
+	public void renameDocTopicItem(DocTopicItem dti, String newSource) {
+		dti.source = newSource; }
+	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region SERIALIZATION -----------------------------------------------------
 	public void serialize(String filePath) throws IOException {

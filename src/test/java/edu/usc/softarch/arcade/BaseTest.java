@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade;
 
+import edu.usc.softarch.arcade.topics.DocTopics;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -11,6 +12,8 @@ public class BaseTest {
 	protected final String resourcesBase =
 		"." + fs + "src" + fs + "test" + fs + "resources";
 	protected final String outputBase =	"." + fs + "target" + fs + "test_results";
+
+	public BaseTest() { DocTopics.resetSingleton(); }
 
 	/* ------------------------------------------------------------------------ */
 	/* -------------------------- DANGER ZONE --------------------------------- */

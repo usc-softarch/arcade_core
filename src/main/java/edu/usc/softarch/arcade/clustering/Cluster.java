@@ -40,6 +40,10 @@ public class Cluster extends ReadOnlyCluster
 	//endregion
 
 	//region CONSTRUCTORS
+
+	/**
+	 * Deserialization constructor.
+	 */
 	private Cluster(String name, Collection<String> entities, int numEntities,
 			Map<Integer, Double> featureMap, DocTopicItem dti) {
 		super(name, entities);
@@ -103,7 +107,7 @@ public class Cluster extends ReadOnlyCluster
 		this.numEntities = c1.getNumEntities() + c2.getNumEntities();
 
 		if (cat.equals(ClusteringAlgorithmType.ARC))
-			this.dti = DocTopics.getSingleton().mergeDocTopicItems(c1, c2);
+			this.dti = DocTopics.getSingleton().mergeDocTopicItems(c1, c2, super.name);
 	}
 	//endregion
 

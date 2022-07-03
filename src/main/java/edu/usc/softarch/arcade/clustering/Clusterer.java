@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.clustering;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -14,7 +13,7 @@ import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class Clusterer {
-	//region INTERFACE
+	//region PUBLIC INTERFACE
 	/**
 	 * Primary entry point for all clustering algorithms. Arguments are:
 	 *
@@ -49,20 +48,19 @@ public class Clusterer {
 			parsedArguments.serialCrit,
 			parsedArguments.stopCrit,
 			parsedArguments.language,
-			parsedArguments.stoppingCriterion,
 			parsedArguments.simMeasure);
 	}
 
 	public static Architecture run(ClusteringAlgorithmType algorithm,
 			Architecture arch, SerializationCriterion serialCrit,
-			StoppingCriterion stopCrit, String language, String stoppingCriterionName,
+			StoppingCriterion stopCrit, String language,
 			SimMeasure.SimMeasureType simMeasure)
 			throws IOException, DistributionSizeMismatchException,
 			UnmatchingDocTopicItemsException {
 		// Create the runner object
 		Clusterer runner = new Clusterer(language, serialCrit, arch, algorithm);
 		// Compute the clustering algorithm and return the resulting architecture
-		runner.computeArchitecture(stopCrit, stoppingCriterionName,	simMeasure);
+		runner.computeArchitecture(stopCrit, simMeasure);
 
 		return runner.architecture;
 	}
@@ -100,8 +98,6 @@ public class Clusterer {
 
 	//region ATTRIBUTES
 	protected final Architecture architecture;
-	protected static double maxClusterGain = 0;
-	public static int numClustersAtMaxClusterGain = 0;
 	public static int numberOfEntitiesToBeClustered = 0;
 	protected final String language;
 	protected final SerializationCriterion serializationCriterion;
@@ -127,13 +123,6 @@ public class Clusterer {
 	protected void addCluster(Cluster cluster) {
 		architecture.put(cluster.name, cluster); }
 	// #endregion ACCESSORS ------------------------------------------------------
-	
-	protected void checkAndUpdateClusterGain(double clusterGain) {
-		if (clusterGain > maxClusterGain) {
-			maxClusterGain = clusterGain;
-			numClustersAtMaxClusterGain = this.architecture.size();
-		}
-	}
 
 	protected void updateFastClustersAndSimMatrixToReflectMergedCluster(
 			SimData data, Cluster newCluster,	SimilarityMatrix simMatrix)
@@ -189,16 +178,13 @@ public class Clusterer {
 	}
 
 	public Architecture computeArchitecture(StoppingCriterion stopCriterion,
-			String stoppingCriterion, SimMeasure.SimMeasureType simMeasure)
-			throws DistributionSizeMismatchException, FileNotFoundException,
+			SimMeasure.SimMeasureType simMeasure)
+			throws DistributionSizeMismatchException, IOException,
 			UnmatchingDocTopicItemsException {
 		SimilarityMatrix simMatrix = new SimilarityMatrix(
 			simMeasure, this.architecture);
 
 		while (stopCriterion.notReadyToStop(this.architecture)) {
-			if (stoppingCriterion.equalsIgnoreCase("clustergain"))
-				checkAndUpdateClusterGain(architecture.computeClusterGain(algorithm));
-
 			SimData data = identifyMostSimClusters(simMatrix);
 			Cluster newCluster = new Cluster(this.algorithm,
 				data.c1, data.c2);
@@ -210,8 +196,10 @@ public class Clusterer {
 					&& this.serializationCriterion.shouldSerialize()) {
 				this.architecture.writeToRsf();
 				// Compute DTI word bags if concern-based technique is used
-				if (DocTopics.isReady())
+				if (DocTopics.isReady()) {
 					this.architecture.serializeBagOfWords();
+					this.architecture.serializeDocTopics();
+				}
 			}
 		}
 

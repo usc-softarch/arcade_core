@@ -8,8 +8,6 @@ public abstract class StoppingCriterion {
 	public static StoppingCriterion makeStoppingCriterion(
 			String stoppingCriterion, double stoppingCriterionVal, Architecture arch) {
 		switch (stoppingCriterion) {
-			case "clustergain":
-				return new ClusterGainStoppingCriterion();
 			case "preselected":
 				return new PreSelectedStoppingCriterion((int)stoppingCriterionVal);
 			case "archsizefraction":

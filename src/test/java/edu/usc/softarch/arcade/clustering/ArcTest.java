@@ -91,7 +91,7 @@ public class ArcTest extends BaseTest {
 
 		assertDoesNotThrow(() ->
 			Clusterer.run(ClusteringAlgorithmType.ARC, arch, serialCrit, stopCrit, lang,
-				"archsizefraction", SimMeasure.SimMeasureType.JS));
+				SimMeasure.SimMeasureType.JS));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of

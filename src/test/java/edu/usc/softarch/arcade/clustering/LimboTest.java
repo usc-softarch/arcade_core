@@ -4,10 +4,13 @@ import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
+import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
+import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.arcade.util.FileUtil;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -65,9 +68,17 @@ public class LimboTest extends BaseTest {
 		StoppingCriterion stopCrit = StoppingCriterion.makeStoppingCriterion(
 			"preselected", 100);
 
-		assertDoesNotThrow(() ->
-			Clusterer.run(ClusteringAlgorithmType.LIMBO, arch, serialCrit, stopCrit, lang,
-				"preselected", SimMeasure.SimMeasureType.IL));
+//		assertDoesNotThrow(() ->
+//			Clusterer.run(ClusteringAlgorithmType.LIMBO, arch, serialCrit, stopCrit,
+//				lang, SimMeasure.SimMeasureType.IL));
+
+		try {
+			Clusterer.run(ClusteringAlgorithmType.LIMBO, arch, serialCrit, stopCrit,
+				lang, SimMeasure.SimMeasureType.IL);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 
 		// Load results
 		String result = assertDoesNotThrow(() ->

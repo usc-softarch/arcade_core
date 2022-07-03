@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import cc.mallet.util.Maths;
-import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.arcade.util.json.EnhancedJsonParser;
 import edu.usc.softarch.arcade.util.json.JsonSerializable;
@@ -28,7 +27,7 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 	/**
 	 * Source entities that make up this DocTopicItem.
 	 */
-	public final String source;
+	String source;
 	/**
 	 * Set of {@link TopicItem}s in this document.
 	 */
@@ -53,14 +52,7 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 	/**
 	 * Merge constructor.
 	 */
-	DocTopicItem(Cluster c1, Cluster c2)
-			throws UnmatchingDocTopicItemsException {
-		this(c1.getDocTopicItem(), c2.getDocTopicItem()); }
-
-	/**
-	 * Merge constructor.
-	 */
-	DocTopicItem(DocTopicItem dti1, DocTopicItem dti2)
+	DocTopicItem(DocTopicItem dti1, DocTopicItem dti2, String newName)
 			throws UnmatchingDocTopicItemsException {
 		// If either argument is null, then return the non-null argument
 		if (dti1 == null) {
@@ -79,7 +71,7 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 			throw new UnmatchingDocTopicItemsException(
 				"In mergeDocTopicItems, nonmatching docTopicItems");
 
-		this.source = dti1.source;
+		this.source = newName;
 		this.topics = new TreeMap<>();
 		Set<Integer> topicNumbers = dti1.getTopicNumbers();
 

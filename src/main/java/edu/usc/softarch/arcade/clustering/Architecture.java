@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.topics.Concern;
-import edu.usc.softarch.arcade.topics.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
@@ -347,82 +346,6 @@ public class Architecture extends TreeMap<String, Cluster>
 	}
 	//endregion
 
-	//region PROCESSING
-	public double computeClusterGain(ClusteringAlgorithmType algorithm) {
-		switch(algorithm) {
-			case WCA:
-			case LIMBO:
-				return computeStructuralClusterGain();
-			case ARC:
-				return computeTopicClusterGain();
-			default:
-				throw new IllegalArgumentException();
-		}
-	}
-
-	/**
-	 * TODO
-	 * @return
-	 */
-  public double computeStructuralClusterGain() {
-		List<Double> clusterCentroids = new ArrayList<>();
-
-		for (Cluster cluster : this.values()) {
-			double centroid = cluster.computeStructuralCentroid(this.numFeatures);
-			clusterCentroids.add(centroid);
-		}
-
-		double globalCentroid = computeStructuralGlobalCentroid(clusterCentroids);
-
-		double clusterGain = 0;
-		for (int i = 0; i < clusterCentroids.size(); i++)
-			clusterGain += (((Cluster) this.values().toArray()[i]).getNumEntities() - 1)	* Math.pow(
-        Math.abs(globalCentroid - clusterCentroids.get(i)), 2);
-
-		return clusterGain;
-	}
-
-	/**
-	 * TODO
-	 * @param clusterCentroids
-	 * @return
-	 */
-  private double computeStructuralGlobalCentroid(
-					List<Double> clusterCentroids) {
-		double centroidSum = 0;
-
-		for (Double centroid : clusterCentroids)
-			centroidSum += centroid;
-
-		return centroidSum / clusterCentroids.size();
-	}
-
-	/**
-	 * TODO
-	 * @return
-	 */
-  public double computeTopicClusterGain() {
-		List<DocTopicItem> docTopicItems = new ArrayList<>();
-		for (Cluster c : this.values())
-			docTopicItems.add(c.getDocTopicItem());
-		DocTopicItem globalDocTopicItem =
-      DocTopics.computeGlobalCentroidUsingTopics(docTopicItems);
-
-		double clusterGain = 0;
-
-		for (int i = 0; i < docTopicItems.size(); i++) {
-			try {
-				clusterGain += (((Cluster) this.values().toArray()[i]).getNumEntities() - 1)
-					* docTopicItems.get(i).getJsDivergence(globalDocTopicItem);
-			} catch (DistributionSizeMismatchException e) {
-				e.printStackTrace(); //TODO handle it
-			}
-		}
-
-		return clusterGain;
-	}
-	//endregion
-
 	//region SERIALIZATION
 	/**
 	 * Writes an RSF file representing this architecture. Uses this object's
@@ -555,6 +478,21 @@ public class Architecture extends TreeMap<String, Cluster>
 				DocTopics.getSingleton().getTopicWordLists()));
 
 		return concernList;
+	}
+
+	public void serializeDocTopics() throws IOException {
+		String fs = File.separator;
+
+		Map<Integer, Cluster> architectureIndex = computeArchitectureIndex();
+		for (Map.Entry<Integer, Cluster> entry : architectureIndex.entrySet()) {
+			DocTopicItem toRename = entry.getValue().getDocTopicItem();
+			DocTopics.getSingleton().renameDocTopicItem(
+				toRename, entry.getKey().toString());
+		}
+
+		String path = this.projectPath + fs + this.projectName + "_"
+			+ this.simMeasure + "_" + this.size() + "_clusteredDocTopics.json";
+		DocTopics.getSingleton().serialize(path);
 	}
 	//endregion
 }

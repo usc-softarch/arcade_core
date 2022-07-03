@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.topics.DocTopics;
-import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -55,11 +54,10 @@ public class ArchSmellDetectorTest extends BaseTest {
 		String docTopicsPath = arcDir + fs + version + fs + "base"
 			+ fs + "docTopics.json";
 
-		DocTopics docTopics = assertDoesNotThrow(
-			() -> DocTopics.deserialize(docTopicsPath));
+		assertDoesNotThrow(() -> DocTopics.deserialize(docTopicsPath));
 		ArchSmellDetector asd =
       new ArchSmellDetector(depsPath, outputClustersPath, resultSerFilename,
-				language, TopicModelExtractionMethod.MALLET_API, docTopics);
+				language);
 		
 		// Call ArchSmellDetector.run() (with runConcern=false)
 		SmellCollection resultSmells = assertDoesNotThrow(

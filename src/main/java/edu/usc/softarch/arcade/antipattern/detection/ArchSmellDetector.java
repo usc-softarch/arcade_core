@@ -24,66 +24,50 @@ import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.TopicItem;
-import edu.usc.softarch.arcade.topics.TopicModelExtractionMethod;
 import edu.usc.softarch.arcade.topics.UnmatchingDocTopicItemsException;
 
 public class ArchSmellDetector {
-	// #region ATTRIBUTES --------------------------------------------------------
+	//region ATTRIBUTES
 	private final String depsRsfFilename;
 	private final String clustersRsfFilename;
 	private final String detectedSmellsFilename;
 	private final String language;
-	private final TopicModelExtractionMethod tmeMethod;
-	private final DocTopics docTopics;
 	private final double scatteredConcernThreshold;
 	private final double parasiticConcernThreshold;
 
-	static final Comparator<TopicItem> TOPIC_PROPORTION_ORDER 
+	static final Comparator<TopicItem> TOPIC_PROPORTION_ORDER
 		= (TopicItem t1, TopicItem t2) -> {
 			Double prop1 = t1.proportion;
 			Double prop2 = t2.proportion;
 			return prop1.compareTo(prop2);
 		};
-	// #endregion ATTRIBUTES -----------------------------------------------------
+	//endregion ATTRIBUTES
 
-	// #region CONSTRUCTORS ------------------------------------------------------
+	//region CONSTRUCTORS
 	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
 			String detectedSmellsFilename) {
 		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, 
 			"structural-irrelevant", .20,
-			.20, null, null);
+			.20);
 	}
 
 	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
-			String detectedSmellsFilename, double scatteredConcernThreshold,
-			double parasiticConcernThreshold) {
-		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, 
-			"structural-irrelevant", scatteredConcernThreshold,
-			parasiticConcernThreshold, null, null);
-	}
-
-	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
-			String detectedSmellsFilename, String language,
-			TopicModelExtractionMethod tmeMethod,	DocTopics docTopics) {
+			String detectedSmellsFilename, String language) {
 		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename,
-			language, .20, .20,
-			tmeMethod, docTopics);
+			language, .20, .20);
 	}
 
 	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
 			String detectedSmellsFilename, String language,
-			double scatteredConcernThreshold, double parasiticConcernThreshold,
-			TopicModelExtractionMethod tmeMethod, DocTopics docTopics) {
+			double scatteredConcernThreshold, double parasiticConcernThreshold) {
 		this.depsRsfFilename = depsRsfFilename;
 		this.clustersRsfFilename = clustersRsfFilename;
 		this.detectedSmellsFilename = detectedSmellsFilename;
 		this.language = language;
 		this.scatteredConcernThreshold = scatteredConcernThreshold;
 		this.parasiticConcernThreshold = parasiticConcernThreshold;
-		this.tmeMethod = tmeMethod;
-		this.docTopics = docTopics;
 	}
-	// #endregion CONSTRUCTORS ---------------------------------------------------
+	//endregion CONSTRUCTORS
 	
 	public static void main(String[] args) throws IOException {
 		String depsRsfFilename = args[0];
@@ -94,10 +78,9 @@ public class ArchSmellDetector {
 		String isArc = args[5];
 
 		if (isArc.equals("true")) {
-			DocTopics docTopics = DocTopics.deserialize(docTopicsPath);
+			DocTopics.deserialize(docTopicsPath);
 			ArchSmellDetector asd = new ArchSmellDetector(depsRsfFilename,
-				clustersRsfFilename, detectedSmellsFilename, language,
-				TopicModelExtractionMethod.MALLET_API, docTopics);
+				clustersRsfFilename, detectedSmellsFilename, language);
 			asd.run(true, true, true);
 		} else {
 			ArchSmellDetector asd = new ArchSmellDetector(depsRsfFilename,
@@ -134,12 +117,8 @@ public class ArchSmellDetector {
 
 	public void runConcernDetectionAlgs(ConcernClusterArchitecture clusters,
 			SmellCollection detectedSmells, Map<String,Set<String>> clusterSmellMap) {
+		buildConcernClustersFromMalletAPI(clusters);
 
-		if (this.tmeMethod == TopicModelExtractionMethod.MALLET_API)
-			buildConcernClustersFromMalletAPI(clusters);
-		if (this.tmeMethod == TopicModelExtractionMethod.VAR_MALLET_FILE)
-			buildConcernClustersFromConfigTopicsFile(clusters);
-		
 		for (ConcernCluster cluster : clusters) {
 			if (cluster.getDocTopicItem() != null) {
 				DocTopicItem docTopicItem = cluster.getDocTopicItem();
@@ -173,46 +152,6 @@ public class ArchSmellDetector {
 		return ConcernClusterArchitecture.loadFromRsf(this.clustersRsfFilename);
 	}
 
-	private void buildConcernClustersFromConfigTopicsFile(
-			ConcernClusterArchitecture clusters) {
-		for (ConcernCluster cluster : clusters) {
-			for (String entity : cluster.getEntities()) {
-				DocTopicItem entityDocTopicItem;
-				switch(this.language.toLowerCase()) {
-					case "c":
-						entityDocTopicItem = this.docTopics.getDocTopicItemForC(entity);
-						break;
-					case "java":
-					default:
-						entityDocTopicItem = setDocTopicItemForJavaFromMalletFile(entity);
-						break;
-				}
-
-				if (cluster.getDocTopicItem() == null)
-					cluster.setDocTopicItem(entityDocTopicItem);
-				else {
-					DocTopicItem mergedDocTopicItem = null;
-
-					try {
-						mergedDocTopicItem = DocTopics.getSingleton().mergeDocTopicItems(
-							cluster.getDocTopicItem(), entityDocTopicItem);
-					} catch (UnmatchingDocTopicItemsException e) {
-						e.printStackTrace(); //TODO handle it
-					}
-
-					cluster.setDocTopicItem(mergedDocTopicItem);
-				}
-			}
-		}
-	}
-
-	private DocTopicItem setDocTopicItemForJavaFromMalletFile(String entity) {
-		DocTopicItem newDocTopicItem;
-		String docTopicName = entity.replace("\\.", "/") + ".java";
-		newDocTopicItem = docTopics.getDocTopicItemForJava(docTopicName);
-		return newDocTopicItem;
-	}
-
 	private void buildConcernClustersFromMalletAPI(
 			ConcernClusterArchitecture clusters) {
 		for (ConcernCluster cluster : clusters) {
@@ -228,7 +167,7 @@ public class ArchSmellDetector {
 
 					try {
 						mergedDocTopicItem = DocTopics.getSingleton().mergeDocTopicItems(
-							cluster.getDocTopicItem(), entityDocTopicItem);
+							cluster.getDocTopicItem(), entityDocTopicItem, cluster.getName());
 					} catch (UnmatchingDocTopicItemsException e) {
 						e.printStackTrace(); //TODO handle it
 					}
@@ -241,7 +180,7 @@ public class ArchSmellDetector {
 	
 	private DocTopicItem setDocTopicItemForJavaFromMalletApi(String entity) {
 		DocTopicItem newDocTopicItem;
-		newDocTopicItem = docTopics.getDocTopicItemForJava(entity);
+		newDocTopicItem = DocTopics.getSingleton().getDocTopicItemForJava(entity);
 		return newDocTopicItem;
 	}
 
