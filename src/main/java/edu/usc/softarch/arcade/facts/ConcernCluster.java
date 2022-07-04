@@ -4,6 +4,7 @@ import java.util.Set;
 import java.io.Serializable;
 import java.util.HashSet;
 
+import edu.usc.softarch.arcade.clustering.ReadOnlyCluster;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 
 /**
@@ -15,6 +16,15 @@ public class ConcernCluster implements Serializable {
 	private String name;
 	private Set<String> entities = new HashSet<>();
 	private DocTopicItem docTopicItem = null;
+	//endregion
+
+	//region CONSTRUCTORS
+	public ConcernCluster() { }
+	public ConcernCluster(ReadOnlyCluster cluster) {
+		this.name = cluster.name;
+		this.entities = new HashSet<>(cluster.getEntities());
+		this.docTopicItem = cluster.getDocTopicItem();
+	}
 	//endregion
 	
 	//region ACCESSORS

@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering;
 
+import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
@@ -71,6 +72,13 @@ public class ReadOnlyCluster {
 
 		if (cat.equals(ClusteringAlgorithmType.ARC))
 			this.dti = DocTopics.getSingleton().mergeDocTopicItems(c1, c2, name);
+	}
+
+	//TODO kill it
+	public ReadOnlyCluster(ConcernCluster cluster) {
+		this.name = cluster.getName();
+		this.dti = cluster.getDocTopicItem();
+		this.entities = new EnhancedHashSet<>(cluster.getEntities());
 	}
 	//endregion
 

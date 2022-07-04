@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.antipattern.detection;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -99,24 +100,25 @@ public class ArchSmellDetector {
 		// Initialize variables
 		SmellCollection detectedSmells = new SmellCollection();
 		ConcernClusterArchitecture clusters = loadClusters();
-		Map<String,Set<String>> clusterSmellMap = new HashMap<>();
 
 		// Execute detection algorithms
 		if (runConcern)
-			runConcernDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
+			runConcernDetectionAlgs(clusters, detectedSmells);
 		if (runStructural)
-			runStructuralDetectionAlgs(clusters, detectedSmells, clusterSmellMap);
+			runStructuralDetectionAlgs(clusters, detectedSmells);
 
 		// Serialize results
-		if (runSerialize)
-			detectedSmells.serializeSmellCollection(detectedSmellsFilename);
+		if (runSerialize) {
+			new File(detectedSmellsFilename).getParentFile().mkdirs();
+			detectedSmells.serialize(detectedSmellsFilename);
+		}
 
 		// Return results
 		return detectedSmells;
 	}
 
 	public void runConcernDetectionAlgs(ConcernClusterArchitecture clusters,
-			SmellCollection detectedSmells, Map<String,Set<String>> clusterSmellMap) {
+			SmellCollection detectedSmells) {
 		buildConcernClustersFromMalletAPI(clusters);
 
 		for (ConcernCluster cluster : clusters) {
@@ -126,12 +128,12 @@ public class ArchSmellDetector {
 			}
 		}
 
-		detectBco(detectedSmells, clusters, clusterSmellMap);
-		detectSpfNew(clusters, clusterSmellMap, detectedSmells);
+		detectBco(detectedSmells, clusters);
+		detectSpfNew(clusters, detectedSmells);
 	}
 
 	public void runStructuralDetectionAlgs(ConcernClusterArchitecture clusters,
-			SmellCollection detectedSmells, Map<String,Set<String>> clusterSmellMap) {
+			SmellCollection detectedSmells) {
 		Map<String, Set<String>> depMap = 
 		ClusterUtil.buildDependenciesMap(this.depsRsfFilename);
 	
@@ -141,8 +143,8 @@ public class ArchSmellDetector {
 		SimpleDirectedGraph<String, DefaultEdge> directedGraph = 
 			clusters.buildConcernClustersDiGraph(clusterGraph);
 		
-		detectBdc(detectedSmells, clusters, clusterSmellMap, directedGraph);
-		detectBuo(detectedSmells, clusters, clusterSmellMap, directedGraph);
+		detectBdc(detectedSmells, clusters, directedGraph);
+		detectBuo(detectedSmells, clusters, directedGraph);
 	}
 
 	/**
@@ -185,8 +187,7 @@ public class ArchSmellDetector {
 	}
 
 	protected void detectBuo(SmellCollection detectedSmells,
-			ConcernClusterArchitecture clusters, 
-			Map<String, Set<String>> clusterSmellMap,
+			ConcernClusterArchitecture clusters,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
 		Set<String> vertices = directedGraph.vertexSet();
         
@@ -223,21 +224,17 @@ public class ArchSmellDetector {
 			int inDegree = directedGraph.inDegreeOf(vertex);
 			int outDegree = directedGraph.outDegreeOf(vertex);
 			if (inDegree > meanInDegrees + stdDevFactor * stdDevInDegrees) {
-				updateSmellMap(clusterSmellMap, vertex, "buo");
 				addDetectedBuoSmell(detectedSmells, clusters, vertex);
 			}
 			if (outDegree > meanOutDegrees + stdDevFactor * stdDevOutDegrees) {
-				updateSmellMap(clusterSmellMap, vertex, "buo");
 				addDetectedBuoSmell(detectedSmells, clusters, vertex);
 			}
 			if (inDegree + outDegree > meanInDegrees + meanOutDegrees + 
 				stdDevFactor * stdDevOutDegrees + stdDevFactor * stdDevInDegrees) {
-				updateSmellMap(clusterSmellMap, vertex, "buo");
 				addDetectedBuoSmell(detectedSmells, clusters, vertex);
 			}
 			int inPlusOutDegree = inDegree + outDegree;
 			if (inPlusOutDegree > meanInAndOutDegrees + stdDevFactor * stdDevInAndOutDegrees) {
-				updateSmellMap(clusterSmellMap, vertex, "buo");
 				addDetectedBuoSmell(detectedSmells, clusters, vertex);
 			}
 		}
@@ -245,7 +242,6 @@ public class ArchSmellDetector {
 
 	protected void detectBdc(SmellCollection detectedSmells,
 			ConcernClusterArchitecture clusters,
-			Map<String, Set<String>> clusterSmellMap,
 			SimpleDirectedGraph<String, DefaultEdge> directedGraph) {
 		KosarajuStrongConnectivityInspector<String, DefaultEdge> inspector =
 			new KosarajuStrongConnectivityInspector<>(directedGraph);
@@ -254,8 +250,6 @@ public class ArchSmellDetector {
 		Set<Set<String>> bdcConnectedSets = new HashSet<>();
 		for (Set<String> connectedSet : connectedSets) {
 			if (connectedSet.size() > 2) {
-				for (String clusterName : connectedSet)
-					updateSmellMap(clusterSmellMap, clusterName, "bdc");
 				bdcConnectedSets.add(connectedSet);
 			}
 		}
@@ -271,8 +265,7 @@ public class ArchSmellDetector {
 	}
 
 	protected StandardDeviation detectBco(SmellCollection detectedSmells,
-			ConcernClusterArchitecture clusters,
-			Map<String, Set<String>> clusterSmellMap) {
+			ConcernClusterArchitecture clusters) {
 		double concernOverloadTopicThreshold = .10;
 		Map<ConcernCluster,Integer> concernCountMap = new HashMap<>(); 
 		for (ConcernCluster cluster : clusters) {
@@ -302,8 +295,6 @@ public class ArchSmellDetector {
 				Smell bco = new Smell(Smell.SmellType.bco);
 				bco.addCluster(cluster);
 				detectedSmells.add(bco);
-				
-				updateSmellMap(clusterSmellMap, cluster.getName(), "bco");
 			}
 		}
 		
@@ -327,31 +318,13 @@ public class ArchSmellDetector {
 	}
 
 	/**
-	 * Adds a smell to the given cluster in clusterSmellMap.
-	 * 
-	 * @param clusterSmellMap Map of all clusters and their sets of smells.
-	 * @param clusterName Name of the cluster to add a smell to.
-	 * @param smellAbrv Abbreviation mell to add to the cluster.
-	 */
-	protected void updateSmellMap(Map<String, Set<String>> clusterSmellMap,
-			String clusterName, String smellAbrv) {
-		Set<String> smellList = clusterSmellMap.get(clusterName);
-		if(smellList == null)
-			smellList = new HashSet<>();
-		smellList.add(smellAbrv);
-		clusterSmellMap.putIfAbsent(clusterName, smellList);
-	}
-
-	/**
 	 * Detects Scattered Parasitic Functionality smell instances.
 	 * 
 	 * @param clusters Input clusters to run detection algorithm on.
-	 * @param clusterSmellsMap Mapping of smells per cluster. Altered.
 	 * @param detectedSmells Set of detected smells. Altered.
 	 */
 	protected void detectSpfNew(
 			ConcernClusterArchitecture clusters,
-			Map<String, Set<String>> clusterSmellsMap,
 			SmellCollection detectedSmells) {
 		// Setting thresholds for detection algorithm
 		Map<Integer, Integer> topicNumCountMap = new HashMap<>();
@@ -390,8 +363,6 @@ public class ArchSmellDetector {
 					ti.topicNum == topicNum || ti.proportion < parasiticConcernThreshold);
 
 				for (int i = 0; i < significantTopicItems.size(); i++) {
-					clusterSmellsMap.putIfAbsent(cluster.getName(), new HashSet<>());
-					clusterSmellsMap.get(cluster.getName()).add("spf");
 					affectedClusters.add(cluster);
 				}
 			}

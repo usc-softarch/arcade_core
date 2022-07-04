@@ -46,7 +46,7 @@ public class SmellToIssuesCorrelation {
 		Map<String,Integer> versionToSmellCount = new LinkedHashMap<>();
 		for (File file : orderedSerFiles) {
 			logger.debug(file.getName());
-			SmellCollection smells = new SmellCollection(file.getAbsolutePath());
+			SmellCollection smells = SmellCollection.deserialize(file.getAbsolutePath());
 			logger.debug("\tcontains " + smells.size() + " smells");
 			
 			logger.debug("\tListing detected smells for file" + file.getName() + ": ");
