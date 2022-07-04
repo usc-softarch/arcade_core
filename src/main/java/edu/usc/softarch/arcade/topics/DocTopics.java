@@ -23,7 +23,7 @@ import edu.usc.softarch.util.json.JsonSerializable;
  */
 public class DocTopics implements JsonSerializable {
 	// #region FIELDS ------------------------------------------------------------
-	private static DocTopics singleton;
+	private static final Map<String, DocTopics> mingleton = new HashMap<>();
 	private final Map<String, DocTopicItem> dtItemList;
 	private Map<Integer, List<String>> topicWordLists;
 	// #endregion FIELDS ---------------------------------------------------------
@@ -51,13 +51,13 @@ public class DocTopics implements JsonSerializable {
 			new File(artifactsDir + fs + "infer.mallet"));
 
 		// Load TopicItems
-		for (int instIndex = 0; instIndex < previousInstances.size(); instIndex++) {
+		for (cc.mallet.types.Instance previousInstance : previousInstances) {
 			DocTopicItem dtItem = new DocTopicItem(
-				(String) previousInstances.get(instIndex).getName());
+				(String) previousInstance.getName());
 
 			double[] topicDistribution =
 				inferencer.getSampledDistribution(
-					previousInstances.get(instIndex), 1000, 10, 10);
+					previousInstance, 1000, 10, 10);
 
 			for (int topicIdx = 0; topicIdx < numTopics; topicIdx++) {
 				TopicItem t = new TopicItem(topicIdx, topicDistribution[topicIdx]);
@@ -72,20 +72,38 @@ public class DocTopics implements JsonSerializable {
 	}
 
 	public static DocTopics getSingleton() {
-		if (singleton == null)
+		return getSingleton("default");
+	}
+
+	public static DocTopics getSingleton(String version) {
+		if (mingleton.get(version) == null)
 			throw new IllegalStateException("DocTopics must be initialized.");
 
-		return singleton;
+		return mingleton.get(version);
 	}
 
 	public static void initializeSingleton(String artifactsDir) throws Exception {
-		singleton = new DocTopics(artifactsDir);
+		initializeSingleton(artifactsDir, "default");
 	}
 
-	public static void resetSingleton() { singleton = new DocTopics(); }
+	public static void initializeSingleton(
+			String artifactsDir, String version) throws Exception {
+		mingleton.put(version, new DocTopics(artifactsDir));
+	}
+
+	public static void resetSingleton() { resetSingleton("default"); }
+
+	public static void resetSingleton(String version) {
+		mingleton.put(version, new DocTopics());
+	}
 
 	public static boolean isReady() {
-		return singleton != null && !singleton.dtItemList.isEmpty();
+		return isReady("default");
+	}
+
+	public static boolean isReady(String version) {
+		return mingleton.get(version) != null
+			&& !mingleton.get(version).dtItemList.isEmpty();
 	}
 	// #endregion CONSTRUCTORS ---------------------------------------------------
 
@@ -199,14 +217,20 @@ public class DocTopics implements JsonSerializable {
 	public DocTopicItem mergeDocTopicItems(
 			DocTopicItem dti1, DocTopicItem dti2, String newName)
 			throws UnmatchingDocTopicItemsException {
+		return mergeDocTopicItems(dti1, dti2, newName, "default");
+	}
+
+	public DocTopicItem mergeDocTopicItems(
+			DocTopicItem dti1, DocTopicItem dti2, String newName, String version)
+			throws UnmatchingDocTopicItemsException {
 		DocTopicItem newDti = new DocTopicItem(dti1, dti2, newName);
 		if (newDti.equals(dti1))
 			return dti1;
 		if (newDti.equals(dti2))
 			return dti2;
 
-		singleton.dtItemList.remove(dti1.source);
-		singleton.dtItemList.remove(dti2.source);
+		mingleton.get(version).dtItemList.remove(dti1.source);
+		mingleton.get(version).dtItemList.remove(dti2.source);
 		addDocTopicItem(newDti);
 
 		return newDti;
@@ -239,15 +263,21 @@ public class DocTopics implements JsonSerializable {
 
 	public static DocTopics deserialize(EnhancedJsonParser parser)
 			throws IOException {
-		singleton = new DocTopics();
+		return deserialize(parser, "default");
+	}
+
+	public static DocTopics deserialize(EnhancedJsonParser parser, String version)
+			throws IOException {
+		mingleton.put(version, new DocTopics());
 		parser.parseCollection(DocTopicItem.class);
 
 		Map<Integer, List> topicWordLists = parser.parseMap(
 			List.class, false, String.class);
 		for (Map.Entry<Integer, List> entry : topicWordLists.entrySet())
-			singleton.topicWordLists.put(entry.getKey(), entry.getValue());
+			mingleton.get(version).topicWordLists.put(
+				entry.getKey(), entry.getValue());
 
-		return singleton;
+		return mingleton.get(version);
 	}
 	// #endregion SERIALIZATION --------------------------------------------------
 }
