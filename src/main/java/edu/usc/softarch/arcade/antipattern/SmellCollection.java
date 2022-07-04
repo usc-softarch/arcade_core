@@ -43,4 +43,15 @@ public class SmellCollection
 		return result;
 	}
 	//endregion
+
+	//region OBJECT METHODS
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		for (Smell smell : this)
+			result.append(smell).append(System.lineSeparator());
+
+		return result.toString();
+	}
+	//endregion
 }

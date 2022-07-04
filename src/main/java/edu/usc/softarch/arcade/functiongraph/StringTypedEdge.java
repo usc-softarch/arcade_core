@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
-import edu.usc.softarch.arcade.classgraphs.StringEdge;
-
 //TODO Replace all occurrences of this with the superclass
 public class StringTypedEdge extends StringEdge implements Serializable {
 	private static final long serialVersionUID = 2367755143057728102L;

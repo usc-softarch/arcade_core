@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
-import edu.usc.softarch.arcade.facts.ConcernCluster;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
 import edu.usc.softarch.util.json.JsonSerializable;
@@ -40,15 +40,20 @@ public class Smell implements Serializable, JsonSerializable {
 	public SmellType getSmellType() { return this.smellType; }
 	public int getTopicNum() { return this.topicNum; }
 
-	public boolean addCluster(ConcernCluster cluster) {
-		return this.clusters.add(cluster.getName()); }
-	public boolean removeCluster(ConcernCluster cluster) {
-		return this.clusters.remove(cluster.getName()); }
+	public boolean addCluster(String clusterName) {
+		return this.clusters.add(clusterName); }
+	public boolean addClusterCollection(Collection<String> clusters) {
+		return this.clusters.addAll(clusters); }
 	//endregion
 
 	//region OBJECT METHODS
 	public String toString() {
-		return smellType + String.join(",", clusters);
+		Collection<String> orderedClusters =
+			clusters.stream().sorted().collect(Collectors.toList());
+		String result = smellType.toString();
+		if (topicNum != -1) result += " " + topicNum;
+		result += ": ";
+		return result + String.join(",", orderedClusters);
 	}
 	
 	public boolean equals (Object obj) {
@@ -65,7 +70,10 @@ public class Smell implements Serializable, JsonSerializable {
 	}
 	
 	public int hashCode() {
-		return this.clusters.hashCode();
+		Collection<String> orderedClusters =
+			clusters.stream().sorted().collect(Collectors.toList());
+
+		return orderedClusters.hashCode() + this.topicNum + this.smellType.ordinal();
 	}
 	//endregion
 

@@ -145,7 +145,7 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 	/**
 	 * Verifies whether this DocTopicItem has the same {@link TopicItem}s as the
 	 * provided DocTopicItem. Only checks their {@link TopicItem#topicNum}, not
-	 * the {@link TopicItem#proportion}.
+	 * the {@link TopicItem#getProportion()}.
 	 */
 	public boolean hasSameTopics(DocTopicItem dti) {
 		if (dti.size() != this.size())
@@ -179,10 +179,10 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 		Collection<TopicItem> toCompareTopics = toCompare.topics.values();
 
 		for (TopicItem pTopicItem : currTopics)
-			sortedP[pTopicItem.topicNum] = pTopicItem.proportion;
+			sortedP[pTopicItem.topicNum] = pTopicItem.getProportion();
 		
 		for (TopicItem qTopicItem : toCompareTopics)
-			sortedQ[qTopicItem.topicNum] = qTopicItem.proportion;
+			sortedQ[qTopicItem.topicNum] = qTopicItem.getProportion();
 		
 		return Maths.jensenShannonDivergence(sortedP, sortedQ);
 	}

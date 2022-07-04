@@ -14,7 +14,7 @@ public class Concern extends ArrayList<String> {
 		super();
 		for (TopicItem topicItem : topics.values()) {
 			int index = topicItem.topicNum;
-			int proportion = (int) (topicItem.proportion * 100);
+			int proportion = (int) (topicItem.getProportion() * 100);
 			this.addAll(wordBags.get(index).subList(0, proportion));
 		}
 	}

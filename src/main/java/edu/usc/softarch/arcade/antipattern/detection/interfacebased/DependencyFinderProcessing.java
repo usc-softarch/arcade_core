@@ -38,7 +38,6 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import edu.usc.softarch.arcade.antipattern.detection.StringMatrix;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 /**

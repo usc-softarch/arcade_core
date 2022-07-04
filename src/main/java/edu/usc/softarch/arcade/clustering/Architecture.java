@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
-import edu.usc.softarch.arcade.config.Config;
 import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
@@ -206,20 +205,8 @@ public class Architecture extends TreeMap<String, Cluster>
 		// If the source language is C or C++, add the only C-based entities
 		if (language.equalsIgnoreCase("c")) {
 			Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
-			// First condition to be assumed true
-			// Second condition to be assumed true
-			// Third condition checks whether the cluster is based on a valid C entity
-			if (Config.getClusteringGranule().equals(Config.Granule.file) &&
-				!cluster.name.startsWith("/") &&
-				p.matcher(cluster.name).find())
+			if (!cluster.name.startsWith("/") && p.matcher(cluster.name).find())
 				this.put(cluster.name, cluster);
-		}
-
-		// This block is used only for certain older modules, disregard
-		if (Config.getClusteringGranule().equals(Config.Granule.func)) {
-			if (cluster.name.equals("\"##\""))
-				return;
-			this.put(cluster.name, cluster);
 		}
 
 		// If the source language is Java, add all clusters that match prefix

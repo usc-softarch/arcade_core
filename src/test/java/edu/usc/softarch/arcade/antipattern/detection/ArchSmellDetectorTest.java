@@ -4,11 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.usc.softarch.arcade.BaseTest;
-import edu.usc.softarch.arcade.topics.DocTopics;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
+
+import java.io.IOException;
 
 /**
  * Tests related to the basic smell detection components of ARCADE:
@@ -30,34 +31,29 @@ public class ArchSmellDetectorTest extends BaseTest {
 	@ParameterizedTest
 	@CsvSource({
 		"struts-2.3.30,"
-		+ "182,"
-		+ "java",
+		+ "182",
 
 		"struts-2.5.2,"
-		+ "164,"
-		+ "java",
+		+ "164",
 
 		"httpd-2.3.8,"
-		+ "71,"
-		+ "c",
+		+ "71",
 
 		"httpd-2.4.26,"
-		+ "82,"
-		+ "c"
+		+ "82"
 	})
-	public void runTest(String version, String size, String language) {
+	public void runTest(String version, String size) throws IOException {
 		String oraclePath =	resourcesDir + fs + version + "_smells.ser";
 		String depsPath = factsDir + fs + version + "_deps.rsf";
 		String outputClustersPath = arcDir + fs + version + fs
 			+ version + "_js_" + size + "_clusters.rsf";
 		String resultSerFilename = outputDirPath + fs + version + "_arc_smells.ser";
-		String docTopicsPath = arcDir + fs + version + fs + "base"
-			+ fs + "docTopics.json";
+		String docTopicsPath = resourcesDir + fs + version
+			+ "_JS_" + size + "_clusteredDocTopics.json";
 
-		assertDoesNotThrow(() -> DocTopics.deserialize(docTopicsPath));
-		ArchSmellDetector asd =
-      new ArchSmellDetector(depsPath, outputClustersPath, resultSerFilename,
-				language);
+		ArchSmellDetector asd = assertDoesNotThrow(() ->
+			new ArchSmellDetector(depsPath, outputClustersPath, resultSerFilename,
+			docTopicsPath));
 		
 		// Call ArchSmellDetector.run() (with runConcern=false)
 		SmellCollection resultSmells = assertDoesNotThrow(

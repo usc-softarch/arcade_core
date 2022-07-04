@@ -1,12 +1,12 @@
 package edu.usc.softarch.arcade.topics;
 
-import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
 import edu.usc.softarch.util.json.JsonSerializable;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -22,16 +22,11 @@ public class TopicItem
 	 */
 	public final int topicNum;
 	/**
-	 * Weight of this TopicItem, i.e. how many entities it represents. Used as a
-	 * multiplier to proportion when calculating the average proportion of two
-	 * TopicItems, primarily when merging two {@link Cluster} objects.
+	 * This stops rounding errors from propagating by retaining the original
+	 * component proportions and re-calculating a TopicItem's proportion each
+	 * time that is necessary.
 	 */
-	public final int weight;
-	/**
-	 * Proportion of this TopicItem within the context of a {@link DocTopicItem}
-	 * object.
-	 */
-	public final double proportion;
+	private final double[] proportionComponents;
 	//endregion
 	
 	//region CONTRUCTORS
@@ -43,24 +38,9 @@ public class TopicItem
 	 * 									 {@link DocTopicItem}.
 	 */
 	public TopicItem(int topicNum, double proportion) {
-		this.weight = 1;
 		this.topicNum = topicNum;
-		this.proportion = proportion;
-	}
-
-	/**
-	 * Constructor for TopicItems with pre-defined weight. Primarily used for
-	 * deserialization.
-	 *
-	 * @param topicNum Topic number of the new TopicItem.
-	 * @param proportion Proportion of the new TopicItem within its
-	 * 									 {@link DocTopicItem}.
-	 * @param weight Weight of (number of entities represented by) this TopicItem.
-	 */
-	public TopicItem(int topicNum, double proportion, int weight) {
-		this.weight = weight;
-		this.topicNum = topicNum;
-		this.proportion = proportion;
+		this.proportionComponents = new double[1];
+		this.proportionComponents[0] = proportion;
 	}
 
 	/**
@@ -70,10 +50,14 @@ public class TopicItem
 	 * @param ti2 TopicItem from second entity being merged.
 	 */
 	public TopicItem(TopicItem ti1, TopicItem ti2) {
-		this.weight = ti1.weight + ti2.weight;
 		this.topicNum = ti1.topicNum;
-		this.proportion = (ti1.proportion * ti1.weight
-			+ ti2.proportion * ti2.weight) / this.weight;
+		this.proportionComponents = new double[
+			ti1.proportionComponents.length + ti2.proportionComponents.length];
+		int index = 0;
+		for (double value : ti1.proportionComponents)
+			this.proportionComponents[index++] = value;
+		for (double value : ti2.proportionComponents)
+			this.proportionComponents[index++] = value;
 	}
 
 	/**
@@ -82,9 +66,15 @@ public class TopicItem
 	 * @param topicItem TopicItem to clone.
 	 */
 	public TopicItem(TopicItem topicItem) {
-		this.weight = topicItem.weight;
 		this.topicNum = topicItem.topicNum;
-		this.proportion = topicItem.proportion;
+		this.proportionComponents = topicItem.proportionComponents;
+	}
+	//endregion
+
+	//region ACCESSORS
+	public double getProportion() {
+		return Arrays.stream(this.proportionComponents).sum()
+			/ this.proportionComponents.length;
 	}
 	//endregion
 	
@@ -97,36 +87,33 @@ public class TopicItem
 		TopicItem topicItem = (TopicItem) o;
 
 		return this.topicNum == topicItem.topicNum
-			&& this.weight == topicItem.weight
-			&& Double.compare(topicItem.proportion, this.proportion) == 0;
+			&& Arrays.equals(this.proportionComponents, topicItem.proportionComponents);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.topicNum, this.weight, this.proportion);	}
+		return Objects.hash(this.topicNum, Arrays.hashCode(this.proportionComponents));	}
 
 	public String toString() {
-		return "[" + this.topicNum + "," + this.proportion + "]"; }
+		return "[" + this.topicNum + "," + this.getProportion() + "]"; }
 
 	@Override
 	public int compareTo(TopicItem o) {
-		return Double.compare(this.proportion, o.proportion);	}
+		return Double.compare(this.getProportion(), o.getProportion());	}
 	//endregion
 
 	//region SERIALIZATION
 	@Override
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
 		generator.writeField("topicNum", this.topicNum);
-		generator.writeField("weight", this.weight);
-		generator.writeField("proportion", this.proportion);
+		generator.writeField("proportion", this.getProportion());
 	}
 
 	public static TopicItem deserialize(EnhancedJsonParser parser)
 			throws IOException {
 		int topicNum = parser.parseInt();
-		int weight = parser.parseInt();
 		double proportion = parser.parseDouble();
-		return new TopicItem(topicNum, proportion, weight);
+		return new TopicItem(topicNum, proportion);
 	}
 	//endregion
 }
