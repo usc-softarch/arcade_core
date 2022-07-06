@@ -10,8 +10,8 @@ import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class McfpDriver {
 	//region ATTRIBUTES
-	private final List<DefaultWeightedEdge> changeSet;
+	private final Map<String, String> matchSet;
 	private int cost;
 	//endregion
 
@@ -34,13 +34,13 @@ public class McfpDriver {
 
 	public McfpDriver(ReadOnlyArchitecture arch1, ReadOnlyArchitecture arch2) {
 		balanceArchitectures(arch1, arch2);
-		this.changeSet = solve(arch1, arch2);
+		this.matchSet = solve(arch1, arch2);
 	}
 	//endregion
 
 	//region ACCESSORS
-	public List<DefaultWeightedEdge> getChangeSet() {
-		return new ArrayList<>(this.changeSet);	}
+	public Map<String, String> getMatchSet() {
+		return new HashMap<>(this.matchSet);	}
 	public int getCost() { return this.cost; }
 	//endregion
 
@@ -89,12 +89,14 @@ public class McfpDriver {
 		return graph;
 	}
 
-	private List<DefaultWeightedEdge> solve(
+	private Map<String, String> solve(
 			ReadOnlyArchitecture arch1, ReadOnlyArchitecture arch2) {
+		Graph<String, DefaultWeightedEdge> graph = makeGraph(arch1, arch2);
+
 		MinimumCostFlowProblem<String, DefaultWeightedEdge> problem =
 			new MinimumCostFlowProblem.MinimumCostFlowProblemImpl<>(
 				// First argument is the problem graph itself
-				makeGraph(arch1, arch2),
+				graph,
 				// Second argument is the function of supply and demand
 				(String v) -> {
 					if (v.equals("source")) return arch1.size();
@@ -107,7 +109,8 @@ public class McfpDriver {
 			new CapacityScalingMinimumCostFlow<>();
 		this.cost = (int) mcfAlgorithm.getMinimumCostFlow(problem).getCost();
 
-		return mcfAlgorithm.getFlowMap().entrySet().stream()
+		Collection<DefaultWeightedEdge> changeSet =
+			mcfAlgorithm.getFlowMap().entrySet().stream()
 			// Remove all edges that were unselected by the algorithm
 			.filter(e -> e.getValue() != 0)
 			// Remove all edges from the dummy source
@@ -117,6 +120,16 @@ public class McfpDriver {
 			// Get only the edge information
 			.map(Map.Entry::getKey)
 			.collect(Collectors.toList());
+
+		Map<String, String> result = new HashMap<>();
+
+		for (DefaultWeightedEdge edge : changeSet) {
+			String source = graph.getEdgeSource(edge).replace("source_", "");
+			String target = graph.getEdgeTarget(edge).replace("target_", "");
+			result.put(source, target);
+		}
+
+		return result;
 	}
 
 	private void balanceArchitectures(

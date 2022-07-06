@@ -118,8 +118,12 @@ public class SimilarityMatrix {
 	}
 
 	public void removeCluster(Cluster c) {
-		for (SimData cell : simMatrix.get(c).values())
-			this.fastSimMatrix.remove(cell);
+		try {
+			for (SimData cell : simMatrix.get(c).values())
+				this.fastSimMatrix.remove(cell);
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
 		simMatrix.remove(c);
 		for (Map<Cluster, SimData> column : simMatrix.values()) {
 			this.fastSimMatrix.remove(column.get(c));

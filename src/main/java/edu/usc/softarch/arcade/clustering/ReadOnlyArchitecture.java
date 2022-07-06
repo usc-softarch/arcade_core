@@ -160,11 +160,10 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 	}
 
 	public void loadDocTopics(String path) throws IOException {
-		DocTopics.deserialize(path);
+		DocTopics loader = DocTopics.deserialize(path);
 
 		for (ReadOnlyCluster cluster : this.values())
-			cluster.setDocTopicItem(
-				DocTopics.getSingleton().getDocTopicItem(cluster.name));
+			cluster.setDocTopicItem(loader.getDocTopicItem(cluster.name));
 	}
 	//endregion
 

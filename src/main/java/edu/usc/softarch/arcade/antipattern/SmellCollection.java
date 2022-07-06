@@ -1,8 +1,11 @@
 package edu.usc.softarch.arcade.antipattern;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
@@ -18,6 +21,13 @@ public class SmellCollection
   public SmellCollection() { super(); }
 	//endregion
 
+	//region ACCESSORS
+	public Collection<Smell> getClusterSmells(String clusterName) {
+		return this.stream().filter(s ->
+			s.containsCluster(clusterName)).collect(Collectors.toList());
+	}
+	//endregion
+
 	//region SERIALIZATION
 	public void serialize(String path) throws IOException {
 		try (EnhancedJsonGenerator generator = new EnhancedJsonGenerator(path)) {
@@ -31,7 +41,11 @@ public class SmellCollection
 	}
 
 	public static SmellCollection deserialize(String path) throws IOException {
-		try (EnhancedJsonParser parser = new EnhancedJsonParser(path)) {
+		return deserialize(new File(path));
+	}
+
+	public static SmellCollection deserialize(File file) throws IOException {
+		try (EnhancedJsonParser parser = new EnhancedJsonParser(file)) {
 			return deserialize(parser);
 		}
 	}

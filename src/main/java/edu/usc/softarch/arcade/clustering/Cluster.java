@@ -5,14 +5,11 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
-import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
@@ -78,9 +75,9 @@ public class Cluster extends ReadOnlyCluster
 	/**
 	 * Merge constructor.
 	 */
-	public Cluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2)
+	public Cluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2, String project)
 			throws UnmatchingDocTopicItemsException {
-		super(cat, c1, c2);
+		super(cat, c1, c2, project);
 
 		this.featureMap = new HashMap<>();
 
@@ -196,7 +193,7 @@ public class Cluster extends ReadOnlyCluster
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, numEntities, featureMap, super.getDocTopicItem());
+		return Objects.hash(name, numEntities, featureMap);
 	}
 	//endregion
 

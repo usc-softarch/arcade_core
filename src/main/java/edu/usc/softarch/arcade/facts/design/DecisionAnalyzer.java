@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.facts.design;
 
+import edu.usc.softarch.arcade.facts.Change;
 import edu.usc.softarch.arcade.facts.issues.IssueRecord;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
@@ -21,13 +22,13 @@ public class DecisionAnalyzer {
 	//endregion
 
 	//region PROCESSING
-	public Collection<Decision> getDecisionList(String version,
-			Collection<Change> changes) {
-		Collection<Decision> result = new ArrayList<>();
+	public Collection<CodeElementDecision> getDecisionList(String version,
+			Collection<Change<String>> changes) {
+		Collection<CodeElementDecision> result = new ArrayList<>();
 
 		for (IssueRecord issue : this.issues) {
 			if (issue.getFixVersions().contains(version)) {
-				Decision decision = getDecision(version, issue, changes);
+				CodeElementDecision decision = getDecision(version, issue, changes);
 				if (!decision.isEmpty()) result.add(decision);
 			}
 		}
@@ -35,12 +36,12 @@ public class DecisionAnalyzer {
 		return result;
 	}
 
-	private Decision getDecision(String version, IssueRecord issue,
-			Collection<Change> changes) {
+	private CodeElementDecision getDecision(String version, IssueRecord issue,
+			Collection<Change<String>> changes) {
 		Collection<String> addedElements = new HashSet<>();
 		Collection<String> removedElements = new HashSet<>();
 
-		for (Change change : changes) {
+		for (Change<String> change : changes) {
 			EnhancedSet<String> addedFiles = new EnhancedHashSet<>(
 				issue.getFileChanges().stream()
 					.map(Map.Entry::getValue).collect(Collectors.toList()));
@@ -56,7 +57,7 @@ public class DecisionAnalyzer {
 			removedElements.addAll(removedFiles.intersection(removedChanges));
 		}
 
-		return new Decision(issue.description, issue.id, version,
+		return new CodeElementDecision(issue.description, issue.id, version,
 			addedElements, removedElements);
 	}
 	//endregion

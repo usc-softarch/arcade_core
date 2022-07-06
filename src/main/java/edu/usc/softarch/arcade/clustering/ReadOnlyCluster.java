@@ -58,7 +58,7 @@ public class ReadOnlyCluster {
 		this.dti = c.dti;
 	}
 
-	protected ReadOnlyCluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2)
+	protected ReadOnlyCluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2, String project)
 			throws UnmatchingDocTopicItemsException {
 		this.entities = new EnhancedHashSet<>(c2.getEntities());
 
@@ -70,7 +70,7 @@ public class ReadOnlyCluster {
 		}
 
 		if (cat.equals(ClusteringAlgorithmType.ARC))
-			this.dti = DocTopics.getSingleton().mergeDocTopicItems(c1, c2, name);
+			this.dti = DocTopics.getSingleton(project).mergeDocTopicItems(c1, c2, name, project);
 	}
 	//endregion
 

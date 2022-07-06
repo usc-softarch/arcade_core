@@ -41,7 +41,7 @@ public class DecisionRankingEngine {
 	//region ATTRIBUTES
 	public final String rankingPath;
 	public final String topRankPath;
-	private final Collection<Map<Integer, Decision>> decisionSets;
+	private final Collection<Map<Integer, CodeElementDecision>> decisionSets;
 	private final Map<Integer, Collection<Integer>> ranking;
 	//endregion
 
@@ -50,14 +50,15 @@ public class DecisionRankingEngine {
 			String... inputPath) throws IOException {
 		this.rankingPath = rankingPath;
 		this.topRankPath = topRankPath;
-		decisionSets = new ArrayList<>();
-		ranking = new HashMap<>();
+		this.decisionSets = new ArrayList<>();
+		this.ranking = new HashMap<>();
 
 		for (String path : inputPath) {
 			try (EnhancedJsonParser parser = new EnhancedJsonParser(path)) {
-				Collection<Decision> result = parser.parseCollection(Decision.class);
-				Map<Integer, Decision> resultMap = new HashMap<>();
-				for (Decision decision : result)
+				Collection<CodeElementDecision> result =
+					parser.parseCollection(CodeElementDecision.class);
+				Map<Integer, CodeElementDecision> resultMap = new HashMap<>();
+				for (CodeElementDecision decision : result)
 					resultMap.put(Integer.parseInt(decision.id), decision);
 
 				this.decisionSets.add(resultMap);
@@ -70,7 +71,7 @@ public class DecisionRankingEngine {
 	public Map<Integer, Collection<Integer>> rankDecisions() {
 		Map<Integer, Integer> appearanceCounts = new HashMap<>();
 
-		for (Map<Integer, Decision> decisionSet : decisionSets) {
+		for (Map<Integer, CodeElementDecision> decisionSet : this.decisionSets) {
 			for (Integer id : decisionSet.keySet()) {
 				Integer count = appearanceCounts.get(id);
 				if (count == null)
@@ -80,7 +81,7 @@ public class DecisionRankingEngine {
 			}
 		}
 
-		for (int i = 1; i < 6; i++)
+		for (int i = 1; i < 5; i++)
 			ranking.put(i, new ArrayList<>());
 
 		for (Map.Entry<Integer, Integer> entry : appearanceCounts.entrySet())
@@ -89,23 +90,23 @@ public class DecisionRankingEngine {
 		return ranking;
 	}
 
-	public Collection<Decision> buildTopRankList() {
-		Collection<Decision> result = new ArrayList<>();
+	public Collection<CodeElementDecision> buildTopRankList() {
+		Collection<CodeElementDecision> result = new ArrayList<>();
 
-		Collection<Integer> topRankIds = ranking.get(5);
+		Collection<Integer> topRankIds = ranking.get(4);
 
 		for (Integer id : topRankIds) {
-			Decision hit = null;
+			CodeElementDecision hit = null;
 			Collection<String> addedElements = new HashSet<>();
 			Collection<String> removedElements = new HashSet<>();
 
-			for (Map<Integer, Decision> decisionSet : decisionSets) {
+			for (Map<Integer, CodeElementDecision> decisionSet : this.decisionSets) {
 				hit = decisionSet.get(id);
 				addedElements.addAll(hit.getAddedElements());
 				removedElements.addAll(hit.getRemovedElements());
 			}
 
-			result.add(new Decision(hit.description, hit.id, hit.version,
+			result.add(new CodeElementDecision(hit.description, hit.id, hit.version,
 				addedElements, removedElements));
 		}
 

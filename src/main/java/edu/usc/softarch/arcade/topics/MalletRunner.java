@@ -32,14 +32,27 @@ import java.util.regex.Pattern;
 public class MalletRunner {
 	//region PUBLIC INTERFACE
 	public static void main(String[] args) throws IOException {
-		run(args[0], args[1], args[2], args[3], args[4]);	}
+		if (args.length < 6)
+			run(args[0], args[1], args[2], args[3], args[4]);
+		else
+			run(args[0], args[1], args[2], args[3], args[4], Boolean.parseBoolean(args[5]));
+	}
 
 	public static void run(String sourceDir, String language, String malletPath,
 			String artifactsPath, String stopWordDir) throws IOException {
+		run(sourceDir, language, malletPath, artifactsPath, stopWordDir, false);
+	}
+
+	public static void run(String sourceDir, String language,
+			String malletPath, String artifactsPath, String stopWordDir,
+			boolean isBatch) throws IOException {
 		MalletRunner runner = new MalletRunner(sourceDir, language,
 			malletPath, artifactsPath, stopWordDir);
 		runner.copySource();
-		runner.runPipeExtractor();
+		if (isBatch)
+			runner.runPipeExtractorBatch();
+		else
+			runner.runPipeExtractor();
 		runner.runTopicModeling();
 		runner.runInferencer();
 		runner.cleanUp();
@@ -58,7 +71,7 @@ public class MalletRunner {
 
 	//region CONSTRUCTORS
 	public MalletRunner(String sourceDir, String language, String malletPath,
-			String artifactsPath, String stopWordDir) {
+		String artifactsPath, String stopWordDir) {
 		this.sourceDir = new File(sourceDir
 			.replaceFirst("^~",System.getProperty("user.home")));
 		this.targetDir = new File(sourceDir
@@ -122,14 +135,24 @@ public class MalletRunner {
 		Files.copy(original, copy, StandardCopyOption.REPLACE_EXISTING);
 	}
 
+	public void runPipeExtractorBatch() throws IOException {
+		for (File versionDir : this.targetDir.listFiles()) {
+			runPipeExtractor(versionDir, versionDir.getName() + "_output.pipe");
+		}
+	}
+
 	/**
 	 * Extracts tokens from the source code for use in recovery.
 	 */
 	public void runPipeExtractor() throws IOException {
+		runPipeExtractor(this.targetDir, "output.pipe");
+	}
+
+	private void runPipeExtractor(File source, String output) throws IOException {
 		Collection<Pipe> pipeList = loadPipes();
 
 		InstanceList instances = new InstanceList(new SerialPipes(pipeList));
-		for (File file : FileUtil.getFileListing(this.targetDir)) {
+		for (File file : FileUtil.getFileListing(source)) {
 			if (file.isDirectory()) continue;
 
 			if (this.language.equals("java"))
@@ -143,7 +166,7 @@ public class MalletRunner {
 		}
 
 		FileUtil.checkDir(artifactsPath, true, false);
-		instances.save(new File(artifactsPath, "output.pipe"));
+		instances.save(new File(artifactsPath, output));
 	}
 
 	/**

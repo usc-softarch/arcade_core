@@ -40,7 +40,8 @@ public class MalletRunnerTest extends BaseTest {
 	})
 	public void pipeExtractorTest(String version, String language) {
 		String srcDir = subjectSystemsDir + fs + version;
-		String oraclePath = arcDir + fs + version + fs + "base" + fs + "output.pipe";
+		String oraclePath =
+			arcDir + fs + version + fs + "base" + fs + version + "_output.pipe";
 		String stopWordsDir = "src" + fs + "main" + fs + "resources" + fs + "res";
 
 		(new File(outputDirPath)).mkdirs();
@@ -56,7 +57,7 @@ public class MalletRunnerTest extends BaseTest {
 
 		if (super.generateOracles) {
 			assertDoesNotThrow(() -> {
-				Path result = Paths.get(outputDirPath + fs + "output.pipe");
+				Path result = Paths.get(outputDirPath + fs + version + "_output.pipe");
 				Path oracle = Paths.get(oraclePath);
 				Files.copy(result, oracle, StandardCopyOption.REPLACE_EXISTING);
 			});

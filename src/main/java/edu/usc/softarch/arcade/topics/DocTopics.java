@@ -24,6 +24,7 @@ import edu.usc.softarch.util.json.JsonSerializable;
 public class DocTopics implements JsonSerializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final Map<String, DocTopics> mingleton = new HashMap<>();
+	private final String projectVersion;
 	private final Map<String, DocTopicItem> dtItemList;
 	private Map<Integer, List<String>> topicWordLists;
 	// #endregion FIELDS ---------------------------------------------------------
@@ -32,20 +33,21 @@ public class DocTopics implements JsonSerializable {
 	/**
 	 * Deserialization constructor.
 	 */
-	private DocTopics() {
+	private DocTopics(String projectVersion) {
+		this.projectVersion = projectVersion;
 		this.dtItemList = new HashMap<>();
 		this.topicWordLists = new TreeMap<>();
 	}
 
-	private DocTopics(String artifactsDir) throws Exception {
-		this();
+	private DocTopics(String artifactsDir, String version) throws Exception {
+		this(version);
 		// Begin by importing documents from text to feature sequences
 		char fs = File.separatorChar;
 
 		int numTopics = 100;
-		
+
 		InstanceList previousInstances = InstanceList.load(
-			new File(artifactsDir + fs + "output.pipe"));
+			new File(artifactsDir + fs + version + "_output.pipe"));
 		
 		TopicInferencer inferencer = TopicInferencer.read(
 			new File(artifactsDir + fs + "infer.mallet"));
@@ -71,10 +73,6 @@ public class DocTopics implements JsonSerializable {
 		this.topicWordLists = parser.run();
 	}
 
-	public static DocTopics getSingleton() {
-		return getSingleton("default");
-	}
-
 	public static DocTopics getSingleton(String version) {
 		if (mingleton.get(version) == null)
 			throw new IllegalStateException("DocTopics must be initialized.");
@@ -82,23 +80,17 @@ public class DocTopics implements JsonSerializable {
 		return mingleton.get(version);
 	}
 
-	public static void initializeSingleton(String artifactsDir) throws Exception {
-		initializeSingleton(artifactsDir, "default");
-	}
-
 	public static void initializeSingleton(
 			String artifactsDir, String version) throws Exception {
-		mingleton.put(version, new DocTopics(artifactsDir));
+		mingleton.put(version, new DocTopics(artifactsDir, version));
 	}
 
-	public static void resetSingleton() { resetSingleton("default"); }
+	public static void resetSingleton() {
+		mingleton.clear();
+	}
 
 	public static void resetSingleton(String version) {
-		mingleton.put(version, new DocTopics());
-	}
-
-	public static boolean isReady() {
-		return isReady("default");
+		mingleton.remove(version);
 	}
 
 	public static boolean isReady(String version) {
@@ -113,7 +105,7 @@ public class DocTopics implements JsonSerializable {
 
 	void addDocTopicItem(DocTopicItem dti) {
 		if (this.dtItemList.containsKey(dti.source))
-			throw new IllegalArgumentException("Can't add a DTI twice.");
+			throw new IllegalArgumentException("Can't add a DTI twice: " + dti.source);
 		this.dtItemList.put(dti.source, dti);
 	}
 
@@ -209,15 +201,10 @@ public class DocTopics implements JsonSerializable {
 		return topicWordLists; }
 
 	public DocTopicItem mergeDocTopicItems(
-			Cluster c1, Cluster c2, String newName)
+			Cluster c1, Cluster c2, String newName, String version)
 			throws UnmatchingDocTopicItemsException {
-		return mergeDocTopicItems(c1.getDocTopicItem(), c2.getDocTopicItem(), newName);
-	}
-
-	public DocTopicItem mergeDocTopicItems(
-			DocTopicItem dti1, DocTopicItem dti2, String newName)
-			throws UnmatchingDocTopicItemsException {
-		return mergeDocTopicItems(dti1, dti2, newName, "default");
+		return mergeDocTopicItems(c1.getDocTopicItem(),
+			c2.getDocTopicItem(), newName, version);
 	}
 
 	public DocTopicItem mergeDocTopicItems(
@@ -250,6 +237,7 @@ public class DocTopics implements JsonSerializable {
 
 	@Override
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
+		generator.writeField("projectVersion", projectVersion);
 		generator.writeField("dtItemList", dtItemList.values());
 		generator.writeField(
 			"topicWordLists", topicWordLists, false, "wordList");
@@ -263,13 +251,12 @@ public class DocTopics implements JsonSerializable {
 
 	public static DocTopics deserialize(EnhancedJsonParser parser)
 			throws IOException {
-		return deserialize(parser, "default");
-	}
+		String version = parser.parseString();
+		mingleton.put(version, new DocTopics(version));
+		Collection<DocTopicItem> dtis = parser.parseCollection(DocTopicItem.class);
 
-	public static DocTopics deserialize(EnhancedJsonParser parser, String version)
-			throws IOException {
-		mingleton.put(version, new DocTopics());
-		parser.parseCollection(DocTopicItem.class);
+		for (DocTopicItem dti : dtis)
+			mingleton.get(version).addDocTopicItem(dti);
 
 		Map<Integer, List> topicWordLists = parser.parseMap(
 			List.class, false, String.class);

@@ -187,7 +187,7 @@ public class Clusterer {
 		while (stopCriterion.notReadyToStop(this.architecture)) {
 			SimData data = identifyMostSimClusters(simMatrix);
 			Cluster newCluster = new Cluster(this.algorithm,
-				data.c1, data.c2);
+				data.c1, data.c2, this.architecture.projectName);
 
 			updateFastClustersAndSimMatrixToReflectMergedCluster(
 				data, newCluster, simMatrix);
@@ -196,7 +196,7 @@ public class Clusterer {
 					&& this.serializationCriterion.shouldSerialize()) {
 				this.architecture.writeToRsf();
 				// Compute DTI word bags if concern-based technique is used
-				if (DocTopics.isReady()) {
+				if (DocTopics.isReady(this.architecture.projectName)) {
 					this.architecture.serializeBagOfWords();
 					this.architecture.serializeDocTopics();
 				}

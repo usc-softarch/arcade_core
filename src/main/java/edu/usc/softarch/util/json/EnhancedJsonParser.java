@@ -25,9 +25,14 @@ public class EnhancedJsonParser implements AutoCloseable {
 
 	//region CONSTRUCTORS
 	public EnhancedJsonParser(String filePath) throws IOException {
+		this(new File(filePath));
+	}
+
+	public EnhancedJsonParser(File file) throws IOException {
 		JsonFactory factory = new JsonFactory();
-		this.parser = factory.createParser(new File(filePath));
-		this.peekParser = factory.createParser(new File(filePath));
+
+		this.parser = factory.createParser(file);
+		this.peekParser = factory.createParser(file);
 
 		this.peekParser.nextToken(); // initialize peeker
 		this.nextToken(); // skip start object

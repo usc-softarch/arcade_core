@@ -236,6 +236,8 @@ public class FileUtil {
 	 */
 	public static String extractVersion(String versionSchemeExpr,
 			String filename) {
+		if (versionSchemeExpr == null) return extractVersion(filename);
+
 		Pattern p = Pattern.compile(versionSchemeExpr);
 		Matcher m = p.matcher(filename);
 

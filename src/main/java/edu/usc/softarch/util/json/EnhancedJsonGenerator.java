@@ -23,9 +23,12 @@ public class EnhancedJsonGenerator implements AutoCloseable {
 	}
 
 	public EnhancedJsonGenerator(String filePath) throws IOException {
+		this(new File(filePath));
+	}
+
+	public EnhancedJsonGenerator(File file) throws IOException {
 		JsonFactory factory = new JsonFactory();
-		this.generator =
-			factory.createGenerator(new File(filePath), JsonEncoding.UTF8);
+		this.generator = factory.createGenerator(file, JsonEncoding.UTF8);
 		this.generator.writeStartObject();
 	}
 	//endregion

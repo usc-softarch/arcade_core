@@ -122,14 +122,14 @@ public class Architecture extends TreeMap<String, Cluster>
 
 		try	{
 			DocTopics.deserialize(artifactsDir
-				+ File.separator + "docTopics.json");
+				+ File.separator + projectName + "_docTopics.json");
 		} catch (IOException e) {
 			System.out.println("No DocTopics file found, generating new one.");
 			// Initialize DocTopics from files
 			try {
-				DocTopics.initializeSingleton(artifactsDir);
-				DocTopics.getSingleton().serialize(artifactsDir
-					+ File.separator + "docTopics.json");
+				DocTopics.initializeSingleton(artifactsDir, this.projectName);
+				DocTopics.getSingleton(this.projectName).serialize(artifactsDir
+					+ File.separator + projectName + "_docTopics.json");
 			} catch (Exception f) {
 				f.printStackTrace();
 			}
@@ -220,7 +220,7 @@ public class Architecture extends TreeMap<String, Cluster>
 		throws UnmatchingDocTopicItemsException {
 		// Set the DocTopics of each Cluster
 		for (Cluster c : super.values())
-			DocTopics.getSingleton().setClusterDocTopic(c, this.language);
+			DocTopics.getSingleton(this.projectName).setClusterDocTopic(c, this.language);
 
 		// Map inner classes to their parents
 		Map<String,String> oldParentClassMap = new HashMap<>();
@@ -263,7 +263,7 @@ public class Architecture extends TreeMap<String, Cluster>
 			if (nestedCluster == null) continue; // was already removed by WithoutDTI
 			Cluster parentCluster = super.get(entry.getValue());
 			Cluster mergedCluster =
-				new Cluster(ClusteringAlgorithmType.ARC, nestedCluster, parentCluster);
+				new Cluster(ClusteringAlgorithmType.ARC, nestedCluster, parentCluster, this.projectName);
 			super.remove(parentCluster.name);
 			super.remove(nestedCluster.name);
 			super.put(mergedCluster.name, mergedCluster);
@@ -465,7 +465,7 @@ public class Architecture extends TreeMap<String, Cluster>
 		List<Concern> concernList = new ArrayList<>();
 		for (Cluster cluster : this.values())
 			concernList.add(cluster.computeConcern(
-				DocTopics.getSingleton().getTopicWordLists()));
+				DocTopics.getSingleton(this.projectName).getTopicWordLists()));
 
 		return concernList;
 	}
@@ -478,16 +478,16 @@ public class Architecture extends TreeMap<String, Cluster>
 
 		for (Map.Entry<Integer, Cluster> entry : architectureIndex.entrySet()) {
 			DocTopicItem toRename = entry.getValue().getDocTopicItem();
-			DocTopics.getSingleton().renameDocTopicItem(
+			DocTopics.getSingleton(this.projectName).renameDocTopicItem(
 				toRename, entry.getKey().toString());
 			toKeep.add(toRename);
 		}
 
-		DocTopics.getSingleton().cleanDocTopics(toKeep);
+		DocTopics.getSingleton(this.projectName).cleanDocTopics(toKeep);
 
 		String path = this.projectPath + fs + this.projectName + "_"
 			+ this.simMeasure + "_" + this.size() + "_clusteredDocTopics.json";
-		DocTopics.getSingleton().serialize(path);
+		DocTopics.getSingleton(this.projectName).serialize(path);
 	}
 	//endregion
 }

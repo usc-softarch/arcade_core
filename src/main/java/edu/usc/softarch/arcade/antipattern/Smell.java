@@ -44,6 +44,9 @@ public class Smell implements Serializable, JsonSerializable {
 		return this.clusters.add(clusterName); }
 	public boolean addClusterCollection(Collection<String> clusters) {
 		return this.clusters.addAll(clusters); }
+
+	public boolean containsCluster(String clusterName) {
+		return this.clusters.contains(clusterName); }
 	//endregion
 
 	//region OBJECT METHODS
