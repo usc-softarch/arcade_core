@@ -70,7 +70,7 @@ public class LimboTest extends BaseTest {
 
 		assertDoesNotThrow(() ->
 			Clusterer.run(ClusteringAlgorithmType.LIMBO, arch, serialCrit, stopCrit,
-				lang, SimMeasure.SimMeasureType.IL));
+				SimMeasure.SimMeasureType.IL));
 
 		// Load results
 		String result = assertDoesNotThrow(() ->

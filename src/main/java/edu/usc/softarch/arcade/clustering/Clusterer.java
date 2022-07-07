@@ -8,9 +8,9 @@ import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
-import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
 
 public class Clusterer {
 	//region PUBLIC INTERFACE
@@ -33,36 +33,8 @@ public class Clusterer {
 	public static void main(String[] args)
 			throws IOException, DistributionSizeMismatchException,
 			UnmatchingDocTopicItemsException {
-		ClusteringAlgoArguments parsedArguments =
-			new ClusteringAlgoArguments(args);
-
+		ClusteringAlgoArguments parsedArguments = new ClusteringAlgoArguments(args);
 		run(parsedArguments);
-	}
-
-	public static Architecture run(ClusteringAlgoArguments parsedArguments)
-			throws IOException, DistributionSizeMismatchException,
-			UnmatchingDocTopicItemsException {
-		return run(
-			parsedArguments.algorithm,
-			parsedArguments.arch,
-			parsedArguments.serialCrit,
-			parsedArguments.stopCrit,
-			parsedArguments.language,
-			parsedArguments.simMeasure);
-	}
-
-	public static Architecture run(ClusteringAlgorithmType algorithm,
-			Architecture arch, SerializationCriterion serialCrit,
-			StoppingCriterion stopCrit, String language,
-			SimMeasure.SimMeasureType simMeasure)
-			throws IOException, DistributionSizeMismatchException,
-			UnmatchingDocTopicItemsException {
-		// Create the runner object
-		Clusterer runner = new Clusterer(language, serialCrit, arch, algorithm);
-		// Compute the clustering algorithm and return the resulting architecture
-		runner.computeArchitecture(stopCrit, simMeasure);
-
-		return runner.architecture;
 	}
 
 	public static class ClusteringAlgoArguments {
@@ -75,7 +47,7 @@ public class Clusterer {
 		public final SimMeasure.SimMeasureType simMeasure;
 
 		public ClusteringAlgoArguments(String[] args)
-				throws IOException, UnmatchingDocTopicItemsException {
+			throws IOException, UnmatchingDocTopicItemsException {
 			this.algorithm = ClusteringAlgorithmType.valueOf(args[0].toUpperCase());
 			this.language = args[1];
 			this.simMeasure =
@@ -94,37 +66,116 @@ public class Clusterer {
 			this.stoppingCriterion = args[3];
 		}
 	}
-	//endregion
 
-	//region ATTRIBUTES
-	protected final Architecture architecture;
-	public static int numberOfEntitiesToBeClustered = 0;
-	protected final String language;
-	protected final SerializationCriterion serializationCriterion;
-	protected final ClusteringAlgorithmType algorithm;
-	//endregion ATTRIBUTES
+	public static Architecture run(ClusteringAlgoArguments parsedArguments)
+			throws IOException, DistributionSizeMismatchException,
+			UnmatchingDocTopicItemsException {
+		return run(
+			parsedArguments.algorithm,
+			parsedArguments.arch,
+			parsedArguments.serialCrit,
+			parsedArguments.stopCrit,
+			parsedArguments.simMeasure);
+	}
 
-	//region CONTRUCTORS
-	protected Clusterer(String language,
-			SerializationCriterion serializationCriterion, Architecture arch,
-			ClusteringAlgorithmType algorithm) {
-		this.language = language;
-		this.serializationCriterion = serializationCriterion;
-		this.architecture = arch;
-		this.algorithm = algorithm;
+	public static Architecture run(ClusteringAlgorithmType algorithm,
+			Architecture arch, SerializationCriterion serialCrit,
+			StoppingCriterion stopCrit, SimMeasure.SimMeasureType simMeasure)
+			throws IOException, DistributionSizeMismatchException,
+			UnmatchingDocTopicItemsException {
+		Clusterer runner = new Clusterer(serialCrit, arch, algorithm, simMeasure);
+		runner.computeArchitecture(stopCrit);
+
+		return runner.architecture;
 	}
 	//endregion
 
-	// #region ACCESSORS ---------------------------------------------------------
+	//region ATTRIBUTES
+	private final Architecture architecture;
+	public static int numberOfEntitiesToBeClustered = 0;
+	private final SerializationCriterion serializationCriterion;
+	private final ClusteringAlgorithmType algorithm;
+	private final SimilarityMatrix simMatrix;
+	//endregion ATTRIBUTES
+
+	//region CONTRUCTORS
+	public Clusterer(SerializationCriterion serializationCriterion,
+			Architecture arch, ClusteringAlgorithmType algorithm,
+			SimMeasure.SimMeasureType simMeasure)
+			throws DistributionSizeMismatchException {
+		this.serializationCriterion = serializationCriterion;
+		this.architecture = arch;
+		this.algorithm = algorithm;
+		this.simMatrix = new SimilarityMatrix(simMeasure, this.architecture);
+	}
+	//endregion
+
+	//region ACCESSORS
 	public Architecture getArchitecture() { return architecture; }
 
-	protected void removeCluster(Cluster cluster) {
-		architecture.remove(cluster.name);	}
-	protected void addCluster(Cluster cluster) {
+	private void addCluster(Cluster cluster) {
 		architecture.put(cluster.name, cluster); }
-	// #endregion ACCESSORS ------------------------------------------------------
+	private void removeCluster(Cluster cluster) {
+		architecture.remove(cluster.name);	}
+	//endregion
 
-	protected void updateFastClustersAndSimMatrixToReflectMergedCluster(
+	//region PROCESSING
+	public Architecture computeArchitecture(StoppingCriterion stopCriterion)
+			throws DistributionSizeMismatchException, IOException,
+			UnmatchingDocTopicItemsException {
+		while (stopCriterion.notReadyToStop(this.architecture)) {
+			doClusteringStep();
+			doSerializationStep();
+		}
+
+		return this.architecture;
+	}
+
+	public void doClusteringStep() throws UnmatchingDocTopicItemsException,
+			DistributionSizeMismatchException {
+		SimData data = identifyMostSimClusters(simMatrix);
+		Cluster newCluster = new Cluster(this.algorithm,
+			data.c1, data.c2, this.architecture.projectName);
+
+		updateFastClustersAndSimMatrixToReflectMergedCluster(
+			data, newCluster, simMatrix);
+	}
+
+	public void doSerializationStep() throws IOException {
+		if (this.serializationCriterion != null
+			&& this.serializationCriterion.shouldSerialize()) {
+			this.architecture.writeToRsf();
+			// Compute DTI word bags if concern-based technique is used
+			if (DocTopics.isReady(this.architecture.projectName)) {
+				this.architecture.serializeBagOfWords();
+				this.architecture.serializeDocTopics();
+			}
+		}
+	}
+
+	/**
+	 * Looks for the smallest non-diagonal value in the matrix, which represents
+	 * the pair of clusters with the lowest level of divergence (highest
+	 * similarity).
+	 *
+	 * @param simMatrix Similarity matrix to analyze.
+	 * @return The maximum-similarity cell.
+	 */
+	private SimData identifyMostSimClusters(SimilarityMatrix simMatrix) {
+		if (simMatrix.size() != architecture.size())
+			throw new IllegalArgumentException("expected simMatrix.size():"
+				+ simMatrix.size() + " to be fastClusters.size(): "
+				+ architecture.size());
+
+		for (Map<Cluster, SimData> col : simMatrix.getColumns())
+			if (col.size() != architecture.size())
+				throw new IllegalArgumentException("expected col.size():" + col.size()
+					+ " to be fastClusters.size(): " + architecture.size());
+
+		return simMatrix.getMinCell();
+	}
+
+	private void updateFastClustersAndSimMatrixToReflectMergedCluster(
 			SimData data, Cluster newCluster,	SimilarityMatrix simMatrix)
 			throws DistributionSizeMismatchException {
 		// Sanity check
@@ -146,63 +197,5 @@ public class Clusterer {
 		removeCluster(otherCluster);
 		addCluster(newCluster);
 	}
-
-	/**
-	 * Looks for the smallest non-diagonal value in the matrix, which represents
-	 * the pair of clusters with the lowest level of divergence (highest
-	 * similarity).
-	 *
-	 * @param simMatrix Similarity matrix to analyze.
-	 * @return The maximum-similarity cell.
-	 */
-	protected SimData identifyMostSimClusters(SimilarityMatrix simMatrix) {
-		if (simMatrix.size() != architecture.size())
-			throw new IllegalArgumentException("expected simMatrix.size():"
-				+ simMatrix.size() + " to be fastClusters.size(): "
-				+ architecture.size());
-
-		for (Map<Cluster, SimData> col : simMatrix.getColumns())
-			if (col.size() != architecture.size())
-				throw new IllegalArgumentException("expected col.size():" + col.size()
-					+ " to be fastClusters.size(): " + architecture.size());
-
-		SimData toReturn = null;
-
-		try {
-			toReturn = simMatrix.getMinCell();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return toReturn;
-	}
-
-	public Architecture computeArchitecture(StoppingCriterion stopCriterion,
-			SimMeasure.SimMeasureType simMeasure)
-			throws DistributionSizeMismatchException, IOException,
-			UnmatchingDocTopicItemsException {
-		SimilarityMatrix simMatrix = new SimilarityMatrix(
-			simMeasure, this.architecture);
-
-		while (stopCriterion.notReadyToStop(this.architecture)) {
-			SimData data = identifyMostSimClusters(simMatrix);
-			Cluster newCluster = new Cluster(this.algorithm,
-				data.c1, data.c2, this.architecture.projectName);
-
-			updateFastClustersAndSimMatrixToReflectMergedCluster(
-				data, newCluster, simMatrix);
-
-			if (this.serializationCriterion != null
-					&& this.serializationCriterion.shouldSerialize()) {
-				this.architecture.writeToRsf();
-				// Compute DTI word bags if concern-based technique is used
-				if (DocTopics.isReady(this.architecture.projectName)) {
-					this.architecture.serializeBagOfWords();
-					this.architecture.serializeDocTopics();
-				}
-			}
-		}
-
-		return this.architecture;
-	}
+	//endregion
 }

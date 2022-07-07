@@ -81,11 +81,11 @@ public class WcaTest extends BaseTest {
 
 		assertDoesNotThrow(() ->
 			Clusterer.run(ClusteringAlgorithmType.WCA, archUem, serialCritUem,
-				stopCrit, lang, SimMeasure.SimMeasureType.UEM));
+				stopCrit, SimMeasure.SimMeasureType.UEM));
 
 		assertDoesNotThrow(() ->
 			Clusterer.run(ClusteringAlgorithmType.WCA, archUemnm, serialCritUemnm,
-				stopCrit, lang, SimMeasure.SimMeasureType.UEMNM));
+				stopCrit, SimMeasure.SimMeasureType.UEMNM));
 
 		// Load uem results
 		String uemResult = assertDoesNotThrow(() ->

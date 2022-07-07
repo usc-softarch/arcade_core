@@ -86,7 +86,7 @@ public class ArcTest extends BaseTest {
 				"archsizefraction", 0.2, arch);
 
 		assertDoesNotThrow(() ->
-			Clusterer.run(ClusteringAlgorithmType.ARC, arch, serialCrit, stopCrit, lang,
+			Clusterer.run(ClusteringAlgorithmType.ARC, arch, serialCrit, stopCrit,
 				SimMeasure.SimMeasureType.JS));
 
 		/* The expectation here is that this resulting clusters file has the same
