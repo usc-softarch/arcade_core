@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.topics;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,7 @@ import edu.usc.softarch.util.json.JsonSerializable;
 public class DocTopics implements JsonSerializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final Map<String, DocTopics> mingleton = new HashMap<>();
-	private final String projectVersion;
+	final String projectVersion;
 	private final Map<String, DocTopicItem> dtItemList;
 	private Map<Integer, List<String>> topicWordLists;
 	// #endregion FIELDS ---------------------------------------------------------
@@ -225,6 +226,9 @@ public class DocTopics implements JsonSerializable {
 
 	public void renameDocTopicItem(DocTopicItem dti, String newSource) {
 		dti.source = newSource; }
+
+	public Collection<DocTopicItem> getCopy() {
+		return new ArrayList<>(this.dtItemList.values()); }
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region SERIALIZATION -----------------------------------------------------

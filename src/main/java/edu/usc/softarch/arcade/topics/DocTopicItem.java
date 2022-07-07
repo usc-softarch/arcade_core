@@ -99,6 +99,8 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 	//endregion
 
 	//region ACCESSORS
+	public String getSource() { return this.source; }
+
 	/**
 	 * Gets a copy of the {@link TopicItem}s in this DocTopicItem.
 	 */
