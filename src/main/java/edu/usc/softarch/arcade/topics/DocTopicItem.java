@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class DocTopicItem implements Serializable, JsonSerializable {
 	//region ATTRIBUTES
 	private static final long serialVersionUID = 5162975838519632395L;
+	private static final double log2 = Math.log(2.0);
 
 	/**
 	 * Source entities that make up this DocTopicItem.
@@ -187,6 +188,28 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 		return Maths.jensenShannonDivergence(sortedP, sortedQ);
 	}
 
+	public double getWeightedJsDivergence(DocTopicItem toCompare)
+			throws DistributionSizeMismatchException {
+		// Error due to size mismatch
+		if (this.size() != toCompare.size())
+			throw new DistributionSizeMismatchException(
+				"P and Q for Jensen Shannon Divergence not the same size");
+
+		double[] sortedP = new double[this.size()];
+		double[] sortedQ = new double[this.size()];
+
+		Collection<TopicItem> currTopics = this.topics.values();
+		Collection<TopicItem> toCompareTopics = toCompare.topics.values();
+
+		for (TopicItem pTopicItem : currTopics)
+			sortedP[pTopicItem.topicNum] = pTopicItem.getProportion();
+
+		for (TopicItem qTopicItem : toCompareTopics)
+			sortedQ[qTopicItem.topicNum] = qTopicItem.getProportion();
+
+		return weightedJSDivergence(sortedP, sortedQ);
+	}
+
 	//TODO make this less horrible
 	public Concern getConcern() {
 		if (this.concern == null)
@@ -201,6 +224,50 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 		if (this.concern == null)
 			this.concern = new Concern(wordBags, this.topics);
 		return new Concern(this.concern);
+	}
+
+	private static double weightedJSDivergence(double[] p1, double[] p2) {
+		double[] average = new double[p1.length];
+		double[] weight = new double[p1.length];
+
+		for(int i = 0; i < p1.length; ++i)
+			average[i] += (p1[i] + p2[i]) / 2.0;
+
+		TreeMap<Double, Integer> averageDistribution = new TreeMap<>();
+		for(int i = 0; i < p1.length; ++i)
+			averageDistribution.put(average[i], i);
+
+		int rank = 0;
+		for (Map.Entry<Double, Integer> value : averageDistribution.entrySet()) {
+			if (rank < 10)
+				weight[value.getValue()] = 0.000001;
+			else if (rank < 30)
+				weight[value.getValue()] = 0.0001;
+			else if (rank < 50)
+				weight[value.getValue()] = 0.01;
+			else
+				weight[value.getValue()] = 1.0;
+
+			rank++;
+		}
+
+		return (weightedKLDivergence(p1, average, weight)
+			+ weightedKLDivergence(p2, average, weight)) / 2.0;
+	}
+
+	private static double weightedKLDivergence(double[] p1, double[] p2, double[] weight) {
+		double klDiv = 0.0;
+
+		for(int i = 0; i < p1.length; ++i) {
+			if (p1[i] != 0.0) {
+				if (p2[i] == 0.0)
+					return Double.POSITIVE_INFINITY;
+
+				klDiv += weight[i] * p1[i] * Math.log(p1[i] / p2[i]);
+			}
+		}
+
+		return klDiv / log2;
 	}
 	//endregion
 

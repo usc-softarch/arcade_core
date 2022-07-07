@@ -7,7 +7,7 @@ import java.util.BitSet;
 import java.util.Set;
 
 public abstract class SimMeasure {
-	public enum SimMeasureType { JS, SCM, UEM, UEMNM, IL, ARCIL, ARCUEM, ARCUEMNM }
+	public enum SimMeasureType { JS, SCM, UEM, UEMNM, IL, ARCIL, ARCUEM, ARCUEMNM, WJS }
 
 	public abstract double computeCellValue(int numEntitiesToCluster, Cluster row,
 		Cluster col, int numFeatures) throws DistributionSizeMismatchException;
@@ -105,6 +105,8 @@ public abstract class SimMeasure {
 				return ArcUemMeasure.getSingleton();
 			case ARCUEMNM:
 				return ArcUemnmMeasure.getSingleton();
+			case WJS:
+				return WeightedJsMeasure.getSingleton();
 			default:
 				throw new IllegalArgumentException(
 					"Unknown similarity measure " + type);
