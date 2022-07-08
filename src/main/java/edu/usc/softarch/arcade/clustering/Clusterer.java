@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.clustering;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -84,7 +83,8 @@ public class Clusterer {
 			StoppingCriterion stopCrit, SimMeasure.SimMeasureType simMeasure)
 			throws IOException, DistributionSizeMismatchException,
 			UnmatchingDocTopicItemsException {
-		Clusterer runner = new Clusterer(serialCrit, arch, algorithm, simMeasure);
+		Clusterer runner = new Clusterer(serialCrit, arch, algorithm,
+			simMeasure, stopCrit);
 		runner.computeArchitecture(stopCrit);
 
 		return runner.architecture;
@@ -97,17 +97,19 @@ public class Clusterer {
 	private final SerializationCriterion serializationCriterion;
 	public final ClusteringAlgorithmType algorithm;
 	private final SimilarityMatrix simMatrix;
+	public final StoppingCriterion stopCrit;
 	//endregion ATTRIBUTES
 
 	//region CONTRUCTORS
 	public Clusterer(SerializationCriterion serializationCriterion,
 			Architecture arch, ClusteringAlgorithmType algorithm,
-			SimMeasure.SimMeasureType simMeasure)
+			SimMeasure.SimMeasureType simMeasure, StoppingCriterion stopCrit)
 			throws DistributionSizeMismatchException {
 		this.serializationCriterion = serializationCriterion;
 		this.architecture = arch;
 		this.algorithm = algorithm;
 		this.simMatrix = new SimilarityMatrix(simMeasure, this.architecture);
+		this.stopCrit = stopCrit;
 	}
 	//endregion
 

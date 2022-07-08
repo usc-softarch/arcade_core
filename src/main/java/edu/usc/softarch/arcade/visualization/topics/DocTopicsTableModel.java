@@ -53,10 +53,7 @@ public class DocTopicsTableModel extends ArchitectureTableModel {
 
 	@Override
 	public Map.Entry<Integer, Double> getHighestValue(int row) {
-		List<DocTopicItem> docTopicsCopy =
-			new ArrayList<>(DocTopics.getSingleton(this.projectName).getCopy());
-
-		DocTopicItem toCheck = docTopicsCopy.get(row);
+		DocTopicItem toCheck = this.docTopicsCopy.get(row);
 		Collection<TopicItem> topics = toCheck.getTopics();
 
 		int topicNum = -1;

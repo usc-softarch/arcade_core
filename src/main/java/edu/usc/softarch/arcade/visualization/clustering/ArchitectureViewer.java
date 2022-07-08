@@ -168,8 +168,10 @@ public abstract class ArchitectureViewer extends JPanel
 	public void valueChanged(ListSelectionEvent e) {
 		if (e.getValueIsAdjusting()) return;
 
+		int row = this.architectureTable
+			.convertRowIndexToModel(this.architectureTable.getSelectedRow());
 		Map.Entry<Integer, Double> highestValue =
-			this.tableModel.getHighestValue(this.architectureTable.getSelectedRow());
+			this.tableModel.getHighestValue(row);
 
 		this.topFeatureLabel.setText(String.valueOf(highestValue.getKey()));
 		this.topFeatureProportionLabel.setText(
