@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class Clusterer {
 		public final SimMeasure.SimMeasureType simMeasure;
 
 		public ClusteringAlgoArguments(String[] args)
-			throws IOException, UnmatchingDocTopicItemsException {
+				throws IOException, UnmatchingDocTopicItemsException {
 			this.algorithm = ClusteringAlgorithmType.valueOf(args[0].toUpperCase());
 			this.language = args[1];
 			this.simMeasure =
@@ -94,7 +95,7 @@ public class Clusterer {
 	private final Architecture architecture;
 	public static int numberOfEntitiesToBeClustered = 0;
 	private final SerializationCriterion serializationCriterion;
-	private final ClusteringAlgorithmType algorithm;
+	public final ClusteringAlgorithmType algorithm;
 	private final SimilarityMatrix simMatrix;
 	//endregion ATTRIBUTES
 
@@ -133,7 +134,7 @@ public class Clusterer {
 
 	public void doClusteringStep() throws UnmatchingDocTopicItemsException,
 			DistributionSizeMismatchException {
-		SimData data = identifyMostSimClusters(simMatrix);
+		SimData data = identifyMostSimClusters();
 		Cluster newCluster = new Cluster(this.algorithm,
 			data.c1, data.c2, this.architecture.projectName);
 
@@ -143,13 +144,8 @@ public class Clusterer {
 
 	public void doSerializationStep() throws IOException {
 		if (this.serializationCriterion != null
-			&& this.serializationCriterion.shouldSerialize()) {
-			this.architecture.writeToRsf();
-			// Compute DTI word bags if concern-based technique is used
-			if (DocTopics.isReady(this.architecture.projectName)) {
-				this.architecture.serializeBagOfWords();
-				this.architecture.serializeDocTopics();
-			}
+				&& this.serializationCriterion.shouldSerialize()) {
+			serialize();
 		}
 	}
 
@@ -158,21 +154,20 @@ public class Clusterer {
 	 * the pair of clusters with the lowest level of divergence (highest
 	 * similarity).
 	 *
-	 * @param simMatrix Similarity matrix to analyze.
 	 * @return The maximum-similarity cell.
 	 */
-	private SimData identifyMostSimClusters(SimilarityMatrix simMatrix) {
-		if (simMatrix.size() != architecture.size())
+	public SimData identifyMostSimClusters() {
+		if (this.simMatrix.size() != this.architecture.size())
 			throw new IllegalArgumentException("expected simMatrix.size():"
-				+ simMatrix.size() + " to be fastClusters.size(): "
-				+ architecture.size());
+				+ this.simMatrix.size() + " to be fastClusters.size(): "
+				+ this.architecture.size());
 
-		for (Map<Cluster, SimData> col : simMatrix.getColumns())
-			if (col.size() != architecture.size())
+		for (Map<Cluster, SimData> col : this.simMatrix.getColumns())
+			if (col.size() != this.architecture.size())
 				throw new IllegalArgumentException("expected col.size():" + col.size()
-					+ " to be fastClusters.size(): " + architecture.size());
+					+ " to be fastClusters.size(): " + this.architecture.size());
 
-		return simMatrix.getMinCell();
+		return this.simMatrix.getMinCell();
 	}
 
 	private void updateFastClustersAndSimMatrixToReflectMergedCluster(
@@ -196,6 +191,17 @@ public class Clusterer {
 		removeCluster(cluster);
 		removeCluster(otherCluster);
 		addCluster(newCluster);
+	}
+	//endregion
+
+	//region SERIALIZATION
+	public void serialize() throws IOException {
+		this.architecture.writeToRsf();
+		// Compute DTI word bags if concern-based technique is used
+		if (DocTopics.isReady(this.architecture.projectName)) {
+			this.architecture.serializeBagOfWords();
+			this.architecture.serializeDocTopics();
+		}
 	}
 	//endregion
 }

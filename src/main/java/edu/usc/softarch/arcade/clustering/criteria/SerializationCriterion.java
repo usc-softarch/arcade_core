@@ -7,19 +7,31 @@ import edu.usc.softarch.arcade.clustering.criteria.serialization.ArchSizeSeriali
 import edu.usc.softarch.arcade.clustering.criteria.serialization.StepCountSerializationCriterion;
 
 public abstract class SerializationCriterion {
+	public enum Criterion {
+		ARCHSIZE, ARCHSIZEMOD, STEPCOUNT, ARCHSIZEFRACTION
+	}
+
 	public abstract boolean shouldSerialize();
 
 	public static SerializationCriterion makeSerializationCriterion(
-		String serializationCriterion, double criterionValue,
-		Architecture arch) {
-		switch (serializationCriterion.toLowerCase()) {
-			case "archsize":
+			String serializationCriterion, double criterionValue,
+			Architecture arch) {
+		return makeSerializationCriterion(
+			Criterion.valueOf(serializationCriterion.toUpperCase()),
+			criterionValue, arch);
+	}
+
+	public static SerializationCriterion makeSerializationCriterion(
+			Criterion serializationCriterion, double criterionValue,
+			Architecture arch) {
+		switch (serializationCriterion) {
+			case ARCHSIZE:
 				return new ArchSizeSerializationCriterion(arch, (int)criterionValue);
-			case "archsizemod":
+			case ARCHSIZEMOD:
 				return new ArchSizeModSerializationCriterion(arch, (int)criterionValue);
-			case "stepcount":
+			case STEPCOUNT:
 				return new StepCountSerializationCriterion((int)criterionValue);
-			case "archsizefraction":
+			case ARCHSIZEFRACTION:
 				return new ArchSizeFractionSerializationCriterion(arch, criterionValue);
 			default:
 				throw new IllegalArgumentException(
