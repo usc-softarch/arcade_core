@@ -14,7 +14,7 @@ import java.util.Map;
 public class DocTopicsTableModel extends ArchitectureTableModel {
 	//region ATTRIBUTES
 	private final String projectName;
-	private final List<DocTopicItem> docTopicsCopy;
+	private List<DocTopicItem> docTopicsCopy;
 	//endregion
 
 	//region CONSTRUCTORS
@@ -53,21 +53,16 @@ public class DocTopicsTableModel extends ArchitectureTableModel {
 
 	@Override
 	public Map.Entry<Integer, Double> getHighestValue(int row) {
-		DocTopicItem toCheck = this.docTopicsCopy.get(row);
-		Collection<TopicItem> topics = toCheck.getTopics();
+		TopicItem topTopicItem = this.docTopicsCopy.get(row).getTopTopicItem();
 
-		int topicNum = -1;
-		double proportion = 0.0;
+		return new AbstractMap.SimpleEntry<>(topTopicItem.topicNum + 1,
+			topTopicItem.getProportion());
+	}
 
-		for (TopicItem topic : topics) {
-			double tempProportion = topic.getProportion();
-			if (tempProportion > proportion) {
-				topicNum = topic.topicNum;
-				proportion = tempProportion;
-			}
-		}
-
-		return new AbstractMap.SimpleEntry<>(topicNum + 1, proportion);
+	@Override
+	public void refresh() {
+		this.docTopicsCopy =
+			new ArrayList<>(DocTopics.getSingleton(this.projectName).getCopy());
 	}
 	//endregion
 }

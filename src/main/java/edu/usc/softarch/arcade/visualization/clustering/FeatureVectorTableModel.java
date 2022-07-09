@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.visualization.clustering;
 import edu.usc.softarch.arcade.clustering.Architecture;
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.visualization.ArchitectureTableModel;
+import org.apache.commons.lang.NotImplementedException;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -62,6 +63,11 @@ public class FeatureVectorTableModel extends ArchitectureTableModel {
 		}
 
 		return new AbstractMap.SimpleEntry<>(featureIndex + 1, proportion);
+	}
+
+	@Override
+	public void refresh() {
+		throw new NotImplementedException();
 	}
 	//endregion
 }

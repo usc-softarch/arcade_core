@@ -28,12 +28,12 @@ public abstract class ArchitectureViewer extends JPanel
 	//region ATTRIBUTES
 	// Real Attributes
 	protected final String projectName;
-	protected final ArchitectureTableModel tableModel;
+	protected ArchitectureTableModel tableModel;
 
 	// Swing Components
 	private final LabeledTextField indexTextField;
 	private final LabeledComboBox<Integer> featureComboBox;
-	private final JTable architectureTable;
+	protected final JTable architectureTable;
 	private final JLabel topFeatureLabel;
 	private final JLabel topFeatureProportionLabel;
 	private final TableRowSorter<TableModel> architectureFilter;
@@ -167,6 +167,8 @@ public abstract class ArchitectureViewer extends JPanel
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		if (e.getValueIsAdjusting()) return;
+
+		if (this.architectureTable.getSelectedRow() == -1) return;
 
 		int row = this.architectureTable
 			.convertRowIndexToModel(this.architectureTable.getSelectedRow());

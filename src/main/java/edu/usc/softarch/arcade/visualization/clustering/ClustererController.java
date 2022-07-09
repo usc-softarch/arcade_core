@@ -36,9 +36,10 @@ public class ClustererController extends JPanel
 	private final DefaultButton doStepButton;
 	private final DefaultButton saveResultsButton;
 	private final JLabel isReadyToStopLabel;
-	private final JLabel cluster1NameLabel;
-	private final JLabel cluster2NameLabel;
+	private final JTextPane cluster1NameTextPane;
+	private final JTextPane cluster2NameTextPane;
 	private final JLabel simValueLabel;
+	private final JLabel highestDTIMatchLabel;
 	private final JTextPane archSizeTextPane;
 
 	// Actions
@@ -69,13 +70,6 @@ public class ClustererController extends JPanel
 		c.gridx = 0; c.gridy = 0; c.weightx = 1.0;
 		this.add(this.chooseOtherSystemButton, c);
 
-		// Undo step button
-		this.undoStepButton =
-			new DefaultButton(this, "Undo", undoStepAction);
-		this.undoStepButton.setEnabled(false); //TODO functionality not ready
-		c.gridx = 2; c.gridy = 0; c.weightx = 1.0;
-		this.add(this.undoStepButton, c);
-
 		// Architecture size label
 		this.archSizeTextPane = new JTextPane();
 		this.archSizeTextPane.setEditable(false);
@@ -86,8 +80,22 @@ public class ClustererController extends JPanel
 		StyleConstants.setAlignment(centerAttribute, StyleConstants.ALIGN_CENTER);
 		archSizeDoc.setParagraphAttributes(
 			0, archSizeDoc.getLength(), centerAttribute, false);
-		c.gridx = 1; c.gridy = 1; c.weightx = 1.0;
+		c.gridx = 1; c.gridy = 0; c.weightx = 1.0;
 		this.add(this.archSizeTextPane, c);
+
+		// Undo step button
+		this.undoStepButton =
+			new DefaultButton(this, "Undo", undoStepAction);
+		this.undoStepButton.setEnabled(false); //TODO functionality not ready
+		c.gridx = 2; c.gridy = 0; c.weightx = 1.0;
+		this.add(this.undoStepButton, c);
+
+		// DTI match evaluation label
+		this.highestDTIMatchLabel = new JLabel("Text");
+		this.highestDTIMatchLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		this.highestDTIMatchLabel.setPreferredSize(new Dimension(200,25));
+		c.gridx = 1; c.gridy = 1; c.weightx = 0.0;
+		this.add(this.highestDTIMatchLabel, c);
 
 		// Next step button
 		this.doStepButton =
@@ -114,11 +122,18 @@ public class ClustererController extends JPanel
 		this.add(this.saveResultsButton, c);
 
 		// Cluster 1 label
-		this.cluster1NameLabel = new JLabel("Text");
-		this.cluster1NameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		this.cluster1NameLabel.setPreferredSize(new Dimension(200,25));
+		this.cluster1NameTextPane = new JTextPane();
+		this.cluster1NameTextPane.setEditable(false);
+		this.cluster1NameTextPane.setBackground(null);
+		this.cluster1NameTextPane.setBorder(null);
+		StyledDocument cluster1Doc = this.cluster1NameTextPane.getStyledDocument();
+		SimpleAttributeSet cluster1centerAttribute = new SimpleAttributeSet();
+		StyleConstants.setAlignment(cluster1centerAttribute, StyleConstants.ALIGN_CENTER);
+		cluster1Doc.setParagraphAttributes(
+			0, cluster1Doc.getLength(), cluster1centerAttribute, false);
+		this.cluster1NameTextPane.setPreferredSize(new Dimension(200,25));
 		c.gridx = 0; c.gridy = 3; c.weightx = 0.0;
-		this.add(this.cluster1NameLabel, c);
+		this.add(this.cluster1NameTextPane, c);
 
 		// Similarity value label
 		this.simValueLabel = new JLabel("Text");
@@ -128,11 +143,18 @@ public class ClustererController extends JPanel
 		this.add(this.simValueLabel, c);
 
 		// Cluster 2 label
-		this.cluster2NameLabel = new JLabel("Text");
-		this.cluster2NameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		this.cluster2NameLabel.setPreferredSize(new Dimension(200,25));
+		this.cluster2NameTextPane = new JTextPane();
+		this.cluster2NameTextPane.setEditable(false);
+		this.cluster2NameTextPane.setBackground(null);
+		this.cluster2NameTextPane.setBorder(null);
+		StyledDocument cluster2Doc = this.cluster2NameTextPane.getStyledDocument();
+		SimpleAttributeSet cluster2centerAttribute = new SimpleAttributeSet();
+		StyleConstants.setAlignment(cluster2centerAttribute, StyleConstants.ALIGN_CENTER);
+		cluster2Doc.setParagraphAttributes(
+			0, cluster2Doc.getLength(), cluster2centerAttribute, false);
+		this.cluster2NameTextPane.setPreferredSize(new Dimension(200,25));
 		c.gridx = 2; c.gridy = 3; c.weightx = 0.0;
-		this.add(this.cluster2NameLabel, c);
+		this.add(this.cluster2NameTextPane, c);
 
 		// Architecture viewer
 		this.viewer = loadViewer();
@@ -165,7 +187,7 @@ public class ClustererController extends JPanel
 					throw new RuntimeException(ex);
 				}
 				this.refreshLabels();
-				this.loadViewer();
+				this.viewer.tableModel.refresh();
 				break;
 		}
 	}
@@ -181,12 +203,18 @@ public class ClustererController extends JPanel
 
 		SimData data = this.clusterer.identifyMostSimClusters();
 
-		this.cluster1NameLabel.setText(data.c1.name);
-		this.cluster2NameLabel.setText(data.c2.name);
+		this.cluster1NameTextPane.setText(data.c1.name);
+		this.cluster2NameTextPane.setText(data.c2.name);
 		this.simValueLabel.setText(data.cellValue.toString());
 
 		int archSize = this.clusterer.getArchitecture().size();
 		this.archSizeTextPane.setText("Architecture size: " + archSize);
+
+		if (data.c1.getDocTopicItem().getTopTopicItem().topicNum ==
+				data.c2.getDocTopicItem().getTopTopicItem().topicNum)
+			this.highestDTIMatchLabel.setText("Top topic items match.");
+		else
+			this.highestDTIMatchLabel.setText("Top topic items are different.");
 	}
 	//endregion
 }

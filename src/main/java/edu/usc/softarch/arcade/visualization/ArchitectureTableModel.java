@@ -5,4 +5,5 @@ import java.util.Map;
 
 public abstract class ArchitectureTableModel extends AbstractTableModel {
 	public abstract Map.Entry<Integer, Double> getHighestValue(int row);
+	public abstract void refresh();
 }
