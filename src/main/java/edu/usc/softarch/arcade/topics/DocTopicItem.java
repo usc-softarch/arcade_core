@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.topics;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsExceptio
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
 import edu.usc.softarch.util.json.JsonSerializable;
+import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -219,6 +221,21 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 				"it was computed");
 		return new Concern(this.concern);
 	}
+
+	public TopicItem getTopTopicItem() {
+		TopicItem result = null;
+		double proportion = 0.0;
+
+		for (TopicItem topic : this.topics.values()) {
+			double tempProportion = topic.getProportion();
+			if (tempProportion > proportion) {
+				result = topic;
+				proportion = tempProportion;
+			}
+		}
+
+		return result;
+	}
 	//endregion
 
 	//region PROCESSING
@@ -230,31 +247,32 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 
 	private static double weightedJSDivergence(double[] p1, double[] p2) {
 		double[] average = new double[p1.length];
-		double[] weight = new double[p1.length];
+		double[] weight1 = getWeights(p1);
+		double[] weight2 = getWeights(p2);
 
-		for(int i = 0; i < p1.length; ++i)
+		for (int i = 0; i < p1.length; ++i)
 			average[i] += (p1[i] + p2[i]) / 2.0;
 
-		TreeMap<Double, Integer> averageDistribution = new TreeMap<>();
-		for(int i = 0; i < p1.length; ++i)
-			averageDistribution.put(average[i], i);
+		return (weightedKLDivergence(p1, average, weight1)
+			+ weightedKLDivergence(p2, average, weight2)) / 2.0;
+	}
 
-		int rank = 0;
-		for (Map.Entry<Double, Integer> value : averageDistribution.entrySet()) {
-			if (rank < 10)
-				weight[value.getValue()] = 0.000001;
-			else if (rank < 30)
-				weight[value.getValue()] = 0.0001;
-			else if (rank < 50)
-				weight[value.getValue()] = 0.01;
+	private static double[] getWeights(double[] p) {
+		double[] weight = new double[p.length];
+
+		double mean = Arrays.stream(p).sum() / p.length;
+		double stdev = (new StandardDeviation()).evaluate(p);
+
+		for (int i = 0; i < p.length; i++) {
+			if (p[i] > mean + (2 * stdev))
+				weight[i] = 1.0;
+			else if (p[i] > mean)
+				weight[i] = 0.01;
 			else
-				weight[value.getValue()] = 1.0;
-
-			rank++;
+				weight[i] = 0.0001;
 		}
 
-		return (weightedKLDivergence(p1, average, weight)
-			+ weightedKLDivergence(p2, average, weight)) / 2.0;
+		return weight;
 	}
 
 	private static double weightedKLDivergence(double[] p1, double[] p2, double[] weight) {

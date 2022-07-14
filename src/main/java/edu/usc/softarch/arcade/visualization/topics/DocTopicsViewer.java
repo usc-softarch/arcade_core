@@ -42,8 +42,11 @@ public class DocTopicsViewer extends ArchitectureViewer {
 
 	@Override
 	protected Integer[] getFeatureIndex() {
-		Integer[] topicNumberList = new Integer[100];
-		for (int i = 1; i < 101; i++)
+		int docTopicsLength =
+			DocTopics.getSingleton(super.projectName).getNumTopics();
+
+		Integer[] topicNumberList = new Integer[docTopicsLength];
+		for (int i = 1; i < docTopicsLength + 1; i++)
 			topicNumberList[i - 1] = i;
 
 		return topicNumberList;

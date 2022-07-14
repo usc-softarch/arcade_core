@@ -104,7 +104,7 @@ public class SmellChangeAnalyzer extends ChangeAnalyzer<Smell> {
 						+ "by the USC SoftArch team, and it is not covered by ARCADE. "
 						+ "Please submit an issue at "
 						+ "https://github.com/usc-softarch/arcade_core");
-				return bdcInstances.size() == 1;
+				return bdcInstances.isEmpty();
 
 			/* This is dealt the same way as Concern Overload. */
 			case spf:

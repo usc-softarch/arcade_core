@@ -84,7 +84,7 @@ public class SmellDecisionAnalyzer {
 			throws IOException {
 		Map<String, SmellCollection> result = new HashMap<>();
 
-		VersionMap versionMap = new VersionMap(smells);
+		VersionMap versionMap = new VersionMap(smells, "[0-9]+\\.[0-9]+(\\.[0-9]+)*", ".json");
 		for (Map.Entry<String, File> smellsFile : versionMap.entrySet())
 			result.put(smellsFile.getKey(),
 				SmellCollection.deserialize(smellsFile.getValue()));

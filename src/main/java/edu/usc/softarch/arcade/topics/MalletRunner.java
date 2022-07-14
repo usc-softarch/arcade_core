@@ -291,7 +291,7 @@ public class MalletRunner {
 		command.add("--num-top-words");
 		command.add("0");
 		command.add("--num-topics");
-		command.add("100");
+		command.add("20");
 		command.add("--num-threads");
 		command.add("5");
 		command.add("--num-iterations");

@@ -32,7 +32,7 @@ public class TopicCompositionParser {
 			throws Exception {
 		TopicCompositionParser parser = new TopicCompositionParser(args[0]);
 
-		// Get the 20 most prominent words of each topic
+		// Get the 200 most prominent words of each topic
 		Map<Integer, List<String>> mostProminentWords = parser.run();
 
 		try(PrintWriter writer = new PrintWriter(args[1])) {
@@ -99,8 +99,8 @@ public class TopicCompositionParser {
 			// Instantiate list to hold the most prominent words of the topic
 			List<String> topicProminentWords = new ArrayList<>();
 
-			// Get the 100 most prominent words of the topic
-			for (int typeCountCell = 0; typeCountCell < 100; typeCountCell++) {
+			// Get the 200 most prominent words of the topic
+			for (int typeCountCell = 0; typeCountCell < 200; typeCountCell++) {
 				Long typeCountIndex = topicTypeCountList.get(typeCountCell);
 				long typeIndex = typeCountIndex & typeMask;
 				topicProminentWords.add(entries.get((int) typeIndex).toString());

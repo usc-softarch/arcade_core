@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import mojo.MoJoCalculator;
 
@@ -21,6 +22,8 @@ public class MoJoEvolutionAnalyzer {
 				.tildeExpandPath(clusterFilesDir)));
 		// FileUtil.sortFileListByVersion sorts the list by the versioning
 		// scheme found in the filename
+		clusterFiles = clusterFiles.stream()
+			.filter(f -> f.getName().contains(".rsf")).collect(Collectors.toList());
 		clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
 
 		for (int comparisonDistance = 1; comparisonDistance < clusterFiles
@@ -30,14 +33,11 @@ public class MoJoEvolutionAnalyzer {
 			System.out.println("Comparison distance is: " + comparisonDistance);
 			for (int i = 0; i < clusterFiles.size(); i += comparisonDistance) {
 				File currFile = clusterFiles.get(i);
-				// exclude annoying .ds_store files from OSX
-				if (!currFile.getName().equals(".DS_Store")) {
-					if (prevFile != null && currFile != null) {
-						double mojoFmValue = doMoJoFMComparison(currFile, prevFile);
-						mojoFmValues.add(mojoFmValue);
-					}
-					prevFile = currFile;
+				if (prevFile != null && currFile != null) {
+					double mojoFmValue = doMoJoFMComparison(currFile, prevFile);
+					mojoFmValues.add(mojoFmValue);
 				}
+				prevFile = currFile;
 			}
 			Double[] mojoFmArr = new Double[mojoFmValues.size()];
 			mojoFmValues.toArray(mojoFmArr);
@@ -45,7 +45,7 @@ public class MoJoEvolutionAnalyzer {
 			DescriptiveStatistics stats = new DescriptiveStatistics(
 				Arrays.stream(mojoFmArr).mapToDouble(Double::valueOf).toArray());
 
-			System.out.println(stats);
+			// System.out.println(stats);
 			System.out.println();
 		}
 	}

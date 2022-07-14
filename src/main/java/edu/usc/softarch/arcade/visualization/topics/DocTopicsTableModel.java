@@ -7,7 +7,6 @@ import edu.usc.softarch.arcade.visualization.ArchitectureTableModel;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +39,7 @@ public class DocTopicsTableModel extends ArchitectureTableModel {
 
 	@Override
 	public int getColumnCount() {
-		return 101; }
+		return DocTopics.getSingleton(this.projectName).getNumTopics() + 1; }
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.util.FileUtil;
@@ -18,7 +19,7 @@ public class SystemEvo {
 	//region PUBLIC INTERFACE
 	public static void main(String[] args) throws IOException {
 		if (args.length > 1)
-			run(args[0], args[1]);
+			System.out.println(run(args[0], args[1]));
 		else
 			runBatch(args[0], true);
 	}
@@ -41,6 +42,8 @@ public class SystemEvo {
 		List<File> clusterFiles = FileUtil.getFileListing(
 			new File(FileUtil.tildeExpandPath(path)));
 		clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
+		clusterFiles = clusterFiles.stream()
+			.filter(f -> f.getName().contains(".rsf")).collect(Collectors.toList());
 
 		double[] sysEvoValues = new double[clusterFiles.size() - 1];
 

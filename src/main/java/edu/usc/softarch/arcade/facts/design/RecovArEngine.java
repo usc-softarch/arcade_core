@@ -22,7 +22,7 @@ public class RecovArEngine {
 		else
 			result = runWithGitLab(args[0], args[1], args[2], args[3]);
 
-		//TODO this is wrong
+		//TODO this is wrong, will fail on args size = 5
 		try (EnhancedJsonGenerator generator = new EnhancedJsonGenerator(args[5])) {
 			generator.writeField("decisions", result);
 		}
@@ -62,7 +62,7 @@ public class RecovArEngine {
 			throws IOException, GitLabRestHandler.GitLabRestHandlerException,
 				InterruptedException {
 		this.versionTree = VersionTree.deserialize(versionTreePath);
-		this.versionMap = new VersionMap(versionScheme, clusterDirPath);
+		this.versionMap = new VersionMap(clusterDirPath, versionScheme);
 
 		GitLabRestHandler gitLabIssueGrabber = new GitLabRestHandler(
 			projectId, versionTree, checkpointFilePath, true);

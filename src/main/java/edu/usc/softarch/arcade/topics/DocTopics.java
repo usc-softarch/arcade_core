@@ -45,8 +45,6 @@ public class DocTopics implements JsonSerializable {
 		// Begin by importing documents from text to feature sequences
 		char fs = File.separatorChar;
 
-		int numTopics = 100;
-
 		InstanceList previousInstances = InstanceList.load(
 			new File(artifactsDir + fs + version + "_output.pipe"));
 		
@@ -62,7 +60,7 @@ public class DocTopics implements JsonSerializable {
 				inferencer.getSampledDistribution(
 					previousInstance, 1000, 10, 10);
 
-			for (int topicIdx = 0; topicIdx < numTopics; topicIdx++) {
+			for (int topicIdx = 0; topicIdx < topicDistribution.length; topicIdx++) {
 				TopicItem t = new TopicItem(topicIdx, topicDistribution[topicIdx]);
 				dtItem.addTopic(t);
 			}
@@ -229,6 +227,11 @@ public class DocTopics implements JsonSerializable {
 
 	public Collection<DocTopicItem> getCopy() {
 		return new ArrayList<>(this.dtItemList.values()); }
+
+	public int getNumTopics() {
+		return this.dtItemList.values()
+			.stream().findFirst().get().getTopics().size();
+	}
 	// #endregion ACCESSORS ------------------------------------------------------
 
 	// #region SERIALIZATION -----------------------------------------------------

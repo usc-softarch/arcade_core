@@ -15,18 +15,28 @@ public class VersionMap extends HashMap<String, File> {
 		this(filesDir, null);
 	}
 
+	/**
+	 * This constructor defaults to RSF type files.
+	 */
 	public VersionMap(String filesDir, String versionScheme)
 			throws IOException {
-		this.putAll(initializeVersionMap(filesDir, versionScheme));
+		this(filesDir, versionScheme, ".rsf");
+	}
+
+	public VersionMap(String filesDir, String versionScheme, String extension)
+		throws IOException {
+		this.putAll(initializeVersionMap(filesDir, versionScheme, extension));
 	}
 
 	private Map<String, File> initializeVersionMap(String clusterDirPath,
-			String versionScheme) throws FileNotFoundException {
+			String versionScheme, String extension) throws FileNotFoundException {
 		Map<String, File> versionMapLoader = new HashMap<>();
 		Collection<File> files = FileUtil.getFileListing(new File(clusterDirPath));
 
 		for (File file : files) {
 			String fileName = file.getName();
+			if (!fileName.contains(extension)) continue;
+
 			String version = FileUtil.extractVersion(null, fileName);
 
 			if (version == null)

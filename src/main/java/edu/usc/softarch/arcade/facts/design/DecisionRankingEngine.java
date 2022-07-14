@@ -39,6 +39,7 @@ public class DecisionRankingEngine {
 	//endregion
 
 	//region ATTRIBUTES
+	private final int analysisCount;
 	public final String rankingPath;
 	public final String topRankPath;
 	private final Collection<Map<Integer, CodeElementDecision>> decisionSets;
@@ -48,6 +49,7 @@ public class DecisionRankingEngine {
 	//region CONSTRUCTORS
 	public DecisionRankingEngine(String rankingPath, String topRankPath,
 			String... inputPath) throws IOException {
+		this.analysisCount = inputPath.length;
 		this.rankingPath = rankingPath;
 		this.topRankPath = topRankPath;
 		this.decisionSets = new ArrayList<>();
@@ -81,7 +83,7 @@ public class DecisionRankingEngine {
 			}
 		}
 
-		for (int i = 1; i < 5; i++)
+		for (int i = 1; i < this.analysisCount + 1; i++)
 			ranking.put(i, new ArrayList<>());
 
 		for (Map.Entry<Integer, Integer> entry : appearanceCounts.entrySet())
@@ -93,7 +95,7 @@ public class DecisionRankingEngine {
 	public Collection<CodeElementDecision> buildTopRankList() {
 		Collection<CodeElementDecision> result = new ArrayList<>();
 
-		Collection<Integer> topRankIds = ranking.get(4);
+		Collection<Integer> topRankIds = ranking.get(this.analysisCount);
 
 		for (Integer id : topRankIds) {
 			CodeElementDecision hit = null;
