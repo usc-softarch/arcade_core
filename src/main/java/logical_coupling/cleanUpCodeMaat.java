@@ -21,7 +21,8 @@ public class cleanUpCodeMaat {
 		File[] files = folder.listFiles();
 				
 		for (File file : files) {
-			if (file.isFile() && file.getName().endsWith("csv")){
+			if (file.isFile() && file.getName().endsWith("csv")
+				&& !file.getName().contains("_clean")){
 			String sourceFile = file.getName();
 			single(sourceFile, inputDirFilename);
 			}
