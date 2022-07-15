@@ -7,7 +7,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.AbstractMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,6 +14,7 @@ import classycle.Analyser;
 import classycle.ClassAttributes;
 import classycle.graph.AtomicVertex;
 import edu.usc.softarch.arcade.clustering.FeatureVectors;
+import edu.usc.softarch.arcade.facts.DependencyGraph;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
@@ -25,14 +25,15 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 		String ffVecsFilename = args[2];
 		String packagePrefix = args[3];
 
-		(new JavaSourceToDepsBuilder()).build(classesDirPath, depsRsfFilename, ffVecsFilename, packagePrefix);
+		(new JavaSourceToDepsBuilder()).build(classesDirPath,
+			depsRsfFilename, ffVecsFilename, packagePrefix);
 	}
 	// #endregion INTERFACE ------------------------------------------------------
 
 	// #region PROCESSING --------------------------------------------------------
 	@Override
-	public void build(String classesDirPath, String depsRsfFilename, String ffVecsFilename)
-			throws IOException {
+	public void build(String classesDirPath, String depsRsfFilename,
+			String ffVecsFilename) throws IOException {
 		build(classesDirPath, depsRsfFilename, ffVecsFilename, "");
 	}
 
@@ -50,18 +51,18 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 
 		// Building the dependency graph as a set of edges between classes
 		AtomicVertex[] graph = analyzer.getClassGraph();
-		this.edges = buildEdges(graph, packagePrefix);
+		this.dependencyGraph = buildEdges(graph, packagePrefix);
 		
 		// Prints the dependencies to a file
-		serializeEdges(this.edges, depsRsfFilepath);
+		serializeEdges(this.dependencyGraph, depsRsfFilepath);
 		
 		// Calculating the number of source entities in dependency graph
 		Set<String> sources = new HashSet<>();
-		for (Map.Entry<String,String> edge : edges)
+		for (Map.Entry<String,String> edge : dependencyGraph)
 			sources.add(edge.getKey());
 		this.numSourceEntities = sources.size();
 
-		this.ffVecs = new FeatureVectors(edges);
+		this.ffVecs = new FeatureVectors(dependencyGraph);
 
 		this.ffVecs.serializeFFVectors(ffVecsFilename);
 	}
@@ -71,9 +72,9 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 	 * 
 	 * @param graph A graph drawn from Classycle.
 	 */
-	private Set<Map.Entry<String, String>> buildEdges(
+	private DependencyGraph buildEdges(
 			AtomicVertex[] graph, String packagePrefix) {
-		Set<Map.Entry<String, String>> edges = new LinkedHashSet<>();
+		DependencyGraph edges = new DependencyGraph();
 
 		// For each Vertex in the graph
 		for (AtomicVertex vertex : graph) {
@@ -111,14 +112,14 @@ public class JavaSourceToDepsBuilder extends SourceToDepsBuilder {
 	// #endregion PROCESSING -----------------------------------------------------
 
 	// #region IO ----------------------------------------------------------------
-	private void serializeEdges(Set<Map.Entry<String, String>> edges,
+	private void serializeEdges(DependencyGraph edges,
 			String depsRsfFilepath) throws FileNotFoundException {
 		(new File(depsRsfFilepath)).getParentFile().mkdirs();
 		PrintStream out = new PrintStream(depsRsfFilepath);
 		PrintWriter writer = new PrintWriter(out);
-		for (Map.Entry<String,String> edge : edges) {
+		for (Map.Entry<String,String> edge : edges)
 			writer.println("depends " + edge.getKey() + " " + edge.getValue());
-		}
+
 		writer.close();
 	}
 	// #endregion IO -------------------------------------------------------------

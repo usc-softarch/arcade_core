@@ -8,9 +8,13 @@ import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
+import edu.usc.softarch.arcade.facts.DependencyGraph;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 public class Clusterer {
 	//region PUBLIC INTERFACE
@@ -31,8 +35,8 @@ public class Clusterer {
 	 * 11: Path to directory containing auxiliary artifacts.
 	 */
 	public static void main(String[] args)
-			throws IOException, DistributionSizeMismatchException,
-			UnmatchingDocTopicItemsException {
+			throws IOException, DistributionSizeMismatchException, SAXException,
+			UnmatchingDocTopicItemsException, ParserConfigurationException {
 		ClusteringAlgoArguments parsedArguments = new ClusteringAlgoArguments(args);
 		run(parsedArguments);
 	}
@@ -47,18 +51,30 @@ public class Clusterer {
 		public final SimMeasure.SimMeasureType simMeasure;
 
 		public ClusteringAlgoArguments(String[] args)
-				throws IOException, UnmatchingDocTopicItemsException {
+				throws IOException, UnmatchingDocTopicItemsException,
+				ParserConfigurationException, SAXException {
 			this.algorithm = ClusteringAlgorithmType.valueOf(args[0].toUpperCase());
 			this.language = args[1];
 			this.simMeasure =
 				SimMeasure.SimMeasureType.valueOf(args[5].toUpperCase());
+
+			FeatureVectors vectors;
+			String depsPath = args[2];
+			if (depsPath.contains(".rsf"))
+				vectors = new FeatureVectors(DependencyGraph.readRsf(depsPath));
+			else if (depsPath.contains(".odem"))
+				vectors = new FeatureVectors(DependencyGraph.readOdem(depsPath));
+			else if (depsPath.contains(".json"))
+				vectors = FeatureVectors.deserializeFFVectors(depsPath);
+			else
+				throw new IOException("Unrecognized dependency file type: " + depsPath);
 			if (args.length > 11)
 				this.arch = new Architecture(args[8], args[9], this.simMeasure,
-					FeatureVectors.deserializeFFVectors(args[2]),	this.language, args[11],
-					args[10]);
+					vectors, this.language, args[11], args[10]);
 			else
 				this.arch = new Architecture(args[8], args[9], this.simMeasure,
-					FeatureVectors.deserializeFFVectors(args[2]),	this.language, args[10]);
+					vectors, this.language, args[10]);
+
 			this.serialCrit = SerializationCriterion.makeSerializationCriterion(
 				args[6], Double.parseDouble(args[7]), arch);
 			this.stopCrit = StoppingCriterion.makeStoppingCriterion(

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import edu.usc.softarch.arcade.facts.DependencyGraph;
 
 public class FeatureVectors implements Serializable {
 	// #region ATTRIBUTES --------------------------------------------------------
@@ -42,7 +43,7 @@ public class FeatureVectors implements Serializable {
 	 */
 	private FeatureVectors() { super(); }
 
-	public FeatureVectors(Set<Map.Entry<String,String>> edges) {
+	public FeatureVectors(DependencyGraph edges) {
 		// Make a List with the sources of all edges
 		List<String> startNodesList =
 			edges.stream().map(Map.Entry::getKey).collect(Collectors.toList());

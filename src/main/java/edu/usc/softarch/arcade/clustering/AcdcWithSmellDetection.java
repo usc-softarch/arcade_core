@@ -108,7 +108,7 @@ public class AcdcWithSmellDetection {
 		}
 		
 		builder.build(classesDirPath, depsRsfFilename, ffVecsFilename);
-		if (builder.getEdges().isEmpty()) return; //TODO Throw appropriate error
+		if (builder.getDependencyGraph().isEmpty()) return; //TODO Throw appropriate error
 		
 		// acdcClusteredfile is the recovered architecture for acdc, one per
 		// subdirectory of dir

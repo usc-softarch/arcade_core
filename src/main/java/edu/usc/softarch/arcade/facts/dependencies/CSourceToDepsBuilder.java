@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,18 +17,14 @@ import edu.usc.softarch.arcade.util.FileUtil;
 public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 	public static FeatureVectors ffVecs = null;
 	public static int numSourceEntities = 0;
-	
-	@Override
-	public Set<Map.Entry<String,String>> getEdges() {
-		return this.edges;
-	}
 
 	public static void main(String[] args) throws IOException {
 		(new CSourceToDepsBuilder()).build(args[0], args[1], args[2]);
 	}
 
 	@Override
-	public void build(String classesDirPath, String depsRsfFilename, String ffVecsFilename) throws IOException {
+	public void build(String classesDirPath, String depsRsfFilename,
+			String ffVecsFilename) throws IOException {
 		String inputDir = FileUtil.tildeExpandPath(classesDirPath);
 		String depsRsfFilepath = FileUtil.tildeExpandPath(depsRsfFilename);
 		(new File(depsRsfFilepath)).getParentFile().mkdirs();
@@ -54,7 +49,6 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		numSourceEntities = RsfReader.unfilteredFaCtS.size();
 		
 		TypedEdgeGraph typedEdgeGraph = new TypedEdgeGraph();
-		edges = new LinkedHashSet<Map.Entry<String,String>>();
 		for (List<String> fact : RsfReader.unfilteredFaCtS) {
 			String source = fact.get(1);
 			String target = fact.get(2);
@@ -63,15 +57,15 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 			
 			Map.Entry<String,String> edge =
 				new AbstractMap.SimpleEntry<>(source,target);
-			edges.add(edge);
+			dependencyGraph.add(edge);
 		}
 		
 		Set<String> sources = new HashSet<>();
-		for (Map.Entry<String,String> edge : edges) {
+		for (Map.Entry<String,String> edge : dependencyGraph) {
 			sources.add(edge.getKey());
 		}
 		numSourceEntities = sources.size();
-		ffVecs = new FeatureVectors(edges);
+		ffVecs = new FeatureVectors(dependencyGraph);
 
 		ffVecs.serializeFFVectors(ffVecsFilename);
 	}
@@ -86,7 +80,7 @@ public class CSourceToDepsBuilder extends SourceToDepsBuilder {
 		while ((line = in.readLine()) != null) {
 			System.out.println(line);
 		}
-		in.close();		
+		in.close();
 	}
 
 	@Override

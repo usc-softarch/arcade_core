@@ -7,6 +7,7 @@ import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchExcepti
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.arcade.visualization.clustering.ClustererController;
 import edu.usc.softarch.arcade.visualization.clustering.ClustererInitializer;
+import org.xml.sax.SAXException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -14,6 +15,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.WindowConstants;
+import javax.xml.parsers.ParserConfigurationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -74,11 +76,9 @@ public class MainFrame extends JFrame implements ActionListener {
 			case ClustererInitializer.loadClustererAction:
 				try {
 					loadClusterer();
-				} catch (IOException ex) {
-					throw new RuntimeException(ex);
-				} catch (UnmatchingDocTopicItemsException ex) {
-					throw new RuntimeException(ex);
-				} catch (DistributionSizeMismatchException ex) {
+				} catch (IOException | UnmatchingDocTopicItemsException
+								 | DistributionSizeMismatchException
+								 | ParserConfigurationException | SAXException ex) {
 					throw new RuntimeException(ex);
 				}
 				this.setContentPane(this.controllerPanel);
@@ -102,7 +102,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	}
 
 	private void loadClusterer() throws IOException,
-			UnmatchingDocTopicItemsException, DistributionSizeMismatchException {
+			UnmatchingDocTopicItemsException, DistributionSizeMismatchException,
+			ParserConfigurationException, SAXException {
 		Clusterer.ClusteringAlgoArguments arguments =
 			new Clusterer.ClusteringAlgoArguments(loadArguments());
 		Clusterer clusterer = new Clusterer(arguments.serialCrit, arguments.arch,
