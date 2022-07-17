@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.metrics;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.metrics.decay.*;
@@ -15,7 +16,7 @@ public class DecayMetricAnalyzer {
 		String clusterPath = FileUtil.tildeExpandPath(args[0]);
 		String depsPath = FileUtil.tildeExpandPath(args[1]);
 
-		run(clusterPath, depsPath);
+		System.out.println(Arrays.toString(run(clusterPath, depsPath)));
 	}
 
 	public static double[] run(String clusterPath, String depsPath)
