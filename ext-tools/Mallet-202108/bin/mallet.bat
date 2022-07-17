@@ -11,7 +11,7 @@ goto :eof
 :gotMalletHome
 
 set MALLET_CLASSPATH=%MALLET_HOME%\class;%MALLET_HOME%\lib\mallet-deps.jar
-set MALLET_MEMORY=1G
+set MALLET_MEMORY=4G
 set MALLET_ENCODING=UTF-8
 
 set CMD=%1
