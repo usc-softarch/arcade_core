@@ -112,6 +112,11 @@ public class ArcTest extends BaseTest {
 				Path oraclePath = Paths.get(oracleClustersPath);
 				Files.copy(resultPath, oraclePath, StandardCopyOption.REPLACE_EXISTING);
 			});
+			assertDoesNotThrow(() -> {
+				Path resultPath = Paths.get(resultConcernsFile);
+				Path oraclePath = Paths.get(oracleConcernsPath);
+				Files.copy(resultPath, oraclePath, StandardCopyOption.REPLACE_EXISTING);
+			});
 		}
 
 		// ------------------------- Generate Oracles ------------------------------

@@ -35,27 +35,32 @@ public class MalletRunner {
 		if (args.length < 6)
 			run(args[0], args[1], args[2], args[3], args[4]);
 		else
-			run(args[0], args[1], args[2], args[3], args[4], Boolean.parseBoolean(args[5]));
+			run(args[0], args[1], args[2], args[3], args[4],
+				Boolean.parseBoolean(args[5]), Boolean.parseBoolean(args[6]),
+				Boolean.parseBoolean(args[7]));
 	}
 
 	public static void run(String sourceDir, String language, String malletPath,
 			String artifactsPath, String stopWordDir) throws IOException {
-		run(sourceDir, language, malletPath, artifactsPath, stopWordDir, false);
+		run(sourceDir, language, malletPath, artifactsPath, stopWordDir,
+			false, false, false);
 	}
 
 	public static void run(String sourceDir, String language,
 			String malletPath, String artifactsPath, String stopWordDir,
-			boolean isBatch) throws IOException {
+			boolean isBatch, boolean copyReady, boolean keepCopy) throws IOException {
 		MalletRunner runner = new MalletRunner(sourceDir, language,
 			malletPath, artifactsPath, stopWordDir);
-		runner.copySource();
+		if (!copyReady)
+			runner.copySource();
 		if (isBatch)
 			runner.runPipeExtractorBatch();
 		else
 			runner.runPipeExtractor();
 		runner.runTopicModeling();
 		runner.runInferencer();
-		runner.cleanUp();
+		if (!keepCopy)
+			runner.cleanUp();
 	}
 	//endregion
 
