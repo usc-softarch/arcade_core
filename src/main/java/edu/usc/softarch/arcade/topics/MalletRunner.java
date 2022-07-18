@@ -56,6 +56,7 @@ public class MalletRunner {
 	 * 										 files.
 	 * @see #copySource()
 	 * @see #runTopicModeling()
+	 * @see #runPrune()
 	 * @see #runInferencer()
 	 * @see #cleanUp()
 	 */
@@ -87,6 +88,7 @@ public class MalletRunner {
 	 * 										 files.
 	 * @see #copySource()
 	 * @see #runTopicModeling()
+	 * @see #runPrune()
 	 * @see #runInferencer()
 	 * @see #cleanUp()
 	 */
@@ -120,6 +122,7 @@ public class MalletRunner {
 	 * 										 files.
 	 * @see #copySource()
 	 * @see #runTopicModeling()
+	 * @see #runPrune()
 	 * @see #runInferencer()
 	 * @see #cleanUp()
 	 */
@@ -131,6 +134,7 @@ public class MalletRunner {
 		if (!copyReady)
 			runner.copySource();
 		runner.runTopicModeling();
+		runner.runPrune();
 		runner.runInferencer();
 		if (!keepCopy)
 			runner.cleanUp();
@@ -276,7 +280,7 @@ public class MalletRunner {
 	}
 
 	/**
-	 * Runs Mallet import-dir to create a vectors file, which is a serialized
+	 * Runs MALLET import-dir to create a vectors file, which is a serialized
 	 * representation of an {@link cc.mallet.types.InstanceList}.
 	 */
 	public void runTopicModeling() throws IOException {
@@ -291,7 +295,7 @@ public class MalletRunner {
 		command.add("--keep-sequence");
 		command.add("TRUE");
 		command.add("--output");
-		command.add(artifactsPath + fs + "vectors");
+		command.add(artifactsPath + fs + "vectors-raw");
 		command.add("--stoplist-file");
 		command.add(stopWordPath);
 
@@ -299,7 +303,26 @@ public class MalletRunner {
 	}
 
 	/**
-	 * Runs Mallet train-topics to create a topicmodel file, which is a serialized
+	 * Runs MALLET prune to remove tokens from the vectors file if they appear
+	 * in more than 90% of the system files.
+	 */
+	public void runPrune() throws IOException {
+		List<String> command = new ArrayList<>();
+
+		command.add(this.malletPath);
+		command.add("prune");
+		command.add("--input");
+		command.add(artifactsPath + fs + "vectors-raw");
+		command.add("--output");
+		command.add(artifactsPath + fs + "vectors");
+		command.add("--min-idf");
+		command.add("1.6");
+
+		executeProcess(command);
+	}
+
+	/**
+	 * Runs MALLET train-topics to create a topicmodel file, which is a serialized
 	 * representation of a {@link cc.mallet.topics.TopicInferencer}.
 	 */
 	public void runInferencer() throws IOException {
