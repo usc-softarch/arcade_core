@@ -70,7 +70,7 @@ public class ReadOnlyCluster {
 		}
 
 		if (cat.equals(ClusteringAlgorithmType.ARC))
-			this.dti = DocTopics.getSingleton(project).mergeDocTopicItems(c1, c2, name, project);
+			this.dti = DocTopics.getSingleton(project).mergeDocTopicItems(c1, c2, name);
 	}
 	//endregion
 
