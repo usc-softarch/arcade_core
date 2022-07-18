@@ -41,9 +41,9 @@ public class SystemEvo {
 			throws IOException {
 		List<File> clusterFiles = FileUtil.getFileListing(
 			new File(FileUtil.tildeExpandPath(path)));
-		clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
 		clusterFiles = clusterFiles.stream()
 			.filter(f -> f.getName().contains(".rsf")).collect(Collectors.toList());
+		clusterFiles = FileUtil.sortFileListByVersion(clusterFiles);
 
 		double[] sysEvoValues = new double[clusterFiles.size() - 1];
 
