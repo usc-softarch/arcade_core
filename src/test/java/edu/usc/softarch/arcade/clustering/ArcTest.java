@@ -32,36 +32,33 @@ public class ArcTest extends BaseTest {
 	 *
 	 * @param systemVersion System version.
 	 * @param lang System language.
-	 * @param arcFileSuffix Expected clusters file suffix.
+	 * @param packagePrefix Package prefix to consider in clustering,
+	 *                      only for Java.
 	 */
 	@ParameterizedTest
 	@CsvSource({
 		"struts-2.3.30,"
 			+ "java,"
-			+ "_JS_182_,"
 			+ "org.apache.struts2",
 
 		"struts-2.5.2,"
 			+ "java,"
-			+ "_JS_164_,"
 			+ "org.apache.struts2",
 
 		"httpd-2.3.8,"
 			+ "c,"
-			+ "_JS_71_,"
 			+ "",
 
 		"httpd-2.4.26,"
 			+ "c,"
-			+ "_JS_82_,"
 			+ ""
 	})
 	public void ARCRecoveryTest(String systemVersion, String lang,
-			String arcFileSuffix, String packagePrefix) {
+			String packagePrefix) {
 		// Creating relevant path Strings
 		String sysResources = resourcesDir + fs + systemVersion;
 		String artifactsDir = sysResources + fs + "base";
-		String arcFileBase = systemVersion + arcFileSuffix;
+		String arcFileBase = systemVersion + "_JS_100_";
 		String oracleClustersPath =
 			sysResources + fs + arcFileBase + "clusters.rsf";
 		String oracleConcernsPath =
@@ -80,10 +77,10 @@ public class ArcTest extends BaseTest {
 
 		SerializationCriterion serialCrit =
 			SerializationCriterion.makeSerializationCriterion(
-			"archsizefraction", 0.2, arch);
+			"archsize", 100, arch);
 
 		StoppingCriterion stopCrit = StoppingCriterion.makeStoppingCriterion(
-				"archsizefraction", 0.2, arch);
+				"preselected", 100, arch);
 
 		assertDoesNotThrow(() ->
 			Clusterer.run(ClusteringAlgorithmType.ARC, arch, serialCrit, stopCrit,

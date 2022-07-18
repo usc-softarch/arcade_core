@@ -100,7 +100,7 @@ public class DocTopics implements JsonSerializable {
 		// Load TopicItems
 		for (Instance previousInstance : instances) {
 			DocTopicItem dtItem = new DocTopicItem(
-				(String) previousInstance.getName());
+				previousInstance.getSource().toString());
 
 			double[] topicDistribution = topicmodel.getSampledDistribution(
 					previousInstance, 1000, 10, 10);
@@ -305,8 +305,11 @@ public class DocTopics implements JsonSerializable {
 
 		// Attempts to locate a DTI that contains the desired class name
 		for (Map.Entry<String, DocTopicItem> entry : dtItemList.entrySet()) {
-			if (entry.getKey().endsWith(name)
-				|| altName.equals(entry.getKey().trim()))
+			String dtiSource = entry.getKey();
+			dtiSource = dtiSource.replace("\\", ".")
+				.replace(".java", "").trim();
+
+			if (dtiSource.endsWith(name) || altName.equals(dtiSource.trim()))
 				return entry.getValue();
 		}
 

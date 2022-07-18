@@ -30,26 +30,22 @@ public class ArchSmellDetectorTest extends BaseTest {
    */
 	@ParameterizedTest
 	@CsvSource({
-		"struts-2.3.30,"
-		+ "182",
+		"struts-2.3.30",
 
-		"struts-2.5.2,"
-		+ "164",
+		"struts-2.5.2",
 
-		"httpd-2.3.8,"
-		+ "71",
+		"httpd-2.3.8",
 
-		"httpd-2.4.26,"
-		+ "82"
+		"httpd-2.4.26"
 	})
-	public void runTest(String version, String size) throws IOException {
+	public void runTest(String version) throws IOException {
 		String oraclePath =	resourcesDir + fs + version + "_smells.ser";
 		String depsPath = factsDir + fs + version + "_deps.rsf";
 		String outputClustersPath = arcDir + fs + version + fs
-			+ version + "_js_" + size + "_clusters.rsf";
+			+ version + "_JS_100_clusters.rsf";
 		String resultSerFilename = outputDirPath + fs + version + "_arc_smells.ser";
 		String docTopicsPath = resourcesDir + fs + version
-			+ "_JS_" + size + "_clusteredDocTopics.json";
+			+ "_JS_100_clusteredDocTopics.json";
 
 		ArchSmellDetector asd = assertDoesNotThrow(() ->
 			new ArchSmellDetector(depsPath, outputClustersPath, resultSerFilename,
