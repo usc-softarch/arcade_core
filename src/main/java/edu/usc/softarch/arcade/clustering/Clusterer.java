@@ -30,9 +30,11 @@ public class Clusterer {
 	 * 6 : Serialization criterion.
 	 * 7 : Parameter value of the serialization criterion.
 	 * 8 : Name of the subject system.
-	 * 9 : Path to place the output.
-	 * 10: Package prefix to include in the analysis. If C, empty string.
-	 * 11: Path to directory containing auxiliary artifacts.
+	 * 9 : Version of the subject system.
+	 * 10: Path to place the output.
+	 * 11: Package prefix to include in the analysis. If C, empty string.
+	 * 12: Path to directory containing auxiliary artifacts.
+	 * 13: Reassign DocTopics
 	 */
 	public static void main(String[] args)
 			throws IOException, DistributionSizeMismatchException, SAXException,
@@ -68,12 +70,13 @@ public class Clusterer {
 				vectors = FeatureVectors.deserializeFFVectors(depsPath);
 			else
 				throw new IOException("Unrecognized dependency file type: " + depsPath);
-			if (args.length > 11)
-				this.arch = new Architecture(args[8], args[9], this.simMeasure,
-					vectors, this.language, args[11], args[10]);
+			if (args.length > 12)
+				this.arch = new Architecture(args[8], args[9], args[10],
+					this.simMeasure, vectors, this.language, args[12], args[11],
+					Boolean.parseBoolean(args[13]));
 			else
-				this.arch = new Architecture(args[8], args[9], this.simMeasure,
-					vectors, this.language, args[10]);
+				this.arch = new Architecture(args[8], args[9], args[10],
+					this.simMeasure, vectors, this.language, args[11]);
 
 			this.serialCrit = SerializationCriterion.makeSerializationCriterion(
 				args[6], Double.parseDouble(args[7]), arch);
@@ -153,8 +156,8 @@ public class Clusterer {
 	public void doClusteringStep() throws UnmatchingDocTopicItemsException,
 			DistributionSizeMismatchException {
 		SimData data = identifyMostSimClusters();
-		Cluster newCluster = new Cluster(this.algorithm,
-			data.c1, data.c2, this.architecture.projectName);
+		Cluster newCluster = new Cluster(this.algorithm, data.c1, data.c2,
+			this.architecture.projectName, this.architecture.projectVersion);
 
 		updateFastClustersAndSimMatrixToReflectMergedCluster(
 			data, newCluster, simMatrix);
@@ -216,7 +219,8 @@ public class Clusterer {
 	public void serialize() throws IOException {
 		this.architecture.writeToRsf();
 		// Compute DTI word bags if concern-based technique is used
-		if (DocTopics.isReady(this.architecture.projectName)) {
+		if (DocTopics.isReady(
+				this.architecture.projectName, this.architecture.projectVersion)) {
 			this.architecture.serializeBagOfWords();
 			this.architecture.serializeDocTopics();
 		}

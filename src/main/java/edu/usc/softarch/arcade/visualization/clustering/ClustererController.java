@@ -167,7 +167,8 @@ public class ClustererController extends JPanel
 
 	private ArchitectureViewer loadViewer() {
 		if (this.clusterer.algorithm.equals(ClusteringAlgorithmType.ARC))
-			return new DocTopicsViewer(this.clusterer.getArchitecture().projectName);
+			return new DocTopicsViewer(this.clusterer.getArchitecture().projectName,
+				this.clusterer.getArchitecture().projectVersion);
 		return new FeatureVectorViewer(this.clusterer.getArchitecture());
 	}
 	//endregion

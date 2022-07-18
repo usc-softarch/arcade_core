@@ -27,44 +27,45 @@ public class WcaTest extends BaseTest {
 
 	@ParameterizedTest
 	@CsvSource({
-		// struts 2.3.30
-		"struts-2.3.30,"
+		"struts,"
+			+ "2.3.30,"
 			+ "java,"
 			+ "org.apache.struts2",
 
-		// struts 2.5.2
-		"struts-2.5.2,"
+		"struts,"
+			+ "2.5.2,"
 			+ "java,"
 			+ "org.apache.struts2",
 
-		// httpd 2.3.8
-		"httpd-2.3.8,"
+		"httpd,"
+			+ "2.3.8,"
 			+ "c,"
 			+ "",
 
-		// httpd 2.4.26
-		"httpd-2.4.26,"
+		"httpd,"
+			+ "2.4.26,"
 			+ "c,"
 			+ ""
 	})
-	public void WcaRecoveryTest(String systemVersion, String lang,
-			String packagePrefix) {
+	public void WcaRecoveryTest(String projectName, String projectVersion,
+			String lang, String packagePrefix) {
 		// Creating relevant arguments
-		String fVecsPath = factsDir + fs + systemVersion + "_fVectors.json";
-		String oracleFilePathBase = resourcesDir + fs + systemVersion;
+		String fullProjectName = projectName + "-" + projectVersion;
+		String fVecsPath = factsDir + fs + fullProjectName + "_fVectors.json";
+		String oracleFilePathBase = resourcesDir + fs + fullProjectName;
 		String uemOraclePath = oracleFilePathBase + "_uem_clusters.rsf";
 		String uemnmOraclePath = oracleFilePathBase + "_uemnm_clusters.rsf";
-		String resultFilePathBase = outputDirPath + fs + systemVersion;
+		String resultFilePathBase = outputDirPath + fs + fullProjectName;
 		String uemResultPath = resultFilePathBase + "_uem_100_clusters.rsf";
 		String uemnmResultPath = resultFilePathBase + "_uemnm_100_clusters.rsf";
 
 		Architecture archUem = assertDoesNotThrow(() ->
-			new Architecture(systemVersion, outputDirPath,
+			new Architecture(projectName, projectVersion, outputDirPath,
 				SimMeasure.SimMeasureType.UEM,
 				FeatureVectors.deserializeFFVectors(fVecsPath), lang, packagePrefix));
 
 		Architecture archUemnm = assertDoesNotThrow(() ->
-			new Architecture(systemVersion, outputDirPath,
+			new Architecture(projectName, projectVersion, outputDirPath,
 				SimMeasure.SimMeasureType.UEMNM,
 				FeatureVectors.deserializeFFVectors(fVecsPath), lang, packagePrefix));
 

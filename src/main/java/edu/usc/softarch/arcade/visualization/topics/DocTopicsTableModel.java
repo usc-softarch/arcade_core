@@ -13,14 +13,16 @@ import java.util.Map;
 public class DocTopicsTableModel extends ArchitectureTableModel {
 	//region ATTRIBUTES
 	private final String projectName;
+	private final String projectVersion;
 	private List<DocTopicItem> docTopicsCopy;
 	//endregion
 
 	//region CONSTRUCTORS
-	public DocTopicsTableModel(String projectName) {
+	public DocTopicsTableModel(String projectName, String projectVersion) {
 		this.projectName = projectName;
-		this.docTopicsCopy =
-			new ArrayList<>(DocTopics.getSingleton(this.projectName).getCopy());
+		this.projectVersion = projectVersion;
+		this.docTopicsCopy = new ArrayList<>(DocTopics
+				.getSingleton(this.projectName, this.projectVersion).getCopy());
 	}
 	//endregion
 
@@ -35,11 +37,15 @@ public class DocTopicsTableModel extends ArchitectureTableModel {
 
 	@Override
 	public int getRowCount() {
-		return DocTopics.getSingleton(this.projectName).getCopy().size(); }
+		return DocTopics.getSingleton(this.projectName, this.projectVersion)
+			.getCopy().size();
+	}
 
 	@Override
 	public int getColumnCount() {
-		return DocTopics.getSingleton(this.projectName).getNumTopics() + 1; }
+		return DocTopics.getSingleton(this.projectName, this.projectVersion)
+			.getNumTopics() + 1;
+	}
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
@@ -60,8 +66,8 @@ public class DocTopicsTableModel extends ArchitectureTableModel {
 
 	@Override
 	public void refresh() {
-		this.docTopicsCopy =
-			new ArrayList<>(DocTopics.getSingleton(this.projectName).getCopy());
+		this.docTopicsCopy = new ArrayList<>(
+			DocTopics.getSingleton(this.projectName, this.projectVersion).getCopy());
 	}
 	//endregion
 }

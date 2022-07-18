@@ -24,39 +24,44 @@ public class SimilarityMatrixTest extends BaseTest {
 	/**
 	 * Tests the SimilarityMatrix initialization.
 	 *
-	 * @param versionName System version.
+	 * @param projectName System version.
 	 * @param language System language.
 	 */
 	@ParameterizedTest
 	@CsvSource({
 		// struts 2.3.30
-		"struts-2.3.30,"
+		"struts,"
+			+ "2.3.30,"
 			+ "java,"
 			+ "org.apache.struts2",
 
 		// struts 2.5.2
-		"struts-2.5.2,"
+		"struts,"
+			+ "2.5.2,"
 			+ "java,"
 			+ "org.apache.struts2",
 
 		// httpd-2.3.8
-		"httpd-2.3.8,"
+		"httpd,"
+			+ "2.3.8,"
 			+ "c,"
 			+ "",
 
 		// httpd-2.4.26
-		"httpd-2.4.26,"
+		"httpd,"
+			+ "2.4.26,"
 			+ "c,"
 			+ ""
 	})
-	public void constructorTest(String versionName,	String language,
-		String packagePrefix) {
-		String artifactsDir = resourcesDir + fs + versionName;
+	public void constructorTest(String projectName, String projectVersion,
+			String language, String packagePrefix) {
+		String fullProjectName = projectName + "-" + projectVersion;
+		String artifactsDir = resourcesDir + fs + fullProjectName;
 		String oracleSimMatrixPath = artifactsDir + fs + "sim_matrix_oracle.json";
 		(new File(outputDirPath)).mkdirs();
 
 		// Deserialize FastFeatureVectors oracle
-		String ffVecsFilePath = factsDir + fs + versionName + "_fVectors.json";
+		String ffVecsFilePath = factsDir + fs + fullProjectName + "_fVectors.json";
 		FeatureVectors builderffVecs =
 			assertDoesNotThrow(() -> FeatureVectors.deserializeFFVectors(ffVecsFilePath));
 
@@ -64,7 +69,7 @@ public class SimilarityMatrixTest extends BaseTest {
 			"failed to deserialize FastFeatureVectors from builder object");
 
 		Architecture concernArch = assertDoesNotThrow(() ->
-			new Architecture(versionName, outputDirPath,
+			new Architecture(projectName, projectVersion, outputDirPath,
 				SimMeasure.SimMeasureType.JS, builderffVecs,
 				language, artifactsDir + "/base", packagePrefix));
 

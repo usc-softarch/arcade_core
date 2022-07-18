@@ -27,37 +27,38 @@ public class LimboTest extends BaseTest {
 
 	@ParameterizedTest
 	@CsvSource({
-		// struts 2.3.30
-		"struts-2.3.30,"
+		"struts,"
+			+ "2.3.30,"
 			+ "java,"
 			+ "org.apache.struts2",
 
-		// struts 2.5.2
-		"struts-2.5.2,"
+		"struts,"
+			+ "2.5.2,"
 			+ "java,"
 			+ "org.apache.struts2",
 
-		// httpd 2.3.8
-		"httpd-2.3.8,"
+		"httpd,"
+			+ "2.3.8,"
 			+ "c,"
 			+ "",
 
-		// httpd 2.4.26
-		"httpd-2.4.26,"
+		"httpd,"
+			+ "2.4.26,"
 			+ "c,"
 			+ ""
 	})
-	public void LimboRecoveryTest(String systemVersion, String lang,
-			String packagePrefix) {
+	public void LimboRecoveryTest(String projectName, String projectVersion,
+			String lang, String packagePrefix) {
 		// Creating relevant arguments
-		String fVecsPath = factsDir + fs + systemVersion + "_fVectors.json";
-		String oraclePath = resourcesDir + fs + systemVersion
-			+ "_limbo_clusters.rsf";
-		String resultPath = outputDirPath + fs + systemVersion
-			+ "_limbo_IL_100_clusters.rsf";
+		String fullProjectName = projectName + "-" + projectVersion;
+		String fVecsPath = factsDir + fs + fullProjectName + "_fVectors.json";
+		String oraclePath = resourcesDir + fs + fullProjectName
+			+ "_clusters.rsf";
+		String resultPath = outputDirPath + fs + fullProjectName
+			+ "_IL_100_clusters.rsf";
 
 		Architecture arch = assertDoesNotThrow(() ->
-			new Architecture(systemVersion + "_limbo", outputDirPath,
+			new Architecture(projectName, projectVersion, outputDirPath,
 				SimMeasure.SimMeasureType.IL,
 				FeatureVectors.deserializeFFVectors(fVecsPath), lang, packagePrefix));
 

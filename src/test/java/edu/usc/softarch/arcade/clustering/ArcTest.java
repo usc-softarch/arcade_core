@@ -30,50 +30,55 @@ public class ArcTest extends BaseTest {
 	/**
 	 * Tests ARC recovery for a single version of a system.
 	 *
-	 * @param systemVersion System version.
+	 * @param systemName System version.
 	 * @param lang System language.
 	 * @param packagePrefix Package prefix to consider in clustering,
 	 *                      only for Java.
 	 */
 	@ParameterizedTest
 	@CsvSource({
-		"struts-2.3.30,"
+		"struts,"
+			+ "2.3.30,"
 			+ "java,"
 			+ "org.apache.struts2",
 
-		"struts-2.5.2,"
+		"struts,"
+			+ "2.5.2,"
 			+ "java,"
 			+ "org.apache.struts2",
 
-		"httpd-2.3.8,"
+		"httpd,"
+			+ "2.3.8,"
 			+ "c,"
 			+ "",
 
-		"httpd-2.4.26,"
+		"httpd,"
+			+ "2.4.26,"
 			+ "c,"
 			+ ""
 	})
-	public void ARCRecoveryTest(String systemVersion, String lang,
-			String packagePrefix) {
+	public void ARCRecoveryTest(String systemName, String systemVersion,
+			String lang, String packagePrefix) {
 		// Creating relevant path Strings
-		String sysResources = resourcesDir + fs + systemVersion;
+		String systemFullName = systemName + "-" + systemVersion;
+		String sysResources = resourcesDir + fs + systemFullName;
 		String artifactsDir = sysResources + fs + "base";
-		String arcFileBase = systemVersion + "_JS_100_";
+		String arcFileBase = systemFullName + "_JS_100_";
 		String oracleClustersPath =
 			sysResources + fs + arcFileBase + "clusters.rsf";
 		String oracleConcernsPath =
 			sysResources + fs + arcFileBase + "concerns.txt";
-		String ffVecs = factsDir + fs + systemVersion + "_fVectors.json";
+		String ffVecs = factsDir + fs + systemFullName + "_fVectors.json";
 		String resultClustersFile =
 			outputDirPath + fs + arcFileBase + "clusters.rsf";
 		String resultConcernsFile =
 			outputDirPath + fs + arcFileBase + "concerns.txt";
 
 		Architecture arch = assertDoesNotThrow(() ->
-			new Architecture(systemVersion, outputDirPath,
+			new Architecture(systemName, systemVersion, outputDirPath,
 				SimMeasure.SimMeasureType.JS,
 				FeatureVectors.deserializeFFVectors(ffVecs), lang,
-				artifactsDir, packagePrefix));
+				artifactsDir, packagePrefix, false));
 
 		SerializationCriterion serialCrit =
 			SerializationCriterion.makeSerializationCriterion(

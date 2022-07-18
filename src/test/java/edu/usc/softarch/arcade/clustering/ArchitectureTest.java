@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.clustering;
 
 import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
-import edu.usc.softarch.arcade.topics.DocTopics;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -23,40 +22,41 @@ public class ArchitectureTest extends BaseTest {
 	/**
 	 * This test verifies that {@link Architecture} is being initialized correctly.
 	 *
-	 * @param versionName System version.
+	 * @param projectName System version.
 	 * @param language System language.
 	 */
 	@ParameterizedTest
 	@CsvSource({
-		// struts 2.3.30
-		"struts-2.3.30,"
+		"struts,"
+			+ "2.3.30,"
 			+ "java,"
 			+ "org.apache.struts2",
 
-		// struts 2.5.2
-		"struts-2.5.2,"
+		"struts,"
+			+ "2.5.2,"
 			+ "java,"
 			+ "org.apache.struts2",
 
-		// httpd-2.3.8
-		"httpd-2.3.8,"
+		"httpd,"
+			+ "2.3.8,"
 			+ "c,"
 			+ "",
 
-		// httpd-2.4.26
-		"httpd-2.4.26,"
+		"httpd,"
+			+ "2.4.26,"
 			+ "c,"
 			+ ""
 	})
-	public void constructorTest(String versionName, String language,
-			String packagePrefix) {
-		String artifactsDir = resourcesDir + fs + versionName;
+	public void constructorTest(String projectName, String projectVersion,
+			String language, String packagePrefix) {
+		String fullProjectName = projectName + "-" + projectVersion;
+		String artifactsDir = resourcesDir + fs + fullProjectName;
 		String initialArchitecturePath = artifactsDir + fs + "initial_architecture.json";
 		String architectureWithDocTopicsPath =
 			artifactsDir + fs + "architecture_with_doc_topics.json";
 
 		// Deserialize FastFeatureVectors oracle
-		String ffVecsFilePath = factsDir + fs + versionName + "_fVectors.json";
+		String ffVecsFilePath = factsDir + fs + fullProjectName + "_fVectors.json";
 		FeatureVectors builderffVecs = null;
 
 		try {
@@ -71,7 +71,7 @@ public class ArchitectureTest extends BaseTest {
 
 		FeatureVectors finalBuilderffVecs = builderffVecs;
 		ArchitectureMock arch = assertDoesNotThrow(() ->
-			new ArchitectureMock(versionName, outputDirPath,
+			new ArchitectureMock(projectName, projectVersion, outputDirPath,
 				SimMeasure.SimMeasureType.IL, finalBuilderffVecs, language,
 				artifactsDir + "/base", packagePrefix));
 

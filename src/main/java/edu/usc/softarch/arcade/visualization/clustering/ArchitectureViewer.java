@@ -28,6 +28,7 @@ public abstract class ArchitectureViewer extends JPanel
 	//region ATTRIBUTES
 	// Real Attributes
 	protected final String projectName;
+	protected final String projectVersion;
 	protected ArchitectureTableModel tableModel;
 
 	// Swing Components
@@ -45,9 +46,10 @@ public abstract class ArchitectureViewer extends JPanel
 	//endregion
 
 	//region CONSTRUCTORS
-	protected ArchitectureViewer(String projectName) {
+	protected ArchitectureViewer(String projectName, String projectVersion) {
 		// Real constructor
 		this.projectName = projectName;
+		this.projectVersion = projectVersion;
 
 		// Set layout
 		this.setLayout(new GridBagLayout());

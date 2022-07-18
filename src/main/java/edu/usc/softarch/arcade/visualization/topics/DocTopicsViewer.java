@@ -13,14 +13,17 @@ import java.io.IOException;
 public class DocTopicsViewer extends ArchitectureViewer {
 	//region PUBLIC INTERFACE
 	public static void main(String[] args) throws IOException {
-		String projectVersion = args[0];
-		String docTopicsPath = args[1];
+		String projectName = args[0];
+		String projectVersion = args[1];
+		String docTopicsPath = args[2];
 
 		DocTopics.deserialize(docTopicsPath);
 
 		LafManager.install(new DarculaTheme());
-		DocTopicsViewer viewerPanel = new DocTopicsViewer(projectVersion);
-		JFrame window = new JFrame("DocTopics Viewer: " + projectVersion);
+		DocTopicsViewer viewerPanel =
+			new DocTopicsViewer(projectName, projectVersion);
+		JFrame window = new JFrame(
+			"DocTopics Viewer: " + projectName + "-" + projectVersion);
 		window.setContentPane(viewerPanel);
 		window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		window.pack();
@@ -31,19 +34,19 @@ public class DocTopicsViewer extends ArchitectureViewer {
 	//endregion
 
 	//region CONSTRUCTORS
-	public DocTopicsViewer(String projectName) {
-		super(projectName); }
+	public DocTopicsViewer(String projectName, String projectVersion) {
+		super(projectName, projectVersion); }
 	//endregion
 
 	//region PROCESSING
 	@Override
 	protected ArchitectureTableModel buildArchitectureTable() {
-		return new DocTopicsTableModel(this.projectName); }
+		return new DocTopicsTableModel(this.projectName, this.projectVersion); }
 
 	@Override
 	protected Integer[] getFeatureIndex() {
-		int docTopicsLength =
-			DocTopics.getSingleton(super.projectName).getNumTopics();
+		int docTopicsLength = DocTopics.getSingleton(
+			super.projectName, super.projectVersion).getNumTopics();
 
 		Integer[] topicNumberList = new Integer[docTopicsLength];
 		for (int i = 1; i < docTopicsLength + 1; i++)

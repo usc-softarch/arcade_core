@@ -40,10 +40,13 @@ public class Architecture extends TreeMap<String, Cluster>
 		implements JsonSerializable {
 	//region ATTRIBUTES
 	/**
-	 * The name of the subject system represented by this architecture. Used in
-	 * serialization.
+	 * The name of the subject system represented by this architecture.
 	 */
 	public final String projectName;
+	/**
+	 * The version of the subject system represented by this architecture.
+	 */
+	public final String projectVersion;
 	/**
 	 * The path to where this data structure should be serialized.
 	 */
@@ -62,11 +65,12 @@ public class Architecture extends TreeMap<String, Cluster>
 	//endregion
 
 	//region CONSTRUCTORS
-	private Architecture(String projectName, String projectPath,
-			SimMeasure.SimMeasureType simMeasure, int numFeatures, String language,
-			Map<String, Cluster> architecture) {
+	private Architecture(String projectName, String projectVersion,
+			String projectPath, SimMeasure.SimMeasureType simMeasure, int numFeatures,
+			String language, Map<String, Cluster> architecture) {
 		super();
 		this.projectName = projectName;
+		this.projectVersion = projectVersion;
 		this.projectPath = projectPath;
 		this.simMeasure = simMeasure;
 		this.numFeatures = numFeatures;
@@ -82,6 +86,7 @@ public class Architecture extends TreeMap<String, Cluster>
 			this.add(new Cluster(c));
 
 		this.projectName = arch.projectName;
+		this.projectVersion = arch.projectVersion;
 		this.projectPath = arch.projectPath;
 		this.simMeasure = arch.simMeasure;
 		this.numFeatures = arch.numFeatures;
@@ -92,7 +97,9 @@ public class Architecture extends TreeMap<String, Cluster>
 	 * Default constructor for new Architecture objects.
 	 *
 	 * @param projectName The name of the subject system represented by this
-	 *                    architecture. Used in serialization.
+	 *                    architecture.
+	 * @param projectVersion The version of the subject system represented by
+	 *                       this architecture.
 	 * @param projectPath The path to where this data structure should be
 	 *                    serialized.
 	 * @param vectors The {@link FeatureVectors} object to construct this
@@ -102,10 +109,11 @@ public class Architecture extends TreeMap<String, Cluster>
 	 *                      initialization of the Architecture. Only used in
 	 *                      Java systems.
 	 */
-	public Architecture(String projectName, String projectPath,
-			SimMeasure.SimMeasureType simMeasure, FeatureVectors vectors,
-			String language, String packagePrefix) {
+	public Architecture(String projectName, String projectVersion,
+			String projectPath, SimMeasure.SimMeasureType simMeasure,
+			FeatureVectors vectors, String language, String packagePrefix) {
 		this.projectName = projectName;
+		this.projectVersion = projectVersion;
 		this.projectPath = projectPath;
 		this.simMeasure = simMeasure;
 		this.numFeatures = vectors.getNamesInFeatureSet().size();
@@ -113,23 +121,37 @@ public class Architecture extends TreeMap<String, Cluster>
 		initializeClusters(vectors, language, packagePrefix);
 	}
 
-	public Architecture(String projectName, String projectPath,
-			SimMeasure.SimMeasureType simMeasure, FeatureVectors vectors,
-			String language, String artifactsDir, String packagePrefix)
+	public Architecture(String projectName, String projectVersion,
+			String projectPath, SimMeasure.SimMeasureType simMeasure,
+			FeatureVectors vectors, String language, String artifactsDir,
+			String packagePrefix) throws UnmatchingDocTopicItemsException {
+		this(projectName, projectVersion, projectPath, simMeasure,
+			vectors, language, artifactsDir, packagePrefix, false);
+	}
+
+	public Architecture(String projectName, String projectVersion,
+			String projectPath, SimMeasure.SimMeasureType simMeasure,
+			FeatureVectors vectors, String language, String artifactsDir,
+			String packagePrefix, boolean reassignVersion)
 			throws UnmatchingDocTopicItemsException {
-		this(projectName, projectPath, simMeasure,
+		this(projectName, projectVersion, projectPath, simMeasure,
 			vectors, language, packagePrefix);
 
 		try	{
-			DocTopics.deserialize(artifactsDir
-				+ File.separator + "docTopics.json");
+			if (reassignVersion)
+				DocTopics.deserialize(artifactsDir
+					+ File.separator + "docTopics.json", projectVersion);
+			else
+				DocTopics.deserialize(artifactsDir
+					+ File.separator + "docTopics.json");
 		} catch (IOException e) {
 			System.out.println("No DocTopics file found, generating new one.");
 			// Initialize DocTopics from files
 			try {
-				DocTopics.initializeSingleton(artifactsDir, this.projectName);
-				DocTopics.getSingleton(this.projectName).serialize(artifactsDir
-					+ File.separator + "docTopics.json");
+				DocTopics.initializeSingleton(
+					artifactsDir, this.projectName, this.projectVersion);
+				DocTopics.getSingleton(this.projectName, this.projectVersion)
+					.serialize(artifactsDir + File.separator + "docTopics.json");
 			} catch (Exception f) {
 				f.printStackTrace();
 			}
@@ -143,17 +165,20 @@ public class Architecture extends TreeMap<String, Cluster>
 	 * Package prefix is set to empty string.
 	 *
 	 * @param projectName The name of the subject system represented by this
-	 *                    architecture. Used in serialization.
+	 *                    architecture.
+	 * @param projectVersion The version of the subject system represented by
+	 *                       this architecture.
 	 * @param projectPath The path to where this data structure should be
 	 *                    serialized.
 	 * @param vectors The {@link FeatureVectors} object to construct this
 	 *                Architecture from.
 	 * @param language The language of the subject system.
 	 */
-	public Architecture(String projectName, String projectPath,
-			SimMeasure.SimMeasureType simMeasure, FeatureVectors vectors,
-			String language) {
-		this(projectName, projectPath, simMeasure, vectors, language, "");
+	public Architecture(String projectName, String projectVersion,
+			String projectPath, SimMeasure.SimMeasureType simMeasure,
+			FeatureVectors vectors, String language) {
+		this(projectName, projectVersion, projectPath, simMeasure,
+			vectors, language, "");
 	}
 
 	/**
@@ -220,7 +245,8 @@ public class Architecture extends TreeMap<String, Cluster>
 		throws UnmatchingDocTopicItemsException {
 		// Set the DocTopics of each Cluster
 		for (Cluster c : super.values())
-			DocTopics.getSingleton(this.projectName).setClusterDocTopic(c, this.language);
+			DocTopics.getSingleton(this.projectName, this.projectVersion)
+				.setClusterDocTopic(c, this.language);
 
 		// Map inner classes to their parents
 		Map<String,String> oldParentClassMap = new HashMap<>();
@@ -263,7 +289,8 @@ public class Architecture extends TreeMap<String, Cluster>
 			if (nestedCluster == null) continue; // was already removed by WithoutDTI
 			Cluster parentCluster = super.get(entry.getValue());
 			Cluster mergedCluster =
-				new Cluster(ClusteringAlgorithmType.ARC, nestedCluster, parentCluster, this.projectName);
+				new Cluster(ClusteringAlgorithmType.ARC, nestedCluster, parentCluster,
+					this.projectName, this.projectVersion);
 			super.remove(parentCluster.name);
 			super.remove(nestedCluster.name);
 			super.put(mergedCluster.name, mergedCluster);
@@ -342,8 +369,9 @@ public class Architecture extends TreeMap<String, Cluster>
 	 */
 	public void writeToRsf() throws FileNotFoundException {
 		String fs = File.separator;
-		String path = this.projectPath + fs + this.projectName + "_"
-			+ this.simMeasure + "_" + this.size() + "_clusters.rsf";
+		String path = this.projectPath + fs + this.projectName + "-"
+			+ this.projectVersion + "_" + this.simMeasure + "_" + this.size()
+			+ "_clusters.rsf";
 		this.writeToRsf(path);
 	}
 
@@ -403,6 +431,7 @@ public class Architecture extends TreeMap<String, Cluster>
 	@Override
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
 		generator.writeField("projectName", projectName);
+		generator.writeField("projectVersion", projectVersion);
 		generator.writeField("projectPath", projectPath);
 		generator.writeField("simMeasure", simMeasure.toString());
 		generator.writeField("numFeatures", numFeatures);
@@ -419,9 +448,8 @@ public class Architecture extends TreeMap<String, Cluster>
 
 	public static Architecture deserialize(EnhancedJsonParser parser)
 			throws IOException {
-		DocTopics.resetSingleton();
-
 		String projectName = parser.parseString();
+		String projectVersion = parser.parseString();
 		String projectPath = parser.parseString();
 		SimMeasure.SimMeasureType simMeasure =
 			SimMeasure.SimMeasureType.valueOf(parser.parseString());
@@ -430,16 +458,17 @@ public class Architecture extends TreeMap<String, Cluster>
 		Map<String, Cluster> architecture =
 			parser.parseMap(String.class, Cluster.class, true);
 
-		return new Architecture(projectName, projectPath, simMeasure,
-			numFeatures, language, architecture);
+		return new Architecture(projectName, projectVersion, projectPath,
+			simMeasure, numFeatures, language, architecture);
 	}
 
 	public void serializeBagOfWords() throws FileNotFoundException {
 		computeConcernWordBags();
 
 		String fs = File.separator;
-		String path = this.projectPath + fs + this.projectName + "_"
-			+ this.simMeasure + "_" + this.size() + "_concerns.txt";
+		String path = this.projectPath + fs + this.projectName + "-"
+			+ this.projectVersion + "_" + this.simMeasure + "_"
+			+ this.size() + "_concerns.txt";
 		File outputFile = new File(path);
 		outputFile.getParentFile().mkdirs();
 
@@ -465,7 +494,8 @@ public class Architecture extends TreeMap<String, Cluster>
 		List<Concern> concernList = new ArrayList<>();
 		for (Cluster cluster : this.values())
 			concernList.add(cluster.computeConcern(
-				DocTopics.getSingleton(this.projectName).getTopicWordLists()));
+				DocTopics.getSingleton(this.projectName, this.projectVersion)
+					.getTopicWordLists()));
 
 		return concernList;
 	}
@@ -478,16 +508,19 @@ public class Architecture extends TreeMap<String, Cluster>
 
 		for (Map.Entry<Integer, Cluster> entry : architectureIndex.entrySet()) {
 			DocTopicItem toRename = entry.getValue().getDocTopicItem();
-			DocTopics.getSingleton(this.projectName).renameDocTopicItem(
-				toRename, entry.getKey().toString());
+			DocTopics.getSingleton(this.projectName, this.projectVersion)
+				.renameDocTopicItem(toRename, entry.getKey().toString());
 			toKeep.add(toRename);
 		}
 
-		DocTopics.getSingleton(this.projectName).cleanDocTopics(toKeep);
+		DocTopics.getSingleton(this.projectName, this.projectVersion)
+			.cleanDocTopics(toKeep);
 
-		String path = this.projectPath + fs + this.projectName + "_"
-			+ this.simMeasure + "_" + this.size() + "_clusteredDocTopics.json";
-		DocTopics.getSingleton(this.projectName).serialize(path);
+		String path = this.projectPath + fs + this.projectName + "-"
+			+ this.projectVersion + "_" + this.simMeasure + "_" + this.size()
+			+ "_clusteredDocTopics.json";
+		DocTopics.getSingleton(this.projectName, this.projectVersion)
+			.serialize(path);
 	}
 	//endregion
 }

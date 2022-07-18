@@ -75,9 +75,10 @@ public class Cluster extends ReadOnlyCluster
 	/**
 	 * Merge constructor.
 	 */
-	public Cluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2, String project)
+	public Cluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2,
+			String projectName, String projectVersion)
 			throws UnmatchingDocTopicItemsException {
-		super(cat, c1, c2, project);
+		super(cat, c1, c2, projectName, projectVersion);
 
 		this.featureMap = new HashMap<>();
 

@@ -10,7 +10,7 @@ public class FeatureVectorViewer extends ArchitectureViewer {
 
 	//region CONSTRUCTORS
 	public FeatureVectorViewer(Architecture arch) {
-		super(arch.projectName);
+		super(arch.projectName, arch.projectVersion);
 		this.arch = arch;
 	}
 	//endregion

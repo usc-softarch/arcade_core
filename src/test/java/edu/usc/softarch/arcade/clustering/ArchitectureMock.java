@@ -10,12 +10,12 @@ public class ArchitectureMock extends Architecture {
 	//endregion
 
 	//region CONSTRUCTORS
-	ArchitectureMock(String projectName, String projectPath,
-			SimMeasure.SimMeasureType simMeasure, FeatureVectors vectors,
-			String language, String artifactsDir, String packagePrefix)
-			throws UnmatchingDocTopicItemsException {
-		super(projectName, projectPath, simMeasure, vectors, language,
-			artifactsDir, packagePrefix);
+	ArchitectureMock(String projectName, String projectVersion,
+			String projectPath, SimMeasure.SimMeasureType simMeasure,
+			FeatureVectors vectors, String language, String artifactsDir,
+			String packagePrefix) throws UnmatchingDocTopicItemsException {
+		super(projectName, projectVersion, projectPath, simMeasure, vectors,
+			language, artifactsDir, packagePrefix);
 	}
 
 	@Override
