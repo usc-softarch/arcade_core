@@ -136,5 +136,7 @@ public class ArcTest extends BaseTest {
 			Arrays.asList(oracle.split("\\r?\\n")));
 		assertEquals(oracleRsf, resultRsf);
 		assertEquals(concernsOracle, concerns);
+
+		//TODO verify that all entities in the dependencies appear in the results
 	}
 }

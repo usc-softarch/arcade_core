@@ -312,22 +312,18 @@ public class DocTopics implements JsonSerializable {
 	 * @see #getDocTopicItem(String, String)
 	 */
 	private DocTopicItem getDocTopicItemForJava(String name) {
-		// Transforms a name from its filepath format to its Java qualified name.
-		String altName = name.replace("/", ".")
-			.replace(".java", "").trim();
-
+		name = name.replace(".", "/");
 		DocTopicItem toReturn = null;
 
 		// Attempts to locate a DTI that contains the desired class name
 		for (Map.Entry<String, DocTopicItem> entry : dtItemList.entrySet()) {
 			String dtiSource = entry.getKey();
-			dtiSource = dtiSource.replace("\\", ".")
+			dtiSource = dtiSource.replace("\\", "/")
 				.replace(".java", "")
 				.replace("_temp", "").trim();
 
-			if ((dtiSource.endsWith(name) || altName.equals(dtiSource.trim()))
-					&& dtiSource.contains(
-						"." + this.projectName + "-" + this.projectVersion + ".")) {
+			if (dtiSource.endsWith(name) && dtiSource.contains(
+						"/" + this.projectName + "-" + this.projectVersion + "/")) {
 				if (toReturn == null)
 					toReturn = entry.getValue();
 				else
