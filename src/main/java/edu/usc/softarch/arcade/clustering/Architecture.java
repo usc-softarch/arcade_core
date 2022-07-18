@@ -122,14 +122,14 @@ public class Architecture extends TreeMap<String, Cluster>
 
 		try	{
 			DocTopics.deserialize(artifactsDir
-				+ File.separator + projectName + "_docTopics.json");
+				+ File.separator + "docTopics.json");
 		} catch (IOException e) {
 			System.out.println("No DocTopics file found, generating new one.");
 			// Initialize DocTopics from files
 			try {
 				DocTopics.initializeSingleton(artifactsDir, this.projectName);
 				DocTopics.getSingleton(this.projectName).serialize(artifactsDir
-					+ File.separator + projectName + "_docTopics.json");
+					+ File.separator + "docTopics.json");
 			} catch (Exception f) {
 				f.printStackTrace();
 			}

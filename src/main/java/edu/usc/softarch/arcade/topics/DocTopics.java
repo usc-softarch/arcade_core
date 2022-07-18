@@ -303,17 +303,26 @@ public class DocTopics implements JsonSerializable {
 		String altName = name.replace("/", ".")
 			.replace(".java", "").trim();
 
+		DocTopicItem toReturn = null;
+
 		// Attempts to locate a DTI that contains the desired class name
 		for (Map.Entry<String, DocTopicItem> entry : dtItemList.entrySet()) {
 			String dtiSource = entry.getKey();
 			dtiSource = dtiSource.replace("\\", ".")
-				.replace(".java", "").trim();
+				.replace(".java", "")
+				.replace("_temp", "").trim();
 
-			if (dtiSource.endsWith(name) || altName.equals(dtiSource.trim()))
-				return entry.getValue();
+			if ((dtiSource.endsWith(name) || altName.equals(dtiSource.trim()))
+					&& dtiSource.contains("." + this.projectVersion + ".")) {
+				if (toReturn == null)
+					toReturn = entry.getValue();
+				else
+					throw new IllegalStateException("Two DocTopicItems found to match "
+						+ name + ": " + toReturn.source + " and " + entry.getKey());
+			}
 		}
 
-		return null;
+		return toReturn;
 	}
 
 	/**
@@ -326,17 +335,26 @@ public class DocTopics implements JsonSerializable {
 	private DocTopicItem getDocTopicItemForC(String name) {
 		String nameWithoutQuotations = name.replace("\"", "");
 
+		DocTopicItem toReturn = null;
+
 		for (DocTopicItem dti : dtItemList.values()) {
 			String strippedSource;
 
 			if (dti.isCSourced()) {
 				//FIXME Make sure this works on Linux and find a permanent fix
-				strippedSource = dti.source.replace("\\", "/");
-				if (strippedSource.endsWith(nameWithoutQuotations))
-					return dti;
+				strippedSource = dti.source.replace("\\", "/")
+					.replace("_temp", "");
+				if (strippedSource.endsWith(nameWithoutQuotations)
+						&& strippedSource.contains("/" + this.projectVersion + "/")) {
+					if (toReturn == null)
+						toReturn = dti;
+					else
+						throw new IllegalStateException("Two DocTopicItems found to match "
+							+ name + ": " + toReturn.source + " and " + dti.source);
+				}
 			}
 		}
-		return null;
+		return toReturn;
 	}
 
 	/**
