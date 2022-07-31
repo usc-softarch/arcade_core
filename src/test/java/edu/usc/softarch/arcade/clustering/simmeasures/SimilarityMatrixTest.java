@@ -74,7 +74,7 @@ public class SimilarityMatrixTest extends BaseTest {
 				language, artifactsDir + "/base", packagePrefix));
 
 		SimilarityMatrix simMatrix = assertDoesNotThrow(() ->
-			new SimilarityMatrix(SimMeasure.SimMeasureType.JS, concernArch) );
+			new SimilarityMatrix(SimMeasure.SimMeasureType.JS, concernArch));
 
 		// ------------------------- Generate Oracles ------------------------------
 

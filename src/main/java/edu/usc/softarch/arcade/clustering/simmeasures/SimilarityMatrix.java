@@ -13,14 +13,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.TreeSet;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.TimeUnit;
 
 import static edu.usc.softarch.arcade.clustering.Clusterer.numberOfEntitiesToBeClustered;
 
 /**
  * A matrix of similarity values between pairs of clusters. This implementation
  * uses a Map of Maps as its basic representation of the matrix, but also holds
- * a TreeSet of SimData values for fast search. It is intentionally
+ * a Set of SimData values for fast search. It is intentionally
  * memory-intensive, and should never be serialized or compared, as either of
  * those operations would defeat the purpose of the fast-search implementation.
  */
@@ -33,15 +36,16 @@ public class SimilarityMatrix {
 	 * calculation of the minCell each time it is required, in order to save up
 	 * memory space. I will not implement this until it proves necessary, as
 	 * the processing time savings is significant. */
-	private final TreeSet<SimData> fastSimMatrix;
+	private final ConcurrentSkipListSet<SimData> fastSimMatrix;
 	public final SimMeasure simMeasure;
 	public final SimMeasure.SimMeasureType simMeasureType;
 	public final int numFeatures;
+	private static final int threadCount = 8;
 	//endregion
 
 	//region CONSTRUCTORS
 	public SimilarityMatrix(SimMeasure.SimMeasureType simMeasureType,
-			Architecture architecture) throws DistributionSizeMismatchException {
+			Architecture architecture) {
 		this(simMeasureType, architecture.getNumFeatures());
 
 		for (Cluster cluster : architecture.values())
@@ -57,12 +61,13 @@ public class SimilarityMatrix {
 		this.numFeatures = toClone.numFeatures;
 
 		// Because SimData is immutable, no cloning is required
-		this.fastSimMatrix = new TreeSet<>(toClone.fastSimMatrix);
+		this.fastSimMatrix = new ConcurrentSkipListSet<>(toClone.fastSimMatrix);
 
 		// Clusters are mutable, so cloning is required
-		this.simMatrix = new HashMap<>();
-		for (Entry<Cluster, Map<Cluster, SimData>> row : toClone.simMatrix.entrySet()) {
-			Map<Cluster, SimData> newCol = new HashMap<>();
+		this.simMatrix = new ConcurrentHashMap<>();
+		for (Entry<Cluster, Map<Cluster, SimData>> row
+				: toClone.simMatrix.entrySet()) {
+			Map<Cluster, SimData> newCol = new ConcurrentHashMap<>();
 			this.simMatrix.put(new Cluster(row.getKey()), newCol);
 			for (Entry<Cluster, SimData> cell : row.getValue().entrySet())
 				newCol.put(new Cluster(cell.getKey()), cell.getValue());
@@ -74,8 +79,8 @@ public class SimilarityMatrix {
 	 */
 	private SimilarityMatrix(SimMeasure.SimMeasureType simMeasureType,
 			int numFeatures) {
-		this.simMatrix = new HashMap<>();
-		this.fastSimMatrix = new TreeSet<>();
+		this.simMatrix = new ConcurrentHashMap<>();
+		this.fastSimMatrix = new ConcurrentSkipListSet<>();
 		this.simMeasure = SimMeasure.makeSimMeasure(simMeasureType);
 		this.numFeatures = numFeatures;
 		this.simMeasureType = simMeasureType;
@@ -88,31 +93,93 @@ public class SimilarityMatrix {
 	public Collection<Map<Cluster, SimData>> getColumns() {
 		return this.simMatrix.values();	}
 
-	public void addCluster(Cluster c)
-			throws DistributionSizeMismatchException {
-		// Add column to existing rows
-		for (Entry<Cluster, Map<Cluster, SimData>> row : simMatrix.entrySet()) {
-			SimData cellData = computeCellData(row.getKey(), c);
-			row.getValue().put(c, cellData);
-			this.fastSimMatrix.add(cellData);
+	public void addCluster(Cluster c) {
+		addNewColumn(c);
+		addNewRow(c);
+	}
+
+	private void addNewColumn(Cluster c) {
+		// Check if first cluster
+		if (simMatrix.size() == 0) return;
+
+		// Set up threads
+		Runnable[] tasks = new Runnable[threadCount];
+		Thread[] threads = new Thread[threadCount];
+		ArrayBlockingQueue<Entry<Cluster, Map<Cluster, SimData>>> rows
+			= new ArrayBlockingQueue<>(simMatrix.size());
+		rows.addAll(simMatrix.entrySet());
+		for (int i = 0; i < threadCount; i++) {
+			tasks[i] = () -> {
+				try {
+					while (true) {
+						Entry<Cluster, Map<Cluster, SimData>> row =
+							rows.poll(1L, TimeUnit.MICROSECONDS);
+						if (row == null) return;
+						SimData cellData = computeCellData(row.getKey(), c);
+						row.getValue().put(c, cellData);
+						this.fastSimMatrix.add(cellData);
+					}
+				} catch (InterruptedException | DistributionSizeMismatchException e) {
+					throw new RuntimeException(e); //TODO handle it
+				}
+			};
+			threads[i] = new Thread(tasks[i]);
+			threads[i].start();
 		}
 
-		// Create new row
-		HashMap<Cluster, SimData> newRow =  new HashMap<>();
-		this.simMatrix.put(c, newRow);
+		// Wait until done
+		for (int i = 0; i < threadCount; i++) {
+			try {
+				threads[i].join();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e); //TODO handle it
+			}
+		}
+	}
 
-		// Add all cells of the new row
-		Collection<Cluster> clusterSet = simMatrix.keySet();
-		for (Cluster cluster : clusterSet) {
-			SimData cellData = computeCellData(c, cluster);
-			newRow.put(cluster, cellData);
-			if (!c.equals(cluster)) {
-				if (cellData.cellValue == 0
-						&& simMeasureType == SimMeasure.SimMeasureType.JS)
-					throw new IllegalArgumentException("Two clusters found with the " +
-						"same topic distribution: " + cellData.c1.name + " ; " +
-						cellData.c2.name);
-				this.fastSimMatrix.add(cellData);
+	private void addNewRow(Cluster c) {
+		// Create new row
+		Map<Cluster, SimData> newRow = new ConcurrentHashMap<>();
+		this.simMatrix.put(c, newRow);
+		Map<Cluster, SimData> row = this.simMatrix.get(c);
+
+		// Set up threads
+		Runnable[] tasks = new Runnable[threadCount];
+		Thread[] threads = new Thread[threadCount];
+		ArrayBlockingQueue<Cluster> clusters =
+			new ArrayBlockingQueue<>(this.simMatrix.size());
+		clusters.addAll(this.simMatrix.keySet());
+		for (int i = 0; i < threadCount; i++) {
+			tasks[i] = () -> {
+				try {
+					while (true) {
+						Cluster cluster = clusters.poll(1L, TimeUnit.MICROSECONDS);
+						if (cluster == null) return;
+						SimData cellData = computeCellData(c, cluster);
+						row.put(cluster, cellData);
+						if (!c.equals(cluster)) {
+							if (cellData.cellValue == 0
+									&& simMeasureType == SimMeasure.SimMeasureType.JS)
+								throw new IllegalArgumentException("Two clusters found with " +
+									"the same topic distribution: " + cellData.c1.name + " ; " +
+									cellData.c2.name);
+							this.fastSimMatrix.add(cellData);
+						}
+					}
+				} catch (InterruptedException | DistributionSizeMismatchException e) {
+					throw new RuntimeException(e); //TODO handle it
+				}
+			};
+			threads[i] = new Thread(tasks[i]);
+			threads[i].start();
+		}
+
+		// Wait until done
+		for (int i = 0; i < threadCount; i++) {
+			try {
+				threads[i].join();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e); //TODO handle it
 			}
 		}
 	}
@@ -145,7 +212,6 @@ public class SimilarityMatrix {
 	//endregion
 
 	//region OBJECT METHODS
-
 	/**
 	 * As mentioned in the class documentation, do NOT attempt to compare two
 	 * SimilarityMatrix objects. There should never be a situation where this is
