@@ -6,9 +6,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.AbstractMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -53,6 +51,20 @@ public class DependencyGraph extends LinkedHashSet<Map.Entry<String, String>> {
 		}
 
 		return result;
+	}
+	//endregion
+
+	//region ACCESSORS
+	public boolean add(String from, String to) {
+		return this.add(new AbstractMap.SimpleEntry<>(from, to)); }
+	//endregion
+
+	//region SERIALIZATION
+	public void writeToRsf(String rsfPath) throws FileNotFoundException {
+		try (PrintWriter writer = new PrintWriter(new PrintStream(rsfPath))) {
+			for (Map.Entry<String, String> edge : this)
+				writer.println("depends " + edge.getKey() + " " + edge.getValue());
+		}
 	}
 	//endregion
 }
