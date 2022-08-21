@@ -159,8 +159,9 @@ public class SimilarityMatrix {
 						row.put(cluster, cellData);
 						if (!c.equals(cluster)) {
 							if (cellData.cellValue == 0
-									&& simMeasureType == SimMeasure.SimMeasureType.JS)
-								throw new IllegalArgumentException("Two clusters found with " +
+									&& (simMeasureType == SimMeasure.SimMeasureType.JS
+									|| simMeasureType == SimMeasure.SimMeasureType.WJS))
+								System.err.println("Two clusters found with " +
 									"the same topic distribution: " + cellData.c1.name + " ; " +
 									cellData.c2.name);
 							this.fastSimMatrix.add(cellData);

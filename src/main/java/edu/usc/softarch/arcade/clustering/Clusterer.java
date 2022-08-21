@@ -11,7 +11,6 @@ import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.facts.DependencyGraph;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
-import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,15 +36,14 @@ public class Clusterer {
 	 * 13: Reassign DocTopics
 	 */
 	public static void main(String[] args)
-			throws IOException, DistributionSizeMismatchException, SAXException,
-			UnmatchingDocTopicItemsException, ParserConfigurationException {
+			throws IOException, UnmatchingDocTopicItemsException,
+			SAXException, ParserConfigurationException {
 		ClusteringAlgoArguments parsedArguments = new ClusteringAlgoArguments(args);
 		run(parsedArguments);
 	}
 
 	public static class ClusteringAlgoArguments {
 		public final ClusteringAlgorithmType algorithm;
-		public final String language;
 		public final Architecture arch;
 		public final SerializationCriterion serialCrit;
 		public final StoppingCriterion stopCrit;
@@ -56,7 +54,6 @@ public class Clusterer {
 				throws IOException, UnmatchingDocTopicItemsException,
 				ParserConfigurationException, SAXException {
 			this.algorithm = ClusteringAlgorithmType.valueOf(args[0].toUpperCase());
-			this.language = args[1];
 			this.simMeasure =
 				SimMeasure.SimMeasureType.valueOf(args[5].toUpperCase());
 
@@ -72,11 +69,11 @@ public class Clusterer {
 				throw new IOException("Unrecognized dependency file type: " + depsPath);
 			if (args.length > 12)
 				this.arch = new Architecture(args[8], args[9], args[10],
-					this.simMeasure, vectors, this.language, args[12], args[11],
+					this.simMeasure, vectors, args[1], args[12], args[11],
 					Boolean.parseBoolean(args[13]));
 			else
 				this.arch = new Architecture(args[8], args[9], args[10],
-					this.simMeasure, vectors, this.language, args[11]);
+					this.simMeasure, vectors, args[1], args[11]);
 
 			this.serialCrit = SerializationCriterion.makeSerializationCriterion(
 				args[6], Double.parseDouble(args[7]), arch);
@@ -87,8 +84,7 @@ public class Clusterer {
 	}
 
 	public static Architecture run(ClusteringAlgoArguments parsedArguments)
-			throws IOException, DistributionSizeMismatchException,
-			UnmatchingDocTopicItemsException {
+			throws IOException, UnmatchingDocTopicItemsException {
 		return run(
 			parsedArguments.algorithm,
 			parsedArguments.arch,
@@ -100,8 +96,7 @@ public class Clusterer {
 	public static Architecture run(ClusteringAlgorithmType algorithm,
 			Architecture arch, SerializationCriterion serialCrit,
 			StoppingCriterion stopCrit, SimMeasure.SimMeasureType simMeasure)
-			throws IOException, DistributionSizeMismatchException,
-			UnmatchingDocTopicItemsException {
+			throws IOException, UnmatchingDocTopicItemsException {
 		Clusterer runner = new Clusterer(serialCrit, arch, algorithm,
 			simMeasure, stopCrit);
 		runner.computeArchitecture(stopCrit);
@@ -122,8 +117,7 @@ public class Clusterer {
 	//region CONTRUCTORS
 	public Clusterer(SerializationCriterion serializationCriterion,
 			Architecture arch, ClusteringAlgorithmType algorithm,
-			SimMeasure.SimMeasureType simMeasure, StoppingCriterion stopCrit)
-			throws DistributionSizeMismatchException {
+			SimMeasure.SimMeasureType simMeasure, StoppingCriterion stopCrit) {
 		this.serializationCriterion = serializationCriterion;
 		this.architecture = arch;
 		this.algorithm = algorithm;
@@ -143,8 +137,7 @@ public class Clusterer {
 
 	//region PROCESSING
 	public Architecture computeArchitecture(StoppingCriterion stopCriterion)
-			throws DistributionSizeMismatchException, IOException,
-			UnmatchingDocTopicItemsException {
+			throws IOException, UnmatchingDocTopicItemsException {
 		while (stopCriterion.notReadyToStop(this.architecture)) {
 			doClusteringStep();
 			doSerializationStep();
@@ -153,8 +146,7 @@ public class Clusterer {
 		return this.architecture;
 	}
 
-	public void doClusteringStep() throws UnmatchingDocTopicItemsException,
-			DistributionSizeMismatchException {
+	public void doClusteringStep() throws UnmatchingDocTopicItemsException {
 		SimData data = identifyMostSimClusters();
 		Cluster newCluster = new Cluster(this.algorithm, data.c1, data.c2,
 			this.architecture.projectName, this.architecture.projectVersion);
@@ -192,8 +184,7 @@ public class Clusterer {
 	}
 
 	private void updateFastClustersAndSimMatrixToReflectMergedCluster(
-			SimData data, Cluster newCluster,	SimilarityMatrix simMatrix)
-			throws DistributionSizeMismatchException {
+			SimData data, Cluster newCluster,	SimilarityMatrix simMatrix) {
 		// Sanity check
 		if (data.c1.name.equals(data.c2.name))
 			throw new IllegalArgumentException("data.c1: " + data.c1

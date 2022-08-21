@@ -343,7 +343,8 @@ public class DocTopics implements JsonSerializable {
 	 * @see #getDocTopicItem(String, String)
 	 */
 	private DocTopicItem getDocTopicItemForC(String name) {
-		String nameWithoutQuotations = name.replace("\"", "");
+		String nameWithoutQuotations = name.replace("\"", "")
+			.replace("\\", "/");
 
 		DocTopicItem toReturn = null;
 
@@ -353,14 +354,17 @@ public class DocTopics implements JsonSerializable {
 			if (dti.isCSourced()) {
 				//FIXME Make sure this works on Linux and find a permanent fix
 				strippedSource = dti.source.replace("\\", "/")
-					.replace("_temp", "");
-				if (strippedSource.endsWith(nameWithoutQuotations)
+					.replace("_temp", "")
+					.replace("./", "");
+				if (strippedSource.endsWith("/" + nameWithoutQuotations)
 						&& strippedSource.contains(
 							"/" + this.projectName + "-" + this.projectVersion + "/")) {
 					if (toReturn == null)
 						toReturn = dti;
 					else
-						throw new IllegalStateException("Two DocTopicItems found to match "
+						//throw new IllegalStateException("Two DocTopicItems found to match "
+						//	+ name + ": " + toReturn.source + " and " + dti.source);
+						System.err.println("Two DocTopicItems found to match "
 							+ name + ": " + toReturn.source + " and " + dti.source);
 				}
 			}

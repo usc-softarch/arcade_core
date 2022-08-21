@@ -220,7 +220,16 @@ public class MalletRunner {
 		this.language = language.toLowerCase();
 		this.malletPath = malletPath;
 		this.artifactsPath = artifactsPath;
-		this.stopWordPath = stopWordPath;
+		(new File(this.artifactsPath)).mkdirs();
+		if (this.language.equalsIgnoreCase("java"))
+			this.stopWordPath =
+				stopWordPath + File.separator + "javakeywordsexpanded";
+		else if (this.language.equalsIgnoreCase("c"))
+			this.stopWordPath = stopWordPath + File.separator + "ckeywordsexpanded";
+		else if (this.language.equalsIgnoreCase("python"))
+			this.stopWordPath = stopWordPath + File.separator + "pythonkeywordsexpanded";
+		else
+			throw new RuntimeException("Unrecognized language " + this.language);
 		this.numTopics = numTopics;
 		this.numIterations = numIterations;
 	}
@@ -237,17 +246,26 @@ public class MalletRunner {
 
 		for (File file : FileUtil.getFileListing(this.sourceDir)) {
 			if (file.isDirectory()) continue;
-			if (this.language.equals("java")) {
-				if (!file.getName().endsWith(".java")) continue;
-				copyFile(file);
-			} else if (this.language.equals("c")) {
-				Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
-				if (p.matcher(file.getName()).find()) {
+			Pattern p;
+			switch (this.language) {
+				case "java":
+					if (!file.getName().endsWith(".java")) continue;
 					copyFile(file);
-				}
-			} else {
-				throw new UnsupportedOperationException("Language " + this.language
-					+ " is not supported. Supported languages are java and c.");
+					break;
+				case "c":
+					p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
+					if (p.matcher(file.getName()).find())
+						copyFile(file);
+					break;
+				case "python":
+					p = Pattern.compile("\\.(py|py3|pyc|pyo|pyw|pyx|pyd|pxd|pyi"
+						+ "|pyz|pywz|rpy|pyde|pyp|pyt|xpy|ipynb)$");
+					if (p.matcher(file.getName()).find())
+						copyFile(file);
+					break;
+				default:
+					throw new UnsupportedOperationException("Language " + this.language
+						+ " is not supported. Supported languages are java, c and python.");
 			}
 		}
 	}

@@ -60,9 +60,9 @@ public class DecayMetricAnalyzer {
 			.filter(f -> f.getName().contains(".rsf")).collect(Collectors.toList());
 		depsFiles = FileUtil.sortFileListByVersion(depsFiles);
 
-		double[] decayValues = new double[(clusterFiles.size() - 1) * 4];
+		double[] decayValues = new double[(clusterFiles.size()) * 4];
 
-		for (int i = 1; i < clusterFiles.size(); i++) {
+		for (int i = 1; i < clusterFiles.size() + 1; i++) {
 			double[] singleResults = runSingle(
 				clusterFiles.get(i - 1).getAbsolutePath(),
 				depsFiles.get(i - 1).getAbsolutePath());
