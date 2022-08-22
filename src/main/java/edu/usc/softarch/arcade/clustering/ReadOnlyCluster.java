@@ -81,6 +81,7 @@ public class ReadOnlyCluster {
 	void addEntity(String entity) { this.entities.add(entity); }
 	public void removeEntities(Set<String> entities) {
 		this.entities.removeAll(entities); }
+	public int size() { return this.entities.size(); }
 
 	/**
 	 * Returns a copy of this Cluster's {@link DocTopicItem}.

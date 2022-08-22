@@ -184,9 +184,8 @@ public class ClustererController extends JPanel
 					this.clusterer.doClusteringStep();
 				} catch (UnmatchingDocTopicItemsException ex) {
 					throw new RuntimeException(ex);
-				} catch (DistributionSizeMismatchException ex) {
-					throw new RuntimeException(ex);
 				}
+
 				this.refreshLabels();
 				this.viewer.tableModel.refresh();
 				break;
