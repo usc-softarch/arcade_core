@@ -6,48 +6,40 @@ import edu.usc.softarch.util.LabeledEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ModularizationQuality {
-	public static double computeMqRatio(
+public class IntraConnectivity {
+	public static double computeIntraConnectivity(
 			String archPath, String depsPath) throws IOException {
-		return computeMqRatio(ReadOnlyArchitecture.readFromRsf(archPath), depsPath);
+		return computeIntraConnectivity(
+			ReadOnlyArchitecture.readFromRsf(archPath), depsPath);
 	}
 
-	public static double computeMqRatio(
+	public static double computeIntraConnectivity(
 			ReadOnlyArchitecture arch, String depsPath) throws IOException {
 		SimpleDirectedGraph<String, LabeledEdge> graph =
 			arch.buildFullGraph(depsPath);
+		return computeIntraConnectivity(arch, graph);
+	}
 
-		Map<String, Double> clusterFactors = new HashMap<>();
+	public static double computeIntraConnectivity(ReadOnlyArchitecture arch,
+			SimpleDirectedGraph<String, LabeledEdge> graph) {
+		double result = 0.0;
+
 		for (ReadOnlyCluster cluster : arch.values()) {
 			Set<LabeledEdge> internalEdges = new HashSet<>();
-			Set<LabeledEdge> externalEdges = new HashSet<>();
 
 			for (String entity : cluster.getEntities()) {
 				Set<LabeledEdge> edges = graph.edgesOf(entity);
 				internalEdges.addAll(edges.stream()
 					.filter(e -> e.label.equals("internal")).collect(Collectors.toSet()));
-				externalEdges.addAll(edges.stream()
-					.filter(e -> e.label.equals("external")).collect(Collectors.toSet()));
 			}
 
-			if (internalEdges.isEmpty())
-				clusterFactors.put(cluster.name, 0.0);
-			else {
-				double cf = (2.0 * internalEdges.size()) /
-					(2.0 * internalEdges.size() + externalEdges.size());
-				clusterFactors.put(cluster.name, cf);
-			}
+			result += internalEdges.size() / Math.pow(cluster.size(), 2);
 		}
 
-		double mq = 0;
-		for (Double cf : clusterFactors.values())
-			mq += cf;
-		return mq / arch.size();
+		return result / arch.size();
 	}
 }
