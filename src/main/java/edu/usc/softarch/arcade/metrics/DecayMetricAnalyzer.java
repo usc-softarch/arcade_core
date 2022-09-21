@@ -36,12 +36,15 @@ public class DecayMetricAnalyzer {
 		SimpleDirectedGraph<String, DefaultEdge> graph =
 			ReadOnlyArchitecture.readFromRsf(clusterPath)
 				.buildGraph(depsPath);
-		double[] result = new double[4];
+		double[] result = new double[7];
 
 		result[0] = RatioCohesiveInteractions.detectRci(graph);
 		result[1] = TwoWayPairRatio.computeTwoWayPairRatio(graph);
 		result[2] = ArchitecturalStability.computeStability(graph);
 		result[3] = TurboMQ.computeTurboMq(clusterPath, depsPath);
+		result[4] = IntraConnectivity.computeIntraConnectivity(clusterPath, depsPath);
+		result[5] = InterConnectivity.computeInterConnectivity(clusterPath, depsPath);
+		result[6] = BasicMQ.computeBasicMq(clusterPath, depsPath);
 
 		return result;
 	}
@@ -60,17 +63,20 @@ public class DecayMetricAnalyzer {
 			.filter(f -> f.getName().contains(".rsf")).collect(Collectors.toList());
 		depsFiles = FileUtil.sortFileListByVersion(depsFiles);
 
-		double[] decayValues = new double[(clusterFiles.size()) * 4];
+		double[] decayValues = new double[(clusterFiles.size()) * 7];
 
 		for (int i = 1; i < clusterFiles.size() + 1; i++) {
 			double[] singleResults = runSingle(
 				clusterFiles.get(i - 1).getAbsolutePath(),
 				depsFiles.get(i - 1).getAbsolutePath());
 
-			decayValues[(i - 1) * 4] = singleResults[0];
-			decayValues[((i - 1) * 4) + 1] = singleResults[1];
-			decayValues[((i - 1) * 4) + 2] = singleResults[2];
-			decayValues[((i - 1) * 4) + 3] = singleResults[3];
+			decayValues[(i - 1) * 7] = singleResults[0];
+			decayValues[((i - 1) * 7) + 1] = singleResults[1];
+			decayValues[((i - 1) * 7) + 2] = singleResults[2];
+			decayValues[((i - 1) * 7) + 3] = singleResults[3];
+			decayValues[((i - 1) * 7) + 4] = singleResults[4];
+			decayValues[((i - 1) * 7) + 5] = singleResults[5];
+			decayValues[((i - 1) * 7) + 6] = singleResults[6];
 		}
 
 		getDescriptiveStatistics(decayValues, clusterFiles.size());
@@ -82,25 +88,37 @@ public class DecayMetricAnalyzer {
 		double[] rciValues = new double[size];
 		double[] twoWayPairRatios = new double[size];
 		double[] stability = new double[size];
-		double[] mq = new double[size];
+		double[] turbomq = new double[size];
+		double[] intra = new double[size];
+		double[] inter = new double[size];
+		double[] basicmq = new double[size];
 
 		for (int i = 0; i < size - 1; i++) {
-			rciValues[i] = decayValues[(i * 4)];
-			twoWayPairRatios[i] = decayValues[(i * 4) + 1];
-			stability[i] = decayValues[(i * 4) + 2];
-			mq[i] = decayValues[(i * 4) + 3];
+			rciValues[i] = decayValues[(i * 7)];
+			twoWayPairRatios[i] = decayValues[(i * 7) + 1];
+			stability[i] = decayValues[(i * 7) + 2];
+			turbomq[i] = decayValues[(i * 7) + 3];
+			intra[i] = decayValues[(i * 7) + 4];
+			inter[i] = decayValues[(i * 7) + 5];
+			basicmq[i] = decayValues[(i * 7) + 6];
 		}
 
 		DescriptiveStatistics rciStats = new DescriptiveStatistics(rciValues);
 		DescriptiveStatistics twoWayPairStats =
 			new DescriptiveStatistics(twoWayPairRatios);
 		DescriptiveStatistics stabilityStats = new DescriptiveStatistics(stability);
-		DescriptiveStatistics mqStats = new DescriptiveStatistics(mq);
+		DescriptiveStatistics turbomqStats = new DescriptiveStatistics(turbomq);
+		DescriptiveStatistics intraStats = new DescriptiveStatistics(intra);
+		DescriptiveStatistics interStats = new DescriptiveStatistics(inter);
+		DescriptiveStatistics basicmqStats = new DescriptiveStatistics(basicmq);
 
 		System.out.println(rciStats);
 		System.out.println(twoWayPairStats);
 		System.out.println(stabilityStats);
-		System.out.println(mqStats);
+		System.out.println(turbomqStats);
+		System.out.println(intraStats);
+		System.out.println(interStats);
+		System.out.println(basicmqStats);
 	}
 	//endregion
 }

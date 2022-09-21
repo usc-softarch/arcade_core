@@ -42,4 +42,18 @@ public class IntraConnectivity {
 
 		return result / arch.size();
 	}
+
+	/**
+	 * Computes the intraconnectivity of a single cluster.
+	 */
+	public static double computeIntraConnectivity(ReadOnlyCluster cluster,
+			SimpleDirectedGraph<String, LabeledEdge> graph) {
+		Set<LabeledEdge> edges = new HashSet<>();
+
+		for (String entity : cluster.getEntities())
+			edges.addAll(graph.edgesOf(entity).stream()
+				.filter(e -> e.label.equals("internal")).collect(Collectors.toSet()));
+
+		return edges.size() / Math.pow(cluster.size(), 2);
+	}
 }

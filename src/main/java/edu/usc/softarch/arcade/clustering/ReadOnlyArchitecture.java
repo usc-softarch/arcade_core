@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering;
 
+import edu.usc.softarch.arcade.metrics.decay.IntraConnectivity;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
@@ -13,9 +14,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 	//region ATTRIBUTES
@@ -208,6 +211,59 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 			for (DefaultEdge edge : graph.edgeSet()) {
 				String source = graph.getEdgeSource(edge);
 				String target = graph.getEdgeTarget(edge);
+				writer.write("\t\"" + source + "\" -> \"" + target + "\";\n");
+			}
+
+			writer.write("}\n");
+		}
+	}
+
+	public void writeToDotFull(String depsPath, String outputPath)
+			throws IOException {
+		try (FileWriter writer = new FileWriter(outputPath)) {
+			SimpleDirectedGraph<String, LabeledEdge> graph = buildFullGraph(depsPath);
+
+			writer.write("digraph G {\n");
+
+			for (ReadOnlyCluster cluster : this.values()) {
+				Set<LabeledEdge> clusterEdges = new HashSet<>();
+
+				writer.write("\tsubgraph \"cluster_" + cluster.name + "\" {\n");
+				writer.write("\t\tnode [style=filled];\n");
+
+				for (String entity : cluster.getEntities()) {
+					writer.write(
+						"\t\t\"" + entity.replace("\\", ".") + "\";\n");
+					clusterEdges.addAll(graph.edgesOf(entity).stream()
+						.filter(e -> e.label.equals("internal"))
+						.collect(Collectors.toSet()));
+				}
+
+				for (LabeledEdge edge : clusterEdges) {
+					String source =
+						graph.getEdgeSource(edge).replace("\\", ".");
+					String target =
+						graph.getEdgeTarget(edge).replace("\\", ".");
+					writer.write("\t\t\"" + source + "\" -> \"" + target + "\";\n");
+				}
+
+				double intraconnectivity =
+					IntraConnectivity.computeIntraConnectivity(cluster, graph);
+
+				writer.write("\t\tlabel = \"Cluster: " + cluster.name
+					+ ", Intra-connectivity: " + intraconnectivity + "\";\n");
+				writer.write("\t}\n");
+			}
+
+			Set<LabeledEdge> externalEdges = graph.edgeSet().stream()
+				.filter(e -> e.label.equals("external"))
+				.collect(Collectors.toSet());
+
+			for (LabeledEdge edge : externalEdges) {
+				String source =
+					graph.getEdgeSource(edge).replace("\\", ".");
+				String target =
+					graph.getEdgeTarget(edge).replace("\\", ".");
 				writer.write("\t\"" + source + "\" -> \"" + target + "\";\n");
 			}
 
