@@ -13,13 +13,13 @@ public class UnderstandCsvToRsf {
 		String csvPath = args[0];
 		String rsfPath = args[1];
 		String projectRootName = args[2];
-		String language = args[3];
+		boolean fileLevel = Boolean.parseBoolean(args[3]);
 
-		run(csvPath, rsfPath, projectRootName, language);
+		run(csvPath, rsfPath, projectRootName, fileLevel);
 	}
 
 	public static void run(String csvPath, String rsfPath,
-			String projectRootName, String language) throws IOException {
+			String projectRootName, boolean fileLevel) throws IOException {
 		DependencyGraph result = new DependencyGraph();
 
 		try (BufferedReader br = new BufferedReader(new FileReader(csvPath))) {
@@ -34,7 +34,7 @@ public class UnderstandCsvToRsf {
 				if (!from.contains(projectRootName) || !to.contains(projectRootName))
 					continue; // Skip unrelated dependencies
 
-				if (language.equalsIgnoreCase("c")) {
+				if (fileLevel) {
 					from = from.split(Pattern.quote(projectRootName + File.separator))[1];
 					to = to.split(Pattern.quote(projectRootName + File.separator))[1];
 				}
@@ -42,6 +42,9 @@ public class UnderstandCsvToRsf {
 					to.replace("\"", ""));
 			}
 		}
+
+		File f = new File(rsfPath);
+		f.getParentFile().mkdirs();
 
 		result.writeToRsf(rsfPath);
 	}

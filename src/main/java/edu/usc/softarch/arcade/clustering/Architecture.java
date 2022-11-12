@@ -227,9 +227,17 @@ public class Architecture extends TreeMap<String, Cluster>
 	 */
 	private void addClusterConditionally(Cluster cluster, String language,
 			String packagePrefix) {
-		// If the source language is C or C++, add the only C-based entities
+		// If the source language is C or C++, add only the C-based entities
 		if (language.equalsIgnoreCase("c")) {
 			Pattern p = Pattern.compile("\\.(c|cpp|cc|s|h|hpp|icc|ia|tbl|p)$");
+			if (!cluster.name.startsWith("/") && p.matcher(cluster.name).find())
+				this.put(cluster.name, cluster);
+		}
+
+		// If the source language is Python, same as above
+		if (language.equalsIgnoreCase("python")) {
+			Pattern p = Pattern.compile("\\.(py|py3|pyc|pyo|pyw|pyx|pyd|pxd|pyi"
+				+ "|pyz|pywz|rpy|pyde|pyp|pyt|xpy|ipynb)$");
 			if (!cluster.name.startsWith("/") && p.matcher(cluster.name).find())
 				this.put(cluster.name, cluster);
 		}

@@ -300,6 +300,8 @@ public class DocTopics implements JsonSerializable {
 			return getDocTopicItemForJava(name);
 		if (language.equalsIgnoreCase("c"))
 			return getDocTopicItemForC(name);
+		if (language.equalsIgnoreCase("python"))
+			return getDocTopicItemForPython(name);
 
 		throw new IllegalArgumentException("Unknown source language " + language);
 	}
@@ -362,6 +364,47 @@ public class DocTopics implements JsonSerializable {
 					if (toReturn == null)
 						toReturn = dti;
 					else
+						/* This should throw an error, since technically ARCADE doesn't
+						 * know what to do with this situation. However, since I don't
+						 * really know how to treat it yet, I'm just letting it happen
+						 * and solving it case-by-case.
+						 */
+						//throw new IllegalStateException("Two DocTopicItems found to match "
+						//	+ name + ": " + toReturn.source + " and " + dti.source);
+						System.err.println("Two DocTopicItems found to match "
+							+ name + ": " + toReturn.source + " and " + dti.source);
+				}
+			}
+		}
+		return toReturn;
+	}
+
+	//TODO merge this and above into "getDocTopicItemForFile(name, language)"
+	private DocTopicItem getDocTopicItemForPython(String name) {
+		String nameWithoutQuotations = name.replace("\"", "")
+			.replace("\\", "/");
+
+		DocTopicItem toReturn = null;
+
+		for (DocTopicItem dti : dtItemList.values()) {
+			String strippedSource;
+
+			if (dti.isPythonSourced()) {
+				//FIXME Make sure this works on Linux and find a permanent fix
+				strippedSource = dti.source.replace("\\", "/")
+					.replace("_temp", "")
+					.replace("./", "");
+				if (strippedSource.endsWith("/" + nameWithoutQuotations)
+					&& strippedSource.contains(
+					"/" + this.projectName + "-" + this.projectVersion + "/")) {
+					if (toReturn == null)
+						toReturn = dti;
+					else
+						/* This should throw an error, since technically ARCADE doesn't
+						 * know what to do with this situation. However, since I don't
+						 * really know how to treat it yet, I'm just letting it happen
+						 * and solving it case-by-case.
+						 */
 						//throw new IllegalStateException("Two DocTopicItems found to match "
 						//	+ name + ": " + toReturn.source + " and " + dti.source);
 						System.err.println("Two DocTopicItems found to match "

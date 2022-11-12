@@ -19,6 +19,7 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -145,6 +146,12 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 			|| source.endsWith(".cpp") || source.endsWith(".s")
 			|| source.endsWith(".hpp") || source.endsWith(".icc")
 			|| source.endsWith(".ia");
+	}
+
+	public boolean isPythonSourced() {
+		Pattern p = Pattern.compile("\\.(py|py3|pyc|pyo|pyw|pyx|pyd|pxd|pyi"
+			+ "|pyz|pywz|rpy|pyde|pyp|pyt|xpy|ipynb)$");
+		return p.matcher(source).find();
 	}
 
 	/**
