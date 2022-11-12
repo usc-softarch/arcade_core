@@ -29,7 +29,7 @@ public class ArchitecturalStability {
 			double denom = incomingEdges.size() + outgoingEdges.size();
 
 			if (denom !=0)
-				stabilitySum += incomingEdges.size() / denom;
+				stabilitySum += outgoingEdges.size() / denom;
 		}
 
 		return stabilitySum / graph.vertexSet().size();
