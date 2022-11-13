@@ -21,20 +21,20 @@ public class Clusterer {
 	/**
 	 * Primary entry point for all clustering algorithms. Arguments are:
 	 *
-	 * 0 : Clustering algorithm.
-	 * 1 : Subject system language.
-	 * 2 : Path to feature vectors file.
-	 * 3 : Stopping criterion.
-	 * 4 : Stopping criterion parameter.
-	 * 5 : Similarity measure desired. Check compatibility in each algorithm.
-	 * 6 : Serialization criterion.
-	 * 7 : Parameter value of the serialization criterion.
-	 * 8 : Name of the subject system.
-	 * 9 : Version of the subject system.
-	 * 10: Path to place the output.
-	 * 11: Package prefix to include in the analysis. If C, empty string.
-	 * 12: Path to directory containing auxiliary artifacts.
-	 * 13: Reassign DocTopics
+	 * algo : Clustering algorithm.
+	 * language : Subject system language.
+	 * deps : Path to feature vectors file.
+	 * stop : Stopping criterion.
+	 * stopthreshold : Stopping criterion parameter.
+	 * measure : Similarity measure desired. Check compatibility in each algorithm.
+	 * serial : Serialization criterion.
+	 * serialthreshold : Parameter value of the serialization criterion.
+	 * projname : Name of the subject system.
+	 * projversion : Version of the subject system.
+	 * projpath: Path to place the output.
+	 * packageprefix: Package prefix to include in the analysis. If C, empty string.
+	 * artifacts: Path to directory containing auxiliary artifacts.
+	 * reassignversion: Reassign DocTopics
 	 */
 	public static void main(String[] args)
 			throws IOException, UnmatchingDocTopicItemsException,
