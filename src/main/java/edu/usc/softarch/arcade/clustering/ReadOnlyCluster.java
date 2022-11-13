@@ -1,17 +1,27 @@
 package edu.usc.softarch.arcade.clustering;
 
+import edu.usc.softarch.arcade.metrics.decay.ArchitecturalStability;
+import edu.usc.softarch.arcade.metrics.decay.InterConnectivity;
+import edu.usc.softarch.arcade.metrics.decay.IntraConnectivity;
+import edu.usc.softarch.arcade.metrics.decay.TurboMQ;
 import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
+import edu.usc.softarch.util.LabeledEdge;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.jgrapht.graph.SimpleDirectedGraph;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Cluster object which cannot be used for further clustering, i.e. is already
@@ -133,5 +143,68 @@ public class ReadOnlyCluster {
 
 	@Override
 	public int hashCode() { return this.name.hashCode(); }
+	//endregion
+
+	//region SERIALIZATION
+	public void writeToDot(SimpleDirectedGraph<String, LabeledEdge> graph,
+			ReadOnlyArchitecture arch, String outputPath) throws IOException {
+		try (FileWriter writer = new FileWriter(outputPath)) {
+			writer.write("digraph " + this.name + " {\n");
+
+			this.writeToDot(graph, arch, writer);
+
+			writer.write("}\n");
+		}
+	}
+
+	public void writeToDot(SimpleDirectedGraph<String, LabeledEdge> graph,
+			ReadOnlyArchitecture arch, FileWriter writer) throws IOException {
+		Set<LabeledEdge> clusterEdges = new HashSet<>();
+
+		writer.write("\tsubgraph \"cluster_" + this.name + "\" {\n");
+		writer.write("\t\tnode [style=filled];\n");
+
+		for (String entity : this.getEntities()) {
+			writer.write(
+				"\t\t\"" + entity.replace("\\", ".") + "\";\n");
+			clusterEdges.addAll(graph.edgesOf(entity).stream()
+				.filter(e -> e.label.equals("internal"))
+				.collect(Collectors.toSet()));
+		}
+
+		for (LabeledEdge edge : clusterEdges) {
+			String source =
+				graph.getEdgeSource(edge).replace("\\", ".");
+			String target =
+				graph.getEdgeTarget(edge).replace("\\", ".");
+			writer.write("\t\t\"" + source + "\" -> \"" + target + "\";\n");
+		}
+
+		double intraconnectivity =
+			IntraConnectivity.computeIntraConnectivity(this, graph);
+		DescriptiveStatistics interconnectivity =
+			InterConnectivity.computeInterConnectivity(this, arch, graph);
+		double basicMq = intraconnectivity - interconnectivity.getMean();
+		double clusterFactor = TurboMQ.computeClusterFactor(this, graph);
+		double fanIn = ArchitecturalStability.computeFanIn(this, graph);
+		double fanOut = ArchitecturalStability.computeFanOut(this, graph);
+		double instability =
+			ArchitecturalStability.computeStability(this, graph);
+
+		writer.write("\t\tlabel = \"Cluster: " + this.name
+			+ "\\nIntra-connectivity: " + intraconnectivity
+			+ "\\nInter-connectivity: " + interconnectivity.getMean() + ", "
+				+ interconnectivity.getPercentile(50.0) + ", "
+				+ interconnectivity.getMin() + ", "
+				+ interconnectivity.getMax() + ", "
+				+ interconnectivity.getStandardDeviation()
+			+ "\\nBasicMQ: " + basicMq
+			+ "\\nCluster Factor: " + clusterFactor
+			+ "\\nFan-in: " + fanIn
+			+ "\\nFan-out: " + fanOut
+			+ "\\nInstability: " + instability
+			+ "\";\n");
+		writer.write("\t}\n");
+	}
 	//endregion
 }

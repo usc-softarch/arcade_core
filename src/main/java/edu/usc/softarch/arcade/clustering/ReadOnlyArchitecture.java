@@ -225,35 +225,8 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 
 			writer.write("digraph G {\n");
 
-			for (ReadOnlyCluster cluster : this.values()) {
-				Set<LabeledEdge> clusterEdges = new HashSet<>();
-
-				writer.write("\tsubgraph \"cluster_" + cluster.name + "\" {\n");
-				writer.write("\t\tnode [style=filled];\n");
-
-				for (String entity : cluster.getEntities()) {
-					writer.write(
-						"\t\t\"" + entity.replace("\\", ".") + "\";\n");
-					clusterEdges.addAll(graph.edgesOf(entity).stream()
-						.filter(e -> e.label.equals("internal"))
-						.collect(Collectors.toSet()));
-				}
-
-				for (LabeledEdge edge : clusterEdges) {
-					String source =
-						graph.getEdgeSource(edge).replace("\\", ".");
-					String target =
-						graph.getEdgeTarget(edge).replace("\\", ".");
-					writer.write("\t\t\"" + source + "\" -> \"" + target + "\";\n");
-				}
-
-				double intraconnectivity =
-					IntraConnectivity.computeIntraConnectivity(cluster, graph);
-
-				writer.write("\t\tlabel = \"Cluster: " + cluster.name
-					+ ", Intra-connectivity: " + intraconnectivity + "\";\n");
-				writer.write("\t}\n");
-			}
+			for (ReadOnlyCluster cluster : this.values())
+				cluster.writeToDot(graph, this, writer);
 
 			Set<LabeledEdge> externalEdges = graph.edgeSet().stream()
 				.filter(e -> e.label.equals("external"))

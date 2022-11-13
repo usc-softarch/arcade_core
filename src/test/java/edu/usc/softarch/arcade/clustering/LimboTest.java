@@ -51,7 +51,7 @@ public class LimboTest extends BaseTest {
 			String lang, String packagePrefix) {
 		// Creating relevant arguments
 		String fullProjectName = projectName + "-" + projectVersion;
-		String fVecsPath = factsDir + fs + fullProjectName + "_fVectors.json";
+		String depsPath = factsDir + fs + fullProjectName + "_deps.rsf";
 		String oraclePath = resourcesDir + fs + fullProjectName
 			+ "_clusters.rsf";
 		String resultPath = outputDirPath + fs + fullProjectName
@@ -59,8 +59,7 @@ public class LimboTest extends BaseTest {
 
 		Architecture arch = assertDoesNotThrow(() ->
 			new Architecture(projectName, projectVersion, outputDirPath,
-				SimMeasure.SimMeasureType.IL,
-				FeatureVectors.deserializeFFVectors(fVecsPath), lang, packagePrefix));
+				SimMeasure.SimMeasureType.IL, depsPath, lang, packagePrefix));
 
 		SerializationCriterion serialCrit =
 			SerializationCriterion.makeSerializationCriterion(
@@ -71,7 +70,7 @@ public class LimboTest extends BaseTest {
 
 		assertDoesNotThrow(() ->
 			Clusterer.run(ClusteringAlgorithmType.LIMBO, arch, serialCrit, stopCrit,
-				SimMeasure.SimMeasureType.IL));
+				SimMeasure.SimMeasureType.IL, false));
 
 		// Load results
 		String result = assertDoesNotThrow(() ->

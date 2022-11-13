@@ -8,13 +8,9 @@ import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
-import edu.usc.softarch.arcade.facts.DependencyGraph;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.arcade.util.CLI;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 public class Clusterer {
 	//region PUBLIC INTERFACE
@@ -35,10 +31,10 @@ public class Clusterer {
 	 * packageprefix: Package prefix to include in the analysis. If C, empty string.
 	 * artifacts: Path to directory containing auxiliary artifacts.
 	 * reassignversion: Reassign DocTopics
+	 * printdots: Print DOT outputs for each cluster
 	 */
 	public static void main(String[] args)
-			throws IOException, UnmatchingDocTopicItemsException,
-			SAXException, ParserConfigurationException {
+			throws IOException, UnmatchingDocTopicItemsException {
 		ClusteringAlgoArguments parsedArguments =
 			new ClusteringAlgoArguments(CLI.parseArguments(args));
 		run(parsedArguments);
@@ -51,29 +47,19 @@ public class Clusterer {
 		public final StoppingCriterion stopCrit;
 		public final String stoppingCriterion;
 		public final SimMeasure.SimMeasureType simMeasure;
+		public final boolean printdots;
 
 		public ClusteringAlgoArguments(Map<String, String> args)
-				throws IOException, UnmatchingDocTopicItemsException,
-				ParserConfigurationException, SAXException {
+				throws IOException, UnmatchingDocTopicItemsException {
 			this.algorithm =
 				ClusteringAlgorithmType.valueOf(args.get("algo").toUpperCase());
 			this.simMeasure =
 				SimMeasure.SimMeasureType.valueOf(args.get("measure").toUpperCase());
 
-			FeatureVectors vectors;
-			String depsPath = args.get("deps");
-			if (depsPath.contains(".rsf"))
-				vectors = new FeatureVectors(DependencyGraph.readRsf(depsPath));
-			else if (depsPath.contains(".odem"))
-				vectors = new FeatureVectors(DependencyGraph.readOdem(depsPath));
-			else if (depsPath.contains(".json"))
-				vectors = FeatureVectors.deserializeFFVectors(depsPath);
-			else
-				throw new IOException("Unrecognized dependency file type: " + depsPath);
-
 			String projname = args.get("projname");
 			String projversion = args.get("projversion");
 			String projpath = args.get("projpath");
+			String depsPath = args.get("deps");
 			String language = args.get("language");
 			String packagePrefix = "";
 			if (language.equalsIgnoreCase("java"))
@@ -86,11 +72,11 @@ public class Clusterer {
 					reassignVersion = Boolean.parseBoolean(args.get("reassignversion"));
 
 				this.arch = new Architecture(projname, projversion, projpath,
-					this.simMeasure, vectors, language, artifacts, packagePrefix,
+					this.simMeasure, depsPath, language, artifacts, packagePrefix,
 					reassignVersion);
 			} else {
 				this.arch = new Architecture(projname, projversion, projpath,
-					this.simMeasure, vectors, language, packagePrefix);
+					this.simMeasure, depsPath, language, packagePrefix);
 			}
 
 			String serial = "archsize";
@@ -115,6 +101,11 @@ public class Clusterer {
 			this.stopCrit = StoppingCriterion.makeStoppingCriterion(
 				stop, stopThreshold, arch);
 			this.stoppingCriterion = stop;
+
+			if (args.containsKey("printdots"))
+				this.printdots = Boolean.parseBoolean(args.get("printdots"));
+			else
+				this.printdots = false;
 		}
 	}
 
@@ -125,15 +116,17 @@ public class Clusterer {
 			parsedArguments.arch,
 			parsedArguments.serialCrit,
 			parsedArguments.stopCrit,
-			parsedArguments.simMeasure);
+			parsedArguments.simMeasure,
+			parsedArguments.printdots);
 	}
 
 	public static Architecture run(ClusteringAlgorithmType algorithm,
 			Architecture arch, SerializationCriterion serialCrit,
-			StoppingCriterion stopCrit, SimMeasure.SimMeasureType simMeasure)
+			StoppingCriterion stopCrit, SimMeasure.SimMeasureType simMeasure,
+			boolean printDots)
 			throws IOException, UnmatchingDocTopicItemsException {
 		Clusterer runner = new Clusterer(serialCrit, arch, algorithm,
-			simMeasure, stopCrit);
+			simMeasure, stopCrit, printDots);
 		runner.computeArchitecture(stopCrit);
 
 		return runner.architecture;
@@ -147,17 +140,20 @@ public class Clusterer {
 	public final ClusteringAlgorithmType algorithm;
 	private final SimilarityMatrix simMatrix;
 	public final StoppingCriterion stopCrit;
+	public final boolean printDots;
 	//endregion ATTRIBUTES
 
 	//region CONTRUCTORS
 	public Clusterer(SerializationCriterion serializationCriterion,
 			Architecture arch, ClusteringAlgorithmType algorithm,
-			SimMeasure.SimMeasureType simMeasure, StoppingCriterion stopCrit) {
+			SimMeasure.SimMeasureType simMeasure, StoppingCriterion stopCrit,
+			boolean printDots) {
 		this.serializationCriterion = serializationCriterion;
 		this.architecture = arch;
 		this.algorithm = algorithm;
 		this.simMatrix = new SimilarityMatrix(simMeasure, this.architecture);
 		this.stopCrit = stopCrit;
+		this.printDots = printDots;
 	}
 	//endregion
 
@@ -244,6 +240,7 @@ public class Clusterer {
 	//region SERIALIZATION
 	public void serialize() throws IOException {
 		this.architecture.writeToRsf();
+
 		// Compute DTI word bags if concern-based technique is used
 		if (DocTopics.isReady(
 				this.architecture.projectName, this.architecture.projectVersion)) {

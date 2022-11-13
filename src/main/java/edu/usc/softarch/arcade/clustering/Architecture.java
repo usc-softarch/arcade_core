@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
+import edu.usc.softarch.arcade.facts.DependencyGraph;
 import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
@@ -51,6 +52,10 @@ public class Architecture extends TreeMap<String, Cluster>
 	 * The path to where this data structure should be serialized.
 	 */
 	public final String projectPath;
+	/**
+	 * The path to where this data structure should be serialized.
+	 */
+	public final String depsPath;
 	public final SimMeasure.SimMeasureType simMeasure;
 	/**
 	 * The total number of features that can exist in any clusters of this
@@ -66,12 +71,13 @@ public class Architecture extends TreeMap<String, Cluster>
 
 	//region CONSTRUCTORS
 	private Architecture(String projectName, String projectVersion,
-			String projectPath, SimMeasure.SimMeasureType simMeasure, int numFeatures,
-			String language, Map<String, Cluster> architecture) {
+			String projectPath, String depsPath, SimMeasure.SimMeasureType simMeasure,
+			int numFeatures, String language, Map<String, Cluster> architecture) {
 		super();
 		this.projectName = projectName;
 		this.projectVersion = projectVersion;
 		this.projectPath = projectPath;
+		this.depsPath = depsPath;
 		this.simMeasure = simMeasure;
 		this.numFeatures = numFeatures;
 		this.language = language;
@@ -88,6 +94,7 @@ public class Architecture extends TreeMap<String, Cluster>
 		this.projectName = arch.projectName;
 		this.projectVersion = arch.projectVersion;
 		this.projectPath = arch.projectPath;
+		this.depsPath = arch.depsPath;
 		this.simMeasure = arch.simMeasure;
 		this.numFeatures = arch.numFeatures;
 		this.language = arch.language;
@@ -102,8 +109,8 @@ public class Architecture extends TreeMap<String, Cluster>
 	 *                       this architecture.
 	 * @param projectPath The path to where this data structure should be
 	 *                    serialized.
-	 * @param vectors The {@link FeatureVectors} object to construct this
-	 *                Architecture from.
+	 * @param depsPath The path to the dependencies RSF file for
+	 *                 this architecture.
 	 * @param language The language of the subject system.
 	 * @param packagePrefix The package prefix to be considered in the
 	 *                      initialization of the Architecture. Only used in
@@ -111,11 +118,16 @@ public class Architecture extends TreeMap<String, Cluster>
 	 */
 	public Architecture(String projectName, String projectVersion,
 			String projectPath, SimMeasure.SimMeasureType simMeasure,
-			FeatureVectors vectors, String language, String packagePrefix) {
+			String depsPath, String language, String packagePrefix)
+			throws IOException {
 		this.projectName = projectName;
 		this.projectVersion = projectVersion;
 		this.projectPath = projectPath;
+		this.depsPath = depsPath;
 		this.simMeasure = simMeasure;
+
+		FeatureVectors vectors =
+			new FeatureVectors(DependencyGraph.readRsf(depsPath));
 		this.numFeatures = vectors.getNamesInFeatureSet().size();
 		this.language = language;
 		initializeClusters(vectors, language, packagePrefix);
@@ -123,19 +135,20 @@ public class Architecture extends TreeMap<String, Cluster>
 
 	public Architecture(String projectName, String projectVersion,
 			String projectPath, SimMeasure.SimMeasureType simMeasure,
-			FeatureVectors vectors, String language, String artifactsDir,
-			String packagePrefix) throws UnmatchingDocTopicItemsException {
+			String depsPath, String language, String artifactsDir,
+			String packagePrefix)
+			throws UnmatchingDocTopicItemsException, IOException {
 		this(projectName, projectVersion, projectPath, simMeasure,
-			vectors, language, artifactsDir, packagePrefix, false);
+			depsPath, language, artifactsDir, packagePrefix, false);
 	}
 
 	public Architecture(String projectName, String projectVersion,
 			String projectPath, SimMeasure.SimMeasureType simMeasure,
-			FeatureVectors vectors, String language, String artifactsDir,
+			String depsPath, String language, String artifactsDir,
 			String packagePrefix, boolean reassignVersion)
-			throws UnmatchingDocTopicItemsException {
+			throws UnmatchingDocTopicItemsException, IOException {
 		this(projectName, projectVersion, projectPath, simMeasure,
-			vectors, language, packagePrefix);
+			depsPath, language, packagePrefix);
 
 		try	{
 			if (reassignVersion)
@@ -170,15 +183,15 @@ public class Architecture extends TreeMap<String, Cluster>
 	 *                       this architecture.
 	 * @param projectPath The path to where this data structure should be
 	 *                    serialized.
-	 * @param vectors The {@link FeatureVectors} object to construct this
-	 *                Architecture from.
+	 * @param depsPath The path to the dependencies RSF file for
+	 *                 this architecture.
 	 * @param language The language of the subject system.
 	 */
 	public Architecture(String projectName, String projectVersion,
 			String projectPath, SimMeasure.SimMeasureType simMeasure,
-			FeatureVectors vectors, String language) {
+			String depsPath, String language) throws IOException {
 		this(projectName, projectVersion, projectPath, simMeasure,
-			vectors, language, "");
+			depsPath, language, "");
 	}
 
 	/**
@@ -441,6 +454,7 @@ public class Architecture extends TreeMap<String, Cluster>
 		generator.writeField("projectName", projectName);
 		generator.writeField("projectVersion", projectVersion);
 		generator.writeField("projectPath", projectPath);
+		generator.writeField("depsPath", depsPath);
 		generator.writeField("simMeasure", simMeasure.toString());
 		generator.writeField("numFeatures", numFeatures);
 		generator.writeField("language", language);
@@ -459,6 +473,7 @@ public class Architecture extends TreeMap<String, Cluster>
 		String projectName = parser.parseString();
 		String projectVersion = parser.parseString();
 		String projectPath = parser.parseString();
+		String depsPath = parser.parseString();
 		SimMeasure.SimMeasureType simMeasure =
 			SimMeasure.SimMeasureType.valueOf(parser.parseString());
 		int numFeatures = parser.parseInt();
@@ -467,7 +482,7 @@ public class Architecture extends TreeMap<String, Cluster>
 			parser.parseMap(String.class, Cluster.class, true);
 
 		return new Architecture(projectName, projectVersion, projectPath,
-			simMeasure, numFeatures, language, architecture);
+			depsPath, simMeasure, numFeatures, language, architecture);
 	}
 
 	public void serializeBagOfWords() throws FileNotFoundException {

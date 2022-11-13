@@ -51,7 +51,7 @@ public class WcaTest extends BaseTest {
 			String lang, String packagePrefix) {
 		// Creating relevant arguments
 		String fullProjectName = projectName + "-" + projectVersion;
-		String fVecsPath = factsDir + fs + fullProjectName + "_fVectors.json";
+		String depsPath = factsDir + fs + fullProjectName + "_deps.rsf";
 		String oracleFilePathBase = resourcesDir + fs + fullProjectName;
 		String uemOraclePath = oracleFilePathBase + "_uem_clusters.rsf";
 		String uemnmOraclePath = oracleFilePathBase + "_uemnm_clusters.rsf";
@@ -61,13 +61,11 @@ public class WcaTest extends BaseTest {
 
 		Architecture archUem = assertDoesNotThrow(() ->
 			new Architecture(projectName, projectVersion, outputDirPath,
-				SimMeasure.SimMeasureType.UEM,
-				FeatureVectors.deserializeFFVectors(fVecsPath), lang, packagePrefix));
+				SimMeasure.SimMeasureType.UEM, depsPath, lang, packagePrefix));
 
 		Architecture archUemnm = assertDoesNotThrow(() ->
 			new Architecture(projectName, projectVersion, outputDirPath,
-				SimMeasure.SimMeasureType.UEMNM,
-				FeatureVectors.deserializeFFVectors(fVecsPath), lang, packagePrefix));
+				SimMeasure.SimMeasureType.UEMNM, depsPath, lang, packagePrefix));
 
 		SerializationCriterion serialCritUem =
 			SerializationCriterion.makeSerializationCriterion(
@@ -82,11 +80,11 @@ public class WcaTest extends BaseTest {
 
 		assertDoesNotThrow(() ->
 			Clusterer.run(ClusteringAlgorithmType.WCA, archUem, serialCritUem,
-				stopCrit, SimMeasure.SimMeasureType.UEM));
+				stopCrit, SimMeasure.SimMeasureType.UEM, false));
 
 		assertDoesNotThrow(() ->
 			Clusterer.run(ClusteringAlgorithmType.WCA, archUemnm, serialCritUemnm,
-				stopCrit, SimMeasure.SimMeasureType.UEMNM));
+				stopCrit, SimMeasure.SimMeasureType.UEMNM, false));
 
 		// Load uem results
 		String uemResult = assertDoesNotThrow(() ->

@@ -5,14 +5,11 @@ import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class ArchitectureTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "ARC";
@@ -56,23 +53,11 @@ public class ArchitectureTest extends BaseTest {
 			artifactsDir + fs + "architecture_with_doc_topics.json";
 
 		// Deserialize FastFeatureVectors oracle
-		String ffVecsFilePath = factsDir + fs + fullProjectName + "_fVectors.json";
-		FeatureVectors builderffVecs = null;
+		String depsPath = factsDir + fs + fullProjectName + "_deps.rsf";
 
-		try {
-			builderffVecs = FeatureVectors.deserializeFFVectors(ffVecsFilePath);
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-
-		if (builderffVecs == null)
-			fail("failed to deserialize FastFeatureVectors from builder object");
-
-		FeatureVectors finalBuilderffVecs = builderffVecs;
 		ArchitectureMock arch = assertDoesNotThrow(() ->
 			new ArchitectureMock(projectName, projectVersion, outputDirPath,
-				SimMeasure.SimMeasureType.IL, finalBuilderffVecs, language,
+				SimMeasure.SimMeasureType.IL, depsPath, language,
 				artifactsDir + "/base", packagePrefix));
 
 		// ------------------------- Generate Oracles ------------------------------

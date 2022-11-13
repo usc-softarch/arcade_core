@@ -68,7 +68,7 @@ public class ArcTest extends BaseTest {
 			sysResources + fs + arcFileBase + "clusters.rsf";
 		String oracleConcernsPath =
 			sysResources + fs + arcFileBase + "concerns.txt";
-		String ffVecs = factsDir + fs + systemFullName + "_fVectors.json";
+		String depsPath = factsDir + fs + systemFullName + "_deps.rsf";
 		String resultClustersFile =
 			outputDirPath + fs + arcFileBase + "clusters.rsf";
 		String resultConcernsFile =
@@ -76,8 +76,7 @@ public class ArcTest extends BaseTest {
 
 		Architecture arch = assertDoesNotThrow(() ->
 			new Architecture(systemName, systemVersion, outputDirPath,
-				SimMeasure.SimMeasureType.JS,
-				FeatureVectors.deserializeFFVectors(ffVecs), lang,
+				SimMeasure.SimMeasureType.JS, depsPath, lang,
 				artifactsDir, packagePrefix, false));
 
 		SerializationCriterion serialCrit =
@@ -89,7 +88,7 @@ public class ArcTest extends BaseTest {
 
 		assertDoesNotThrow(() ->
 			Clusterer.run(ClusteringAlgorithmType.ARC, arch, serialCrit, stopCrit,
-				SimMeasure.SimMeasureType.JS));
+				SimMeasure.SimMeasureType.JS, false));
 
 		/* The expectation here is that this resulting clusters file has the same
 		 * name as the oracle clusters file, meaning it has the same number of

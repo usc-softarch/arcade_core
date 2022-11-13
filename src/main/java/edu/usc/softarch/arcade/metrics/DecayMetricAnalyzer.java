@@ -40,7 +40,7 @@ public class DecayMetricAnalyzer {
 
 		result[0] = RatioCohesiveInteractions.detectRci(graph);
 		result[1] = TwoWayPairRatio.computeTwoWayPairRatio(graph);
-		result[2] = ArchitecturalStability.computeStability(graph);
+		result[2] = ArchitecturalStability.computeStability(clusterPath, depsPath);
 		result[3] = TurboMQ.computeTurboMq(clusterPath, depsPath);
 		result[4] = IntraConnectivity.computeIntraConnectivity(clusterPath, depsPath);
 		result[5] = InterConnectivity.computeInterConnectivity(clusterPath, depsPath);

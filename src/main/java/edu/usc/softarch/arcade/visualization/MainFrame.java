@@ -109,7 +109,8 @@ public class MainFrame extends JFrame implements ActionListener {
 			new Clusterer.ClusteringAlgoArguments(
 				CLI.parseArguments(loadArguments()));
 		Clusterer clusterer = new Clusterer(arguments.serialCrit, arguments.arch,
-			arguments.algorithm, arguments.simMeasure, arguments.stopCrit);
+			arguments.algorithm, arguments.simMeasure,
+			arguments.stopCrit, false);
 		this.controllerPanel = new ClustererController(clusterer);
 	}
 

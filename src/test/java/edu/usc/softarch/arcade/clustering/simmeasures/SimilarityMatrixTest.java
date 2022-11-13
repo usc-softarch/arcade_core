@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import edu.usc.softarch.arcade.BaseTest;
 import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -14,7 +13,6 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SimilarityMatrixTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "ARC";
@@ -60,17 +58,11 @@ public class SimilarityMatrixTest extends BaseTest {
 		String oracleSimMatrixPath = artifactsDir + fs + "sim_matrix_oracle.json";
 		(new File(outputDirPath)).mkdirs();
 
-		// Deserialize FastFeatureVectors oracle
-		String ffVecsFilePath = factsDir + fs + fullProjectName + "_fVectors.json";
-		FeatureVectors builderffVecs =
-			assertDoesNotThrow(() -> FeatureVectors.deserializeFFVectors(ffVecsFilePath));
-
-		assertNotNull(builderffVecs,
-			"failed to deserialize FastFeatureVectors from builder object");
+		String depsPath = factsDir + fs + fullProjectName + "_deps.rsf";
 
 		Architecture concernArch = assertDoesNotThrow(() ->
 			new Architecture(projectName, projectVersion, outputDirPath,
-				SimMeasure.SimMeasureType.JS, builderffVecs,
+				SimMeasure.SimMeasureType.JS, depsPath,
 				language, artifactsDir + "/base", packagePrefix));
 
 		SimilarityMatrix simMatrix = assertDoesNotThrow(() ->

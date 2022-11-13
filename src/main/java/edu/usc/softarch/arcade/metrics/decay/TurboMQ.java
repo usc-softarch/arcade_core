@@ -28,30 +28,32 @@ public class TurboMQ {
 	public static double computeTurboMq(ReadOnlyArchitecture arch,
 			SimpleDirectedGraph<String, LabeledEdge> graph) {
 		Map<String, Double> clusterFactors = new HashMap<>();
-		for (ReadOnlyCluster cluster : arch.values()) {
-			Set<LabeledEdge> internalEdges = new HashSet<>();
-			Set<LabeledEdge> externalEdges = new HashSet<>();
-
-			for (String entity : cluster.getEntities()) {
-				Set<LabeledEdge> edges = graph.edgesOf(entity);
-				internalEdges.addAll(edges.stream()
-					.filter(e -> e.label.equals("internal")).collect(Collectors.toSet()));
-				externalEdges.addAll(edges.stream()
-					.filter(e -> e.label.equals("external")).collect(Collectors.toSet()));
-			}
-
-			if (internalEdges.isEmpty())
-				clusterFactors.put(cluster.name, 0.0);
-			else {
-				double cf = (2.0 * internalEdges.size()) /
-					(2.0 * internalEdges.size() + externalEdges.size());
-				clusterFactors.put(cluster.name, cf);
-			}
-		}
+		for (ReadOnlyCluster cluster : arch.values())
+			clusterFactors.put(cluster.name, computeClusterFactor(cluster, graph));
 
 		double mq = 0;
 		for (Double cf : clusterFactors.values())
 			mq += cf;
 		return mq / arch.size();
+	}
+
+	public static double computeClusterFactor(ReadOnlyCluster cluster,
+			SimpleDirectedGraph<String, LabeledEdge> graph) {
+		Set<LabeledEdge> internalEdges = new HashSet<>();
+		Set<LabeledEdge> externalEdges = new HashSet<>();
+
+		for (String entity : cluster.getEntities()) {
+			Set<LabeledEdge> edges = graph.edgesOf(entity);
+			internalEdges.addAll(edges.stream()
+				.filter(e -> e.label.equals("internal")).collect(Collectors.toSet()));
+			externalEdges.addAll(edges.stream()
+				.filter(e -> e.label.equals("external")).collect(Collectors.toSet()));
+		}
+
+		if (internalEdges.isEmpty())
+			return 0.0;
+		else
+			return (2.0 * internalEdges.size()) /
+				(2.0 * internalEdges.size() + externalEdges.size());
 	}
 }
