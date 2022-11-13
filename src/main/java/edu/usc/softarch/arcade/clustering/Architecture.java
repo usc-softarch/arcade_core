@@ -250,7 +250,7 @@ public class Architecture extends TreeMap<String, Cluster>
 	}
 
 	protected void initializeClusterDocTopics()
-		throws UnmatchingDocTopicItemsException {
+			throws UnmatchingDocTopicItemsException {
 		// Set the DocTopics of each Cluster
 		for (Cluster c : super.values())
 			DocTopics.getSingleton(this.projectName, this.projectVersion)
@@ -291,7 +291,7 @@ public class Architecture extends TreeMap<String, Cluster>
 
 	//TODO Change this to the correct format
 	private void removeInnerClasses(Map<String, String> parentClassMap)
-		throws UnmatchingDocTopicItemsException {
+			throws UnmatchingDocTopicItemsException {
 		for (Map.Entry<String, String> entry : parentClassMap.entrySet()) {
 			Cluster nestedCluster = super.get(entry.getKey());
 			if (nestedCluster == null) continue; // was already removed by WithoutDTI

@@ -5,6 +5,7 @@ import com.github.weisj.darklaf.theme.DarculaTheme;
 import edu.usc.softarch.arcade.clustering.Clusterer;
 import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.arcade.util.CLI;
 import edu.usc.softarch.arcade.visualization.clustering.ClustererController;
 import edu.usc.softarch.arcade.visualization.clustering.ClustererInitializer;
 import org.xml.sax.SAXException;
@@ -105,7 +106,8 @@ public class MainFrame extends JFrame implements ActionListener {
 			UnmatchingDocTopicItemsException, DistributionSizeMismatchException,
 			ParserConfigurationException, SAXException {
 		Clusterer.ClusteringAlgoArguments arguments =
-			new Clusterer.ClusteringAlgoArguments(loadArguments());
+			new Clusterer.ClusteringAlgoArguments(
+				CLI.parseArguments(loadArguments()));
 		Clusterer clusterer = new Clusterer(arguments.serialCrit, arguments.arch,
 			arguments.algorithm, arguments.simMeasure, arguments.stopCrit);
 		this.controllerPanel = new ClustererController(clusterer);

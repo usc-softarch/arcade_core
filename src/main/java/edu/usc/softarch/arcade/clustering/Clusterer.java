@@ -11,6 +11,7 @@ import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 import edu.usc.softarch.arcade.facts.DependencyGraph;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.arcade.util.CLI;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,7 +39,8 @@ public class Clusterer {
 	public static void main(String[] args)
 			throws IOException, UnmatchingDocTopicItemsException,
 			SAXException, ParserConfigurationException {
-		ClusteringAlgoArguments parsedArguments = new ClusteringAlgoArguments(args);
+		ClusteringAlgoArguments parsedArguments =
+			new ClusteringAlgoArguments(CLI.parseArguments(args));
 		run(parsedArguments);
 	}
 
@@ -50,15 +52,16 @@ public class Clusterer {
 		public final String stoppingCriterion;
 		public final SimMeasure.SimMeasureType simMeasure;
 
-		public ClusteringAlgoArguments(String[] args)
+		public ClusteringAlgoArguments(Map<String, String> args)
 				throws IOException, UnmatchingDocTopicItemsException,
 				ParserConfigurationException, SAXException {
-			this.algorithm = ClusteringAlgorithmType.valueOf(args[0].toUpperCase());
+			this.algorithm =
+				ClusteringAlgorithmType.valueOf(args.get("algo").toUpperCase());
 			this.simMeasure =
-				SimMeasure.SimMeasureType.valueOf(args[5].toUpperCase());
+				SimMeasure.SimMeasureType.valueOf(args.get("measure").toUpperCase());
 
 			FeatureVectors vectors;
-			String depsPath = args[2];
+			String depsPath = args.get("deps");
 			if (depsPath.contains(".rsf"))
 				vectors = new FeatureVectors(DependencyGraph.readRsf(depsPath));
 			else if (depsPath.contains(".odem"))
@@ -67,19 +70,51 @@ public class Clusterer {
 				vectors = FeatureVectors.deserializeFFVectors(depsPath);
 			else
 				throw new IOException("Unrecognized dependency file type: " + depsPath);
-			if (args.length > 12)
-				this.arch = new Architecture(args[8], args[9], args[10],
-					this.simMeasure, vectors, args[1], args[12], args[11],
-					Boolean.parseBoolean(args[13]));
-			else
-				this.arch = new Architecture(args[8], args[9], args[10],
-					this.simMeasure, vectors, args[1], args[11]);
+
+			String projname = args.get("projname");
+			String projversion = args.get("projversion");
+			String projpath = args.get("projpath");
+			String language = args.get("language");
+			String packagePrefix = "";
+			if (language.equalsIgnoreCase("java"))
+				packagePrefix = args.get("packageprefix");
+
+			if (this.algorithm == ClusteringAlgorithmType.ARC) {
+				String artifacts = args.get("artifacts");
+				boolean reassignVersion = false;
+				if (args.containsKey("reassignversion"))
+					reassignVersion = Boolean.parseBoolean(args.get("reassignversion"));
+
+				this.arch = new Architecture(projname, projversion, projpath,
+					this.simMeasure, vectors, language, artifacts, packagePrefix,
+					reassignVersion);
+			} else {
+				this.arch = new Architecture(projname, projversion, projpath,
+					this.simMeasure, vectors, language, packagePrefix);
+			}
+
+			String serial = "archsize";
+			double serialThreshold = 50.0;
+
+			if (args.containsKey("serial")) {
+				serial = args.get("serial");
+				serialThreshold = Double.parseDouble("serialthreshold");
+			}
 
 			this.serialCrit = SerializationCriterion.makeSerializationCriterion(
-				args[6], Double.parseDouble(args[7]), arch);
+				serial, serialThreshold, arch);
+
+			String stop = "preselected";
+			double stopThreshold = 50.0;
+
+			if (args.containsKey("stop")) {
+				stop = args.get("stop");
+				stopThreshold = Double.parseDouble(args.get("stopthreshold"));
+			}
+
 			this.stopCrit = StoppingCriterion.makeStoppingCriterion(
-				args[3], Double.parseDouble(args[4]), arch);
-			this.stoppingCriterion = args[3];
+				stop, stopThreshold, arch);
+			this.stoppingCriterion = stop;
 		}
 	}
 
