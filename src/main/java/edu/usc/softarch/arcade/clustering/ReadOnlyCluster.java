@@ -16,6 +16,7 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -148,10 +149,16 @@ public class ReadOnlyCluster {
 	//region SERIALIZATION
 	public void writeToDot(SimpleDirectedGraph<String, LabeledEdge> graph,
 			ReadOnlyArchitecture arch, String outputPath) throws IOException {
-		try (FileWriter writer = new FileWriter(outputPath)) {
-			writer.write("digraph " + this.name + " {\n");
+		writeToDot(graph, arch, outputPath, this.name);
+	}
 
-			this.writeToDot(graph, arch, writer);
+	public void writeToDot(SimpleDirectedGraph<String, LabeledEdge> graph,
+			ReadOnlyArchitecture arch, String outputPath, String name)
+			throws IOException {
+		try (FileWriter writer = new FileWriter(outputPath)) {
+			writer.write("digraph " + name + " {\n");
+
+			this.writeToDot(graph, arch, writer, name);
 
 			writer.write("}\n");
 		}
@@ -159,9 +166,15 @@ public class ReadOnlyCluster {
 
 	public void writeToDot(SimpleDirectedGraph<String, LabeledEdge> graph,
 			ReadOnlyArchitecture arch, FileWriter writer) throws IOException {
+		writeToDot(graph, arch, writer, this.name);
+	}
+
+	public void writeToDot(SimpleDirectedGraph<String, LabeledEdge> graph,
+			ReadOnlyArchitecture arch, FileWriter writer, String name)
+			throws IOException {
 		Set<LabeledEdge> clusterEdges = new HashSet<>();
 
-		writer.write("\tsubgraph \"cluster_" + this.name + "\" {\n");
+		writer.write("\tsubgraph \"cluster_" + name + "\" {\n");
 		writer.write("\t\tnode [style=filled];\n");
 
 		for (String entity : this.getEntities()) {
@@ -191,18 +204,21 @@ public class ReadOnlyCluster {
 		double instability =
 			ArchitecturalStability.computeStability(this, graph);
 
-		writer.write("\t\tlabel = \"Cluster: " + this.name
-			+ "\\nIntra-connectivity: " + intraconnectivity
-			+ "\\nInter-connectivity: " + interconnectivity.getMean() + ", "
-				+ interconnectivity.getPercentile(50.0) + ", "
-				+ interconnectivity.getMin() + ", "
-				+ interconnectivity.getMax() + ", "
-				+ interconnectivity.getStandardDeviation()
-			+ "\\nBasicMQ: " + basicMq
-			+ "\\nCluster Factor: " + clusterFactor
-			+ "\\nFan-in: " + fanIn
-			+ "\\nFan-out: " + fanOut
-			+ "\\nInstability: " + instability
+		DecimalFormat formatter = new DecimalFormat("#.####");
+
+		writer.write("\t\tlabel = \"Cluster: " + name
+			+ "\\nIntra-connectivity: " + formatter.format(intraconnectivity)
+			+ "\\nInter-connectivity: "
+				+ formatter.format(interconnectivity.getMean()) + ", "
+				+ formatter.format(interconnectivity.getPercentile(50.0)) + ", "
+				+ formatter.format(interconnectivity.getMin()) + ", "
+				+ formatter.format(interconnectivity.getMax()) + ", "
+				+ formatter.format(interconnectivity.getStandardDeviation())
+			+ "\\nBasicMQ: " + formatter.format(basicMq)
+			+ "\\nCluster Factor: " + formatter.format(clusterFactor)
+			+ "\\nFan-in: " + formatter.format(fanIn)
+			+ "\\nFan-out: " + formatter.format(fanOut)
+			+ "\\nInstability: " + formatter.format(instability)
 			+ "\";\n");
 		writer.write("\t}\n");
 	}

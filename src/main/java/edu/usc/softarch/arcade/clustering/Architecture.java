@@ -25,6 +25,7 @@ import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
 import edu.usc.softarch.util.json.JsonSerializable;
@@ -419,10 +420,26 @@ public class Architecture extends TreeMap<String, Cluster>
 		}
 	}
 
-	public void writeToDot(String depsPath, String outputPath)
+	public void writeToDot(String outputPath)
 			throws IOException {
 		ReadOnlyArchitecture roArch = new ReadOnlyArchitecture(this);
-		roArch.writeToDot(depsPath, outputPath);
+		roArch.writeToDot(this.depsPath, outputPath);
+	}
+
+	public void writeToDotClusters() throws IOException {
+		String fs = File.separator;
+		String path = this.projectPath + fs + this.projectName + "-"
+			+ this.projectVersion + "_" + this.simMeasure + "_" + this.size()
+			+ "_clusterDots";
+		FileUtil.checkDir(path, true, false);
+		writeToDotClusters(path);
+	}
+
+	public void writeToDotClusters(String outputPath)
+			throws IOException {
+		ReadOnlyArchitecture roArch = new ReadOnlyArchitecture(this);
+		roArch.writeToDotClusters(
+			this.depsPath, outputPath, computeArchitectureIndex());
 	}
 
 	/**

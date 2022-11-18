@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.clustering;
 
-import edu.usc.softarch.arcade.metrics.decay.IntraConnectivity;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
@@ -14,7 +13,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -216,6 +214,25 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 
 			writer.write("}\n");
 		}
+	}
+
+	public void writeToDotClusters(String depsPath, String outputPath)
+			throws IOException {
+		SimpleDirectedGraph<String, LabeledEdge> graph = buildFullGraph(depsPath);
+
+		for (ReadOnlyCluster cluster : this.values())
+			cluster.writeToDot(graph, this,
+				outputPath + File.separator + cluster.name + ".dot");
+	}
+
+	public void writeToDotClusters(String depsPath, String outputPath,
+			Map<Integer, Cluster> index) throws IOException {
+		SimpleDirectedGraph<String, LabeledEdge> graph = buildFullGraph(depsPath);
+
+		for (Map.Entry<Integer, Cluster> cluster : index.entrySet())
+			cluster.getValue().writeToDot(graph, this,
+				outputPath + File.separator + cluster.getKey() + ".dot",
+				cluster.getKey().toString());
 	}
 
 	public void writeToDotFull(String depsPath, String outputPath)
