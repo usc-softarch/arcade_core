@@ -156,7 +156,7 @@ public class ReadOnlyCluster {
 			ReadOnlyArchitecture arch, String outputPath, String name)
 			throws IOException {
 		try (FileWriter writer = new FileWriter(outputPath)) {
-			writer.write("digraph " + name + " {\n");
+			writer.write("digraph \"" + name + "\" {\n");
 
 			this.writeToDot(graph, arch, writer, name);
 

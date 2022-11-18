@@ -16,6 +16,8 @@ public class RsfToDot {
 
 		if (mode.equals("full"))
 			arch.writeToDotFull(depsPath, outputPath);
+		else if (mode.equals("clusters"))
+			arch.writeToDotClusters(depsPath, outputPath);
 		else
 			arch.writeToDot(depsPath, outputPath);
 	}

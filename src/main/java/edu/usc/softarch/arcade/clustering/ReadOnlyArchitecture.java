@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.clustering;
 
 import edu.usc.softarch.arcade.topics.DocTopics;
+import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
 import edu.usc.softarch.util.LabeledEdge;
@@ -219,10 +220,11 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 	public void writeToDotClusters(String depsPath, String outputPath)
 			throws IOException {
 		SimpleDirectedGraph<String, LabeledEdge> graph = buildFullGraph(depsPath);
+		FileUtil.checkDir(outputPath, true, false);
 
 		for (ReadOnlyCluster cluster : this.values())
 			cluster.writeToDot(graph, this,
-				outputPath + File.separator + cluster.name + ".dot");
+				outputPath + File.separator + cluster.name.replace(File.separatorChar, '.') + ".dot");
 	}
 
 	public void writeToDotClusters(String depsPath, String outputPath,
