@@ -195,8 +195,10 @@ public class Cluster extends ReadOnlyCluster
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, numEntities, featureMap);
-	}
+		return Objects.hash(name, numEntities, featureMap); }
+
+	@Override
+	public int compareTo(Cluster o) { return this.name.compareTo(o.name);	}
 	//endregion
 
 	//region SERIALIZATION
@@ -221,9 +223,5 @@ public class Cluster extends ReadOnlyCluster
 
 		return new Cluster(name, entities, numEntities, featureMap, dti);
 	}
-
-	@Override
-	public int compareTo(Cluster o) {
-		return this.name.compareTo(o.name);	}
 	//endregion
 }

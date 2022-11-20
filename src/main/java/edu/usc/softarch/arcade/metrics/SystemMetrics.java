@@ -1,6 +1,9 @@
 package edu.usc.softarch.arcade.metrics;
 
 import edu.usc.softarch.arcade.util.FileUtil;
+import edu.usc.softarch.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.util.json.EnhancedJsonParser;
+import edu.usc.softarch.util.json.JsonSerializable;
 import mojo.MoJoCalculator;
 
 import java.io.File;
@@ -10,8 +13,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class SystemMetrics {
+public class SystemMetrics implements JsonSerializable {
 	//region ATTRIBUTES
 	private final Collection<ArchitectureMetrics> versionMetrics;
 
@@ -78,6 +82,17 @@ public class SystemMetrics {
 				archFiles.get(i).getAbsolutePath(),
 				depsFiles.get(i).getAbsolutePath()));
 	}
+
+	private SystemMetrics(Collection<ArchitectureMetrics> versionMetrics,
+			String[] versions, double[] a2a, double[] cvgForwards,
+			double[] cvgBackwards, double[] mojoFm) {
+		this.versionMetrics = versionMetrics;
+		this.versions = versions;
+		this.a2a = a2a;
+		this.cvgForwards = cvgForwards;
+		this.cvgBackwards = cvgBackwards;
+		this.mojoFm = mojoFm;
+	}
 	//endregion
 
 	//region ACCESSORS
@@ -93,5 +108,52 @@ public class SystemMetrics {
 		return Arrays.copyOf(this.cvgBackwards, this.cvgBackwards.length); }
 	public double[] getMojoFm() {
 		return Arrays.copyOf(this.mojoFm, this.mojoFm.length); }
+	//endregion
+
+	//region SERIALIZATION
+	public void serialize(String path) throws IOException {
+		try (EnhancedJsonGenerator generator = new EnhancedJsonGenerator(path)) {
+			serialize(generator);
+		}
+	}
+
+	@Override
+	public void serialize(EnhancedJsonGenerator generator) throws IOException {
+		generator.writeField("archs", versionMetrics);
+		generator.writeField("versions", List.of(versions));
+		generator.writeField("a2a",
+			Arrays.stream(a2a).boxed().collect(Collectors.toList()));
+		generator.writeField("cvgF",
+			Arrays.stream(cvgForwards).boxed().collect(Collectors.toList()));
+		generator.writeField("cvgB",
+			Arrays.stream(cvgBackwards).boxed().collect(Collectors.toList()));
+		generator.writeField("mojo",
+			Arrays.stream(mojoFm).boxed().collect(Collectors.toList()));
+	}
+
+	public static SystemMetrics deserialize(String path) throws IOException {
+		try (EnhancedJsonParser parser = new EnhancedJsonParser(path)) {
+			return deserialize(parser);
+		}
+	}
+
+	public static SystemMetrics deserialize(EnhancedJsonParser parser)
+			throws IOException {
+		Collection<ArchitectureMetrics> versionMetrics =
+			parser.parseCollection(ArchitectureMetrics.class);
+		String[] versions =
+			parser.parseCollection(String.class).toArray(new String[0]);
+		double[] a2a = Stream.of(parser.parseCollection(Double.class)
+			.toArray(new Double[0])).mapToDouble(Double::doubleValue).toArray();
+		double[] cvgForwards = Stream.of(parser.parseCollection(Double.class)
+			.toArray(new Double[0])).mapToDouble(Double::doubleValue).toArray();
+		double[] cvgBackwards = Stream.of(parser.parseCollection(Double.class)
+			.toArray(new Double[0])).mapToDouble(Double::doubleValue).toArray();
+		double[] mojoFm = Stream.of(parser.parseCollection(Double.class)
+			.toArray(new Double[0])).mapToDouble(Double::doubleValue).toArray();
+
+		return new SystemMetrics(versionMetrics, versions, a2a, cvgForwards,
+			cvgBackwards, mojoFm);
+	}
 	//endregion
 }

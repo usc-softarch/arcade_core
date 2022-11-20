@@ -8,6 +8,9 @@ import edu.usc.softarch.arcade.metrics.decay.InterConnectivity;
 import edu.usc.softarch.arcade.metrics.decay.IntraConnectivity;
 import edu.usc.softarch.arcade.metrics.decay.TurboMQ;
 import edu.usc.softarch.util.LabeledEdge;
+import edu.usc.softarch.util.json.EnhancedJsonGenerator;
+import edu.usc.softarch.util.json.EnhancedJsonParser;
+import edu.usc.softarch.util.json.JsonSerializable;
 import mojo.MoJoCalculator;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
@@ -15,7 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class ArchitectureMetrics {
+public class ArchitectureMetrics implements JsonSerializable {
 	//region ATTRIBUTES
 	private final Collection<ClusterMetrics> clusterMetrics;
 
@@ -59,10 +62,50 @@ public class ArchitectureMetrics {
 			this.mojoFmGt = mojoCalc.mojofm();
 		}
 	}
+
+	private ArchitectureMetrics(Collection<ClusterMetrics> clusterMetrics,
+			double intraConnectivity, double interConnectivity, double basicMq,
+			double turboMq, double instability, double mojoFmGt) {
+		this.clusterMetrics = clusterMetrics;
+		this.intraConnectivity = intraConnectivity;
+		this.interConnectivity = interConnectivity;
+		this.basicMq = basicMq;
+		this.turboMq = turboMq;
+		this.instability = instability;
+		this.mojoFmGt = mojoFmGt;
+	}
 	//endregion
 
 	//region ACCESSORS
 	public Collection<ClusterMetrics> getClusterMetrics() {
 		return new ArrayList<>(this.clusterMetrics); }
+	//endregion
+
+	//region SERIALIZATION
+	@Override
+	public void serialize(EnhancedJsonGenerator generator) throws IOException {
+		generator.writeField("clusters", clusterMetrics);
+		generator.writeField("intra", intraConnectivity);
+		generator.writeField("inter", interConnectivity);
+		generator.writeField("basicMq", basicMq);
+		generator.writeField("turboMq", turboMq);
+		generator.writeField("insta", instability);
+		generator.writeField("mojogt", mojoFmGt);
+	}
+
+	public static ArchitectureMetrics deserialize(EnhancedJsonParser parser)
+			throws IOException {
+		Collection<ClusterMetrics> clusterMetrics =
+			parser.parseCollection(ClusterMetrics.class);
+		double intraConnectivity = parser.parseDouble();
+		double interConnectivity = parser.parseDouble();
+		double basicMq = parser.parseDouble();
+		double turboMq = parser.parseDouble();
+		double instability = parser.parseDouble();
+		double mojoFmGt = parser.parseDouble();
+
+		return new ArchitectureMetrics(clusterMetrics, intraConnectivity,
+			interConnectivity, basicMq, turboMq, instability, mojoFmGt);
+	}
 	//endregion
 }
