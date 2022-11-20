@@ -1,6 +1,6 @@
 package edu.usc.softarch.arcade.facts.design;
 
-import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
 import edu.usc.softarch.arcade.facts.Decision;
 

@@ -2,7 +2,7 @@ package edu.usc.softarch.arcade.facts.smells;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
-import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.facts.Change;
 import edu.usc.softarch.arcade.facts.VersionMap;
 import edu.usc.softarch.arcade.facts.VersionTree;

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.McfpDriver;
 import edu.usc.softarch.util.EnhancedSet;
@@ -94,9 +94,9 @@ public class SystemEvo {
 		// separately by doubling their quantities (once for add/remove, once for
 		// move).
 		ReadOnlyArchitecture sourceTrimmed =
-			sourceClusters.removeEntities(removedEntities);
+			sourceClusters.difference(removedEntities);
 		ReadOnlyArchitecture targetTrimmed =
-			targetClusters.removeEntities(addedEntities);
+			targetClusters.difference(addedEntities);
 
 		McfpDriver mcfpDriver = new McfpDriver(sourceTrimmed, targetTrimmed);
 

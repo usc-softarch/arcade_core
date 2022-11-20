@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.clustering.data;
 
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
-import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.metrics.decay.ArchitecturalStability;
 import edu.usc.softarch.arcade.metrics.decay.InterConnectivity;
 import edu.usc.softarch.arcade.metrics.decay.IntraConnectivity;

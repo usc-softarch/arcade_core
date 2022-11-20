@@ -1,5 +1,7 @@
 package edu.usc.softarch.arcade.clustering;
 
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
+
 import java.io.IOException;
 
 /**

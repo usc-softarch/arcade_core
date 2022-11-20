@@ -1,6 +1,6 @@
 package edu.usc.softarch.arcade.metrics.decay;
 
-import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 

@@ -7,7 +7,7 @@ import edu.usc.softarch.arcade.antipattern.detection.concern.ConcernOverload;
 import edu.usc.softarch.arcade.antipattern.detection.concern.ScatteredParasiticFunctionality;
 import edu.usc.softarch.arcade.antipattern.detection.dependency.DependencyCycle;
 import edu.usc.softarch.arcade.antipattern.detection.dependency.LinkOverload;
-import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.topics.DocTopics;

@@ -2,7 +2,7 @@ package edu.usc.softarch.arcade.antipattern.detection.concern;
 
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
-import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
 import edu.usc.softarch.arcade.topics.TopicItem;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
