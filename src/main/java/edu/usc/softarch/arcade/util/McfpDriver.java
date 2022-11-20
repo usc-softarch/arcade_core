@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.util;
 
 import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
-import edu.usc.softarch.arcade.clustering.ReadOnlyCluster;
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.flow.mincost.CapacityScalingMinimumCostFlow;

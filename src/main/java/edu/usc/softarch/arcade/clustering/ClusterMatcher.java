@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.clustering;
 
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.util.CLI;
 import edu.usc.softarch.arcade.util.McfpDriver;

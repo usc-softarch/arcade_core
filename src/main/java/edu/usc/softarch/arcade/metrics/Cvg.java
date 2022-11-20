@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.metrics;
 
 import edu.usc.softarch.arcade.clustering.ReadOnlyArchitecture;
-import edu.usc.softarch.arcade.clustering.ReadOnlyCluster;
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
 
 import java.io.IOException;
 import java.util.HashSet;

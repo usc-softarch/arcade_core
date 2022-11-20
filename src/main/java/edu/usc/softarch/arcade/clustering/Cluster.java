@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
@@ -52,7 +53,7 @@ public class Cluster extends ReadOnlyCluster
 	public Cluster(String name, BitSet featureSet, int numFeatures) {
 		super(name);
 
-		super.entities.add(name);
+		super.addEntity(name);
 
 		this.featureMap = new HashMap<>();
 		for (int i = 0; i < numFeatures; i++)
@@ -202,7 +203,7 @@ public class Cluster extends ReadOnlyCluster
 	@Override
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
 		generator.writeField("name", name);
-		generator.writeField("entities", entities);
+		generator.writeField("entities", super.getEntities());
 		generator.writeField("numEntities", numEntities);
 		generator.writeField("featureMap", featureMap,
 			true, "featureIndex", "featureValue");
