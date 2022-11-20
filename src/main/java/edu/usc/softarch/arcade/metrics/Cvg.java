@@ -3,6 +3,7 @@ package edu.usc.softarch.arcade.metrics;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +21,12 @@ public class Cvg {
 			throws IOException {
 		return run(ReadOnlyArchitecture.readFromRsf(sourceArchPath),
 			ReadOnlyArchitecture.readFromRsf(targetArchPath));
+	}
+
+	public static double run(File sourceArchFile, File targetArchFile)
+			throws IOException {
+		return run(ReadOnlyArchitecture.readFromRsf(sourceArchFile),
+			ReadOnlyArchitecture.readFromRsf(targetArchFile));
 	}
 
 	public static double run(ReadOnlyArchitecture sourceArch,
