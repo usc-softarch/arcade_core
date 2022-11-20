@@ -10,9 +10,15 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -195,6 +201,24 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 		}
 
 		return result;
+	}
+
+	public void writeToRsf(String path) throws FileNotFoundException {
+		File rsfFile = new File(path);
+		rsfFile.getParentFile().mkdirs();
+
+		writeToRsf(rsfFile);
+	}
+
+	public void writeToRsf(File file) throws FileNotFoundException {
+		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
+			new FileOutputStream(file), StandardCharsets.UTF_8))) {
+			for (ReadOnlyCluster cluster : this.values()) {
+				Collection<String> entities = cluster.getEntities();
+				for (String entity : entities)
+					out.println("contain " + cluster.name + " " + entity);
+			}
+		}
 	}
 
 	public void writeToDot(String depsPath, String outputPath)
