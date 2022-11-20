@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.clustering.data;
 
 import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
+import edu.usc.softarch.arcade.metrics.ClusterMetrics;
 import edu.usc.softarch.arcade.metrics.decay.ArchitecturalStability;
 import edu.usc.softarch.arcade.metrics.decay.InterConnectivity;
 import edu.usc.softarch.arcade.metrics.decay.IntraConnectivity;
@@ -337,32 +338,22 @@ public class ReadOnlyCluster {
 			writer.write("\t\t\"" + source + "\" -> \"" + target + "\";\n");
 		}
 
-		double intraconnectivity =
-			IntraConnectivity.computeIntraConnectivity(this, graph);
-		DescriptiveStatistics interconnectivity =
-			InterConnectivity.computeInterConnectivity(this, arch, graph);
-		double basicMq = intraconnectivity - interconnectivity.getMean();
-		double clusterFactor = TurboMQ.computeClusterFactor(this, graph);
-		double fanIn = ArchitecturalStability.computeFanIn(this, graph);
-		double fanOut = ArchitecturalStability.computeFanOut(this, graph);
-		double instability =
-			ArchitecturalStability.computeStability(this, graph);
-
+		ClusterMetrics metrics = new ClusterMetrics(this, arch, graph);
 		DecimalFormat formatter = new DecimalFormat("#.####");
 
 		writer.write("\t\tlabel = \"Cluster: " + name
-			+ "\\nIntra-connectivity: " + formatter.format(intraconnectivity)
+			+ "\\nIntra-connectivity: " + formatter.format(metrics.intraConnectivity)
 			+ "\\nInter-connectivity: "
-				+ formatter.format(interconnectivity.getMean()) + ", "
-				+ formatter.format(interconnectivity.getPercentile(50.0)) + ", "
-				+ formatter.format(interconnectivity.getMin()) + ", "
-				+ formatter.format(interconnectivity.getMax()) + ", "
-				+ formatter.format(interconnectivity.getStandardDeviation())
-			+ "\\nBasicMQ: " + formatter.format(basicMq)
-			+ "\\nCluster Factor: " + formatter.format(clusterFactor)
-			+ "\\nFan-in: " + formatter.format(fanIn)
-			+ "\\nFan-out: " + formatter.format(fanOut)
-			+ "\\nInstability: " + formatter.format(instability)
+				+ formatter.format(metrics.interConnectivity.getMean()) + ", "
+				+ formatter.format(metrics.interConnectivity.getPercentile(50.0))
+				+ ", " + formatter.format(metrics.interConnectivity.getMin()) + ", "
+				+ formatter.format(metrics.interConnectivity.getMax()) + ", "
+				+ formatter.format(metrics.interConnectivity.getStandardDeviation())
+			+ "\\nBasicMQ: " + formatter.format(metrics.basicMq)
+			+ "\\nCluster Factor: " + formatter.format(metrics.clusterFactor)
+			+ "\\nFan-in: " + formatter.format(metrics.fanIn)
+			+ "\\nFan-out: " + formatter.format(metrics.fanOut)
+			+ "\\nInstability: " + formatter.format(metrics.instability)
 			+ "\";\n");
 		writer.write("\t}\n");
 	}
