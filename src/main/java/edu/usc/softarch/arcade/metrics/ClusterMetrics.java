@@ -14,7 +14,9 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ClusterMetrics implements JsonSerializable {
@@ -63,7 +65,9 @@ public class ClusterMetrics implements JsonSerializable {
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
 		generator.writeField("name", clusterName);
 		generator.writeField("intra", intraConnectivity);
-		generator.writeField("inter", List.of(interConnectivity.getValues()));
+		generator.writeField("inter",
+			Arrays.stream(interConnectivity.getValues())
+				.boxed().collect(Collectors.toList()));
 		generator.writeField("basicMq", basicMq);
 		generator.writeField("cf", clusterFactor);
 		generator.writeField("fanIn", fanIn);

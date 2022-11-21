@@ -177,3 +177,14 @@ main functionalities of ARCADE, not to supplant it.
   world can't really resolve a problem well enough. In those cases, ugly 
   mechanisms like reflection and inner switches might be justifiable. Just 
   remember, even though it works, it's still not very honorable.
+- **If it handles lists, it should handle arrays** - Except in situations 
+  where this is strictly impossible, any function that can handle a 
+  Collection should also be able to handle an array of the same type. Having 
+  to constantly parse between arrays and Collections is a pain, and since 
+  different libraries use the two interchangeably, your system should be 
+  prepared for both. The inverse is also true: if it handles arrays, it 
+  should handle lists.
+- **If it handles boxed, it should handle unboxed** - As with the above, 
+  unless it is impossible to do so, any function that handles boxed types 
+  like Integer and Double should also be able to handle unboxed types like 
+  int and double, and vice-versa.
