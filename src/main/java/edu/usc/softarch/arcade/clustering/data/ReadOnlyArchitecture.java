@@ -39,6 +39,16 @@ import java.util.stream.Collectors;
  * components.
  */
 public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
+	//region PUBLIC INTERFACE
+	public static void main(String[] args) throws IOException {
+		ReadOnlyArchitecture roa = ReadOnlyArchitecture.readFromRsf(args[0]);
+		SimpleDirectedGraph<String, LabeledEdge> graph =
+			roa.buildFullGraph(args[1]);
+		System.out.println("Architecture has " + graph.vertexSet().size()
+			+ " entities and " + graph.edgeSet().size() + " dependencies.");
+	}
+	//endregion
+
 	//region ATTRIBUTES
 	/**
 	 * Map of code-level entity names to the clusters in which they are
