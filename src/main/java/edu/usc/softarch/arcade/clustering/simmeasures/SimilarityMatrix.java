@@ -14,8 +14,10 @@ import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static edu.usc.softarch.arcade.clustering.Clusterer.numberOfEntitiesToBeClustered;
@@ -45,7 +47,8 @@ public class SimilarityMatrix {
 
 	//region CONSTRUCTORS
 	public SimilarityMatrix(SimMeasure.SimMeasureType simMeasureType,
-			Architecture architecture) {
+			Architecture architecture)
+			throws ExecutionException, InterruptedException {
 		this(simMeasureType, architecture.getNumFeatures());
 
 		for (Cluster cluster : architecture.values())
@@ -93,18 +96,20 @@ public class SimilarityMatrix {
 	public Collection<Map<Cluster, SimData>> getColumns() {
 		return this.simMatrix.values();	}
 
-	public void addCluster(Cluster c) {
+	public void addCluster(Cluster c)
+			throws ExecutionException, InterruptedException {
 		addNewColumn(c);
 		addNewRow(c);
 	}
 
-	private void addNewColumn(Cluster c) {
+	private void addNewColumn(Cluster c)
+			throws ExecutionException, InterruptedException {
 		// Check if first cluster
 		if (simMatrix.size() == 0) return;
 
 		// Set up threads
 		Runnable[] tasks = new Runnable[threadCount];
-		Thread[] threads = new Thread[threadCount];
+		CompletableFuture<?>[] futures = new CompletableFuture<?>[threadCount];
 		ArrayBlockingQueue<Entry<Cluster, Map<Cluster, SimData>>> rows
 			= new ArrayBlockingQueue<>(simMatrix.size());
 		rows.addAll(simMatrix.entrySet());
@@ -123,21 +128,15 @@ public class SimilarityMatrix {
 					throw new RuntimeException(e); //TODO handle it
 				}
 			};
-			threads[i] = new Thread(tasks[i]);
-			threads[i].start();
+			futures[i] = CompletableFuture.runAsync(tasks[i]);
 		}
 
 		// Wait until done
-		for (int i = 0; i < threadCount; i++) {
-			try {
-				threads[i].join();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e); //TODO handle it
-			}
-		}
+		CompletableFuture.allOf(futures).get();
 	}
 
-	private void addNewRow(Cluster c) {
+	private void addNewRow(Cluster c)
+			throws ExecutionException, InterruptedException {
 		// Create new row
 		Map<Cluster, SimData> newRow = new ConcurrentHashMap<>();
 		this.simMatrix.put(c, newRow);
@@ -145,7 +144,7 @@ public class SimilarityMatrix {
 
 		// Set up threads
 		Runnable[] tasks = new Runnable[threadCount];
-		Thread[] threads = new Thread[threadCount];
+		CompletableFuture<?>[] futures = new CompletableFuture<?>[threadCount];
 		ArrayBlockingQueue<Cluster> clusters =
 			new ArrayBlockingQueue<>(this.simMatrix.size());
 		clusters.addAll(this.simMatrix.keySet());
@@ -171,18 +170,11 @@ public class SimilarityMatrix {
 					throw new RuntimeException(e); //TODO handle it
 				}
 			};
-			threads[i] = new Thread(tasks[i]);
-			threads[i].start();
+			futures[i] = CompletableFuture.runAsync(tasks[i]);
 		}
 
 		// Wait until done
-		for (int i = 0; i < threadCount; i++) {
-			try {
-				threads[i].join();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e); //TODO handle it
-			}
-		}
+		CompletableFuture.allOf(futures).get();
 	}
 
 	public void removeCluster(Cluster c) {

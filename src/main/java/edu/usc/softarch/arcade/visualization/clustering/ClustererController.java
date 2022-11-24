@@ -21,6 +21,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.ExecutionException;
 
 public class ClustererController extends JPanel
 		implements ActionListener {
@@ -182,7 +183,8 @@ public class ClustererController extends JPanel
 			case doStepAction:
 				try {
 					this.clusterer.doClusteringStep();
-				} catch (UnmatchingDocTopicItemsException ex) {
+				} catch (UnmatchingDocTopicItemsException
+								 | ExecutionException | InterruptedException ex) {
 					throw new RuntimeException(ex);
 				}
 

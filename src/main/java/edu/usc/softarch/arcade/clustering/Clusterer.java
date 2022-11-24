@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.clustering;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import edu.usc.softarch.arcade.clustering.simmeasures.SimData;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
@@ -34,7 +35,8 @@ public class Clusterer {
 	 * printdots: Print DOT outputs for each cluster
 	 */
 	public static void main(String[] args)
-			throws IOException, UnmatchingDocTopicItemsException {
+			throws IOException, UnmatchingDocTopicItemsException,
+			ExecutionException, InterruptedException {
 		ClusteringAlgoArguments parsedArguments =
 			new ClusteringAlgoArguments(CLI.parseArguments(args));
 		run(parsedArguments);
@@ -110,7 +112,8 @@ public class Clusterer {
 	}
 
 	public static Architecture run(ClusteringAlgoArguments parsedArguments)
-			throws IOException, UnmatchingDocTopicItemsException {
+			throws IOException, UnmatchingDocTopicItemsException,
+			ExecutionException, InterruptedException {
 		return run(
 			parsedArguments.algorithm,
 			parsedArguments.arch,
@@ -124,7 +127,8 @@ public class Clusterer {
 			Architecture arch, SerializationCriterion serialCrit,
 			StoppingCriterion stopCrit, SimMeasure.SimMeasureType simMeasure,
 			boolean printDots)
-			throws IOException, UnmatchingDocTopicItemsException {
+			throws IOException, UnmatchingDocTopicItemsException,
+			ExecutionException, InterruptedException {
 		Clusterer runner = new Clusterer(serialCrit, arch, algorithm,
 			simMeasure, stopCrit, printDots);
 		runner.computeArchitecture(stopCrit);
@@ -147,7 +151,7 @@ public class Clusterer {
 	public Clusterer(SerializationCriterion serializationCriterion,
 			Architecture arch, ClusteringAlgorithmType algorithm,
 			SimMeasure.SimMeasureType simMeasure, StoppingCriterion stopCrit,
-			boolean printDots) {
+			boolean printDots) throws ExecutionException, InterruptedException {
 		this.serializationCriterion = serializationCriterion;
 		this.architecture = arch;
 		this.algorithm = algorithm;
@@ -168,7 +172,8 @@ public class Clusterer {
 
 	//region PROCESSING
 	public Architecture computeArchitecture(StoppingCriterion stopCriterion)
-			throws IOException, UnmatchingDocTopicItemsException {
+			throws IOException, UnmatchingDocTopicItemsException,
+			ExecutionException, InterruptedException {
 		while (stopCriterion.notReadyToStop(this.architecture)) {
 			doClusteringStep();
 			doSerializationStep();
@@ -177,13 +182,19 @@ public class Clusterer {
 		return this.architecture;
 	}
 
-	public void doClusteringStep() throws UnmatchingDocTopicItemsException {
+	public void doClusteringStep() throws UnmatchingDocTopicItemsException,
+			ExecutionException, InterruptedException {
 		SimData data = identifyMostSimClusters();
 		Cluster newCluster = new Cluster(this.algorithm, data.c1, data.c2,
 			this.architecture.projectName, this.architecture.projectVersion);
 
 		updateFastClustersAndSimMatrixToReflectMergedCluster(
 			data, newCluster, simMatrix);
+
+		if (this.architecture.size() % 50 == 0)
+			System.out.println("Architecture size at " + this.architecture.size()
+				+ ". Memory usage at " + (Runtime.getRuntime().totalMemory()
+				- Runtime.getRuntime().freeMemory()) + ". Continuing clustering.");
 	}
 
 	public void doSerializationStep() throws IOException {
@@ -215,7 +226,8 @@ public class Clusterer {
 	}
 
 	private void updateFastClustersAndSimMatrixToReflectMergedCluster(
-			SimData data, Cluster newCluster,	SimilarityMatrix simMatrix) {
+			SimData data, Cluster newCluster,	SimilarityMatrix simMatrix)
+			throws ExecutionException, InterruptedException {
 		// Sanity check
 		if (data.c1.name.equals(data.c2.name))
 			throw new IllegalArgumentException("data.c1: " + data.c1

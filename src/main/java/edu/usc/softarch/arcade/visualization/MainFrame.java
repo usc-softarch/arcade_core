@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.util.concurrent.ExecutionException;
 
 public class MainFrame extends JFrame implements ActionListener {
 	//region PUBLIC INTERFACE
@@ -79,7 +80,8 @@ public class MainFrame extends JFrame implements ActionListener {
 					loadClusterer();
 				} catch (IOException | UnmatchingDocTopicItemsException
 								 | DistributionSizeMismatchException
-								 | ParserConfigurationException | SAXException ex) {
+								 | ParserConfigurationException | SAXException
+								 | ExecutionException | InterruptedException ex) {
 					throw new RuntimeException(ex);
 				}
 				this.setContentPane(this.controllerPanel);
@@ -104,7 +106,8 @@ public class MainFrame extends JFrame implements ActionListener {
 
 	private void loadClusterer() throws IOException,
 			UnmatchingDocTopicItemsException, DistributionSizeMismatchException,
-			ParserConfigurationException, SAXException {
+			ParserConfigurationException, SAXException, ExecutionException,
+			InterruptedException {
 		Clusterer.ClusteringAlgoArguments arguments =
 			new Clusterer.ClusteringAlgoArguments(
 				CLI.parseArguments(loadArguments()));
