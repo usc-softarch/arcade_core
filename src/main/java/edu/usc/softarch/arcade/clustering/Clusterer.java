@@ -167,7 +167,7 @@ public class Clusterer {
 	private void addCluster(Cluster cluster) {
 		architecture.put(cluster.name, cluster); }
 	private void removeCluster(Cluster cluster) {
-		architecture.remove(cluster.name);	}
+		architecture.remove(cluster.name); }
 	//endregion
 
 	//region PROCESSING
@@ -190,11 +190,6 @@ public class Clusterer {
 
 		updateFastClustersAndSimMatrixToReflectMergedCluster(
 			data, newCluster, simMatrix);
-
-		if (this.architecture.size() % 50 == 0)
-			System.out.println("Architecture size at " + this.architecture.size()
-				+ ". Memory usage at " + (Runtime.getRuntime().totalMemory()
-				- Runtime.getRuntime().freeMemory()) + ". Continuing clustering.");
 	}
 
 	public void doSerializationStep() throws IOException {
