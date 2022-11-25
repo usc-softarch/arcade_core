@@ -15,9 +15,6 @@ import java.util.TreeSet;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  * This pattern finds and moves children of the root node which are not
  * clusters under the appropriate adoptive cluster-node.
@@ -34,10 +31,7 @@ import org.apache.logging.log4j.Logger;
  * algorithm deterministic.
  */
 public class OrphanAdoption extends Pattern {
-	private static final Logger logger = 
-		LogManager.getLogger(OrphanAdoption.class);
-
-	private Comparator<DefaultMutableTreeNode> nodeComparer = 
+	private final Comparator<DefaultMutableTreeNode> nodeComparer =
 		(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) -> {
 			Node n1 = (Node)o1.getUserObject();
 			Node n2 = (Node)o2.getUserObject();
@@ -45,9 +39,7 @@ public class OrphanAdoption extends Pattern {
 	};
 
 	public OrphanAdoption(DefaultMutableTreeNode root)	{
-		super(root);
-		name = "Orphan Adoption";
-	}
+		super(root); }
 
 	public void execute()	{
 		List<Node> vModified = new ArrayList<>();
@@ -57,7 +49,6 @@ public class OrphanAdoption extends Pattern {
 		int on = orphanNumber();
 		int prevon = on + 1;
 		while(on < prevon) {
-			logger.trace("Orphan Number: " + on);
 			prevon = on;
 			vAdopted = oneRound(true);
 			vModified.addAll(vAdopted);
@@ -76,9 +67,7 @@ public class OrphanAdoption extends Pattern {
 		// Run oneRoundForward as many times as the #orphans is decreasing
 		do {
 			vAdopted = oneRound(false);
-			logger.trace("Before " + vAdopted.size());
 			result.addAll(vAdopted);
-			logger.trace("After " + vAdopted.size() + "");
 		}	while (!vAdopted.isEmpty());
 		return result;
 	}
@@ -95,12 +84,11 @@ public class OrphanAdoption extends Pattern {
 		for (Node orphan : nodeChildren(root)) {
 			if(orphan.isCluster()) continue; // If child is a cluster, skip
 
-			logger.trace("ROA:\torphan =: " + orphan.getName());
 			DefaultMutableTreeNode tOrphan = orphan.getTreeNode();
 			Map<Node, Double> prospectiveParents = prospectParents(orphan, reverse);
 
-			if(prospectiveParents.isEmpty()) logger.trace("\tNOT\t adopted");
-			else vReturn.addAll(chooseParent(prospectiveParents, tOrphan));
+			if(!prospectiveParents.isEmpty())
+				vReturn.addAll(chooseParent(prospectiveParents, tOrphan));
 		}
 		return new ArrayList<>(vReturn);
 	}
@@ -113,7 +101,7 @@ public class OrphanAdoption extends Pattern {
 
 		for (Node orphanAcross : orphanAcrossNodes) {
 			DefaultMutableTreeNode tOrphanAcross = orphanAcross.getTreeNode();
-			double counter = 0;
+			double counter;
 
 			/********************************************************************
 				NOTE: retain only across from the orphan which are clusters <-- only
@@ -144,14 +132,14 @@ public class OrphanAdoption extends Pattern {
 					prospectiveParents.put(nparent, counter);
 				}	else {
 					counter = 0;
-					SortedSet<Node> c_across = new TreeSet<>();
+					SortedSet<Node> cAcross = new TreeSet<>();
 
 					List<TreeNode> tempALBase =
 						Collections.list(parent.breadthFirstEnumeration());
 					List<DefaultMutableTreeNode> tempAL = new ArrayList<>();
 					for(TreeNode node : tempALBase)
 						tempAL.add((DefaultMutableTreeNode)node);
-					Collections.sort(tempAL, nodeComparer);
+					tempAL.sort(nodeComparer);
 
 					List<DefaultMutableTreeNode> tempALit = tempAL;
 					// If using targets, ignore parent itself
@@ -159,13 +147,13 @@ public class OrphanAdoption extends Pattern {
 					if (!reverse) tempALit = tempAL.subList(1, tempAL.size());
 
 					for (DefaultMutableTreeNode ps_curr : tempALit) {
-						Node nps_curr =	(Node) ps_curr.getUserObject();
-						c_across.clear();
+						Node npsCurr =	(Node) ps_curr.getUserObject();
+						cAcross.clear();
 
-						if (reverse) c_across.addAll(nps_curr.getTargets());
-						else c_across.addAll(nps_curr.getSources());
+						if (reverse) cAcross.addAll(npsCurr.getTargets());
+						else cAcross.addAll(npsCurr.getSources());
 
-						if (c_across.contains(orphan)) counter = counter + 0.000001;
+						if (cAcross.contains(orphan)) counter = counter + 0.000001;
 					}
 					prospectiveParents.put(nparent, ++counter);
 				}
@@ -182,19 +170,19 @@ public class OrphanAdoption extends Pattern {
 			Map<Node, Double> prospectiveParents,
 			DefaultMutableTreeNode tOrphan) {
 		Set<Node> vReturn = new HashSet<>();
-		double max_value = 0;
-		Node max_key = new Node("faraz", "oana");
+		double maxValue = 0;
+		Node maxKey = new Node("faraz", "oana");
 
-		for (Node curr_key : prospectiveParents.keySet()) {
-			Double curr_value = prospectiveParents.get(curr_key);
+		for (Node currKey : prospectiveParents.keySet()) {
+			Double currValue = prospectiveParents.get(currKey);
 
-			if (curr_value >= max_value) {
-				max_value = curr_value;
-				max_key = curr_key;
+			if (currValue >= maxValue) {
+				maxValue = currValue;
+				maxKey = currKey;
 			}
 		}
 
-		DefaultMutableTreeNode max = (max_key.getTreeNode());
+		DefaultMutableTreeNode max = (maxKey.getTreeNode());
 		max.add(tOrphan);
 
 		List<TreeNode> tempALBase =
@@ -202,12 +190,11 @@ public class OrphanAdoption extends Pattern {
 		List<DefaultMutableTreeNode> tempAL = new ArrayList<>();
 		for(TreeNode node : tempALBase)
 			tempAL.add((DefaultMutableTreeNode)node);
-		Collections.sort(tempAL, nodeComparer);
+		tempAL.sort(nodeComparer);
 		
 		for (DefaultMutableTreeNode ec : tempAL)
 			vReturn.add((Node) ec.getUserObject());
 
-		logger.trace("\twas adopted by ***\t" + max_key.getName());
 		return vReturn;
 	}
 }

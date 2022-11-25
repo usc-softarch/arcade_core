@@ -8,13 +8,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 */
 public class ClusterLast extends Pattern {
 	public ClusterLast(DefaultMutableTreeNode root) {
-		super(root);
-		name = "Cluster Last";
-	}
+		super(root); }
 
 	public void execute() {
 		if (orphanNumber() != 0) {
-			IO.put("Clustering leftover nodes",2);
 			// Create a node of type Subsystem which will contain all the remaining unclustered orphans 
 			Node nOrphanContainer = new Node("orphanContainer.ss", "Subsystem");
 			DefaultMutableTreeNode orphanContainer = new DefaultMutableTreeNode(nOrphanContainer);
@@ -24,10 +21,8 @@ public class ClusterLast extends Pattern {
 			for (Node ncurr : orphans()) {
 				DefaultMutableTreeNode curr = ncurr.getTreeNode();
 
-				if (!ncurr.isCluster()) {
+				if (!ncurr.isCluster())
 					orphanContainer.add(curr);
-					IO.put("contain\t\t" + nOrphanContainer.getName() + "\t" + ncurr.getName(),	2);
-				}
 			}
 		}
 	}

@@ -1,4 +1,4 @@
 /**
- * This package originally written by V. Tzerpos.
+ * This package heavily modified from the original by V. Tzerpos.
  */
 package edu.usc.softarch.arcade.clustering.acdc;

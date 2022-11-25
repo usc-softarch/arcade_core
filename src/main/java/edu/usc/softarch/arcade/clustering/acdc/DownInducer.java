@@ -2,19 +2,18 @@ package edu.usc.softarch.arcade.clustering.acdc;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import java.util.List;
+import java.util.Collection;
 
 public class DownInducer extends Pattern {
 	public DownInducer(DefaultMutableTreeNode root) {
-		super(root);
-	}
+		super(root); }
 	
 	public void execute() {
 		// Remove all but fine-grain clusters from the tree	
 		for (Node parent : allNodes(root)) {
 			DefaultMutableTreeNode tparent = parent.getTreeNode();
 			if (parent.isCluster()) {
-				List<Node> subTree = nodeChildren(tparent);
+				Collection<Node> subTree = nodeChildren(tparent);
 				tparent.removeAllChildren();
 				tparent.removeFromParent();
 				boolean hasChildrenFiles = false;

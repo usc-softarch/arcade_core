@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.clustering.acdc;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,17 +18,16 @@ import javax.swing.tree.TreeNode;
  * Clusters the children of the root based on their dependencies
  */
 public class SubGraph extends Pattern {
-	private int clusterSize;
+	private final int clusterSize;
 
 	public SubGraph(DefaultMutableTreeNode root, int size) {
 		super(root);
 		clusterSize = size;
-		name = "Subgraph Dominator";
 	}
 
 	public void execute() {
-		List<Node> vModified = new ArrayList<>();
-		List<Node> vRootChildren = nodeChildren(root);
+		Collection<Node> vModified = new ArrayList<>();
+		Collection<Node> vRootChildren = nodeChildren(root);
 
 		//************************************************************************
 		// Note: The nodes to be clustered are the children of the root only. 
@@ -41,7 +40,7 @@ public class SubGraph extends Pattern {
 		// targets in a Map
 		Map<Node,Integer> ht = new HashMap<>();
 
-		int counter = 0; // keeps track of #targets per node
+		int counter; // keeps track of #targets per node
 
 		for (Node ncurr : vRootChildren) {
 			setOfTargets = new HashSet<>(); //reset
@@ -57,44 +56,31 @@ public class SubGraph extends Pattern {
 
 				if (vRootChildren.contains(n)) counter++;
 			}
-			ht.put(ncurr, Integer.valueOf(counter));
+			ht.put(ncurr, counter);
 		}
 
 		//sort ht in increasing order
-		List<Sortable> my_array = new ArrayList<>();
-		for (Node curr_key : ht.keySet()) {
-			Integer curr_value = ht.get(curr_key);
-
+		List<Sortable> myArray = new ArrayList<>();
+		for (Map.Entry<Node, Integer> entry : ht.entrySet()) {
 			// build a sortable object with the two pieces of information
-			Sortable s_before = new Sortable(curr_value, curr_key);
+			Sortable sBefore = new Sortable(entry.getValue(), entry.getKey());
 
 			// add the sortable object to the sarray
-			my_array.add(s_before);
+			myArray.add(sBefore);
 		}
-		Collections.sort(my_array);
-
-		for (int i = 0; i < my_array.size(); i++) {
-			Sortable s_print = my_array.get(i);
-			Node object_key = (Node) s_print.getObject();
-			Integer integer_object = (Integer) s_print.getKey();
-
-			IO.put("Node = " + object_key.getName()	+
-			       " , Type := "	+ object_key.getType() +
-			       " , Targets = " + integer_object, 2);
-		}
+		myArray.sort(null);
 
 		Node tentativeDominator;
-		int next_index = 0;
+		int nextIndex = 0;
 		boolean found;
-		
+
 		// This is where the big loop begins
-		
 		while (!ht.isEmpty()) {
 			// some nodes (identified below as covered set nodes) might be removed from
 			// the hashtable so we want to make sure that our ArrayList is also updated
 			do {
-				Sortable s_after = my_array.get(next_index++);
-				tentativeDominator = (Node) s_after.getObject();
+				Sortable sAfter = myArray.get(nextIndex++);
+				tentativeDominator = sAfter.getObject();
 				// while hashtable doesn't contain it, skip over current node
 				// to the next one
 				found = ht.containsKey(tentativeDominator);
@@ -103,32 +89,27 @@ public class SubGraph extends Pattern {
 			DefaultMutableTreeNode tentativeDominatorTreeNode =
 				tentativeDominator.getTreeNode();
 
-			IO.put("**************************", 2);
-			IO.put("Dominator " + tentativeDominator, 2);
 			Set<DefaultMutableTreeNode> cS = 
 				coveredSet(tentativeDominatorTreeNode, vRootChildren);
 			
 			if (cS.size() == 1)	ht.remove(tentativeDominator);
 			else { //coveredSet returned tentativeRoot and its set of dominated nodes
 				// max cluster size allowed is clusterSize!!
-				Node ncurr_cS;
+				Node ncurrCS;
 
 				if (cS.size() < clusterSize) {
 					for (DefaultMutableTreeNode curr_cS : cS) {
-						ncurr_cS = (Node) curr_cS.getUserObject();
-						ht.remove(ncurr_cS);
+						ncurrCS = (Node) curr_cS.getUserObject();
+						ht.remove(ncurrCS);
 					}
 				}
 				else //if cS has > clusterSize elements, attempt deeper clustering
 					ht.remove(tentativeDominator);
 
 				// Create a new subsystem node
-				Node ssNode = 
-					new Node(tentativeDominator.getBaseName() + ".ss", "Subsystem");
+				Node ssNode = new Node(
+					tentativeDominator.getBaseName() + ".ss", "Subsystem");
 				if (!vModified.contains(ssNode)) vModified.add(ssNode);
-
-				IO.put("Cluster Node " + ssNode.getName()
-					+ " was created and contains :", 2);
 
 				DefaultMutableTreeNode ssTreeNode = new DefaultMutableTreeNode(ssNode);
 				ssNode.setTreeNode(ssTreeNode);
@@ -147,9 +128,7 @@ public class SubGraph extends Pattern {
 				Iterator<DefaultMutableTreeNode> ics2 = cS.iterator();
 				Set<DefaultMutableTreeNode> nodesToMove = new HashSet<>();
 
-				IO.put("Ancestor :=  " + 
-					((Node) (ancestor.getUserObject())).getName(), 2);
-				int numOfElementsInPath = 0;
+				int numOfElementsInPath;
 				boolean continueLoop = true;
 				while (ics2.hasNext() && continueLoop) {
 					DefaultMutableTreeNode nnn = ics2.next();
@@ -161,12 +140,11 @@ public class SubGraph extends Pattern {
 						numOfElementsInPath++;
 					}
 
-					//if ancestor belongs to covered set,only ancestor should be moved
+					//if ancestor belongs to covered set, only ancestor should be moved
 					if (numOfElementsInPath == 1) {
 						nodesToMove.clear();
 						nodesToMove.add(ancestor);
 						continueLoop = false;
-						IO.put("Ancestor belongs to the covered set!", 2);
 					} else {
 						path = nnn.pathFromAncestorEnumeration(ancestor);
 
@@ -194,57 +172,17 @@ public class SubGraph extends Pattern {
 						if (!vModified.contains(em.getUserObject()))
 							vModified.add((Node) em.getUserObject());
 					}
-
-					IO.put(" Moved:\t" + (
-						(Node) (nextToMove.getUserObject())).getName(), 2);
 				}
 
 				if (ancestor == root)	ancestor.add(ssTreeNode);
 				else {
 					//only child is the ancestor
-					if (ssTreeNode.equals(ancestor)) IO.put("Opa", 2);
-					else ancestor.add(ssTreeNode);
+					if (!ssTreeNode.equals(ancestor)) ancestor.add(ssTreeNode);
 				}
 			}
 		}
 
 		induceEdges(vModified);
-	}
-
-	static void printCoveredSet(DefaultMutableTreeNode domin, List<Node> vTree) {
-		IO.put(
-			"**************************************************************",
-			2);
-		Set<DefaultMutableTreeNode> cS = coveredSet(domin, vTree);
-		for (DefaultMutableTreeNode curr : cS) {
-			Node ncurr = (Node) curr.getUserObject();
-			IO.put(
-				"\tCovered Set Node: **** "
-					+ ncurr.getName()
-					+ " , Type := "
-					+ ncurr.getType(),
-				2);
-		}
-
-		for (DefaultMutableTreeNode curr1 : findTargets(cS, vTree)) {
-			Node ncurr1 = (Node) curr1.getUserObject();
-			IO.put(
-				"\t** Target of covered set:= "
-					+ ncurr1.getName()
-					+ " , Type := "
-					+ ncurr1.getType(),
-				2);
-
-			for (DefaultMutableTreeNode curr2 : findSources(curr1, vTree)) {
-				Node ncurr2 = (Node) curr2.getUserObject();
-				IO.put(
-					"\t\tIts source := "
-						+ ncurr2.getName()
-						+ " , Type := "
-						+ ncurr2.getType(),
-					2);
-			}
-		}
 	}
 
 	/**
@@ -258,7 +196,7 @@ public class SubGraph extends Pattern {
 	*/
 	private static Set<DefaultMutableTreeNode> coveredSet(
 			DefaultMutableTreeNode tentativeRoot,
-			List<Node> vTree) {
+			Collection<Node> vTree) {
 		Set<DefaultMutableTreeNode> result = new HashSet<>();
 		result.add(tentativeRoot);
 
@@ -289,7 +227,7 @@ public class SubGraph extends Pattern {
 	* items in the passed HashSet parameter.
 	*/
 	private static Set<DefaultMutableTreeNode> findTargets(
-			Set<DefaultMutableTreeNode> source, List<Node> vRootChildren) {
+			Set<DefaultMutableTreeNode> source, Collection<Node> vRootChildren) {
 		Set<DefaultMutableTreeNode> allTargets = new HashSet<>();
 
 		//iterate thorough the passed HashSet
@@ -312,7 +250,7 @@ public class SubGraph extends Pattern {
 	*/
 	private static Set<DefaultMutableTreeNode> findSources (
 			DefaultMutableTreeNode target,
-			List<Node> vRootChildren) {
+			Collection<Node> vRootChildren) {
 		Set<DefaultMutableTreeNode> allSources = new HashSet<>();
 
 		// get sources of the passed node

@@ -1,12 +1,10 @@
 package edu.usc.softarch.arcade.clustering.acdc;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * This application facilitates the task of recovering the structure
@@ -21,58 +19,47 @@ import org.apache.logging.log4j.Logger;
  * (but it might get further clustered within its cluster)
  */
 public class ACDC {
-	private static final Logger logger = LogManager.getLogger(ACDC.class);
-	
-	public static void main(String[] args) {
+	//region PUBLIC INTERFACE
+	public static void main(String[] args) throws IOException {
 		String inputName = args[0];
 		String outputName = args[1];
 
 		run(inputName, outputName);
 	}
 
-	public static void run(String inputName, String outputName) {
-		IO.set_debug_level(0);
-    int maxClusterSize = 20; //used by SubGraph pattern
-		InputHandler input = new TAInput();
-		OutputHandler output = new RSFOutput();
+	public static void run(String inputName, String outputName)
+			throws IOException {
+		int maxClusterSize = 20; //used by SubGraph pattern
 
-		String selectedPatterns = "bso";
-	
 		// Create a tree with a dummy root
-		Node dummy = new Node ("ROOT", "Dummy");
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode (dummy);
+		Node dummy = new Node("ROOT", "Dummy");
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode(dummy);
 		dummy.setTreeNode(root);
 		Pattern inducer = new DownInducer(root);
-			   	
-    logger.info("Input File: " + inputName);
-    logger.info("Output File: " + outputName);
-    logger.info("Patterns: " + selectedPatterns);
-    logger.info("Cluster Size: " + maxClusterSize);
 
-		// Populate the tree from the input file   
-		input.readInput(inputName, root);
-		
-		List<Pattern> vpatterns = new ArrayList<>();
+		// Populate the tree from the input file
+		TAInput.readInput(inputName, root);
+
+		Collection<Pattern> vpatterns = new ArrayList<>();
 		vpatterns.add(new BodyHeader(root));
 		vpatterns.add(new SubGraph(root,maxClusterSize));
 		vpatterns.add(new OrphanAdoption(root));
 
 		// Induce all edges
-		List<Node> allNodes = Pattern.allNodes(root);
+		Collection<Node> allNodes = Pattern.allNodes(root);
 		Pattern.induceEdges(allNodes);
 
 		// Execute the patterns
-		for (Pattern p : vpatterns) {
-			logger.info("Executing " + p.getName() + " pattern...");
+		for (Pattern p : vpatterns)
 			p.execute();
-    }
 
 		// Take care of any objects that were not clustered
 		Pattern c = new ClusterLast(root);
 		c.execute();
-	
-    // Create output file
+
+		// Create output file
 		inducer.execute();
-		output.writeOutput(outputName, root);
+		RSFOutput.writeOutput(outputName, root);
 	}
+	//endregion
 }
