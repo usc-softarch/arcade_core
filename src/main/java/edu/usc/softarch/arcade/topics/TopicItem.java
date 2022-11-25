@@ -27,6 +27,7 @@ public class TopicItem
 	 * time that is necessary.
 	 */
 	private final double[] proportionComponents;
+	private double proportion = -1.0;
 	//endregion
 	
 	//region CONTRUCTORS
@@ -68,13 +69,22 @@ public class TopicItem
 	public TopicItem(TopicItem topicItem) {
 		this.topicNum = topicItem.topicNum;
 		this.proportionComponents = topicItem.proportionComponents;
+		this.proportion = topicItem.proportion;
 	}
 	//endregion
 
 	//region ACCESSORS
-	public double getProportion() {
-		return Arrays.stream(this.proportionComponents).sum()
-			/ this.proportionComponents.length;
+	public synchronized double getProportion() {
+		if (this.proportion == -1.0) {
+			this.proportion = 0.0;
+
+			for (double proportionComponent : proportionComponents)
+				this.proportion += proportionComponent;
+
+			this.proportion /= this.proportionComponents.length;
+		}
+
+		return this.proportion;
 	}
 	//endregion
 	
