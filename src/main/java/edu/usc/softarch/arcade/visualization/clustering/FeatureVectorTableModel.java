@@ -45,7 +45,7 @@ public class FeatureVectorTableModel extends ArchitectureTableModel {
 		if (columnIndex == 0)
 			return row.name;
 
-		return row.getFeatureMap().get(columnIndex - 1);
+		return row.getFeatureMap()[columnIndex - 1];
 	}
 
 	@Override
@@ -54,11 +54,12 @@ public class FeatureVectorTableModel extends ArchitectureTableModel {
 
 		int featureIndex = -1;
 		double proportion = 0.0;
+		double[] featureMap = cluster.getFeatureMap();
 
-		for (Map.Entry<Integer, Double> entry : cluster.getFeatureMap().entrySet()) {
-			if (entry.getValue() > proportion) {
-				featureIndex = entry.getKey();
-				proportion = entry.getValue();
+		for (int i = 0; i < featureMap.length; i++) {
+			if (featureMap[i] > proportion) {
+				featureIndex = i;
+				proportion = featureMap[i];
 			}
 		}
 
@@ -67,7 +68,6 @@ public class FeatureVectorTableModel extends ArchitectureTableModel {
 
 	@Override
 	public void refresh() {
-		throw new NotImplementedException();
-	}
+		throw new NotImplementedException(); }
 	//endregion
 }

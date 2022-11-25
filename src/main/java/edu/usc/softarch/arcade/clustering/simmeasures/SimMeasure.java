@@ -4,7 +4,6 @@ import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
 
 import java.util.BitSet;
-import java.util.Set;
 
 public abstract class SimMeasure {
 	public enum SimMeasureType { JS, SCM, UEM, UEMNM, IL, ARCIL, ARCUEM, ARCUEMNM, WJS }
@@ -15,9 +14,9 @@ public abstract class SimMeasure {
 	protected void normalizeFeatureVectorOfCluster(Cluster cluster,
 			int featuresLength, double[] firstDist) {
 		for (int i = 0; i < featuresLength; i++) {
-			if (cluster.getFeatureMap().get(i) != null) {
-				double featureValue = cluster.getFeatureMap().get(i);
-				firstDist[i] = featureValue/cluster.getFeatureMap().size();
+			if (cluster.getFeatureMap()[i] != 0.0) {
+				double featureValue = cluster.getFeatureMap()[i];
+				firstDist[i] = featureValue / cluster.getFeatureCount();
 			}
 			else { // this feature is zero
 				firstDist[i] = 0;
@@ -27,11 +26,9 @@ public abstract class SimMeasure {
 
 	protected int getNumOf01Features(Cluster currCluster,
 			Cluster otherCluster) {
-		Set<Integer> otherIndices = otherCluster.getFeatureMap().keySet();
-
 		int num01Features = 0;
-		for (Integer otherIndex : otherIndices)
-			if (currCluster.getFeatureMap().get(otherIndex) == null)
+		for (Integer otherIndex : otherCluster.getFeatureIndices())
+			if (currCluster.getFeatureMap()[otherIndex] == 0.0)
 				num01Features++;
 
 		return num01Features;
@@ -45,11 +42,11 @@ public abstract class SimMeasure {
 	protected int getNumOf00Features(Cluster currCluster,
 			Cluster otherCluster, int numFeatures) {
 		BitSet currIndices = new BitSet(numFeatures);
-		for (Integer integer : currCluster.getFeatureMap().keySet())
+		for (Integer integer : currCluster.getFeatureIndices())
 			currIndices.set(integer);
 
 		BitSet otherIndices = new BitSet(numFeatures);
-		for (Integer integer : otherCluster.getFeatureMap().keySet())
+		for (Integer integer : otherCluster.getFeatureIndices())
 			otherIndices.set(integer);
 
 		currIndices.or(otherIndices);
@@ -60,12 +57,10 @@ public abstract class SimMeasure {
 
 	protected int getNumOfFeaturesInBothEntities(Cluster currCluster,
 			Cluster otherCluster) {
-		Set<Integer> currIndices = currCluster.getFeatureMap().keySet();
-
 		int numSharedFeatures = 0;
-		for (Integer currIndex : currIndices)
-			if (currCluster.getFeatureMap().get(currIndex) != null
-				&& otherCluster.getFeatureMap().get(currIndex) !=null)
+		for (Integer currIndex : currCluster.getFeatureIndices())
+			if (currCluster.getFeatureMap()[currIndex] != 0.0
+					&& otherCluster.getFeatureMap()[currIndex] != 0.0)
 				numSharedFeatures++;
 
 		return numSharedFeatures;
@@ -73,13 +68,12 @@ public abstract class SimMeasure {
 
 	protected double getSumOfFeaturesInBothEntities(Cluster currCluster,
 			Cluster otherCluster) {
-		Set<Integer> currIndices = currCluster.getFeatureMap().keySet();
-
 		double sumSharedFeatures = 0;
-		for (Integer currIndex : currIndices) {
-			if (currCluster.getFeatureMap().get(currIndex) != null && otherCluster.getFeatureMap().get(currIndex) !=null) {
-				Double currFeatureValue = currCluster.getFeatureMap().get(currIndex);
-				Double otherFeatureValue = otherCluster.getFeatureMap().get(currIndex);
+		for (Integer currIndex : currCluster.getFeatureIndices()) {
+			if (currCluster.getFeatureMap()[currIndex] != 0.0
+					&& otherCluster.getFeatureMap()[currIndex] != 0.0) {
+				double currFeatureValue = currCluster.getFeatureMap()[currIndex];
+				double otherFeatureValue = otherCluster.getFeatureMap()[currIndex];
 				sumSharedFeatures += currFeatureValue + otherFeatureValue;
 			}
 		}
