@@ -27,7 +27,7 @@ public class SubGraph extends Pattern {
 
 	public void execute() {
 		Collection<Node> vModified = new ArrayList<>();
-		Collection<Node> vRootChildren = nodeChildren(root);
+		Map<String, Node> vRootChildren = nodeChildrenAlt(root);
 
 		//************************************************************************
 		// Note: The nodes to be clustered are the children of the root only. 
@@ -42,7 +42,7 @@ public class SubGraph extends Pattern {
 
 		int counter; // keeps track of #targets per node
 
-		for (Node ncurr : vRootChildren) {
+		for (Node ncurr : vRootChildren.values()) {
 			setOfTargets = new HashSet<>(); //reset
 
 			setOfTargets.add(ncurr.getTreeNode());
@@ -54,7 +54,7 @@ public class SubGraph extends Pattern {
 			for (DefaultMutableTreeNode c : setOfTargets) {
 				Node n = (Node) c.getUserObject();
 
-				if (vRootChildren.contains(n)) counter++;
+				if (vRootChildren.containsKey(n.getName())) counter++;
 			}
 			ht.put(ncurr, counter);
 		}
@@ -196,7 +196,7 @@ public class SubGraph extends Pattern {
 	*/
 	private static Set<DefaultMutableTreeNode> coveredSet(
 			DefaultMutableTreeNode tentativeRoot,
-			Collection<Node> vTree) {
+			Map<String, Node> vTree) {
 		Set<DefaultMutableTreeNode> result = new HashSet<>();
 		result.add(tentativeRoot);
 
@@ -227,7 +227,7 @@ public class SubGraph extends Pattern {
 	* items in the passed HashSet parameter.
 	*/
 	private static Set<DefaultMutableTreeNode> findTargets(
-			Set<DefaultMutableTreeNode> source, Collection<Node> vRootChildren) {
+			Set<DefaultMutableTreeNode> source, Map<String, Node> vRootChildren) {
 		Set<DefaultMutableTreeNode> allTargets = new HashSet<>();
 
 		//iterate thorough the passed HashSet
@@ -236,7 +236,7 @@ public class SubGraph extends Pattern {
 
 			//iterate through these targets adding each to the HashSet 'targets'
 			for (Node n : ncurr.getTargets()) {
-				if (vRootChildren.contains(n)) {
+				if (vRootChildren.containsKey(n.getName())) {
 					DefaultMutableTreeNode t = n.getTreeNode();
 					allTargets.add(t);
 				}
@@ -250,7 +250,7 @@ public class SubGraph extends Pattern {
 	*/
 	private static Set<DefaultMutableTreeNode> findSources (
 			DefaultMutableTreeNode target,
-			Collection<Node> vRootChildren) {
+			Map<String, Node> vRootChildren) {
 		Set<DefaultMutableTreeNode> allSources = new HashSet<>();
 
 		// get sources of the passed node
@@ -259,7 +259,7 @@ public class SubGraph extends Pattern {
 		// iterate through the sources of the passed node
 		// and add them to the HashSet called 'sources'
 		for (Node n : ntarget.getSources()) {
-			if (vRootChildren.contains(n)) {
+			if (vRootChildren.containsKey(n.getName())) {
 				DefaultMutableTreeNode t = n.getTreeNode();
 				allSources.add(t);
 			}

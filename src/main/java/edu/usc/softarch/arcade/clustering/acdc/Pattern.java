@@ -3,8 +3,10 @@ package edu.usc.softarch.arcade.clustering.acdc;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -33,6 +35,22 @@ public abstract class Pattern {
 			DefaultMutableTreeNode curr2 = (DefaultMutableTreeNode) child;
 			Node ncurr2 = (Node) curr2.getUserObject();
 			result.add(ncurr2);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Returns a collection of child nodes to the given parameter.
+	 */
+	protected Map<String, Node> nodeChildrenAlt(DefaultMutableTreeNode node) {
+		Map<String, Node> result = new HashMap<>();
+		Collection<TreeNode> children = Collections.list(node.children());
+
+		for (TreeNode child : children) {
+			DefaultMutableTreeNode curr2 = (DefaultMutableTreeNode) child;
+			Node ncurr2 = (Node) curr2.getUserObject();
+			result.put(ncurr2.getName(), ncurr2);
 		}
 
 		return result;
