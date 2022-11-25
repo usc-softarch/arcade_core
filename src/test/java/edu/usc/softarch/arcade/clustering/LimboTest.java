@@ -94,10 +94,10 @@ public class LimboTest extends BaseTest {
 			FileUtil.readFile((oraclePath), StandardCharsets.UTF_8));
 
 		// RsfCompare.equals() to compare contents of oracle and result files
-		Set<String> uemResultRsf = new HashSet<>(
+		Set<String> ilResultRsf = new HashSet<>(
 			Arrays.asList(result.split("\\r?\\n")));
-		Set<String> uemOracleRsf = new HashSet<>(
+		Set<String> ilOracleRsf = new HashSet<>(
 			Arrays.asList(oracle.split("\\r?\\n")));
-		assertEquals(uemResultRsf, uemOracleRsf);
+		assertEquals(ilResultRsf, ilOracleRsf);
 	}
 }
