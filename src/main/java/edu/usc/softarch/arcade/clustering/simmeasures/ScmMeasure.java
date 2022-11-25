@@ -15,11 +15,8 @@ public class ScmMeasure extends SimMeasure {
 	@Override
 	public double computeCellValue(int numEntitiesToCluster, Cluster row,
 			Cluster col, int numFeatures) {
-		double[] firstDist = new double[numFeatures];
-		double[] secondDist = new double[numFeatures];
-
-		normalizeFeatureVectorOfCluster(row, numFeatures, firstDist);
-		normalizeFeatureVectorOfCluster(col, numFeatures, secondDist);
+		double[] firstDist = normalizeFeatureVectorOfCluster(row, numFeatures);
+		double[] secondDist = normalizeFeatureVectorOfCluster(col, numFeatures);
 
 		double jsDivergenceStruct = Maths.jensenShannonDivergence(firstDist, secondDist);
 		if (Double.isInfinite(jsDivergenceStruct))

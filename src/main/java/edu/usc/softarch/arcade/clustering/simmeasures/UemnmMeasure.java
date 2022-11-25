@@ -25,6 +25,7 @@ public class UemnmMeasure extends SimMeasure {
 		int num00Features = getNumOf00Features(row, col, numFeatures);
 		int numSharedFeatures = getNumOfFeaturesInBothEntities(row, col);
 
+		//TODO Need to get rid of NaN somehow
 		return 1 - (0.5 * sumOfFeaturesInBothEntities /
 			(0.5 * sumOfFeaturesInBothEntities + 2
 				* ((double) num10Features + (double) num01Features)

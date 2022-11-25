@@ -23,6 +23,7 @@ public class UemMeasure extends SimMeasure {
 		int numberOf10Features = getNumOf10Features(row, col);
 		int numberOf01Features = getNumOf01Features(row, col);
 
+		//TODO Need to get rid of NaN somehow
 		return 1 - (0.5 * sumOfFeaturesInBothEntities /
 			(0.5 * sumOfFeaturesInBothEntities + numberOf10Features
 				+ numberOf01Features));

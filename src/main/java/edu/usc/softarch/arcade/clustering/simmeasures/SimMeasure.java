@@ -11,17 +11,18 @@ public abstract class SimMeasure {
 	public abstract double computeCellValue(int numEntitiesToCluster, Cluster row,
 		Cluster col, int numFeatures) throws DistributionSizeMismatchException;
 
-	protected void normalizeFeatureVectorOfCluster(Cluster cluster,
-			int featuresLength, double[] firstDist) {
-		for (int i = 0; i < featuresLength; i++) {
-			if (cluster.getFeatureMap()[i] != 0.0) {
-				double featureValue = cluster.getFeatureMap()[i];
-				firstDist[i] = featureValue / cluster.getFeatureCount();
-			}
-			else { // this feature is zero
-				firstDist[i] = 0;
+	protected double[] normalizeFeatureVectorOfCluster(Cluster cluster,
+			int featuresLength) {
+		double[] result = new double[featuresLength];
+
+		for (Integer index : cluster.getFeatureIndices()) {
+			if (cluster.getFeatureMap()[index] != 0.0) {
+				double featureValue = cluster.getFeatureMap()[index];
+				result[index] = featureValue / cluster.getFeatureCount();
 			}
 		}
+
+		return result;
 	}
 
 	protected int getNumOf01Features(Cluster currCluster,

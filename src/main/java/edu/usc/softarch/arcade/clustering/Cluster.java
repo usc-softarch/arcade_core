@@ -117,7 +117,7 @@ public class Cluster extends ReadOnlyCluster
 		return new ArrayList<>(this.featureIndices); }
 
 	public int getFeatureCount() {
-		return getFeatureIndices().size(); }
+		return this.featureIndices.size(); }
 
 	/**
 	 * Returns the number of entities represented by this Cluster.
@@ -218,7 +218,7 @@ public class Cluster extends ReadOnlyCluster
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, numEntities, Arrays.hashCode(featureMap)); }
+		return Objects.hash(name, numEntities); }
 
 	@Override
 	public int compareTo(Cluster o) { return this.name.compareTo(o.name);	}

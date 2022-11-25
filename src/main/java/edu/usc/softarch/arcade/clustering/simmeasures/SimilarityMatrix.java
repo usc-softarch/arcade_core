@@ -157,7 +157,7 @@ public class SimilarityMatrix {
 						SimData cellData = computeCellData(c, cluster);
 						row.put(cluster, cellData);
 						if (!c.equals(cluster)) {
-							if (cellData.cellValue == 0
+							if (cellData.cellValue == 0.0
 									&& (simMeasureType == SimMeasure.SimMeasureType.JS
 									|| simMeasureType == SimMeasure.SimMeasureType.WJS))
 								System.err.println("Two clusters found with " +
@@ -182,7 +182,7 @@ public class SimilarityMatrix {
 			for (SimData cell : simMatrix.get(c).values())
 				this.fastSimMatrix.remove(cell);
 		} catch (NullPointerException e) {
-			e.printStackTrace();
+			e.printStackTrace(); //TODO handle it
 		}
 		simMatrix.remove(c);
 		for (Map<Cluster, SimData> column : simMatrix.values()) {

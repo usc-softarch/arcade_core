@@ -207,7 +207,7 @@ public class ClustererController extends JPanel
 
 		this.cluster1NameTextPane.setText(data.c1.name);
 		this.cluster2NameTextPane.setText(data.c2.name);
-		this.simValueLabel.setText(data.cellValue.toString());
+		this.simValueLabel.setText(String.valueOf(data.cellValue));
 
 		int archSize = this.clusterer.getArchitecture().size();
 		this.archSizeTextPane.setText("Architecture size: " + archSize);
