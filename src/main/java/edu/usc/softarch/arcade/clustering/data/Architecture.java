@@ -392,11 +392,15 @@ public class Architecture extends TreeMap<String, Cluster>
 	 * to determine the name of the output file.
 	 */
 	public void writeToRsf() throws FileNotFoundException {
+		this.writeToRsf(true);
+	}
+
+	public void writeToRsf(boolean useIndices) throws FileNotFoundException {
 		String fs = File.separator;
 		String path = this.projectPath + fs + this.projectName + "-"
 			+ this.projectVersion + "_" + this.simMeasure + "_" + this.size()
 			+ "_clusters.rsf";
-		this.writeToRsf(path);
+		this.writeToRsf(path, useIndices);
 	}
 
 	/**
@@ -406,9 +410,19 @@ public class Architecture extends TreeMap<String, Cluster>
 	 *             the desired output filename.
 	 */
 	public void writeToRsf(String path) throws FileNotFoundException {
+		this.writeToRsf(path, true);
+	}
+
+	public void writeToRsf(String path, boolean useIndices)
+			throws FileNotFoundException {
 		File rsfFile = new File(path);
 		rsfFile.getParentFile().mkdirs();
 
+		if (useIndices) writeToRsfWithIndices(rsfFile);
+		else writeToRsfWithoutIndices(rsfFile);
+	}
+
+	private void writeToRsfWithIndices(File rsfFile) throws FileNotFoundException {
 		Map<Integer, Cluster> architectureIndex = computeArchitectureIndex();
 
 		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
@@ -418,6 +432,18 @@ public class Architecture extends TreeMap<String, Cluster>
 				Collection<String> entities = cluster.getValue().getEntities();
 				for (String entity : entities)
 					out.println("contain " + clusterIndex + " " + entity);
+			}
+		}
+	}
+
+	private void writeToRsfWithoutIndices(File rsfFile)
+			throws FileNotFoundException {
+		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
+				new FileOutputStream(rsfFile), StandardCharsets.UTF_8))) {
+			for (Cluster cluster : this.values()) {
+				Collection<String> entities = cluster.getEntities();
+				for (String entity : entities)
+					out.println("contain " + cluster.name + " " + entity);
 			}
 		}
 	}

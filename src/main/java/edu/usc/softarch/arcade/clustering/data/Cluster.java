@@ -105,6 +105,17 @@ public class Cluster extends ReadOnlyCluster
 		this.numEntities = c1.getNumEntities() + c2.getNumEntities();
 		this.featureIndices = buildFeatureIndices();
 	}
+
+	/**
+	 * Constructor for Clusters to be used in custom clustering that does
+	 * not utilize similarity measures and the Clusterer framework, such as PKG.
+	 */
+	public Cluster(String name) {
+		super(name);
+		this.numEntities = 0;
+		this.featureMap = new double[1];
+		this.featureIndices = new ArrayList<>();
+	}
 	//endregion
 
 	//region ACCESSORS
