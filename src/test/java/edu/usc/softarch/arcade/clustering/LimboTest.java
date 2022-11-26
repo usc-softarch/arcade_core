@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.clustering;
 
 import edu.usc.softarch.arcade.BaseTest;
+import edu.usc.softarch.arcade.clustering.data.Architecture;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.criteria.SerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;

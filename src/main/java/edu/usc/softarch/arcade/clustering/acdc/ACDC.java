@@ -1,5 +1,13 @@
 package edu.usc.softarch.arcade.clustering.acdc;
 
+import edu.usc.softarch.arcade.clustering.acdc.data.Node;
+import edu.usc.softarch.arcade.clustering.acdc.patterns.BodyHeader;
+import edu.usc.softarch.arcade.clustering.acdc.patterns.ClusterLast;
+import edu.usc.softarch.arcade.clustering.acdc.patterns.DownInducer;
+import edu.usc.softarch.arcade.clustering.acdc.patterns.OrphanAdoption;
+import edu.usc.softarch.arcade.clustering.acdc.patterns.Pattern;
+import edu.usc.softarch.arcade.clustering.acdc.patterns.SubGraph;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,6 +1,6 @@
 package edu.usc.softarch.arcade.clustering.criteria.stopping;
 
-import edu.usc.softarch.arcade.clustering.Architecture;
+import edu.usc.softarch.arcade.clustering.data.Architecture;
 import edu.usc.softarch.arcade.clustering.criteria.StoppingCriterion;
 
 public class NoOrphansStoppingCriterion

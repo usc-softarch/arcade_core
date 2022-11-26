@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import edu.usc.softarch.arcade.BaseTest;
-import edu.usc.softarch.arcade.clustering.Architecture;
+import edu.usc.softarch.arcade.clustering.data.Architecture;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.visualization.clustering;
 
-import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.data.Architecture;
+import edu.usc.softarch.arcade.clustering.data.Cluster;
 import edu.usc.softarch.arcade.visualization.ArchitectureTableModel;
 import org.apache.commons.lang.NotImplementedException;
 

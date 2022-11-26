@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.clustering.simmeasures;
 
 import cc.mallet.util.Maths;
-import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.data.Cluster;
 
 public class InfoLossMeasure extends SimMeasure {
 	private static SimMeasure singleton;

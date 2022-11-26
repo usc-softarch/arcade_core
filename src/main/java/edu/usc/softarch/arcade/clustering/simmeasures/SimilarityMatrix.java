@@ -3,8 +3,8 @@ package edu.usc.softarch.arcade.clustering.simmeasures;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.data.Architecture;
+import edu.usc.softarch.arcade.clustering.data.Cluster;
 import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
 
 import java.io.IOException;

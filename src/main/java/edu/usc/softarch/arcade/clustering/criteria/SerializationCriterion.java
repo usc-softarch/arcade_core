@@ -1,6 +1,6 @@
 package edu.usc.softarch.arcade.clustering.criteria;
 
-import edu.usc.softarch.arcade.clustering.Architecture;
+import edu.usc.softarch.arcade.clustering.data.Architecture;
 import edu.usc.softarch.arcade.clustering.criteria.serialization.ArchSizeFractionSerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.serialization.ArchSizeModSerializationCriterion;
 import edu.usc.softarch.arcade.clustering.criteria.serialization.ArchSizeSerializationCriterion;

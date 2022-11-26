@@ -1,6 +1,6 @@
 package edu.usc.softarch.arcade.visualization.clustering;
 
-import edu.usc.softarch.arcade.clustering.Architecture;
+import edu.usc.softarch.arcade.clustering.data.Architecture;
 import edu.usc.softarch.arcade.visualization.ArchitectureTableModel;
 
 public class FeatureVectorViewer extends ArchitectureViewer {

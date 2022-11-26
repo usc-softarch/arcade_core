@@ -1,6 +1,6 @@
 package edu.usc.softarch.arcade.clustering.criteria.stopping;
 
-import edu.usc.softarch.arcade.clustering.Architecture;
+import edu.usc.softarch.arcade.clustering.data.Architecture;
 
 public class ArchSizeFractionStoppingCriterion
 		extends PreSelectedStoppingCriterion {

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import edu.usc.softarch.arcade.clustering.data.Architecture;
+import edu.usc.softarch.arcade.clustering.data.Cluster;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimData;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimilarityMatrix;

@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import edu.usc.softarch.arcade.BaseTest;
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
+import edu.usc.softarch.arcade.clustering.data.FeatureVectors;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

@@ -1,12 +1,7 @@
 package edu.usc.softarch.arcade.clustering.data;
 
-import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 import edu.usc.softarch.arcade.metrics.ClusterMetrics;
-import edu.usc.softarch.arcade.metrics.decay.ArchitecturalStability;
-import edu.usc.softarch.arcade.metrics.decay.InterConnectivity;
-import edu.usc.softarch.arcade.metrics.decay.IntraConnectivity;
-import edu.usc.softarch.arcade.metrics.decay.TurboMQ;
 import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
@@ -14,7 +9,6 @@ import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsExceptio
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
 import edu.usc.softarch.util.LabeledEdge;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import java.io.FileWriter;

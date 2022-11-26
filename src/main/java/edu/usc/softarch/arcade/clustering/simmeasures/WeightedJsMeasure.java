@@ -1,6 +1,6 @@
 package edu.usc.softarch.arcade.clustering.simmeasures;
 
-import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.data.Cluster;
 import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
 
 public class WeightedJsMeasure extends SimMeasure {

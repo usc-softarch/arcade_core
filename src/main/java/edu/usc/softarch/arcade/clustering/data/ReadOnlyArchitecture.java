@@ -1,7 +1,5 @@
 package edu.usc.softarch.arcade.clustering.data;
 
-import edu.usc.softarch.arcade.clustering.Architecture;
-import edu.usc.softarch.arcade.clustering.Cluster;
 import edu.usc.softarch.arcade.clustering.Clusterer;
 import edu.usc.softarch.arcade.facts.DependencyGraph;
 import edu.usc.softarch.arcade.topics.DocTopics;

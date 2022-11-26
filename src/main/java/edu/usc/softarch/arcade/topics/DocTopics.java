@@ -11,7 +11,7 @@ import java.util.TreeMap;
 import cc.mallet.topics.TopicInferencer;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
-import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.data.Cluster;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;

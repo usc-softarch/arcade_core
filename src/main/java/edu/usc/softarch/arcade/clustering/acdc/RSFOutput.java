@@ -1,5 +1,7 @@
 package edu.usc.softarch.arcade.clustering.acdc;
 
+import edu.usc.softarch.arcade.clustering.acdc.data.Node;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

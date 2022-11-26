@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.clustering;
+package edu.usc.softarch.arcade.clustering.data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,7 +19,8 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.clustering.Clusterer;
+import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
 import edu.usc.softarch.arcade.clustering.simmeasures.SimMeasure;
 import edu.usc.softarch.arcade.facts.DependencyGraph;
 import edu.usc.softarch.arcade.topics.Concern;

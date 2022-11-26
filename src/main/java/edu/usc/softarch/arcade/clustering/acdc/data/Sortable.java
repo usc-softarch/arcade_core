@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.clustering.acdc;
+package edu.usc.softarch.arcade.clustering.acdc.data;
 
 public class Sortable implements Comparable<Sortable> {
   private final Integer key;

@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.clustering.acdc;
+package edu.usc.softarch.arcade.clustering.acdc.data;
 
 import java.util.List;
 import java.util.Set;

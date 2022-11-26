@@ -1,4 +1,7 @@
-package edu.usc.softarch.arcade.clustering.acdc;
+package edu.usc.softarch.arcade.clustering.acdc.patterns;
+
+import edu.usc.softarch.arcade.clustering.acdc.data.Edge;
+import edu.usc.softarch.arcade.clustering.acdc.data.Node;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +25,7 @@ public abstract class Pattern {
 	//endregion
 
 	//region PROCESSING
-	protected abstract void execute();
+	public abstract void execute();
 
 	/**
 	 * Returns a collection of child nodes to the given parameter.

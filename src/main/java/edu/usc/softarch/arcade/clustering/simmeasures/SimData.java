@@ -2,7 +2,7 @@ package edu.usc.softarch.arcade.clustering.simmeasures;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.data.Cluster;
 
 import java.io.IOException;
 import java.util.Map;

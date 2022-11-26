@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.clustering.acdc;
+package edu.usc.softarch.arcade.clustering.acdc.data;
 
 /**
  * This class encapsulates information about an Edge object.

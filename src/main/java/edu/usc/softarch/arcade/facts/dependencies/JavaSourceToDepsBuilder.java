@@ -13,7 +13,7 @@ import java.util.Set;
 import classycle.Analyser;
 import classycle.ClassAttributes;
 import classycle.graph.AtomicVertex;
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
+import edu.usc.softarch.arcade.clustering.data.FeatureVectors;
 import edu.usc.softarch.arcade.facts.DependencyGraph;
 import edu.usc.softarch.arcade.util.FileUtil;
 

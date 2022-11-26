@@ -1,4 +1,6 @@
-package edu.usc.softarch.arcade.clustering.acdc;
+package edu.usc.softarch.arcade.clustering.acdc.patterns;
+
+import edu.usc.softarch.arcade.clustering.acdc.data.Node;
 
 import java.util.ArrayList;
 import java.util.Collection;

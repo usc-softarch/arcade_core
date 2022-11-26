@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.clustering.simmeasures;
 
 import cc.mallet.util.Maths;
-import edu.usc.softarch.arcade.clustering.Cluster;
+import edu.usc.softarch.arcade.clustering.data.Cluster;
 import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
 
 public class ScmMeasure extends SimMeasure {

@@ -2,7 +2,7 @@ package edu.usc.softarch.arcade.facts.dependencies;
 
 import java.io.IOException;
 
-import edu.usc.softarch.arcade.clustering.FeatureVectors;
+import edu.usc.softarch.arcade.clustering.data.FeatureVectors;
 import edu.usc.softarch.arcade.facts.DependencyGraph;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

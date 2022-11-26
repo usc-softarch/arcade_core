@@ -1,5 +1,8 @@
 package edu.usc.softarch.arcade.clustering.acdc;
 
+import edu.usc.softarch.arcade.clustering.acdc.data.Edge;
+import edu.usc.softarch.arcade.clustering.acdc.data.Node;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
