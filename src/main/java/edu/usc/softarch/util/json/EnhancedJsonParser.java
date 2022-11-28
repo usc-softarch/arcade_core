@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -46,16 +48,131 @@ public class EnhancedJsonParser implements AutoCloseable {
 		return this.parser.getText();
 	}
 
+	private Collection<String> parseStringCollection() throws IOException {
+		Collection<String> result = new ArrayList<>();
+
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
+
+		while (!this.nextToken().equals(JsonToken.END_ARRAY))
+			result.add(this.parser.getText());
+
+		return result;
+	}
+
+	public String[] parseStringArray() throws IOException {
+		return parseStringCollection().toArray(new String[0]); }
+
+	public String[][] parseStringMatrix() throws IOException {
+		List<Collection<String>> resultAux = new ArrayList<>();
+
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
+
+		while (this.nextToken().equals(JsonToken.START_ARRAY)) {
+			Collection<String> array = new ArrayList<>();
+
+			while (!this.nextToken().equals(JsonToken.END_ARRAY))
+				array.add(this.parser.getText());
+
+			resultAux.add(array);
+		}
+
+		String[][] result = new String[resultAux.size()][];
+
+		for (int i = 0; i < result.length; i++)
+			result[i] = resultAux.get(i).toArray(new String[0]);
+
+		return result;
+	}
+
 	public Integer parseInt() throws IOException {
 		this.nextToken(); // skip field name
 		this.nextToken(); // move to value
 		return this.parser.getIntValue();
 	}
 
+	private Collection<Integer> parseIntCollection() throws IOException {
+		Collection<Integer> result = new ArrayList<>();
+
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
+
+		while (!this.nextToken().equals(JsonToken.END_ARRAY))
+			result.add(this.parser.getIntValue());
+
+		return result;
+	}
+
+	public int[] parseIntArray() throws IOException {
+		return this.unboxIntArray(parseIntCollection().toArray(new Integer[0])); }
+
+	public int[][] parseIntMatrix() throws IOException {
+		List<Collection<Integer>> resultAux = new ArrayList<>();
+
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
+
+		while (this.nextToken().equals(JsonToken.START_ARRAY)) {
+			Collection<Integer> array = new ArrayList<>();
+
+			while (!this.nextToken().equals(JsonToken.END_ARRAY))
+				array.add(this.parser.getIntValue());
+
+			resultAux.add(array);
+		}
+
+		int[][] result = new int[resultAux.size()][];
+
+		for (int i = 0; i < result.length; i++)
+			result[i] = this.unboxIntArray(resultAux.get(i).toArray(new Integer[0]));
+
+		return result;
+	}
+
 	public Double parseDouble() throws IOException {
 		this.nextToken(); //skip field name
 		this.nextToken(); // move to value
 		return this.parser.getDoubleValue();
+	}
+
+	private Collection<Double> parseDoubleCollection() throws IOException {
+		Collection<Double> result = new ArrayList<>();
+
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
+
+		while (!this.nextToken().equals(JsonToken.END_ARRAY))
+			result.add(this.parser.getDoubleValue());
+
+		return result;
+	}
+
+	public double[] parseDoubleArray() throws IOException {
+		return this.unboxDoubleArray(parseDoubleCollection().toArray(new Double[0]));
+	}
+
+	public double[][] parseDoubleMatrix() throws IOException {
+		List<Collection<Double>> resultAux = new ArrayList<>();
+
+		this.nextToken(); // skip field name
+		this.nextToken(); // skip start array
+
+		while (this.nextToken().equals(JsonToken.START_ARRAY)) {
+			Collection<Double> array = new ArrayList<>();
+
+			while (!this.nextToken().equals(JsonToken.END_ARRAY))
+				array.add(this.parser.getDoubleValue());
+
+			resultAux.add(array);
+		}
+
+		double[][] result = new double[resultAux.size()][];
+
+		for (int i = 0; i < result.length; i++)
+			result[i] = this.unboxDoubleArray(resultAux.get(i).toArray(new Double[0]));
+
+		return result;
 	}
 
 	public <T> T parseObject(Class<T> type) throws IOException {
@@ -149,42 +266,6 @@ public class EnhancedJsonParser implements AutoCloseable {
 		return result;
 	}
 
-	private Collection<String> parseStringCollection() throws IOException {
-		Collection<String> result = new ArrayList<>();
-
-		this.nextToken(); // skip field name
-		this.nextToken(); // skip start array
-
-		while (!this.nextToken().equals(JsonToken.END_ARRAY))
-			result.add(this.parser.getText());
-
-		return result;
-	}
-
-	private Collection<Integer> parseIntCollection() throws IOException {
-		Collection<Integer> result = new ArrayList<>();
-
-		this.nextToken(); // skip field name
-		this.nextToken(); // skip start array
-
-		while (!this.nextToken().equals(JsonToken.END_ARRAY))
-			result.add(this.parser.getIntValue());
-
-		return result;
-	}
-
-	private Collection<Double> parseDoubleCollection() throws IOException {
-		Collection<Double> result = new ArrayList<>();
-
-		this.nextToken(); // skip field name
-		this.nextToken(); // skip start array
-
-		while (!this.nextToken().equals(JsonToken.END_ARRAY))
-			result.add(this.parser.getDoubleValue());
-
-		return result;
-	}
-
 	private <T> Collection<T> parseObjectCollection(Class<T> type)
 		throws IOException {
 		Collection<T> result = new ArrayList<>();
@@ -240,6 +321,11 @@ public class EnhancedJsonParser implements AutoCloseable {
 	private JsonToken peekToken() { return this.peekParser.currentToken(); }
 	private String peekText() throws IOException {
 		return this.peekParser.getText(); }
+
+	private int[] unboxIntArray(Integer[] array) {
+		return Arrays.stream(array).mapToInt(Integer::intValue).toArray(); }
+	private double[] unboxDoubleArray(Double[] array) {
+		return Arrays.stream(array).mapToDouble(Double::doubleValue).toArray(); }
 	//endregion
 
 	//region OBJECT METHODS

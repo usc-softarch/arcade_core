@@ -38,12 +38,61 @@ public class EnhancedJsonGenerator implements AutoCloseable {
 		this.generator.writeStringField(name, value);
 	}
 
+	public void writeField(String name, String[] values) throws IOException {
+		this.generator.writeFieldName(name);
+		this.generator.writeArray(values, 0, values.length);
+	}
+
+	public void writeField(String name, String[][] values) throws IOException {
+		this.generator.writeFieldName(name);
+		this.generator.writeStartArray();
+
+		for (String[] array : values)
+			this.generator.writeArray(array, 0, array.length);
+
+		this.generator.writeEndArray();
+	}
+
 	public void writeField(String name, Integer value) throws IOException {
-		this.generator.writeNumberField(name, value);
+		this.generator.writeNumberField(name, value); }
+
+	public void writeField(String name, int value) throws IOException {
+		this.generator.writeNumberField(name, value); }
+
+	public void writeField(String name, int[] values) throws IOException {
+		this.generator.writeFieldName(name);
+		this.generator.writeArray(values, 0, values.length);
+	}
+
+	public void writeField(String name, int[][] values) throws IOException {
+		this.generator.writeFieldName(name);
+		this.generator.writeStartArray();
+
+		for (int[] array : values)
+			this.generator.writeArray(array, 0, array.length);
+
+		this.generator.writeEndArray();
 	}
 
 	public void writeField(String name, Double value) throws IOException {
-		this.generator.writeNumberField(name, value);
+		this.generator.writeNumberField(name, value); }
+
+	public void writeField(String name, double value) throws IOException {
+		this.generator.writeNumberField(name, value); }
+
+	public void writeField(String name, double[] values) throws IOException {
+		this.generator.writeFieldName(name);
+		this.generator.writeArray(values, 0, values.length);
+	}
+
+	public void writeField(String name, double[][] values) throws IOException {
+		this.generator.writeFieldName(name);
+		this.generator.writeStartArray();
+
+		for (double[] array : values)
+			this.generator.writeArray(array, 0, array.length);
+
+		this.generator.writeEndArray();
 	}
 
 	public void writeField(String name, JsonSerializable value)
@@ -151,24 +200,15 @@ public class EnhancedJsonGenerator implements AutoCloseable {
 
 	private void writeStringArrayField(String name,
 			Collection<String> values) throws IOException {
-		this.generator.writeFieldName(name);
-		this.generator.writeArray(
-			values.toArray(new String[0]), 0, values.size());
-	}
+		this.writeField(name, values.toArray(new String[0])); }
 
 	private void writeIntegerArrayField(String name,
 			Collection<Integer> values) throws IOException {
-		this.generator.writeFieldName(name);
-		this.generator.writeArray(
-			values.stream().mapToInt(i->i).toArray(), 0, values.size());
-	}
+		this.writeField(name, values.stream().mapToInt(i->i).toArray()); }
 
 	private void writeDoubleArrayField(String name,
 			Collection<Double> values) throws IOException {
-		this.generator.writeFieldName(name);
-		this.generator.writeArray(
-			values.stream().mapToDouble(i->i).toArray(), 0, values.size());
-	}
+		this.writeField(name, values.stream().mapToDouble(i->i).toArray()); }
 	//endregion
 
 	//region OBJECT METHODS
