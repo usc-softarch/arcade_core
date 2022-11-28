@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class SystemMetrics implements JsonSerializable {
 	//region PUBLIC INTERFACE
@@ -41,10 +40,10 @@ public class SystemMetrics implements JsonSerializable {
 	private final Collection<ArchitectureMetrics> versionMetrics;
 
 	private final String[] versions;
-	private final double[] a2a;
-	private final double[] cvgForwards;
-	private final double[] cvgBackwards;
-	private final double[] mojoFm;
+	private final double[][] a2a;
+	private final double[][] cvgForwards;
+	private final double[][] cvgBackwards;
+	private final double[][] mojoFm;
 	//endregion
 
 	//region CONSTRUCTORS
@@ -75,25 +74,41 @@ public class SystemMetrics implements JsonSerializable {
 			this.versions[i] = archDirs.get(i).getName();
 
 		// Run a2a
-		this.a2a = new double[this.versions.length - 1];
-		for (int i = 0; i < this.versions.length - 1; i++)
-			this.a2a[i] = SystemEvo.run(archFiles.get(i), archFiles.get(i + 1));
+		this.a2a = new double[this.versions.length - 1][];
+		for (int i = 0; i < this.versions.length - 1; i++) {
+			this.a2a[i] = new double[this.versions.length - 2 - i];
+
+			for (int j = i + 1; j < this.versions.length; j++)
+				this.a2a[i][j - i - 1] =
+					SystemEvo.run(archFiles.get(i), archFiles.get(j));
+		}
 
 		// Run cvg
-		this.cvgForwards = new double[this.versions.length - 1];
-		this.cvgBackwards = new double[this.versions.length - 1];
+		this.cvgForwards = new double[this.versions.length - 1][];
+		this.cvgBackwards = new double[this.versions.length - 1][];
 		for (int i = 0; i < this.versions.length - 1; i++) {
-			this.cvgForwards[i] = Cvg.run(archFiles.get(i), archFiles.get(i + 1));
-			this.cvgBackwards[i] = Cvg.run(archFiles.get(i + 1), archFiles.get(i));
+			this.cvgForwards[i] = new double[this.versions.length - 2 - i];
+			this.cvgBackwards[i] = new double[this.versions.length - 2 - i];
+
+			for (int j = i + 1; j < this.versions.length; j++) {
+				this.cvgForwards[i][j - i - 1] =
+					Cvg.run(archFiles.get(i), archFiles.get(j));
+				this.cvgBackwards[i][j - i - 1] =
+					Cvg.run(archFiles.get(j), archFiles.get(i));
+			}
 		}
 
 		// Run MoJoFM
-		this.mojoFm = new double[this.versions.length - 1];
+		this.mojoFm = new double[this.versions.length - 1][];
 		for (int i = 0; i < this.versions.length - 1; i++) {
-			MoJoCalculator mojoCalc = new MoJoCalculator(
-				archFiles.get(i).getAbsolutePath(),
-				archFiles.get(i + 1).getAbsolutePath(), null);
-			this.mojoFm[i] = mojoCalc.mojofm();
+			this.mojoFm[i] = new double[this.versions.length - 2 - i];
+
+			for (int j = i + 1; j < this.versions.length; j++) {
+				MoJoCalculator mojoCalc = new MoJoCalculator(
+					archFiles.get(i).getAbsolutePath(),
+					archFiles.get(j).getAbsolutePath(), null);
+				this.mojoFm[i][j - i - 1] = mojoCalc.mojofm();
+			}
 		}
 
 		// Initialize ArchitectureMetrics
@@ -105,8 +120,8 @@ public class SystemMetrics implements JsonSerializable {
 	}
 
 	private SystemMetrics(Collection<ArchitectureMetrics> versionMetrics,
-			String[] versions, double[] a2a, double[] cvgForwards,
-			double[] cvgBackwards, double[] mojoFm) {
+			String[] versions, double[][] a2a, double[][] cvgForwards,
+			double[][] cvgBackwards, double[][] mojoFm) {
 		this.versionMetrics = versionMetrics;
 		this.versions = versions;
 		this.a2a = a2a;
@@ -121,13 +136,13 @@ public class SystemMetrics implements JsonSerializable {
 		return new ArrayList<>(this.versionMetrics); }
 	public String[] getVersions() {
 		return Arrays.copyOf(this.versions, this.versions.length); }
-	public double[] getA2a() {
+	public double[][] getA2a() {
 		return Arrays.copyOf(this.a2a, this.a2a.length); }
-	public double[] getCvgForwards() {
+	public double[][] getCvgForwards() {
 		return Arrays.copyOf(this.cvgForwards, this.cvgForwards.length); }
-	public double[] getCvgBackwards() {
+	public double[][] getCvgBackwards() {
 		return Arrays.copyOf(this.cvgBackwards, this.cvgBackwards.length); }
-	public double[] getMojoFm() {
+	public double[][] getMojoFm() {
 		return Arrays.copyOf(this.mojoFm, this.mojoFm.length); }
 	//endregion
 
@@ -142,14 +157,10 @@ public class SystemMetrics implements JsonSerializable {
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
 		generator.writeField("archs", versionMetrics);
 		generator.writeField("versions", List.of(versions));
-		generator.writeField("a2a",
-			Arrays.stream(a2a).boxed().collect(Collectors.toList()));
-		generator.writeField("cvgF",
-			Arrays.stream(cvgForwards).boxed().collect(Collectors.toList()));
-		generator.writeField("cvgB",
-			Arrays.stream(cvgBackwards).boxed().collect(Collectors.toList()));
-		generator.writeField("mojo",
-			Arrays.stream(mojoFm).boxed().collect(Collectors.toList()));
+		generator.writeField("a2a", a2a);
+		generator.writeField("cvgF", cvgForwards);
+		generator.writeField("cvgB", cvgBackwards);
+		generator.writeField("mojo", mojoFm);
 	}
 
 	public static SystemMetrics deserialize(String path) throws IOException {
@@ -162,16 +173,11 @@ public class SystemMetrics implements JsonSerializable {
 			throws IOException {
 		Collection<ArchitectureMetrics> versionMetrics =
 			parser.parseCollection(ArchitectureMetrics.class);
-		String[] versions =
-			parser.parseCollection(String.class).toArray(new String[0]);
-		double[] a2a = Stream.of(parser.parseCollection(Double.class)
-			.toArray(new Double[0])).mapToDouble(Double::doubleValue).toArray();
-		double[] cvgForwards = Stream.of(parser.parseCollection(Double.class)
-			.toArray(new Double[0])).mapToDouble(Double::doubleValue).toArray();
-		double[] cvgBackwards = Stream.of(parser.parseCollection(Double.class)
-			.toArray(new Double[0])).mapToDouble(Double::doubleValue).toArray();
-		double[] mojoFm = Stream.of(parser.parseCollection(Double.class)
-			.toArray(new Double[0])).mapToDouble(Double::doubleValue).toArray();
+		String[] versions = parser.parseStringArray();
+		double[][] a2a = parser.parseDoubleMatrix();
+		double[][] cvgForwards = parser.parseDoubleMatrix();
+		double[][] cvgBackwards = parser.parseDoubleMatrix();
+		double[][] mojoFm = parser.parseDoubleMatrix();
 
 		return new SystemMetrics(versionMetrics, versions, a2a, cvgForwards,
 			cvgBackwards, mojoFm);

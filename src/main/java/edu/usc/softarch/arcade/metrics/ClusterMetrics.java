@@ -14,9 +14,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ClusterMetrics implements JsonSerializable {
 	//region ATTRIBUTES
@@ -64,9 +61,7 @@ public class ClusterMetrics implements JsonSerializable {
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
 		generator.writeField("name", clusterName);
 		generator.writeField("intra", intraConnectivity);
-		generator.writeField("inter",
-			Arrays.stream(interConnectivity.getValues())
-				.boxed().collect(Collectors.toList()));
+		generator.writeField("inter", interConnectivity.getValues());
 		generator.writeField("basicMq", basicMq);
 		generator.writeField("cf", clusterFactor);
 		generator.writeField("fanIn", fanIn);
@@ -78,10 +73,8 @@ public class ClusterMetrics implements JsonSerializable {
 			throws IOException {
 		String clusterName = parser.parseString();
 		double intraConnectivity = parser.parseDouble();
-		// Need to unbox the list because DescriptiveStatistics is dumb
-		DescriptiveStatistics interConnectivity = new DescriptiveStatistics(
-			Stream.of(parser.parseCollection(Double.class).toArray(new Double[0]))
-				.mapToDouble(Double::doubleValue).toArray());
+		DescriptiveStatistics interConnectivity =
+			new DescriptiveStatistics(parser.parseDoubleArray());
 		double basicMq = parser.parseDouble();
 		double clusterFactor = parser.parseDouble();
 		double fanIn = parser.parseDouble();
