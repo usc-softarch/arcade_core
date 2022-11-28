@@ -31,7 +31,7 @@ public class Pkg {
 		Map<String, Cluster> pkgClusters = new HashMap<>();
 		for (Map.Entry<String, Cluster> entry : arch.entrySet()) {
 			String entityName = entry.getKey();
-			String packageName = identifyPackage(entityName);
+			String packageName = identifyPackage(entityName, language);
 			pkgClusters.putIfAbsent(packageName, new Cluster(packageName));
 			pkgClusters.get(packageName).addEntity(entityName);
 		}
@@ -46,11 +46,14 @@ public class Pkg {
 
 	//region PROCESSING
 	//TODO Fix this so it can take Java class formats too
-	private static String identifyPackage(String entity) {
-		return identifyPackage(entity, File.separator);
+	private static String identifyPackage(String entity, String language) {
+		if (language.equals("java"))
+			return identifyPackageAux(entity, ".");
+		else
+			return identifyPackageAux(entity, File.separator);
 	}
 
-	private static String identifyPackage(String entity, String separator) {
+	private static String identifyPackageAux(String entity, String separator) {
 		int index = entity.lastIndexOf(separator);
 		if (index != -1)
 			return entity.substring(0, entity.lastIndexOf(separator));

@@ -329,7 +329,7 @@ public class DocTopics implements JsonSerializable {
 				if (toReturn == null)
 					toReturn = entry.getValue();
 				else
-					throw new IllegalStateException("Two DocTopicItems found to match "
+					System.err.println("Two DocTopicItems found to match "
 						+ name + ": " + toReturn.source + " and " + entry.getKey());
 			}
 		}

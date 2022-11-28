@@ -249,7 +249,9 @@ public class MalletRunner {
 			Pattern p;
 			switch (this.language) {
 				case "java":
-					if (!file.getName().endsWith(".java")) continue;
+					if (!file.getName().endsWith(".java")
+							|| file.getAbsolutePath().contains("src" + File.separator + "test"))
+						continue;
 					copyFile(file);
 					break;
 				case "c":

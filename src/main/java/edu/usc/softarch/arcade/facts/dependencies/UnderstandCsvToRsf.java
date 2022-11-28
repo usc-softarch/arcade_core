@@ -26,7 +26,8 @@ public class UnderstandCsvToRsf {
 			String line = br.readLine(); // Skip header
 
 			while ((line = br.readLine()) != null) {
-				if (line.trim().isEmpty()) continue; // Skip empty lines
+				// Skip empty lines and anonymous classes
+				if (line.trim().isEmpty() || line.contains("(Anon_")) continue;
 
 				String[] entry = line.split(",");
 				String from = entry[0];
