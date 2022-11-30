@@ -8,12 +8,15 @@ import edu.usc.softarch.util.json.JsonSerializable;
 import mojo.MoJoCalculator;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class SystemMetrics implements JsonSerializable {
@@ -32,12 +35,13 @@ public class SystemMetrics implements JsonSerializable {
 	public static void run(String systemDirPath, String depsDirPath,
 			String outputPath) throws IOException {
 		SystemMetrics metrics = new SystemMetrics(systemDirPath, depsDirPath);
-		metrics.serialize(outputPath);
+		metrics.serialize(outputPath + File.separator + "metricsObject.json");
+		metrics.writeClusterMetrics(outputPath);
 	}
 	//endregion
 
 	//region ATTRIBUTES
-	private final Collection<ArchitectureMetrics> versionMetrics;
+	private final Map<String, ArchitectureMetrics> versionMetrics;
 
 	private final String[] versions;
 	private final double[][] a2a;
@@ -76,7 +80,7 @@ public class SystemMetrics implements JsonSerializable {
 		// Run a2a
 		this.a2a = new double[this.versions.length - 1][];
 		for (int i = 0; i < this.versions.length - 1; i++) {
-			this.a2a[i] = new double[this.versions.length - 2 - i];
+			this.a2a[i] = new double[this.versions.length - 1 - i];
 
 			for (int j = i + 1; j < this.versions.length; j++)
 				this.a2a[i][j - i - 1] =
@@ -87,8 +91,8 @@ public class SystemMetrics implements JsonSerializable {
 		this.cvgForwards = new double[this.versions.length - 1][];
 		this.cvgBackwards = new double[this.versions.length - 1][];
 		for (int i = 0; i < this.versions.length - 1; i++) {
-			this.cvgForwards[i] = new double[this.versions.length - 2 - i];
-			this.cvgBackwards[i] = new double[this.versions.length - 2 - i];
+			this.cvgForwards[i] = new double[this.versions.length - 1 - i];
+			this.cvgBackwards[i] = new double[this.versions.length - 1 - i];
 
 			for (int j = i + 1; j < this.versions.length; j++) {
 				this.cvgForwards[i][j - i - 1] =
@@ -101,7 +105,7 @@ public class SystemMetrics implements JsonSerializable {
 		// Run MoJoFM
 		this.mojoFm = new double[this.versions.length - 1][];
 		for (int i = 0; i < this.versions.length - 1; i++) {
-			this.mojoFm[i] = new double[this.versions.length - 2 - i];
+			this.mojoFm[i] = new double[this.versions.length - 1 - i];
 
 			for (int j = i + 1; j < this.versions.length; j++) {
 				MoJoCalculator mojoCalc = new MoJoCalculator(
@@ -112,14 +116,14 @@ public class SystemMetrics implements JsonSerializable {
 		}
 
 		// Initialize ArchitectureMetrics
-		this.versionMetrics = new ArrayList<>();
+		this.versionMetrics = new TreeMap<>();
 		for (int i = 0; i < this.versions.length; i++)
-			this.versionMetrics.add(new ArchitectureMetrics(
+			this.versionMetrics.put(this.versions[i], new ArchitectureMetrics(
 				archFiles.get(i).getAbsolutePath(),
 				depsFiles.get(i).getAbsolutePath()));
 	}
 
-	private SystemMetrics(Collection<ArchitectureMetrics> versionMetrics,
+	private SystemMetrics(Map<String, ArchitectureMetrics> versionMetrics,
 			String[] versions, double[][] a2a, double[][] cvgForwards,
 			double[][] cvgBackwards, double[][] mojoFm) {
 		this.versionMetrics = versionMetrics;
@@ -133,7 +137,7 @@ public class SystemMetrics implements JsonSerializable {
 
 	//region ACCESSORS
 	public Collection<ArchitectureMetrics> getVersionMetrics() {
-		return new ArrayList<>(this.versionMetrics); }
+		return this.versionMetrics.values(); }
 	public String[] getVersions() {
 		return Arrays.copyOf(this.versions, this.versions.length); }
 	public double[][] getA2a() {
@@ -147,6 +151,91 @@ public class SystemMetrics implements JsonSerializable {
 	//endregion
 
 	//region SERIALIZATION
+	public void writeClusterMetrics(String dirPath) throws IOException {
+		FileUtil.checkDir(dirPath, true, false);
+
+		// Initialize results map with maps of all relevant cluster metrics
+		Map<String, Map<String, double[]>> results = new HashMap<>();
+		results.put("intraConnectivity", new TreeMap<>());
+		results.put("interConnectivityMean", new TreeMap<>());
+		results.put("interConnectivityMin", new TreeMap<>());
+		results.put("interConnectivityMax", new TreeMap<>());
+		results.put("interConnectivityStDev", new TreeMap<>());
+		results.put("basicMq", new TreeMap<>());
+		results.put("clusterFactor", new TreeMap<>());
+		results.put("fanIn", new TreeMap<>());
+		results.put("fanOut", new TreeMap<>());
+		results.put("instability", new TreeMap<>());
+
+		// Get data from each individual version
+		for (int i = 0; i < versions.length; i++) {
+			ArchitectureMetrics version = this.versionMetrics.get(versions[i]);
+
+			// Get data from each cluster of this version
+			for (ClusterMetrics clusterMetrics : version.getClusterMetrics()) {
+				String name = clusterMetrics.clusterName;
+
+				// Create entries for this cluster, if they don't exist
+				if (!results.get("intraConnectivity").containsKey(name))
+					for (Map<String, double[]> metric : results.values())
+						metric.put(name, initializeNanArray(versions.length));
+
+				results.get("intraConnectivity").get(name)[i] =
+					clusterMetrics.intraConnectivity;
+				results.get("interConnectivityMean").get(name)[i] =
+					clusterMetrics.interConnectivity.getMean();
+				results.get("interConnectivityMin").get(name)[i] =
+					clusterMetrics.interConnectivity.getMin();
+				results.get("interConnectivityMax").get(name)[i] =
+					clusterMetrics.interConnectivity.getMax();
+				results.get("interConnectivityStDev").get(name)[i] =
+					clusterMetrics.interConnectivity.getStandardDeviation();
+				results.get("basicMq").get(name)[i] =
+					clusterMetrics.basicMq;
+				results.get("clusterFactor").get(name)[i] =
+					clusterMetrics.clusterFactor;
+				results.get("fanIn").get(name)[i] =
+					clusterMetrics.fanIn;
+				results.get("fanOut").get(name)[i] =
+					clusterMetrics.fanOut;
+				results.get("instability").get(name)[i] =
+					clusterMetrics.instability;
+			}
+		}
+
+		for (String metric : results.keySet())
+			writeMetricCsv(dirPath, metric, results);
+	}
+
+	private void writeMetricCsv(String dirPath, String metric,
+			Map<String, Map<String, double[]>> results) throws IOException {
+		try (FileWriter writer = new FileWriter(
+			dirPath + File.separator + metric + ".csv")) {
+			writer.write("Cluster");
+			for (String version : this.versions)
+				writer.write("," + version);
+			writer.write(System.lineSeparator());
+
+			for (Map.Entry<String, double[]> cluster
+				: results.get(metric).entrySet()) {
+				writer.write(cluster.getKey());
+				for (double v : cluster.getValue()) {
+					writer.write(",");
+					if (!Double.isNaN(v)) writer.write(Double.toString(v));
+				}
+				writer.write(System.lineSeparator());
+			}
+		}
+	}
+
+	private double[] initializeNanArray(int length) {
+		double[] result = new double[length];
+		for (int i = 0; i < length; i++)
+			result[i] = Double.NaN;
+
+		return result;
+	}
+
 	public void serialize(String path) throws IOException {
 		try (EnhancedJsonGenerator generator = new EnhancedJsonGenerator(path)) {
 			serialize(generator);
@@ -155,7 +244,7 @@ public class SystemMetrics implements JsonSerializable {
 
 	@Override
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
-		generator.writeField("archs", versionMetrics);
+		generator.writeField("archs", versionMetrics.values());
 		generator.writeField("versions", List.of(versions));
 		generator.writeField("a2a", a2a);
 		generator.writeField("cvgF", cvgForwards);
@@ -171,9 +260,14 @@ public class SystemMetrics implements JsonSerializable {
 
 	public static SystemMetrics deserialize(EnhancedJsonParser parser)
 			throws IOException {
-		Collection<ArchitectureMetrics> versionMetrics =
-			parser.parseCollection(ArchitectureMetrics.class);
+		List<ArchitectureMetrics> versionMetricsCollection =
+			new ArrayList<>(parser.parseCollection(ArchitectureMetrics.class));
 		String[] versions = parser.parseStringArray();
+
+		Map<String, ArchitectureMetrics> versionMetrics = new TreeMap<>();
+		for (int i = 0; i < versions.length; i++)
+			versionMetrics.put(versions[i], versionMetricsCollection.get(i));
+
 		double[][] a2a = parser.parseDoubleMatrix();
 		double[][] cvgForwards = parser.parseDoubleMatrix();
 		double[][] cvgBackwards = parser.parseDoubleMatrix();

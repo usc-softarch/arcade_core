@@ -6,8 +6,8 @@ import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
-import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
+import edu.usc.softarch.util.EnhancedTreeSet;
 import edu.usc.softarch.util.LabeledEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
@@ -54,7 +54,7 @@ public class ReadOnlyCluster {
 	 */
 	public ReadOnlyCluster(String name) {
 		this.name = name;
-		this.entities = new EnhancedHashSet<>();
+		this.entities = new EnhancedTreeSet<>();
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class ReadOnlyCluster {
 	protected ReadOnlyCluster(ClusteringAlgorithmType cat, Cluster c1, Cluster c2,
 			String projectName, String projectVersion)
 			throws UnmatchingDocTopicItemsException {
-		this.entities = new EnhancedHashSet<>(c2.getEntities());
+		this.entities = new EnhancedTreeSet<>(c2.getEntities());
 
 		if (cat.equals(ClusteringAlgorithmType.ARC) && c1.name.contains("$"))
 			this.name = c2.name;
@@ -192,6 +192,18 @@ public class ReadOnlyCluster {
 	public Set<String> intersection(ReadOnlyCluster c) {
 		return this.entities.intersection(c.entities); }
 
+	public String[] intersectionArray(ReadOnlyCluster c) {
+		Object[] objArray = this.entities.intersectionArray(c.entities);
+		String[] result = new String[objArray.length];
+		for (int i = 0; i < objArray.length; i++)
+			result[i] = (String) objArray[i];
+
+		return result;
+	}
+
+	public int intersectionSize(ReadOnlyCluster c) {
+		return this.entities.intersectionSize(c.entities); }
+
 	/**
 	 * Returns the difference of the entities of two clusters.
 	 *
@@ -209,6 +221,18 @@ public class ReadOnlyCluster {
 	 */
 	public Set<String> symmetricDifference(ReadOnlyCluster c) {
 		return this.entities.symmetricDifference(c.entities); }
+
+	public String[] symmetricDifferenceArray(ReadOnlyCluster c) {
+		Object[] objArray = this.entities.symmetricDifferenceArray(c.entities);
+		String[] result = new String[objArray.length];
+		for (int i = 0; i < objArray.length; i++)
+			result[i] = (String) objArray[i];
+
+		return result;
+	}
+
+	public int symmetricDifferenceSize(ReadOnlyCluster c) {
+		return this.entities.symmetricDifferenceSize(c.entities); }
 	//endregion
 
 	//region PROCESSING

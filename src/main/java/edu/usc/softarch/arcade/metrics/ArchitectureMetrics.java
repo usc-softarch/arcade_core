@@ -15,12 +15,14 @@ import mojo.MoJoCalculator;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class ArchitectureMetrics implements JsonSerializable {
 	//region ATTRIBUTES
-	private final Collection<ClusterMetrics> clusterMetrics;
+	private final Map<String, ClusterMetrics> clusterMetrics;
 
 	public final double intraConnectivity;
 	public final double interConnectivity;
@@ -43,9 +45,10 @@ public class ArchitectureMetrics implements JsonSerializable {
 		SimpleDirectedGraph<String, LabeledEdge> graph =
 			arch.buildFullGraph(depsPath);
 
-		this.clusterMetrics = new ArrayList<>();
+		this.clusterMetrics = new TreeMap<>();
 		for (ReadOnlyCluster cluster : arch.values())
-			this.clusterMetrics.add(new ClusterMetrics(cluster, arch, graph));
+			this.clusterMetrics.put(
+				cluster.name, new ClusterMetrics(cluster, arch, graph));
 
 		this.intraConnectivity =
 			IntraConnectivity.computeIntraConnectivity(arch, graph);
@@ -63,7 +66,7 @@ public class ArchitectureMetrics implements JsonSerializable {
 		}
 	}
 
-	private ArchitectureMetrics(Collection<ClusterMetrics> clusterMetrics,
+	private ArchitectureMetrics(Map<String, ClusterMetrics> clusterMetrics,
 			double intraConnectivity, double interConnectivity, double basicMq,
 			double turboMq, double instability, double mojoFmGt) {
 		this.clusterMetrics = clusterMetrics;
@@ -78,13 +81,13 @@ public class ArchitectureMetrics implements JsonSerializable {
 
 	//region ACCESSORS
 	public Collection<ClusterMetrics> getClusterMetrics() {
-		return new ArrayList<>(this.clusterMetrics); }
+		return this.clusterMetrics.values(); }
 	//endregion
 
 	//region SERIALIZATION
 	@Override
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
-		generator.writeField("clusters", clusterMetrics);
+		generator.writeField("clusters", clusterMetrics.values());
 		generator.writeField("intra", intraConnectivity);
 		generator.writeField("inter", interConnectivity);
 		generator.writeField("basicMq", basicMq);
@@ -95,8 +98,13 @@ public class ArchitectureMetrics implements JsonSerializable {
 
 	public static ArchitectureMetrics deserialize(EnhancedJsonParser parser)
 			throws IOException {
-		Collection<ClusterMetrics> clusterMetrics =
+		Collection<ClusterMetrics> clusterMetricsCollection =
 			parser.parseCollection(ClusterMetrics.class);
+
+		Map<String, ClusterMetrics> clusterMetrics =
+			clusterMetricsCollection.stream()
+				.collect(Collectors.toMap(c -> c.clusterName, c -> c));
+
 		double intraConnectivity = parser.parseDouble();
 		double interConnectivity = parser.parseDouble();
 		double basicMq = parser.parseDouble();

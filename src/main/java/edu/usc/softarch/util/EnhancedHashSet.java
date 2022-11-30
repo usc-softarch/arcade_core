@@ -4,6 +4,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This implementation of {@link EnhancedSet} is primarily for use in
+ * applications that have a low frequency of use of the enhanced operations,
+ * and a high frequency of regular operations. It has little emphasis on
+ * optimization but benefits from the underlying {@link HashSet} structure.
+ */
 public class EnhancedHashSet<E>
 		extends HashSet<E> implements EnhancedSet<E> {
 	public EnhancedHashSet() { super(); }
@@ -27,6 +33,14 @@ public class EnhancedHashSet<E>
 	}
 
 	@Override
+	public Object[] intersectionArray(Collection<E> c) {
+		return this.intersection(c).toArray(); }
+
+	@Override
+	public int intersectionSize(Collection<E> c) {
+		return this.intersection(c).size(); }
+
+	@Override
 	public Set<E> difference(Collection<E> c) {
 		Set<E> differenceSet = new EnhancedHashSet<>(this);
 		differenceSet.removeAll(c);
@@ -40,6 +54,14 @@ public class EnhancedHashSet<E>
 		symmetricDiff.removeAll(this.intersection(c));
 		return symmetricDiff;
 	}
+
+	@Override
+	public Object[] symmetricDifferenceArray(Collection<E> c) {
+		return this.symmetricDifference(c).toArray(); }
+
+	@Override
+	public int symmetricDifferenceSize(Collection<E> c) {
+		return this.symmetricDifference(c).size(); }
 
 	@Override
 	public String toString() {

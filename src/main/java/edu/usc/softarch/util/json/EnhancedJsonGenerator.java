@@ -27,6 +27,7 @@ public class EnhancedJsonGenerator implements AutoCloseable {
 	}
 
 	public EnhancedJsonGenerator(File file) throws IOException {
+		file.getParentFile().mkdirs();
 		JsonFactory factory = new JsonFactory();
 		this.generator = factory.createGenerator(file, JsonEncoding.UTF8);
 		this.generator.writeStartObject();

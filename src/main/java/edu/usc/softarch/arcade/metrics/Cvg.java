@@ -76,8 +76,8 @@ public class Cvg {
 
 		for (ReadOnlyCluster sourceCluster : this.sourceArch.values()) {
 			for (ReadOnlyCluster targetCluster : this.targetArch.values()) {
-				Set<String> intersection = sourceCluster.intersection(targetCluster);
-				double sim = (double) intersection.size() /
+				int intersectionSize = sourceCluster.intersectionSize(targetCluster);
+				double sim = (double) intersectionSize /
 					Math.max(sourceCluster.size(), targetCluster.size());
 				if (sim > this.lowerSimThreshold && sim <= this.upperSimThreshold) {
 					sourceMatches.add(sourceCluster);

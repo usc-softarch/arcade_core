@@ -69,7 +69,7 @@ public class McfpDriver {
 			for (Map.Entry<String, ReadOnlyCluster> cluster2 : arch2.entrySet()) {
 				// Calculate cost as the symmetric difference of the two clusters
 				int cost =
-					cluster1.getValue().symmetricDifference(cluster2.getValue()).size();
+					cluster1.getValue().symmetricDifferenceSize(cluster2.getValue());
 
 				// Create vertex for the target cluster
 				String vertex2 = "target_" + cluster2.getKey();
