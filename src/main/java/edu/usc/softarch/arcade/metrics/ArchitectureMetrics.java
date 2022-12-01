@@ -59,7 +59,7 @@ public class ArchitectureMetrics implements JsonSerializable {
 		this.instability = ArchitecturalStability.computeStability(arch, graph);
 
 		if (gtPath.isEmpty())
-			this.mojoFmGt = -1.0;
+			this.mojoFmGt = Double.NaN;
 		else {
 			MoJoCalculator mojoCalc = new MoJoCalculator(archPath, gtPath, null);
 			this.mojoFmGt = mojoCalc.mojofm();

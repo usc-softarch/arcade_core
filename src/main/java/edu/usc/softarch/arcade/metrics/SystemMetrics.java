@@ -37,6 +37,9 @@ public class SystemMetrics implements JsonSerializable {
 		SystemMetrics metrics = new SystemMetrics(systemDirPath, depsDirPath);
 		metrics.serialize(outputPath + File.separator + "metricsObject.json");
 		metrics.writeClusterMetrics(outputPath);
+		metrics.writeVersionMetrics(
+			outputPath + File.separator + "versionMetrics.csv");
+		metrics.writeSystemMetrics(outputPath);
 	}
 	//endregion
 
@@ -204,10 +207,18 @@ public class SystemMetrics implements JsonSerializable {
 		}
 
 		for (String metric : results.keySet())
-			writeMetricCsv(dirPath, metric, results);
+			writeClusterMetricCsv(dirPath, metric, results);
 	}
 
-	private void writeMetricCsv(String dirPath, String metric,
+	private double[] initializeNanArray(int length) {
+		double[] result = new double[length];
+		for (int i = 0; i < length; i++)
+			result[i] = Double.NaN;
+
+		return result;
+	}
+
+	private void writeClusterMetricCsv(String dirPath, String metric,
 			Map<String, Map<String, double[]>> results) throws IOException {
 		try (FileWriter writer = new FileWriter(
 			dirPath + File.separator + metric + ".csv")) {
@@ -228,12 +239,115 @@ public class SystemMetrics implements JsonSerializable {
 		}
 	}
 
-	private double[] initializeNanArray(int length) {
-		double[] result = new double[length];
-		for (int i = 0; i < length; i++)
-			result[i] = Double.NaN;
+	public void writeVersionMetrics(String path) throws IOException {
+		new File(path).getParentFile().mkdirs();
 
-		return result;
+		// Initialize results map with arrays of all version metrics
+		Map<String, double[]> results = new HashMap<>();
+		results.put("intraConnectivity", new double[this.versions.length]);
+		results.put("interConnectivity", new double[this.versions.length]);
+		results.put("basicMq", new double[this.versions.length]);
+		results.put("turboMq", new double[this.versions.length]);
+		results.put("instability", new double[this.versions.length]);
+		results.put("mojoFmGt", new double[this.versions.length]);
+
+		// Get data from each version
+		for (int i = 0; i < versions.length; i++) {
+			ArchitectureMetrics version = this.versionMetrics.get(versions[i]);
+
+			results.get("intraConnectivity")[i] = version.intraConnectivity;
+			results.get("interConnectivity")[i] = version.interConnectivity;
+			results.get("basicMq")[i] = version.basicMq;
+			results.get("turboMq")[i] = version.turboMq;
+			results.get("instability")[i] = version.instability;
+			results.get("mojoFmGt")[i] = version.mojoFmGt;
+		}
+
+		try (FileWriter writer = new FileWriter(path)) {
+			writer.write("Metric");
+			for (String version : this.versions)
+				writer.write("," + version);
+			writer.write(System.lineSeparator());
+
+			this.writeVersionMetric(writer, "Intra-Connectivity",
+				"intraConnectivity", results);
+			this.writeVersionMetric(writer, "Inter-Connectivity",
+				"interConnectivity", results);
+			this.writeVersionMetric(writer, "BasicMQ",
+				"basicMq", results);
+			this.writeVersionMetric(writer, "TurboMQ",
+				"turboMq", results);
+			this.writeVersionMetric(writer, "Architectural Instability",
+				"instability", results);
+			this.writeVersionMetric(writer, "MoJoFM-GT",
+				"mojoFmGt", results);
+		}
+	}
+
+	private void writeVersionMetric(FileWriter writer, String metricName,
+			String metricKey, Map<String, double[]> values) throws IOException {
+		writer.write(metricName);
+		writer.write(getVersionMetricValues(values, metricKey));
+		writer.write(System.lineSeparator());
+	}
+
+	private String getVersionMetricValues(Map<String, double[]> versionMetrics,
+			String metric) {
+		StringBuilder sb = new StringBuilder();
+		for (double v : versionMetrics.get(metric))
+			sb.append(",").append(v);
+		return sb.toString();
+	}
+
+	public void writeSystemMetrics(String dirPath) throws IOException {
+		FileUtil.checkDir(dirPath, true, false);
+
+		this.writeSystemMetric(
+			dirPath + File.separator + "a2a.csv", this.a2a);
+		this.writeSystemMetric(
+			dirPath + File.separator + "mojofm.csv", this.mojoFm);
+		this.writeCvg(dirPath + File.separator + "cvg.csv");
+	}
+
+	private void writeSystemMetric(String path, double[][] metric)
+			throws IOException {
+		try (FileWriter writer = new FileWriter(path)) {
+			for (String version : this.versions)
+				writer.write("," + version);
+			writer.write(System.lineSeparator());
+
+			for (int i = 0; i < this.versions.length; i++) {
+				writer.write(this.versions[i]);
+				for (int j = 0; j < this.versions.length; j++) {
+					writer.write(",");
+					if (i > j)
+						writer.write(Double.toString(metric[j][i - j - 1]));
+					else if (i < j)
+						writer.write(Double.toString(metric[i][j - i - 1]));
+				}
+				writer.write(System.lineSeparator());
+			}
+		}
+	}
+
+	private void writeCvg(String path) throws IOException {
+		try (FileWriter writer = new FileWriter(path)) {
+			for (String version : this.versions)
+				writer.write("," + version);
+			writer.write(System.lineSeparator());
+
+			for (int i = 0; i < this.versions.length; i++) {
+				writer.write(this.versions[i]);
+				for (int j = 0; j < this.versions.length; j++) {
+					writer.write(",");
+					if (i > j)
+						writer.write(Double.toString(this.cvgBackwards[j][i - j - 1]));
+					else if (i < j)
+						writer.write(Double.toString(this.cvgForwards[i][j - i - 1]));
+				}
+				writer.write(System.lineSeparator());
+			}
+		}
 	}
 
 	public void serialize(String path) throws IOException {
