@@ -13,20 +13,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
 import com.thoughtworks.xstream.XStream;
 
-import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.MapUtil;
 
 public class SmellToIssuesCorrelation {
-	private static Logger logger =
-		LogManager.getLogger(SmellToIssuesCorrelation.class);
-
 	public static void main(String[] args) throws IOException {
 		// inputDirFilename is the directory containing the .ser files which contain detected smells
 		String inputDirFilename = args[0];
@@ -43,13 +36,7 @@ public class SmellToIssuesCorrelation {
 		// key: version, value: smells counts for the version
 		Map<String,Integer> versionToSmellCount = new LinkedHashMap<>();
 		for (File file : orderedSerFiles) {
-			logger.debug(file.getName());
 			SmellCollection smells = SmellCollection.deserialize(file.getAbsolutePath());
-			logger.debug("\tcontains " + smells.size() + " smells");
-			
-			logger.debug("\tListing detected smells for file" + file.getName() + ": ");
-			for (Smell smell : smells)
-				logger.debug("\t" + smell.getSmellType() + " " + smell);
 			
 			// You may need to change the regular expression below to match the versioning scheme of your project
 			Pattern p = Pattern.compile("[0-9]+\\.[0-9]+(\\.[0-9]+)*");

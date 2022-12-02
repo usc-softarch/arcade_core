@@ -1,12 +1,8 @@
 package edu.usc.softarch.arcade.jira;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -17,7 +13,6 @@ import net.rcarz.jiraclient.JiraException;
 import net.rcarz.jiraclient.RestClient;
 
 public class JiraClientPrototype {
-	private static Logger logger = LogManager.getLogger(JiraClientPrototype.class);
 	private static final String JIRA_URL = "https://issues.apache.org/jira";
 	
 	public static void main(String[] args) throws Exception {
@@ -48,19 +43,16 @@ public class JiraClientPrototype {
             	String issuesFilename = allIssuesPrefix + "_startat_" + i + ".ser";
 
             	sr = jira.searchIssues(jqlString,"*all",maxResults,i);
-                for (Issue issue : sr.issues)
-                    logger.debug("Result: " + issue);
-                                
-                XStream xstream = new XStream();
-                xstream.omitField(RestClient.class, "httpClient"); // do not serialize this field
-                String allIssuesStr = xstream.toXML(sr.issues);
-                
-                System.out.println("Writing file " + issuesFilename);
-                PrintWriter writer = new PrintWriter(new File(issuesFilename));
-                writer.print(allIssuesStr);
-                writer.close();
-                
-                System.out.println("Obtained issues starting at: " + i);
+							XStream xstream = new XStream();
+							xstream.omitField(RestClient.class, "httpClient"); // do not serialize this field
+							String allIssuesStr = xstream.toXML(sr.issues);
+
+							System.out.println("Writing file " + issuesFilename);
+							PrintWriter writer = new PrintWriter(issuesFilename);
+							writer.print(allIssuesStr);
+							writer.close();
+
+							System.out.println("Obtained issues starting at: " + i);
             }
 
         } catch (JiraException ex) {

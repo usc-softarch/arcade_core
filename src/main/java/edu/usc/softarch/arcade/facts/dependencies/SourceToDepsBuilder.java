@@ -4,11 +4,8 @@ import java.io.IOException;
 
 import edu.usc.softarch.arcade.clustering.data.FeatureVectors;
 import edu.usc.softarch.arcade.facts.DependencyGraph;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public abstract class SourceToDepsBuilder {
-	protected Logger logger = LogManager.getLogger(SourceToDepsBuilder.class);
 	protected DependencyGraph dependencyGraph = new DependencyGraph();
 	protected int numSourceEntities;
 	protected FeatureVectors ffVecs;

@@ -12,17 +12,12 @@ import java.util.stream.Collectors;
 import net.rcarz.jiraclient.Issue;
 import net.rcarz.jiraclient.Version;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
 import com.thoughtworks.xstream.XStream;
 
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.MapUtil;
 
 public class IssuesAnalyzer {
-	static Logger logger = LogManager.getLogger(IssuesAnalyzer.class);
-
 	public static void main(String[] args) throws FileNotFoundException {
 		// The directory where the serialized issue files are stored
 		String issuesDir = args[0];

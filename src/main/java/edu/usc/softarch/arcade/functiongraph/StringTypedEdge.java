@@ -2,12 +2,9 @@ package edu.usc.softarch.arcade.functiongraph;
 
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
-
 //TODO Replace all occurrences of this with the superclass
 public class StringTypedEdge extends StringEdge implements Serializable {
 	private static final long serialVersionUID = 2367755143057728102L;
-	private static Logger logger = Logger.getLogger(StringTypedEdge.class);
 
 	public String arcTypeStr = "";
 	
@@ -23,15 +20,6 @@ public class StringTypedEdge extends StringEdge implements Serializable {
 			return false;
 		
 		StringTypedEdge e = (StringTypedEdge) o;
-		
-		logger.debug("e.arcTypeStr: " + e.arcTypeStr);
-		logger.debug("this.arcTypeStr: " + this.arcTypeStr);
-		
-		logger.debug("e.srcStr: " + e.getSrcStr());
-		logger.debug("this.srcStr: " + this.getSrcStr());
-		
-		logger.debug("e.tgtStr: " + e.getTgtStr());
-		logger.debug("this.tgtStr: " + this.getTgtStr());
 
 		return (e.getSrcStr().equals(this.getSrcStr()) &&
 			e.getTgtStr().equals(this.getTgtStr()) &&

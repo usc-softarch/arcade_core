@@ -3,16 +3,12 @@ package edu.usc.softarch.arcade.functiongraph;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  * @author joshua
  */
 public class StringEdge implements Serializable {
 	// #region FIELDS ------------------------------------------------------------
 	private static final long serialVersionUID = -4787247799445316839L;
-	private static Logger logger = LogManager.getLogger(StringEdge.class);
 
 	private String srcStr = "";
 	private String tgtStr = "";
@@ -63,11 +59,6 @@ public class StringEdge implements Serializable {
 			return false;
 		
 		StringEdge e = (StringEdge) o;
-		
-		logger.trace("e.srcStr: " + e.srcStr);
-		logger.trace("this.srcStr: " + this.srcStr);
-		logger.trace("e.tgtStr: " + e.tgtStr);
-		logger.trace("this.tgtStr: " + this.tgtStr);
 
 		return (e.srcStr.equals(this.srcStr) &&
 			e.tgtStr.equals(this.tgtStr) &&

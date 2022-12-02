@@ -27,8 +27,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import edu.usc.softarch.arcade.util.CentralTendency;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -48,8 +46,6 @@ import edu.usc.softarch.arcade.util.FileUtil;
 public class DependencyFinderProcessing {
 	// #region ATTRIBUTES --------------------------------------------------------
 	// Utility data
-	private static Logger logger =
-		LogManager.getLogger(DependencyFinderProcessing.class);
 	private String summary = "SUMMARY:\n version, unused interface, "
 		+ "unused block, sloppy, lego, function overload, duplicate "
 		+ "functionality, logical deps\n";
@@ -130,7 +126,6 @@ public class DependencyFinderProcessing {
 
 		Map<String, String> result = new LinkedHashMap<>();
 		for (File file : files) {
-			logger.debug(file.getName());
 			String version =
 				FileUtil.extractVersion(versionSchemeExpr, file.getName());
 			if (version.equals(""))
@@ -146,11 +141,9 @@ public class DependencyFinderProcessing {
 		Document doc = loadXmlFile(xmlFilePath, true);
 
 		// Load smells file
-		logger.info("Started processing XML input");
 		loadMethodList(doc);
 		loadDependencies(doc);
 		loadClasses(doc);
-		logger.info("Finished processing XML input");
 	}
 
 	private Document loadXmlFile(String xmlFilePath, boolean useEntityResolver)
@@ -181,18 +174,14 @@ public class DependencyFinderProcessing {
 		NodeList nclist = doc.getElementsByTagName("class");
 		for (int k = 0; k < nclist.getLength(); k++){
 			Node node = nclist.item(k);
-			logger.debug("\nCurrent Element :{}", node.getNodeName());
 			Element eElement = (Element) node;
 			String key =
 				eElement.getElementsByTagName("name").item(0).getTextContent();	
-			logger.debug("Current key :{}", key);
 			NodeList nflist = eElement.getElementsByTagName("feature");
 			List<String> methods	= new ArrayList<>();
 			for (int n = 0; n < nflist.getLength(); n++) {
 				Element	e = (Element) nflist.item(n);
 				methods.add(e.getElementsByTagName("name").item(0).getTextContent());
-				logger.debug("Current methods :{}",
-					e.getElementsByTagName("name").item(0).getTextContent());
 			}
 			methodList.put(key, methods);
 		}
@@ -206,21 +195,17 @@ public class DependencyFinderProcessing {
 		NodeList nlist = doc.getElementsByTagName("feature");
 		for (int i = 0; i < nlist.getLength(); i++) {
 			Node node = nlist.item(i);
-			logger.debug("\nCurrent Element :{}", node.getNodeName());
-			 
+
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element eElement = (Element) node;
 				String key =
 					eElement.getElementsByTagName("name").item(0).getTextContent();		
-				logger.debug("Current key :{}", key);
 
 				//Get inbounds
 				NodeList inboundNode = eElement.getElementsByTagName("inbound");
 				List<String> inbounds = new ArrayList<>();
 	 			for (int j = 0; j < inboundNode.getLength(); j++) {
 	 				inbounds.add(inboundNode.item(j).getTextContent());
-	 				logger.debug("Current inbound :{}",
-						inboundNode.item(j).getTextContent());
 	 			}
 	 			
 	 			//Get outbounds
@@ -229,8 +214,6 @@ public class DependencyFinderProcessing {
 
 	 			for (int j = 0; j < outboundNode.getLength(); j++) {
 	 				outbounds.add(outboundNode.item(j).getTextContent());
-	 				logger.debug("Current inbound :{}",
-						outboundNode.item(j).getTextContent());
 	 			}
 
 	 			if (key.startsWith(packageName)) {
@@ -249,21 +232,17 @@ public class DependencyFinderProcessing {
 		NodeList nlist = doc.getElementsByTagName("class");
 		for (int i = 0; i < nlist.getLength(); i++) {
 			Node node = nlist.item(i);
-			logger.debug("\nCurrent Element :{}", node.getNodeName());
-			 
+
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element eElement = (Element) node;
 				String key =
 					eElement.getElementsByTagName("name").item(0).getTextContent();		
-				logger.debug("Current key :{}", key);
 
 				//Get inbounds
 				NodeList inboundNode = eElement.getElementsByTagName("inbound");
 				List<String> inbounds = new ArrayList<>();
 	 			for (int j = 0; j < inboundNode.getLength(); j++) {
 	 				inbounds.add(inboundNode.item(j).getTextContent());
-	 				logger.debug("Current inbound :{}",
-						inboundNode.item(j).getTextContent());
 	 			}
 	 			
 	 			//Get outbounds
@@ -272,8 +251,6 @@ public class DependencyFinderProcessing {
 
 	 			for (int j = 0; j < outboundNode.getLength(); j++){
 	 				outbounds.add(outboundNode.item(j).getTextContent());
-	 				logger.debug("Current inbound :{}",
-						outboundNode.item(j).getTextContent());
 	 			}
 
 	 			if (key.startsWith(packageName)) {
@@ -290,8 +267,6 @@ public class DependencyFinderProcessing {
 
 		try (BufferedReader in = new BufferedReader(new FileReader(filePath))) {
 			for (String line = in.readLine(); line != null; line = in.readLine()) {
-				logger.debug(line);
-
 				if (line.trim().isEmpty()) continue;
 
 				Scanner s = new Scanner(line);
@@ -303,7 +278,6 @@ public class DependencyFinderProcessing {
 				List<String> fact =
 					new ArrayList<>(Arrays.asList(arcType, startNode, endNode));
 
-				logger.debug(fact);
 				facts.add(fact);
 				// add to cluster
 				List<String> currentCluster = clusterList.get(startNode);
@@ -313,7 +287,7 @@ public class DependencyFinderProcessing {
 				clusterList.put(startNode, currentCluster);
 				class2component.put(endNode, startNode);
 				if (s.findInLine(expr) != null) {
-					logger.error("Found non-triple in file: {}", line);
+					System.err.println("Found non-triple in file: " + line);
 					System.exit(1);
 				}
 
@@ -330,12 +304,10 @@ public class DependencyFinderProcessing {
 		Document doc = loadXmlFile(xmlFilePath, false);
 		this.codeClone = new HashMap<>();		
 		
-		logger.info("Started processing clone");
 		// Building class method mapping
 		NodeList nclist = doc.getElementsByTagName("duplication");
 		for (int k = 0; k < nclist.getLength(); k++) {
 			Node node = nclist.item(k);
-			logger.debug("\nCurrent Element :{}", node.getNodeName());
 			Element eElement = (Element) node;
 			NodeList duplicatedFiles = eElement.getElementsByTagName("file");
 			
@@ -362,9 +334,6 @@ public class DependencyFinderProcessing {
 			}
 			this.codeClone.put(k, tmp);
 		}
-		
-		// Building inbound dependencies
-		logger.info("Finished processing clone input");
 	}
 
 	private void readLogicalDeps(String logicalDep) {
@@ -414,8 +383,6 @@ public class DependencyFinderProcessing {
 		
 		// Batch execution
 		for (String key : versionSmells.keySet()) {
-			logger.info("Start detecting smells for one version:{}, {}",
-				versionSmells.get(key), clusterSmells.get(key));
 			String smellFile = versionSmells.get(key);
 			String clusterFile =  clusterSmells.get(key);
 			String cloneFile = cloneVersions.get(key);
@@ -433,8 +400,7 @@ public class DependencyFinderProcessing {
 		readClusterFile(clustersPath);
 		loadClonesFile(clonesPath);
 		readLogicalDeps(logicalDep);
-		logger.info("Start detecting smells");
-		
+
 		details += "\n" + version + ":\n";
 		JSONObject listFilesPerVersions = new JSONObject();
 		detailsJson.put(version, listFilesPerVersions);
@@ -456,7 +422,6 @@ public class DependencyFinderProcessing {
 		
 		Set<String> allLogicalDeps = classLogicalDependencies.keySet();
 		Iterator<String> it = allLogicalDeps.iterator();
-		logger.info("componentName, other components , smells?");
 
 		while (it.hasNext()) {
 			String fromClass = it.next();
@@ -487,7 +452,6 @@ public class DependencyFinderProcessing {
 					numOfConnection --;
 				if (numOfConnection > 0) {
 					total ++;
-					logger.info("{},{},{}", s, componentList, numOfConnection);
 					details += s + "," + componentList.toString()
 						+ "," + numOfConnection + "\n";
 					
@@ -539,7 +503,6 @@ public class DependencyFinderProcessing {
 		Set<String> allComponent = clusterList.keySet();
 		Set<String> unusedComponent = new HashSet<>(); 
 		Set<String> unusedInterface = new HashSet<>(); 
-		logger.info("componentName, className , methodName");
 		content += "\nUnused interface: \n";
 		content += "componentName, className\n";
 		Iterator<String> it = allComponent.iterator();
@@ -563,7 +526,6 @@ public class DependencyFinderProcessing {
 					if (classhasSmell) {
 						List<String> inboundClass	= inboundClasses.get(className);
 						if (inboundClass == null || inboundClass.isEmpty()){
-							logger.info("{},{},,", componentName, className);
 							content += componentName + "," + className + ",,\n";
 
 							unusedComponent.add(componentName);
@@ -576,7 +538,6 @@ public class DependencyFinderProcessing {
 		
 		// check unused component
 		Set<String> unsedCompSmell = new HashSet<>();
-		logger.info("\nUnused components:");
 		content += "\nUnused components:\n";
 		content += "component Name,\n";
 		for (String com :allComponent) {
@@ -591,7 +552,6 @@ public class DependencyFinderProcessing {
 					unsedCom = false;
 			}
 			if (unsedCom && containPackageNameClass) {
-				logger.info(com);
 				content += com + "\n";
 				unsedCompSmell.add(com);
 			}
@@ -627,7 +587,6 @@ public class DependencyFinderProcessing {
 		// And have no outbound from itself
 		// We can considered it as Sloppy Delegation Smell
 		Set<String> allFeatures	= inboundDependencies.keySet();
-		logger.info("component, affected class, total class, percentages");
 		String className = "";
 		Iterator<String> it = allFeatures.iterator();
 		HashMap<String, Set<String>> componentHasSmell = new HashMap<>();
@@ -697,7 +656,6 @@ public class DependencyFinderProcessing {
 		double[] optStat = new double[allComponent.size()];
 		int i = 0;
 		Map<String, Integer> counter = new HashMap<>();
-		logger.info("componentName, number of public methods , smells?");
 		Iterator<String> it = allComponent.iterator();
 		while (it.hasNext()) {
 			String componentName = it.next();
@@ -732,7 +690,6 @@ public class DependencyFinderProcessing {
 				lego ++;
 			}
 			if (hasSmell) {
-				logger.info("{}, {},{}", com, counter.get(com), smellType);
 				details += com + ", " + counter.get(com) + "," + smellType + "\n";
 				
 				// add all lego & overload to json
@@ -753,7 +710,6 @@ public class DependencyFinderProcessing {
 	public void detectComponentClonebyClassLevel(String version) {
 		Set<Integer> allduplication = codeClone.keySet();
 		Iterator<Integer> it = allduplication.iterator();
-		logger.info("componentName, other components , smells?");
 		int total = 0;
 		Map<String, List<String>> effectedClass = new HashMap<>();
 		while (it.hasNext()) {
@@ -773,18 +729,14 @@ public class DependencyFinderProcessing {
 						effectedClass.put(com, effected);
 					}
 				}
-				if (componentList.size() > 1)
-					logger.info(componentList.toString());
 			}
 		}
 		
 		// Analyze component with many affected class
-		logger.info("componentName, totalClass , effected?");
 		for (String com : effectedClass.keySet()) {
 			List<String> effected = effectedClass.get(com);
 			List<String> allClass = clusterList.get(com);
 			float effect = (effected.size() * 100.0f) / allClass.size();
-			logger.info("{}, {}, {}, {}", com, allClass.size(), effected.size(), effect);
 			// 10% of class has code clone
 			if (effect > 10) {
 				details += com + ", " + effected.size() + ", " + allClass.size()  + ", " + effect + "\n";
