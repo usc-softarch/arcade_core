@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.usc.softarch.arcade.BaseTest;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import edu.usc.softarch.arcade.util.CentralTendency;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -57,9 +57,9 @@ public class SystemEvoTest extends BaseTest {
 			resourcesDir + fs + clusterAlgo + fs + projectName + "_oracle.csv";
 		String clustersDir = resourcesDir + fs + clusterAlgo + fs + projectName;
 
-		DescriptiveStatistics outputStats =
+		CentralTendency outputStats =
 			assertDoesNotThrow(() -> SystemEvo.runBatch(clustersDir));
-    
+
     try (BufferedReader br = new BufferedReader(new FileReader(oraclePath))) {
       Map<String, Double> oracleMap = new HashMap<>();
       String line;
@@ -78,13 +78,9 @@ public class SystemEvoTest extends BaseTest {
         () -> assertEquals(oracleMap.get("mean"),
 					outputStats.getMean(),"Mean does not match the oracle"),
         () -> assertEquals(oracleMap.get("std dev"),
-					outputStats.getStandardDeviation(),"StandardDeviation does not match the oracle"),
+					outputStats.getStDev(),"StandardDeviation does not match the oracle"),
         () -> assertEquals(oracleMap.get("median"),
-					outputStats.getPercentile(50),"Median does not match the oracle"),
-        () -> assertEquals(oracleMap.get("skewness"),
-					outputStats.getSkewness(),"Skewness does not match the oracle"),
-        () -> assertEquals(oracleMap.get("kurtosis"),
-					outputStats.getKurtosis(),"Kurtosis does not match the oracle")
+					outputStats.getMedian(),"Median does not match the oracle")
       );
     } catch(IOException e) {
       e.printStackTrace();

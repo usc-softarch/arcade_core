@@ -5,10 +5,9 @@ import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
 import edu.usc.softarch.arcade.topics.TopicItem;
-import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
+import edu.usc.softarch.arcade.util.CentralTendency;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,11 +46,8 @@ public class ScatteredParasiticFunctionality {
 		// Calculate significance threshold
 		double[] topicCountsArray = topicCounts.values().stream()
 			.mapToDouble(Integer::doubleValue).toArray();
-		double topicCountMean =
-			Arrays.stream(topicCountsArray).sum() / topicCountsArray.length;
-		double topicCountStdev =
-			(new StandardDeviation()).evaluate(topicCountsArray);
-		double significanceThreshold = topicCountMean + topicCountStdev;
+		CentralTendency ct = new CentralTendency(topicCountsArray);
+		double significanceThreshold = ct.getMean() + ct.getStDev();
 
 		// Select significant topics
 		Set<Integer> topicNums = new HashSet<>(topicCounts.keySet());

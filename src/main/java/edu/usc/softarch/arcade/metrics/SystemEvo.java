@@ -7,10 +7,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.util.CentralTendency;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.McfpDriver;
 import edu.usc.softarch.util.EnhancedSet;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
  * Calculates A2A.
@@ -33,11 +33,11 @@ public class SystemEvo {
 		return (new SystemEvo(sourceRsf, targetRsf)).solve();
 	}
 
-	public static DescriptiveStatistics runBatch(String path) throws IOException {
+	public static CentralTendency runBatch(String path) throws IOException {
 		return runBatch(path, false);
 	}
 
-	public static DescriptiveStatistics runBatch(String path, boolean verbose)
+	public static CentralTendency runBatch(String path, boolean verbose)
 			throws IOException {
 		List<File> clusterFiles = FileUtil.getFileListing(
 			new File(FileUtil.tildeExpandPath(path)));
@@ -54,7 +54,7 @@ public class SystemEvo {
 					+ " to " + clusterFiles.get(i).getName() + ": " + sysEvoValues[i - 1]);
 		}
 
-		return new DescriptiveStatistics(sysEvoValues);
+		return new CentralTendency(sysEvoValues);
 	}
 	//endregion
 

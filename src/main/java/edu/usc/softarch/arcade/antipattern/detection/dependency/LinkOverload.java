@@ -3,7 +3,7 @@ package edu.usc.softarch.arcade.antipattern.detection.dependency;
 import edu.usc.softarch.arcade.antipattern.Smell;
 import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
-import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
+import edu.usc.softarch.arcade.util.CentralTendency;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
@@ -53,10 +53,9 @@ public class LinkOverload {
 
 		// Get standard deviations
 		double[] stdev = new double[3];
-		StandardDeviation stdDev = new StandardDeviation();
-		stdev[0] = stdDev.evaluate(inDegrees);
-		stdev[1] = stdDev.evaluate(outDegrees);
-		stdev[2] = stdDev.evaluate(linkDegrees);
+		stdev[0] = (new CentralTendency(inDegrees)).getStDev();
+		stdev[1] = (new CentralTendency(outDegrees)).getStDev();
+		stdev[2] = (new CentralTendency(linkDegrees)).getStDev();
 
 		// Check each cluster against the average
 		for (String cluster : graph.vertexSet()) {

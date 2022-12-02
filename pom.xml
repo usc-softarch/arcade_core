@@ -81,12 +81,6 @@
 <!--      <artifactId>poi-ooxml</artifactId>-->
 <!--      <version>5.2.2</version>-->
 <!--    </dependency>-->
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
-			<version>3.6.1</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/net.rcarz/jira-client -->
     <dependency>
       <groupId>net.rcarz</groupId>
@@ -246,6 +240,14 @@
           </excludes>
         </configuration>
       </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<forceJavacCompilerUse>true</forceJavacCompilerUse>
+				</configuration>
+			</plugin>
     </plugins>
     <resources>
       <resource>

@@ -363,10 +363,10 @@ public class ReadOnlyCluster {
 			+ "\\nIntra-connectivity: " + formatter.format(metrics.intraConnectivity)
 			+ "\\nInter-connectivity: "
 				+ formatter.format(metrics.interConnectivity.getMean()) + ", "
-				+ formatter.format(metrics.interConnectivity.getPercentile(50.0))
+				+ formatter.format(metrics.interConnectivity.getMedian())
 				+ ", " + formatter.format(metrics.interConnectivity.getMin()) + ", "
 				+ formatter.format(metrics.interConnectivity.getMax()) + ", "
-				+ formatter.format(metrics.interConnectivity.getStandardDeviation())
+				+ formatter.format(metrics.interConnectivity.getStDev())
 			+ "\\nBasicMQ: " + formatter.format(metrics.basicMq)
 			+ "\\nCluster Factor: " + formatter.format(metrics.clusterFactor)
 			+ "\\nFan-in: " + formatter.format(metrics.fanIn)

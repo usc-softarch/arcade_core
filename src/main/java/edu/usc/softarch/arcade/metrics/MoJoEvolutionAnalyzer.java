@@ -3,13 +3,11 @@ package edu.usc.softarch.arcade.metrics;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.usc.softarch.arcade.util.CentralTendency;
 import mojo.MoJoCalculator;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import edu.usc.softarch.arcade.util.FileUtil;
 
@@ -42,8 +40,7 @@ public class MoJoEvolutionAnalyzer {
 			Double[] mojoFmArr = new Double[mojoFmValues.size()];
 			mojoFmValues.toArray(mojoFmArr);
 			
-			DescriptiveStatistics stats = new DescriptiveStatistics(
-				Arrays.stream(mojoFmArr).mapToDouble(Double::valueOf).toArray());
+			CentralTendency stats = new CentralTendency(mojoFmArr);
 
 			// System.out.println(stats);
 			System.out.println();

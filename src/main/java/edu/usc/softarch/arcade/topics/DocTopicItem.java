@@ -12,10 +12,10 @@ import java.util.Set;
 import cc.mallet.util.Maths;
 import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.arcade.util.CentralTendency;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
 import edu.usc.softarch.util.json.JsonSerializable;
-import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -267,8 +267,9 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 	private static double[] getWeights(double[] p) {
 		double[] weight = new double[p.length];
 
-		double mean = Arrays.stream(p).sum() / p.length;
-		double stdev = (new StandardDeviation()).evaluate(p);
+		CentralTendency ct = new CentralTendency(p);
+		double mean = ct.getMean();
+		double stdev = ct.getStDev();
 
 		for (int i = 0; i < p.length; i++) {
 			if (p[i] > mean + (2 * stdev))

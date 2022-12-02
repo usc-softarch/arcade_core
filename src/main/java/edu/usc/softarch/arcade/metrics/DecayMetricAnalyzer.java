@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.metrics.decay.*;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import edu.usc.softarch.arcade.util.CentralTendency;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
@@ -103,14 +103,14 @@ public class DecayMetricAnalyzer {
 			basicmq[i] = decayValues[(i * 7) + 6];
 		}
 
-		DescriptiveStatistics rciStats = new DescriptiveStatistics(rciValues);
-		DescriptiveStatistics twoWayPairStats =
-			new DescriptiveStatistics(twoWayPairRatios);
-		DescriptiveStatistics stabilityStats = new DescriptiveStatistics(stability);
-		DescriptiveStatistics turbomqStats = new DescriptiveStatistics(turbomq);
-		DescriptiveStatistics intraStats = new DescriptiveStatistics(intra);
-		DescriptiveStatistics interStats = new DescriptiveStatistics(inter);
-		DescriptiveStatistics basicmqStats = new DescriptiveStatistics(basicmq);
+		CentralTendency rciStats = new CentralTendency(rciValues);
+		CentralTendency twoWayPairStats =
+			new CentralTendency(twoWayPairRatios);
+		CentralTendency stabilityStats = new CentralTendency(stability);
+		CentralTendency turbomqStats = new CentralTendency(turbomq);
+		CentralTendency intraStats = new CentralTendency(intra);
+		CentralTendency interStats = new CentralTendency(inter);
+		CentralTendency basicmqStats = new CentralTendency(basicmq);
 
 		System.out.println(rciStats);
 		System.out.println(twoWayPairStats);

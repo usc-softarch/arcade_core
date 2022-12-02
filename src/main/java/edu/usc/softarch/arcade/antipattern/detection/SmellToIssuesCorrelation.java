@@ -13,8 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
-import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -120,10 +118,10 @@ public class SmellToIssuesCorrelation {
 		for (int i=0;i<smellCounts.size();i++)
 			System.out.println(versions.get(i) + ", " + smellCountsArr[i] + ", " + issueCountsArr[i]);
 		
-		PearsonsCorrelation pearsons = new PearsonsCorrelation();
-		System.out.println("Pearson's correlation: " + pearsons.correlation(smellCountsArr, issueCountsArr));
-		
-		SpearmansCorrelation spearmans = new SpearmansCorrelation();
-		System.out.println("Spearman's correlation: " + spearmans.correlation(smellCountsArr, issueCountsArr));
+//		PearsonsCorrelation pearsons = new PearsonsCorrelation();
+//		System.out.println("Pearson's correlation: " + pearsons.correlation(smellCountsArr, issueCountsArr));
+//
+//		SpearmansCorrelation spearmans = new SpearmansCorrelation();
+//		System.out.println("Spearman's correlation: " + spearmans.correlation(smellCountsArr, issueCountsArr));
 	}
 }

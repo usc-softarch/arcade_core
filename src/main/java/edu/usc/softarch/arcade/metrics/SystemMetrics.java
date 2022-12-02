@@ -192,7 +192,7 @@ public class SystemMetrics implements JsonSerializable {
 				results.get("interConnectivityMax").get(name)[i] =
 					clusterMetrics.interConnectivity.getMax();
 				results.get("interConnectivityStDev").get(name)[i] =
-					clusterMetrics.interConnectivity.getStandardDeviation();
+					clusterMetrics.interConnectivity.getStDev();
 				results.get("basicMq").get(name)[i] =
 					clusterMetrics.basicMq;
 				results.get("clusterFactor").get(name)[i] =

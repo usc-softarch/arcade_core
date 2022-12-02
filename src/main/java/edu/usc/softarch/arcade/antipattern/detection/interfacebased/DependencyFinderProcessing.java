@@ -26,7 +26,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import edu.usc.softarch.arcade.util.CentralTendency;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -716,17 +716,17 @@ public class DependencyFinderProcessing {
 		JSONObject fileList = (JSONObject) detailsJson.get(version);
 		
 		System.out.println("Operations stats:");
-		DescriptiveStatistics operationStats = new DescriptiveStatistics(optStat);
+		CentralTendency operationStats = new CentralTendency(optStat);
 		System.out.println(operationStats);
 		for (String com : counter.keySet()) {
 			boolean hasSmell = false;
 			String smellType = "";
-			if (counter.get(com) > operationStats.getMean() + 1.5 * operationStats.getStandardDeviation()) {
+			if (counter.get(com) > operationStats.getMean() + 1.5 * operationStats.getStDev()) {
 				hasSmell = true;
 				smellType = "Overload";
 				over ++;
 			}
-			if (counter.get(com) < operationStats.getMean() - 0.75 * operationStats.getStandardDeviation()) {
+			if (counter.get(com) < operationStats.getMean() - 0.75 * operationStats.getStDev()) {
 				hasSmell = true;
 				smellType = "Lego";
 				lego ++;

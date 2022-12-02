@@ -6,11 +6,11 @@ import edu.usc.softarch.arcade.metrics.decay.ArchitecturalStability;
 import edu.usc.softarch.arcade.metrics.decay.InterConnectivity;
 import edu.usc.softarch.arcade.metrics.decay.IntraConnectivity;
 import edu.usc.softarch.arcade.metrics.decay.TurboMQ;
+import edu.usc.softarch.arcade.util.CentralTendency;
 import edu.usc.softarch.util.LabeledEdge;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
 import edu.usc.softarch.util.json.JsonSerializable;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class ClusterMetrics implements JsonSerializable {
 	//region ATTRIBUTES
 	public final String clusterName;
 	public final double intraConnectivity;
-	public final DescriptiveStatistics interConnectivity;
+	public final CentralTendency interConnectivity;
 	public final double basicMq;
 	public final double clusterFactor;
 	public final double fanIn;
@@ -43,7 +43,7 @@ public class ClusterMetrics implements JsonSerializable {
 	}
 
 	private ClusterMetrics(String clusterName, double intraConnectivity,
-			DescriptiveStatistics interConnectivity, double basicMq,
+			CentralTendency interConnectivity, double basicMq,
 			double clusterFactor, double fanIn, double fanOut, double instability) {
 		this.clusterName = clusterName;
 		this.intraConnectivity = intraConnectivity;
@@ -73,8 +73,8 @@ public class ClusterMetrics implements JsonSerializable {
 			throws IOException {
 		String clusterName = parser.parseString();
 		double intraConnectivity = parser.parseDouble();
-		DescriptiveStatistics interConnectivity =
-			new DescriptiveStatistics(parser.parseDoubleArray());
+		CentralTendency interConnectivity =
+			new CentralTendency(parser.parseDoubleArray());
 		double basicMq = parser.parseDouble();
 		double clusterFactor = parser.parseDouble();
 		double fanIn = parser.parseDouble();

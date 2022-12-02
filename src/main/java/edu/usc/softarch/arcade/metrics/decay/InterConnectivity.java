@@ -2,8 +2,8 @@ package edu.usc.softarch.arcade.metrics.decay;
 
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
+import edu.usc.softarch.arcade.util.CentralTendency;
 import edu.usc.softarch.util.LabeledEdge;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import java.io.IOException;
@@ -61,7 +61,7 @@ public class InterConnectivity {
 		return result / ((arch.size() * (arch.size() - 1.0)) / 2);
 	}
 
-	public static DescriptiveStatistics computeInterConnectivity(
+	public static CentralTendency computeInterConnectivity(
 			ReadOnlyCluster cluster, ReadOnlyArchitecture arch,
 			SimpleDirectedGraph<String, LabeledEdge> graph) {
 		List<Double> results = new ArrayList<>();
@@ -90,6 +90,6 @@ public class InterConnectivity {
 		// Need to unbox the list because DescriptiveStatistics is dumb
 		double[] resultsArray = Stream.of(results.toArray(new Double[0]))
 			.mapToDouble(Double::doubleValue).toArray();
-		return new DescriptiveStatistics(resultsArray);
+		return new CentralTendency(resultsArray);
 	}
 }

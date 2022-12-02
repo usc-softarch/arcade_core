@@ -5,16 +5,14 @@ import edu.usc.softarch.arcade.antipattern.SmellCollection;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
 import edu.usc.softarch.arcade.topics.TopicItem;
-import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
+import edu.usc.softarch.arcade.util.CentralTendency;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ConcernOverload {
 	public static SmellCollection detect(ReadOnlyArchitecture arch) {
-		return detect(arch, .10);
-	}
+		return detect(arch, .10); }
 
 	public static SmellCollection detect(ReadOnlyArchitecture arch,
 			double overloadThreshold) {
@@ -25,13 +23,9 @@ public class ConcernOverload {
 		double[] doubleConcernCountValues =
 			concernCounts.values().stream().mapToDouble(Double::valueOf).toArray();
 
-		double concernCountMean = Arrays.stream(doubleConcernCountValues).sum()
-			/ doubleConcernCountValues.length;
-		double concernCountStdev =
-			(new StandardDeviation()).evaluate(doubleConcernCountValues);
-
+		CentralTendency ct = new CentralTendency(doubleConcernCountValues);
 		for (Map.Entry<String, Integer> entry : concernCounts.entrySet()) {
-			if (entry.getValue() > concernCountMean + concernCountStdev) {
+			if (entry.getValue() > ct.getMean() + ct.getStDev()) {
 				Smell bco = new Smell(Smell.SmellType.bco);
 				bco.addCluster(entry.getKey());
 				result.add(bco);
