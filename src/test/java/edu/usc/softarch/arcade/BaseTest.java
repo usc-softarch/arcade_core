@@ -1,19 +1,16 @@
 package edu.usc.softarch.arcade;
 
 import edu.usc.softarch.arcade.topics.DocTopics;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-public class BaseTest {
-	protected final String fs = File.separator;
-	protected final String resourcesBase =
+public abstract class BaseTest {
+	protected static final String fs = File.separator;
+	protected static final String resourcesBase =
 		"." + fs + "src" + fs + "test" + fs + "resources";
-	protected final String outputBase =	"." + fs + "target" + fs + "test_results";
-
-	public BaseTest() { DocTopics.resetSingleton(); }
+	protected static final String outputBase =
+		"." + fs + "target" + fs + "test_results";
 
 	/* ------------------------------------------------------------------------ */
 	/* -------------------------- DANGER ZONE --------------------------------- */
@@ -29,11 +26,6 @@ public class BaseTest {
 	/* -------------------------- DANGER ZONE --------------------------------- */
 	/* ------------------------------------------------------------------------ */
 
-	/**
-	 * This test stops ARCADE from ever passing CI if someone forgets to turn off
-	 * oracle generation.
-	 */
-	@Test
-	public void oracleGenerationIsOffTest() {
-		assertFalse(generateOracles);	}
+	@BeforeEach
+	public void resetDocTopics() { DocTopics.resetSingleton(); }
 }

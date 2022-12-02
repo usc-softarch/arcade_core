@@ -60,7 +60,6 @@ public class cleanUpCodeMaat {
 	
 	private static String convertFile(String javaName){
 		String output = javaName;
-		System.out.println(javaName);
 		
 		for (String pattern : PATTERNS) {
 			if (javaName.contains(pattern)) {

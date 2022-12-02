@@ -3,111 +3,128 @@ package logical_coupling;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.usc.softarch.arcade.BaseTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import edu.usc.softarch.arcade.util.FileUtil;
+public class CodeMaatTest extends BaseTest {
+	private static final String resourcesDir1 =
+		resourcesBase + fs + "CodeMaatTest_resources";
+	private static final String resourcesDir2 =
+		resourcesBase + fs + "CleanUpCodeMaat_resources";
+	private static final String codeMaatPath = "." + fs + "ext-tools" + fs
+		+ "code-maat" + fs + "code-maat-1.0-SNAPSHOT-standalone.jar";
 
-public class CodeMaatTest {
+	private Map<String, String> read(Reader in) throws IOException {
+		Map<String, String> result = new HashMap<>();
 
-    @ParameterizedTest
-    @CsvSource({
-        /** Test Parameters */
-        // [project.log input file]
-        // [project.csv oracle file]
+		try (BufferedReader br = new BufferedReader(in)) {
+			String line = br.readLine(); // Skip header
+			while ((line = br.readLine()) != null) {
+				String[] values = line.split(",");
+				result.put(values[0] + values[1], values[2] + "," + values[3]);
+			}
+		}
 
-        // httpd
-        ".///src///test///resources///CodeMaatTest_resources///httpd///cleaned_httpd_project.log,"
-        + ".///src///test///resources///CodeMaatTest_resources///httpd///httpd_oracle_project.csv,",
+		return result;
+	}
 
-        // struts
-        ".///src///test///resources///CodeMaatTest_resources///struts///cleaned_struts_project.log,"
-        + ".///src///test///resources///CodeMaatTest_resources///struts///struts_oracle_project.csv,",
+	private void assertMapsAreEqual(
+			Map<String, String> outputMap, Map<String, String> oracleMap) {
+		for (Map.Entry<String, String> entry : oracleMap.entrySet()) {
+			String entityPair = entry.getKey();
+			String result = outputMap.get(entityPair);
+			assertNotNull(result);
 
-        // nutch 1.7
-        ".///src///test///resources///CodeMaatTest_resources///nutch///cleaned_nutch_17.log,"
-        + ".///src///test///resources///CodeMaatTest_resources///nutch///nutch_17_oracle.csv,",
+			String[] oraclesValues = entry.getValue().split(",");
+			int oracleDegree = Integer.parseInt(oraclesValues[0]);
+			int oracleAvgRevs = Integer.parseInt(oraclesValues[1]);
 
-        // nutch 1.8
-        ".///src///test///resources///CodeMaatTest_resources///nutch///cleaned_nutch_18.log,"
-        + ".///src///test///resources///CodeMaatTest_resources///nutch///nutch_18_oracle.csv,",
+			String[] outputValues = result.split(",");
+			int outputDegree = Integer.parseInt(outputValues[0]);
+			int outputAvgRevs = Integer.parseInt(outputValues[1]);
 
-        // nutch 1.9
-        ".///src///test///resources///CodeMaatTest_resources///nutch///cleaned_nutch_19.log,"
-        + ".///src///test///resources///CodeMaatTest_resources///nutch///nutch_19_oracle.csv,",
-    })
-    public void codeMaatTest(String logDir, String oracleDir){
-        String logPath = FileUtil.tildeExpandPath(logDir.replace("///", File.separator));
-        String oraclePath = FileUtil.tildeExpandPath(oracleDir.replace("///", File.separator));
+			assertAll(
+				() -> assertEquals(oracleDegree, outputDegree,
+					"Output degree does not match the oracle for key "
+						+ entityPair),
+				() -> assertEquals(oracleAvgRevs, outputAvgRevs,
+					"Output average-revs does not match the oracle for key "
+						+ entityPair)
+			);
+		}
+	}
 
-        String codeMaatDir = ".///ext-tools///code-maat///code-maat-1.0-SNAPSHOT-standalone.jar";
-        String codeMaatPath = FileUtil.tildeExpandPath(codeMaatDir.replace("///", File.separator));
+	@ParameterizedTest
+	@CsvSource({
+		"httpd",
 
-        // use ProcessBuilder to create the output project.csv
-        ProcessBuilder builder = new ProcessBuilder("java", "-jar", codeMaatPath, "-l", logPath, "-c", "git2", "-a", "coupling");
-        Process process = assertDoesNotThrow(()->{
-          return builder.start();
-        });
+		"struts",
 
-        // read in the output from the process input stream
-        Map<String, String> output_map = new HashMap<String, String>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));){
-          String line;
-          while ((line = br.readLine()) != null){
-            String[] values = line.split(",");
-            output_map.put(values[0]+values[1],values[2]+","+values[3]);
-          }
-        }catch(IOException e) {
-            e.printStackTrace();
-            fail("Exception caught in CodeMaatTest when reading in output from process");
-        }
+		"nutch_17",
 
-        // read in the oracle project.csv
-        Map<String, String> oracle_map = new HashMap<String, String>();
-        try (BufferedReader br = new BufferedReader(new FileReader(oraclePath));){
-          //Map of key = {entity,coupled}, value  = {degree,average-revs}
-          String line;
-          while ((line = br.readLine()) != null){
-            String[] values = line.split(",");
-            oracle_map.put(values[0]+values[1],values[2]+","+values[3]);
-          }
-        }catch(IOException e) {
-            e.printStackTrace();
-            fail("Exception caught in CodeMaatTest when reading in oracle file");
-        }
-        
-        // check if oracle and generated output match
-        for (Map.Entry<String,String> mapElement  : oracle_map.entrySet()){
-          String key = (String)mapElement.getKey();
-          if(key.equals("entitycoupled")){
-            continue;
-          }
-          String output_value = output_map.get(key);
-          if(output_value == null){
-            fail("output does not contain key: " + key);
-          }
-          String values[] = ((String)mapElement.getValue()).split(",");
-          int oracle_degree = Integer.parseInt(values[0]);
-          int oracle_avg_revs = Integer.parseInt(values[1]);
-    
-          String output_values[] = ((String)output_value).split(",");
-          int output_degree = Integer.parseInt(output_values[0]);
-          int output_avg_revs = Integer.parseInt(output_values[1]);
-    
-          assertAll(
-            () -> assertEquals(oracle_degree, output_degree, "Output degree does not match the oracle for key" + key),
-            () -> assertEquals(oracle_avg_revs, output_avg_revs, "Output average-revs does not match the oracle for key" + key)
-          );
-        }
-    }
+		"nutch_18",
+
+		"nutch_19"
+	})
+	public void codeMaatTest(String subjectSystem) {
+		// Creating relevant path Strings
+		String sysResources = resourcesDir1 + fs + subjectSystem;
+		String logPath = sysResources + fs + "cleaned_" + subjectSystem + ".log";
+		String oraclePath = sysResources + fs + subjectSystem + "_oracle.csv";
+
+		// Use ProcessBuilder to create the output project.csv
+		ProcessBuilder builder = new ProcessBuilder("java", "-jar",
+			codeMaatPath, "-l", logPath, "-c", "git2", "-a", "coupling");
+		Process process = assertDoesNotThrow(builder::start);
+
+		Map<String, String> outputMap = assertDoesNotThrow(() ->
+			read(new InputStreamReader(process.getInputStream())));
+		Map<String, String> oracleMap = assertDoesNotThrow(() ->
+			read(new FileReader(oraclePath)));
+
+		assertMapsAreEqual(outputMap, oracleMap);
+	}
+
+	@ParameterizedTest
+	@CsvSource({
+		"struts,"
+			+ "",
+
+		"nutch,"
+			+ "17",
+
+		"nutch,"
+			+ "18",
+
+		"nutch,"
+			+ "19"
+	})
+	public void cleanUpCodeMaatTest(String systemName, String systemVersion) {
+		// Creating relevant path Strings
+		String sysResources = resourcesDir2 + fs + systemName;
+		String fileBase = "project_" + systemName + "_" + systemVersion + "_";
+		String oraclePath = sysResources + fs + "oracle_" + fileBase + ".csv";
+		String outputCsv = sysResources + fs + fileBase + "clean.csv";
+
+		String[] args = { sysResources };
+		cleanUpCodeMaat.main(args);
+
+		Map<String, String> outputMap =
+			assertDoesNotThrow(() -> this.read(new FileReader(outputCsv)));
+		Map<String, String> oracleMap =
+			assertDoesNotThrow(() -> this.read(new FileReader(oraclePath)));
+
+		assertMapsAreEqual(outputMap, oracleMap);
+	}
 }

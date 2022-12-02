@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RsfCompare implements Comparable<RsfCompare> {
+public class RsfCompare {
 	public static void main(String[] args) throws IOException {
 		String rsf1Path = args[0];
 		String rsf2Path = args[1];
@@ -20,19 +20,12 @@ public class RsfCompare implements Comparable<RsfCompare> {
 		System.out.println(rsf1Compare.equals(rsf2Compare));
 	}
 
-	private Set<String> rsfSet;
+	private final Set<String> rsfSet;
 	
 	// Constructor passes in string (pass in path to FileUtil.readFile)
 	public RsfCompare(String rsfContents) {
-    this.rsfSet = new HashSet<>(Arrays.asList(rsfContents.split("\\r?\\n"))); }
-	
-	@Override
-	public int compareTo(RsfCompare rsf1) {
-		// Returns 0 if contents of the 2 rsf files are the same (regardless of order)
-		if (this.rsfSet.equals(rsf1.rsfSet))
-			return 0;
-		else
-			return 1;
+    this.rsfSet = new HashSet<>(
+			Arrays.asList(rsfContents.split("\\r?\\n")));
 	}
 
 	@Override
@@ -40,7 +33,7 @@ public class RsfCompare implements Comparable<RsfCompare> {
 		if (!(o instanceof RsfCompare))
 			return false;
 
-		RsfCompare toCompare = (RsfCompare)o;
+		RsfCompare toCompare = (RsfCompare) o;
 		return this.rsfSet.equals(toCompare.rsfSet);
 	}
 
