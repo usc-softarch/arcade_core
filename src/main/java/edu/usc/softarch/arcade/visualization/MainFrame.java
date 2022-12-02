@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.visualization;
 
-import com.github.weisj.darklaf.LafManager;
-import com.github.weisj.darklaf.theme.DarculaTheme;
+//import com.github.weisj.darklaf.LafManager;
+//import com.github.weisj.darklaf.theme.DarculaTheme;
 import edu.usc.softarch.arcade.clustering.Clusterer;
 import edu.usc.softarch.arcade.topics.exceptions.DistributionSizeMismatchException;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
 public class MainFrame extends JFrame implements ActionListener {
 	//region PUBLIC INTERFACE
 	public static void main(String[] args) {
-		LafManager.install(new DarculaTheme());
+//		LafManager.install(new DarculaTheme());
 		MainFrame window = new MainFrame();
 		window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		// Puts the window in the center of the screen

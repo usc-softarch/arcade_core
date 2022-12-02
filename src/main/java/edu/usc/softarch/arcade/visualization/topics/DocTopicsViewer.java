@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.visualization.topics;
 
-import com.github.weisj.darklaf.LafManager;
-import com.github.weisj.darklaf.theme.DarculaTheme;
+//import com.github.weisj.darklaf.LafManager;
+//import com.github.weisj.darklaf.theme.DarculaTheme;
 import edu.usc.softarch.arcade.topics.DocTopics;
 import edu.usc.softarch.arcade.visualization.ArchitectureTableModel;
 import edu.usc.softarch.arcade.visualization.clustering.ArchitectureViewer;
@@ -19,7 +19,7 @@ public class DocTopicsViewer extends ArchitectureViewer {
 
 		DocTopics.deserialize(docTopicsPath);
 
-		LafManager.install(new DarculaTheme());
+//		LafManager.install(new DarculaTheme());
 		DocTopicsViewer viewerPanel =
 			new DocTopicsViewer(projectName, projectVersion);
 		JFrame window = new JFrame(

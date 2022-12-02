@@ -4,7 +4,7 @@
   <groupId>edu.usc.softarch.arcade</groupId>
   <artifactId>arcade_core</artifactId>
   <packaging>jar</packaging>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <name>arcade_core</name>
   <url>https://github.com/usc-softarch/arcade_core</url>
   <properties>
@@ -36,17 +36,6 @@
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
-<!--    <dependency>-->
-<!--      <groupId>org.apache.logging.log4j</groupId>-->
-<!--      <artifactId>log4j-api</artifactId>-->
-<!--      <version>2.19.0</version>-->
-<!--    </dependency>-->
-<!--    &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core &ndash;&gt;-->
-<!--    <dependency>-->
-<!--      <groupId>org.apache.logging.log4j</groupId>-->
-<!--      <artifactId>log4j-core</artifactId>-->
-<!--      <version>2.19.0</version>-->
-<!--    </dependency>-->
 		<dependency>
 			<groupId>cc.mallet</groupId>
 			<artifactId>mallet</artifactId>
@@ -111,28 +100,14 @@
         <artifactId>jackson-databind</artifactId>
         <version>2.14.0</version>
     </dependency>
-		<dependency>
-			<groupId>com.github.weisj</groupId>
-			<artifactId>darklaf-core</artifactId>
-			<version>3.0.2</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.github.weisj</groupId>-->
+<!--			<artifactId>darklaf-core</artifactId>-->
+<!--			<version>3.0.2</version>-->
+<!--		</dependency>-->
 	</dependencies>
   <build>
     <plugins>
-       <!-- <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.1.1</version>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>javadoc</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin> -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.5.5</version>
@@ -256,8 +231,8 @@
         <includes>
           <include>cfg/*</include>
           <include>log4j2.xml</include>
-		  <include>stoplists/*</include>
-		  <include>res/*</include>
+					<include>stoplists/*</include>
+					<include>res/*</include>
         </includes>
       </resource>
     </resources>
