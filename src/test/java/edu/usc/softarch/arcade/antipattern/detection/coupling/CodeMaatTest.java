@@ -1,4 +1,4 @@
-package logical_coupling;
+package edu.usc.softarch.arcade.antipattern.detection.coupling;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -116,14 +117,21 @@ public class CodeMaatTest extends BaseTest {
 		String fileBase = "project_" + systemName + "_" + systemVersion + "_";
 		String oraclePath = sysResources + fs + "oracle_" + fileBase + ".csv";
 		String outputCsv = sysResources + fs + fileBase + "clean.csv";
+		String[] prefixes = { "src/org/apache/", "java/org/apache/",
+			"java/main/org/apache/", "java/test/org/apache/", "test/org/apache/" };
 
-		String[] args = { sysResources };
-		cleanUpCodeMaat.main(args);
+		assertDoesNotThrow(() ->
+			CodeMaatHelper.batchRun(sysResources, sysResources, "java",
+				"org.apache.", false, prefixes));
 
 		Map<String, String> outputMap =
 			assertDoesNotThrow(() -> this.read(new FileReader(outputCsv)));
 		Map<String, String> oracleMap =
 			assertDoesNotThrow(() -> this.read(new FileReader(oraclePath)));
+
+		// Clean-up
+		for (File file : new File(sysResources).listFiles())
+			if (file.getName().contains("clean")) file.delete();
 
 		assertMapsAreEqual(outputMap, oracleMap);
 	}
