@@ -14,14 +14,16 @@ public class DirCleaner {
 	public static void main(String[] args) throws IOException {
 		Queue<File> files = new LinkedList<>();
 		files.add(new File(args[0]));
+		boolean safeMode = Boolean.parseBoolean(args[2]);
 
 		try (FileWriter writer = new FileWriter(args[1])) {
 			while (!files.isEmpty()) {
 				File currFile = files.poll();
 				if (currFile.isFile()) continue;
-				if (currFile.getAbsolutePath().contains("test")) {
+				if (currFile.getName().contains("test")) {
 					writer.write(currFile.getAbsolutePath() + System.lineSeparator());
-					FileUtil.deleteNonEmptyDirectory(currFile);
+					if (!safeMode)
+						FileUtil.deleteNonEmptyDirectory(currFile);
 				}
 				else
 					files.addAll(Arrays.asList(currFile.listFiles()));
