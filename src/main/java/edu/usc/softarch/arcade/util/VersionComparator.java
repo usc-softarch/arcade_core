@@ -67,7 +67,7 @@ public class VersionComparator implements Comparator<File> {
 	 */
 	public static String extractVersion(File s) {
 		// Define the regular expression pattern to match the version string
-		String pattern = "(\\d+(\\.\\d+)?(\\.\\d+)?(alpha\\d?|beta\\d?|rc\\d?|pre\\d?)?)";
+		String pattern = "(\\d+(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?(alpha\\d?|beta\\d?|rc\\d?|pre\\d?)?)";
 
 		// Create a Pattern object
 		Pattern r = Pattern.compile(pattern);
