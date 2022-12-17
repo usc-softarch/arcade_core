@@ -40,6 +40,13 @@
 			<artifactId>trove</artifactId>
 			<version>local</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.carrotsearch/hppc -->
+		<!-- This is required by Mallet, which uses it reflexively. -->
+		<dependency>
+			<groupId>com.carrotsearch</groupId>
+			<artifactId>hppc</artifactId>
+			<version>0.9.1</version>
+		</dependency>
     <!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
     <dependency>
       <groupId>org.jgrapht</groupId>

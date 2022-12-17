@@ -4,6 +4,7 @@ logs/
 *~
 .DS_Store
 .idea/
+__pycache__
 
 build.xml
 
