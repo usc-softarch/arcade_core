@@ -457,8 +457,7 @@ public class Architecture extends TreeMap<String, Cluster>
 	public void writeToDotClusters() throws IOException {
 		String fs = File.separator;
 		String path = this.projectPath + fs + this.projectName + "-"
-			+ this.projectVersion + "_" + this.simMeasure + "_" + this.size()
-			+ "_clusterDots";
+			+ this.projectVersion + "_" + this.simMeasure + "_clusterDots";
 		FileUtil.checkDir(path, true, false);
 		writeToDotClusters(path);
 	}
