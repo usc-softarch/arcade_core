@@ -42,8 +42,8 @@ public class VersionComparator implements Comparator<File> {
 			return 1;
 
 		// If both versions have a suffix, check their types. If they are different,
-		// return their difference, such that alpha comes before beta, and beta
-		// comes before rc.
+		// return their difference, such that alpha comes before beta, beta comes
+		// pre, and pre comes before rc.
 		int v1SuffixType = getSuffixType(v1Suffix);
 		int v2SuffixType = getSuffixType(v2Suffix);
 		if (v1SuffixType != v2SuffixType)
@@ -67,7 +67,7 @@ public class VersionComparator implements Comparator<File> {
 	 */
 	public static String extractVersion(File s) {
 		// Define the regular expression pattern to match the version string
-		String pattern = "(\\d+(\\.\\d+)?(\\.\\d+)?(alpha\\d?|beta\\d?|rc\\d?)?)";
+		String pattern = "(\\d+(\\.\\d+)?(\\.\\d+)?(alpha\\d?|beta\\d?|rc\\d?|pre\\d?)?)";
 
 		// Create a Pattern object
 		Pattern r = Pattern.compile(pattern);
@@ -86,12 +86,12 @@ public class VersionComparator implements Comparator<File> {
 	public static int getDigitsBeforeSuffix(String s) {
 		// Use a regular expression to match one or more digits followed by
 		// either "alpha", "beta", or "rc"
-		Pattern pattern = Pattern.compile("\\d+(alpha|beta|rc)");
+		Pattern pattern = Pattern.compile("\\d+(alpha|beta|rc|pre)");
 		Matcher matcher = pattern.matcher(s);
 		if (matcher.find()) {
 			// Return the group of digits as an int after removing the suffix
 			return Integer.parseInt(matcher.group()
-				.replaceAll("(alpha|beta|rc)", ""));
+				.replaceAll("(alpha|beta|rc|pre)", ""));
 		} else if (s.matches("\\d+")) {
 			// If the input string only contains digits, return it as an int
 			return Integer.parseInt(s);
@@ -114,9 +114,11 @@ public class VersionComparator implements Comparator<File> {
 			return 0;
 		else if (suffix.startsWith("beta"))
 			return 1;
-		else if (suffix.startsWith("rc"))
+		else if (suffix.startsWith("pre"))
 			return 2;
-		return 3;
+		else if (suffix.startsWith("rc"))
+			return 3;
+		return 4;
 	}
 
 	private static String getSuffixNumber(String suffix) {
