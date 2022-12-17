@@ -132,42 +132,21 @@ public class FileUtil {
 	}
 
 	/**
-	 * Sorts files by version. Correctness is dubious due to
-	 * {@link #extractVersion(String)}, but it has worked so far. If anything
-	 * comes up due to this method, please report it. Otherwise, it will be
-	 * left as is.
+	 * Sorts files by version. Is able to process any file with a name matching
+	 * the pattern (\d+(\.\d+)?(\.\d+)?(alpha\d?|beta\d?|rc\d?)?).
+	 *
+	 * If there are multiple matches (i.e. there are multiple version strings in
+	 * the name of the file), it will give an incorrect result because you
+	 * shouldn't have two versions in your filename what are you even doing...
 	 *
 	 * @param inList List of Files to sort.
 	 * @param reverse True for descending order, false for ascending.
+	 * @see VersionComparator
 	 */
 	public static List<File> sortFileListByVersion(List<File> inList,
 			boolean reverse) {
 		List<File> outList = new ArrayList<>(inList);
-
-		outList.sort((File o1, File o2) -> {
-			String version1 = extractVersion(o1.getName());
-			String[] parts1 = version1.split("\\.");
-			String version2 = extractVersion(o2.getName());
-			String[] parts2 = version2.split("\\.");
-
-			// Number of version "parts" (separated by ".") of the
-			// simpler version.
-			int minLength = Math.min(parts1.length, parts2.length);
-
-			// For each version part shared by both compared versions
-			for (int i = 0; i < minLength; i++) {
-				try {
-					Integer part1 = Integer.parseInt(parts1[i]);
-					Integer part2 = Integer.parseInt(parts2[i]);
-					int compareToVal = part1.compareTo(part2);
-					if (compareToVal != 0) return compareToVal;
-				} catch (NumberFormatException e) {
-					// This means letters were used in the versioning schema by a heathen.
-					return version1.compareTo(version2);
-				}
-			}
-			return version1.compareTo(version2);
-		});
+		outList.sort(new VersionComparator());
 
 		if (reverse) Collections.reverse(outList);
 		return outList;
