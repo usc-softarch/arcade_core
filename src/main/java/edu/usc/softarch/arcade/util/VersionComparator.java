@@ -67,7 +67,7 @@ public class VersionComparator implements Comparator<File> {
 	 */
 	public static String extractVersion(File s) {
 		// Define the regular expression pattern to match the version string
-		String pattern = "(\\d+(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?(alpha\\d?|beta\\d?|rc\\d?|pre\\d?)?)";
+		String pattern = "(\\d+(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?(-?(alpha\\d?|beta\\d?|rc\\d?|pre\\d?)?))";
 
 		// Create a Pattern object
 		Pattern r = Pattern.compile(pattern);
@@ -86,12 +86,12 @@ public class VersionComparator implements Comparator<File> {
 	public static int getDigitsBeforeSuffix(String s) {
 		// Use a regular expression to match one or more digits followed by
 		// either "alpha", "beta", or "rc"
-		Pattern pattern = Pattern.compile("\\d+(alpha|beta|rc|pre)");
+		Pattern pattern = Pattern.compile("\\d+-?(alpha|beta|rc|pre)");
 		Matcher matcher = pattern.matcher(s);
 		if (matcher.find()) {
 			// Return the group of digits as an int after removing the suffix
 			return Integer.parseInt(matcher.group()
-				.replaceAll("(alpha|beta|rc|pre)", ""));
+				.replaceAll("-?(alpha|beta|rc|pre)", ""));
 		} else if (s.matches("\\d+")) {
 			// If the input string only contains digits, return it as an int
 			return Integer.parseInt(s);
@@ -110,6 +110,9 @@ public class VersionComparator implements Comparator<File> {
 	}
 
 	private static int getSuffixType(String suffix) {
+		if (suffix.startsWith("-"))
+			suffix = suffix.substring(1);
+
 		if (suffix.startsWith("alpha"))
 			return 0;
 		else if (suffix.startsWith("beta"))
@@ -122,7 +125,7 @@ public class VersionComparator implements Comparator<File> {
 	}
 
 	private static String getSuffixNumber(String suffix) {
-		String[] parts = suffix.split("[a-zA-Z]+");
+		String[] parts = suffix.split("-?[a-zA-Z]+");
 		if (parts.length == 0)
 			return "0";
 		return parts[0];

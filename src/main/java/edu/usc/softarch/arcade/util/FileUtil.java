@@ -133,7 +133,13 @@ public class FileUtil {
 
 	/**
 	 * Sorts files by version. Is able to process any file with a name matching
-	 * the pattern (\d+(\.\d+)?(\.\d+)?(\.\d+)?(alpha\d?|beta\d?|rc\d?|pre\d?)?).
+	 * the pattern
+	 * (\d+(\.\d+)?(\.\d+)?(\.\d+)?(-?(alpha\d?|beta\d?|rc\d?|pre\d?)?)).
+	 *
+	 * The pattern represents a sequence of up to four version numbers, where the
+	 * last number may be followed by a suffix alpha, beta, rc and pre. The
+	 * suffix can optionally be separated from the last number by a dash
+	 * character, and may be following by a single number.
 	 *
 	 * The ordering of non-release versions is somewhat arbitrary:
 	 * alpha -> beta -> pre -> rc
@@ -144,6 +150,9 @@ public class FileUtil {
 	 *
 	 * The number of positions allowed is also arbitrarily set to four. I have
 	 * not found a need for more than this, and am wary of using (\.\d+)*.
+	 * Likewise, the allowance for only one number after the suffix is due to my
+	 * not having found any lunatic insane enough to create more than 10
+	 * pre-releases of the same suffix.
 	 *
 	 * If there are multiple matches (i.e. there are multiple version strings in
 	 * the name of the file), it will give an incorrect result because you
