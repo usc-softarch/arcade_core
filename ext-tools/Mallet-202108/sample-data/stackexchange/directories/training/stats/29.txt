@@ -1,1 +1,0 @@
- Contingency table (chi-square). Also Logistic Regression is your friend - use dummy variables. 

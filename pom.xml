@@ -41,13 +41,25 @@
 			<version>local</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.carrotsearch/hppc -->
-		<!-- This is required by Mallet, which uses it reflexively. -->
+		<!-- These are required by Mallet, which use them reflexively. -->
 		<dependency>
 			<groupId>com.carrotsearch</groupId>
 			<artifactId>hppc</artifactId>
 			<version>0.9.1</version>
 		</dependency>
-    <!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
+		<!-- https://mvnrepository.com/artifact/org.apache-extras.beanshell/bsh -->
+		<dependency>
+			<groupId>org.apache-extras.beanshell</groupId>
+			<artifactId>bsh</artifactId>
+			<version>2.0b6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.errorprone</groupId>
+			<artifactId>error_prone_annotations</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<!-- These are required by Mallet, which use them reflexively. -->
+		<!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
     <dependency>
       <groupId>org.jgrapht</groupId>
       <artifactId>jgrapht-core</artifactId>

@@ -1,5 +1,8 @@
 package edu.usc.softarch.arcade.topics;
 
+import cc.mallet.classify.tui.Text2Vectors;
+import cc.mallet.classify.tui.Vectors2Vectors;
+import cc.mallet.topics.tui.TopicTrainer;
 import edu.usc.softarch.arcade.util.FileUtil;
 
 import java.io.File;
@@ -8,14 +11,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Utility to automate execution of MALLET. Note that using this class'
- * utilities on Windows requires that one have an environment variable
- * MALLET_HOME pointing to the root of one's MALLET installation.
+ * Utility to automate execution of MALLET.
  *
  * @see DocTopics
  */
@@ -23,14 +22,14 @@ public class MalletRunner {
 	//region PUBLIC INTERFACE
 	public static void main(String[] args) throws IOException {
 		if (args.length < 6)
-			run(args[0], args[1], args[2], args[3], args[4]);
+			run(args[0], args[1], args[2], args[3]);
 		else if (args.length < 8)
-			run(args[0], args[1], args[2], args[3], args[4],
-				Boolean.parseBoolean(args[5]), Boolean.parseBoolean(args[6]));
+			run(args[0], args[1], args[2], args[3],
+				Boolean.parseBoolean(args[4]), Boolean.parseBoolean(args[5]));
 		else
-			run(args[0], args[1], args[2], args[3], args[4],
-				Boolean.parseBoolean(args[5]), Boolean.parseBoolean(args[6]),
-				Integer.parseInt(args[7]), Integer.parseInt(args[8]));
+			run(args[0], args[1], args[2], args[3],
+				Boolean.parseBoolean(args[4]), Boolean.parseBoolean(args[5]),
+				Integer.parseInt(args[6]), Integer.parseInt(args[7]));
 	}
 
 	/**
@@ -46,9 +45,6 @@ public class MalletRunner {
 	 * @param sourceDir Path to the directory containing the source code of the
 	 *                  subject system.
 	 * @param language Source language of the subject system.
-	 * @param malletPath Path to the execution file for MALLET, found in one's
-	 *                   MALLET installation. Typically, bin\mallet for *nix
-	 *                   systems or bin\mallet.bat for Windows.
 	 * @param artifactsPath Path to the directory into which to place the outputs.
 	 * @param stopWordPath Path to a stopwords file to be used in extracting the
 	 *                     token vectors.
@@ -60,9 +56,9 @@ public class MalletRunner {
 	 * @see #runInferencer()
 	 * @see #cleanUp()
 	 */
-	public static void run(String sourceDir, String language, String malletPath,
+	public static void run(String sourceDir, String language,
 			String artifactsPath, String stopWordPath) throws IOException {
-		run(sourceDir, language, malletPath, artifactsPath, stopWordPath,
+		run(sourceDir, language, artifactsPath, stopWordPath,
 			false, false);
 	}
 
@@ -74,9 +70,6 @@ public class MalletRunner {
 	 *
 	 * @param sourceDir Path to the directory containing the source code of the
 	 *                  subject system.
-	 * @param malletPath Path to the execution file for MALLET, found in one's
-	 *                   MALLET installation. Typically, bin\mallet for *nix
-	 *                   systems or bin\mallet.bat for Windows.
 	 * @param artifactsPath Path to the directory into which to place the outputs.
 	 * @param stopWordPath Path to a stopwords file to be used in extracting the
 	 *                     token vectors.
@@ -93,9 +86,9 @@ public class MalletRunner {
 	 * @see #cleanUp()
 	 */
 	public static void run(String sourceDir, String language,
-			String malletPath, String artifactsPath, String stopWordPath,
+			String artifactsPath, String stopWordPath,
 			boolean copyReady, boolean keepCopy) throws IOException {
-		run(sourceDir, language, malletPath, artifactsPath, stopWordPath,
+		run(sourceDir, language, artifactsPath, stopWordPath,
 			copyReady, keepCopy, 50, 250);
 	}
 
@@ -105,9 +98,6 @@ public class MalletRunner {
 	 *
 	 * @param sourceDir Path to the directory containing the source code of the
 	 *                  subject system.
-	 * @param malletPath Path to the execution file for MALLET, found in one's
-	 *                   MALLET installation. Typically, bin\mallet for *nix
-	 *                   systems or bin\mallet.bat for Windows.
 	 * @param artifactsPath Path to the directory into which to place the outputs.
 	 * @param stopWordPath Path to a stopwords file to be used in extracting the
 	 *                     token vectors.
@@ -126,11 +116,11 @@ public class MalletRunner {
 	 * @see #runInferencer()
 	 * @see #cleanUp()
 	 */
-	public static void run(String sourceDir, String language, String malletPath,
+	public static void run(String sourceDir, String language,
 			String artifactsPath, String stopWordPath, boolean copyReady,
 			boolean keepCopy, int numTopics, int numIterations) throws IOException {
 		MalletRunner runner = new MalletRunner(sourceDir, language,
-			malletPath, artifactsPath, stopWordPath, numTopics, numIterations);
+			artifactsPath, stopWordPath, numTopics, numIterations);
 		if (!copyReady)
 			runner.copySource();
 		runner.runTopicModeling();
@@ -157,11 +147,6 @@ public class MalletRunner {
 	 */
 	private final String language;
 	/**
-	 * Path to the execution file for MALLET, found in one's MALLET installation.
-	 * Typically, bin\mallet for *nix systems or bin\mallet.bat for Windows.
-	 */
-	private final String malletPath;
-	/**
 	 * Path to the directory in which to place the output vectors and topicmodel
 	 * files.
 	 */
@@ -182,16 +167,13 @@ public class MalletRunner {
 	 * @param sourceDir Path to the directory containing the source code of the
 	 *                  subject system.
 	 * @param language Source language of the subject system.
-	 * @param malletPath Path to the execution file for MALLET, found in one's
-	 *                   MALLET installation. Typically, bin\mallet for *nix
-	 *                   systems or bin\mallet.bat for Windows.
 	 * @param artifactsPath Path to the directory into which to place the outputs.
 	 * @param stopWordPath Path to a stopwords file to be used in extracting the
 	 *                     token vectors.
 	 */
-	public MalletRunner(String sourceDir, String language, String malletPath,
+	public MalletRunner(String sourceDir, String language,
 			String artifactsPath, String stopWordPath) {
-		this(sourceDir, language, malletPath, artifactsPath, stopWordPath,
+		this(sourceDir, language, artifactsPath, stopWordPath,
 			50, 250);
 	}
 
@@ -201,16 +183,13 @@ public class MalletRunner {
 	 * @param sourceDir Path to the directory containing the source code of the
 	 *                  subject system.
 	 * @param language Source language of the subject system.
-	 * @param malletPath Path to the execution file for MALLET, found in one's
-	 *                   MALLET installation. Typically, bin\mallet for *nix
-	 *                   systems or bin\mallet.bat for Windows.
 	 * @param artifactsPath Path to the directory into which to place the outputs.
 	 * @param stopWordPath Path to a stopwords file to be used in extracting the
 	 *                     token vectors.
 	 * @param numTopics Number of topics to use in the inference process.
 	 * @param numIterations Number of iterations to use in the inference process.
 	 */
-	public MalletRunner(String sourceDir, String language, String malletPath,
+	public MalletRunner(String sourceDir, String language,
 			String artifactsPath, String stopWordPath, int numTopics,
 			int numIterations) {
 		this.sourceDir = new File(sourceDir
@@ -218,7 +197,6 @@ public class MalletRunner {
 		this.targetDir = new File(sourceDir
 			.replaceFirst("^~",System.getProperty("user.home")) + "_temp");
 		this.language = language.toLowerCase();
-		this.malletPath = malletPath;
 		this.artifactsPath = artifactsPath;
 		(new File(this.artifactsPath)).mkdirs();
 		if (this.language.equalsIgnoreCase("java"))
@@ -304,22 +282,13 @@ public class MalletRunner {
 	 * representation of an {@link cc.mallet.types.InstanceList}.
 	 */
 	public void runTopicModeling() throws IOException {
-		List<String> command = new ArrayList<>();
-
-		command.add(this.malletPath);
-		command.add("import-dir");
-		command.add("--input");
-		command.add(targetDir.getAbsolutePath());
-		command.add("--remove-stopwords");
-		command.add("TRUE");
-		command.add("--keep-sequence");
-		command.add("TRUE");
-		command.add("--output");
-		command.add(artifactsPath + fs + "vectors-raw");
-		command.add("--stoplist-file");
-		command.add(stopWordPath);
-
-		executeProcess(command);
+		Text2Vectors.main(new String[]{
+			"--input", targetDir.getAbsolutePath(),
+			"--remove-stopwords", "TRUE",
+			"--keep-sequence", "TRUE",
+			"--output", artifactsPath + fs + "vectors-raw",
+			"--stoplist-file", stopWordPath
+		});
 	}
 
 	/**
@@ -327,18 +296,11 @@ public class MalletRunner {
 	 * in more than 90% of the system files.
 	 */
 	public void runPrune() throws IOException {
-		List<String> command = new ArrayList<>();
-
-		command.add(this.malletPath);
-		command.add("prune");
-		command.add("--input");
-		command.add(artifactsPath + fs + "vectors-raw");
-		command.add("--output");
-		command.add(artifactsPath + fs + "vectors");
-		command.add("--min-idf");
-		command.add("1.6");
-
-		executeProcess(command);
+		Vectors2Vectors.main(new String[]{
+			"--input", artifactsPath + fs + "vectors-raw",
+			"--output", artifactsPath + fs + "vectors",
+			"--min-idf", "1.6"
+		});
 	}
 
 	/**
@@ -346,46 +308,14 @@ public class MalletRunner {
 	 * representation of a {@link cc.mallet.topics.TopicInferencer}.
 	 */
 	public void runInferencer() throws IOException {
-		List<String> command = new ArrayList<>();
-
-		command.add(this.malletPath);
-		command.add("train-topics");
-		command.add("--input");
-		command.add(artifactsPath + fs + "vectors");
-		command.add("--inferencer-filename");
-		command.add(artifactsPath + fs + "topicmodel");
-		command.add("--num-top-words");
-		command.add("0");
-		command.add("--num-topics");
-		command.add(String.valueOf(this.numTopics));
-		command.add("--num-threads");
-		command.add("5");
-		command.add("--num-iterations");
-		command.add(String.valueOf(this.numIterations));
-
-		executeProcess(command);
-	}
-
-	/**
-	 * Executes a process using the given command.
-	 *
-	 * @param command Command to use in the process.
-	 * @throws IOException if the process fails.
-	 * @see #runTopicModeling()
-	 * @see #runInferencer()
-	 */
-	private void executeProcess(List<String> command) throws IOException {
-		ProcessBuilder pb = new ProcessBuilder(command);
-		pb.inheritIO();
-
-		try {
-			Process p = pb.start();
-			p.waitFor();
-		} catch(IOException e) {
-			throw new IOException("Failed to start Process.", e);
-		} catch (InterruptedException e) {
-			throw new IOException("Failed to wait for Process.", e);
-		}
+		TopicTrainer.main(new String[]{
+			"--input", artifactsPath + fs + "vectors",
+			"--inferencer-filename", artifactsPath + fs + "topicmodel",
+			"--num-top-words", "0",
+			"--num-topics", String.valueOf(this.numTopics),
+			"--num-threads", "5",
+			"--num-iterations", String.valueOf(this.numIterations)
+		});
 	}
 
 	/**

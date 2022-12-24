@@ -1,1 +1,0 @@
- Another great resource is the LearnR blog , which went through an extensive study of visualizations with lattice and ggplot2. 

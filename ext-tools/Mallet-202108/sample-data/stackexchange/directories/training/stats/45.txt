@@ -1,1 +1,0 @@
- The Mersenne Twister is one I've come across and used before now. 

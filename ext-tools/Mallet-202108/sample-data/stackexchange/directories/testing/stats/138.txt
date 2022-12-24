@@ -1,1 +1,0 @@
- I'm interested in learning R on the cheap. What's the best free resource/book/tutorial for learning R? 

@@ -1,1 +1,0 @@
- What is the back-propagation algorithm and how does it work? 
