@@ -88,7 +88,7 @@ public class Clusterer {
 
 			if (args.containsKey("serial")) {
 				serial = args.get("serial");
-				serialThreshold = Double.parseDouble("serialthreshold");
+				serialThreshold = Double.parseDouble(args.get("serialthreshold"));
 			}
 
 			this.serialCrit = SerializationCriterion.makeSerializationCriterion(

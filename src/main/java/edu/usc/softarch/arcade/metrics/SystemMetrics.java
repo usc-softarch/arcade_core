@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.metrics;
 
 import edu.usc.softarch.arcade.util.CLI;
 import edu.usc.softarch.arcade.util.FileUtil;
+import edu.usc.softarch.arcade.util.VersionComparator;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
 import edu.usc.softarch.util.json.JsonSerializable;
@@ -57,15 +58,7 @@ public class SystemMetrics implements JsonSerializable {
 	public SystemMetrics(String systemDirPath, String depsDirPath)
 			throws IOException {
 		// Get and sort the architecture files
-		List<File> archFiles = new ArrayList<>();
-		List<File> archDirs = List.of(
-			new File(FileUtil.tildeExpandPath(systemDirPath)).listFiles());
-		for (File archDir : archDirs) {
-			archFiles.add(Arrays.stream(archDir.listFiles())
-				.filter(f -> f.getName().contains(".rsf"))
-				.findFirst().get());
-		}
-		archFiles = FileUtil.sortFileListByVersion(archFiles);
+		List<File> archFiles = FileUtil.getFileListing(systemDirPath, ".rsf");
 
 		// Get and sort the dependency files
 		List<File> depsFiles = List.of(
@@ -74,11 +67,10 @@ public class SystemMetrics implements JsonSerializable {
 			.filter(f -> f.getName().contains(".rsf")).collect(Collectors.toList());
 		depsFiles = FileUtil.sortFileListByVersion(depsFiles);
 
-		// Initialize the version list from the version directories
-		this.versions = new String[archDirs.size()];
-		archDirs = FileUtil.sortFileListByVersion(archDirs);
-		for (int i = 0; i < archDirs.size(); i++)
-			this.versions[i] = archDirs.get(i).getName();
+		// Initialize the version list
+		this.versions = new String[archFiles.size()];
+		for (int i = 0; i < archFiles.size(); i++)
+			this.versions[i] = VersionComparator.extractVersion(archFiles.get(i));
 
 		// Run a2a
 		this.a2a = new double[this.versions.length - 1][];

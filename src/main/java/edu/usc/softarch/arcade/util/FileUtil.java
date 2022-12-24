@@ -333,11 +333,23 @@ public class FileUtil {
 	 * Recursively walk a directory tree and return a List of files matching the
 	 * FilenameFilter; the List is sorted using File.compareTo().
 	 *
+	 * @param dir is a valid directory path, which can be read.
+	 * @param extension Which file extensions to consider.
+	 */
+	public static List<File> getFileListing(String dir, String extension)
+			throws FileNotFoundException {
+		return getFileListing(new File(dir), extension);
+	}
+
+	/**
+	 * Recursively walk a directory tree and return a List of files matching the
+	 * FilenameFilter; the List is sorted using File.compareTo().
+	 *
 	 * @param dir is a valid directory, which can be read.
 	 * @param extension Which file extensions to consider.
 	 */
 	public static List<File> getFileListing(File dir, String extension)
-		throws FileNotFoundException {
+			throws FileNotFoundException {
 		validateDirectory(dir);
 		List<File> result = getFileListingNoSort(dir, extension);
 		Collections.sort(result);

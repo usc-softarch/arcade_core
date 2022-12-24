@@ -58,21 +58,29 @@ public class CentralTendency {
 	public int getN() { return this.values.size(); }
 
 	public double getMax() {
+		if (this.values.isEmpty()) return Double.NaN;
+
 		this.sort();
 		return this.values.get(this.values.size() - 1);
 	}
 
 	public double getMin() {
+		if (this.values.isEmpty()) return Double.NaN;
+
 		this.sort();
 		return this.values.get(0);
 	}
 
 	public double getMedian() {
+		if (this.values.isEmpty()) return Double.NaN;
+
 		this.sort();
 		return this.values.get(this.values.size() / 2);
 	}
 
 	public double getMean() {
+		if (this.values.isEmpty()) return Double.NaN;
+
 		if (Double.isNaN(this.mean)) {
 			this.mean = 0.0;
 			for (Double value : this.values)
@@ -83,6 +91,8 @@ public class CentralTendency {
 	}
 
 	public double getStDev() {
+		if (this.values.isEmpty()) return Double.NaN;
+
 		if (Double.isNaN(this.stDev) && !this.values.isEmpty()) {
 			double numerator = 0.0;
 			for (Double value : values)

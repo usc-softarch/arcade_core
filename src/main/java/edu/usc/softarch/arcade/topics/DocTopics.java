@@ -139,7 +139,7 @@ public class DocTopics implements JsonSerializable {
 	 */
 	public static void initializeSingleton(String artifactsDir,
 			String projectName, String projectVersion) throws Exception {
-		mingleton.put(projectName + "-" + projectVersion,
+		mingleton.put(projectName.toLowerCase() + "-" + projectVersion,
 			new DocTopics(artifactsDir, projectName, projectVersion));
 	}
 
@@ -157,7 +157,7 @@ public class DocTopics implements JsonSerializable {
 	 * @param projectVersion Key project version of the singleton to reset.
 	 */
 	public static void resetSingleton(String projectName, String projectVersion) {
-		mingleton.remove(projectName + "-" + projectVersion); }
+		mingleton.remove(projectName.toLowerCase() + "-" + projectVersion); }
 	//endregion
 
 	//region ACCESSORS
@@ -171,8 +171,8 @@ public class DocTopics implements JsonSerializable {
 	 * @see #getSingleton(String, String)
 	 */
 	public static boolean isReady(String projectName, String projectVersion) {
-		return mingleton.get(projectName + "-" + projectVersion) != null
-			&& !mingleton.get(projectName + "-" + projectVersion).dtItemList.isEmpty();
+		return mingleton.get(projectName.toLowerCase() + "-" + projectVersion) != null
+			&& !mingleton.get(projectName.toLowerCase() + "-" + projectVersion).dtItemList.isEmpty();
 	}
 
 	/**
@@ -196,10 +196,10 @@ public class DocTopics implements JsonSerializable {
 	 */
 	public static DocTopics getSingleton(String projectName,
 			String projectVersion) throws IllegalStateException {
-		if (mingleton.get(projectName + "-" + projectVersion) == null)
+		if (mingleton.get(projectName.toLowerCase() + "-" + projectVersion) == null)
 			throw new IllegalStateException("DocTopics must be initialized.");
 
-		return mingleton.get(projectName + "-" + projectVersion);
+		return mingleton.get(projectName.toLowerCase() + "-" + projectVersion);
 	}
 
 	/**
@@ -346,7 +346,9 @@ public class DocTopics implements JsonSerializable {
 	 */
 	private DocTopicItem getDocTopicItemForC(String name) {
 		String nameWithoutQuotations = name.replace("\"", "")
-			.replace("\\", "/");
+			.replace("\\", "/")
+			// This is a hack to deal with the CSourceToDepsBuilder being bad
+			.replace(".cpp", ".c");
 
 		DocTopicItem toReturn = null;
 
@@ -357,10 +359,12 @@ public class DocTopics implements JsonSerializable {
 				//FIXME Make sure this works on Linux and find a permanent fix
 				strippedSource = dti.source.replace("\\", "/")
 					.replace("_temp", "")
-					.replace("./", "");
+					.replace("./", "")
+					// This is a hack to deal with the CSourceToDepsBuilder being bad
+					.replace(".cpp", ".c");
 				if (strippedSource.endsWith("/" + nameWithoutQuotations)
 						&& strippedSource.contains(
-							"/" + this.projectName + "-" + this.projectVersion + "/")) {
+							"/" + this.projectName.toLowerCase() + "-" + this.projectVersion + "/")) {
 					if (toReturn == null)
 						toReturn = dti;
 					else
@@ -547,19 +551,19 @@ public class DocTopics implements JsonSerializable {
 		else
 			parser.parseString();
 
-		mingleton.put(name + "-" + version, new DocTopics(name, version));
+		mingleton.put(name.toLowerCase() + "-" + version, new DocTopics(name, version));
 		Collection<DocTopicItem> dtis = parser.parseCollection(DocTopicItem.class);
 
 		for (DocTopicItem dti : dtis)
-			mingleton.get(name + "-" + version).addDocTopicItem(dti);
+			mingleton.get(name.toLowerCase() + "-" + version).addDocTopicItem(dti);
 
 		Map<Integer, List> topicWordLists = parser.parseMap(
 			List.class, false, String.class);
 		for (Map.Entry<Integer, List> entry : topicWordLists.entrySet())
-			mingleton.get(name + "-" + version).topicWordLists.put(
+			mingleton.get(name.toLowerCase() + "-" + version).topicWordLists.put(
 				entry.getKey(), entry.getValue());
 
-		return mingleton.get(name + "-" + version);
+		return mingleton.get(name.toLowerCase() + "-" + version);
 	}
 	//endregion
 }
