@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.metrics;
+package edu.usc.softarch.arcade.metrics.data;
 
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;

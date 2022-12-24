@@ -62,7 +62,7 @@ public class VersionComparator implements Comparator<File> {
 	/**
 	 * Extracts the version string from the input string.
 	 *
-	 * @param s the input string
+	 * @param s the input file
 	 * @return the version string, or an empty string if no match was found
 	 */
 	public static String extractVersion(File s) {

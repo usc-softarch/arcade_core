@@ -1,8 +1,9 @@
-package edu.usc.softarch.arcade.metrics;
+package edu.usc.softarch.arcade.metrics.data;
 
+import edu.usc.softarch.arcade.metrics.Cvg;
 import edu.usc.softarch.arcade.util.CLI;
 import edu.usc.softarch.arcade.util.FileUtil;
-import edu.usc.softarch.arcade.util.VersionComparator;
+import edu.usc.softarch.arcade.util.Version;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
 import edu.usc.softarch.util.json.JsonSerializable;
@@ -45,12 +46,11 @@ public class SystemMetrics implements JsonSerializable {
 	//endregion
 
 	//region ATTRIBUTES
-	private final Map<String, ArchitectureMetrics> versionMetrics;
+	private final Map<Version, ArchitectureMetrics> versionMetrics;
 
-	private final String[] versions;
-	private final double[][] a2a;
-	private final double[][] cvgForwards;
-	private final double[][] cvgBackwards;
+	private final Version[] versions;
+	private final A2aSystemData a2a;
+	private final CvgSystemData cvg;
 	private final double[][] mojoFm;
 	//endregion
 
@@ -58,7 +58,8 @@ public class SystemMetrics implements JsonSerializable {
 	public SystemMetrics(String systemDirPath, String depsDirPath)
 			throws IOException {
 		// Get and sort the architecture files
-		List<File> archFiles = FileUtil.getFileListing(systemDirPath, ".rsf");
+		List<File> archFiles = FileUtil.sortFileListByVersion(
+			FileUtil.getFileListing(systemDirPath, ".rsf"));
 
 		// Get and sort the dependency files
 		List<File> depsFiles = List.of(
@@ -68,34 +69,15 @@ public class SystemMetrics implements JsonSerializable {
 		depsFiles = FileUtil.sortFileListByVersion(depsFiles);
 
 		// Initialize the version list
-		this.versions = new String[archFiles.size()];
+		this.versions = new Version[archFiles.size()];
 		for (int i = 0; i < archFiles.size(); i++)
-			this.versions[i] = VersionComparator.extractVersion(archFiles.get(i));
+			this.versions[i] = new Version(archFiles.get(i));
 
 		// Run a2a
-		this.a2a = new double[this.versions.length - 1][];
-		for (int i = 0; i < this.versions.length - 1; i++) {
-			this.a2a[i] = new double[this.versions.length - 1 - i];
-
-			for (int j = i + 1; j < this.versions.length; j++)
-				this.a2a[i][j - i - 1] =
-					SystemEvo.run(archFiles.get(i), archFiles.get(j));
-		}
+		this.a2a = new A2aSystemData(this.versions, archFiles);
 
 		// Run cvg
-		this.cvgForwards = new double[this.versions.length - 1][];
-		this.cvgBackwards = new double[this.versions.length - 1][];
-		for (int i = 0; i < this.versions.length - 1; i++) {
-			this.cvgForwards[i] = new double[this.versions.length - 1 - i];
-			this.cvgBackwards[i] = new double[this.versions.length - 1 - i];
-
-			for (int j = i + 1; j < this.versions.length; j++) {
-				this.cvgForwards[i][j - i - 1] =
-					Cvg.run(archFiles.get(i), archFiles.get(j));
-				this.cvgBackwards[i][j - i - 1] =
-					Cvg.run(archFiles.get(j), archFiles.get(i));
-			}
-		}
+		this.cvg = new CvgSystemData(this.versions, archFiles);
 
 		// Run MoJoFM
 		this.mojoFm = new double[this.versions.length - 1][];
@@ -118,14 +100,13 @@ public class SystemMetrics implements JsonSerializable {
 				depsFiles.get(i).getAbsolutePath()));
 	}
 
-	private SystemMetrics(Map<String, ArchitectureMetrics> versionMetrics,
-			String[] versions, double[][] a2a, double[][] cvgForwards,
-			double[][] cvgBackwards, double[][] mojoFm) {
+	private SystemMetrics(Map<Version, ArchitectureMetrics> versionMetrics,
+			Version[] versions, A2aSystemData a2a, CvgSystemData cvg,
+			double[][] mojoFm) {
 		this.versionMetrics = versionMetrics;
 		this.versions = versions;
 		this.a2a = a2a;
-		this.cvgForwards = cvgForwards;
-		this.cvgBackwards = cvgBackwards;
+		this.cvg = cvg;
 		this.mojoFm = mojoFm;
 	}
 	//endregion
@@ -133,14 +114,12 @@ public class SystemMetrics implements JsonSerializable {
 	//region ACCESSORS
 	public Collection<ArchitectureMetrics> getVersionMetrics() {
 		return this.versionMetrics.values(); }
-	public String[] getVersions() {
+	public Version[] getVersions() {
 		return Arrays.copyOf(this.versions, this.versions.length); }
-	public double[][] getA2a() {
-		return Arrays.copyOf(this.a2a, this.a2a.length); }
-	public double[][] getCvgForwards() {
-		return Arrays.copyOf(this.cvgForwards, this.cvgForwards.length); }
-	public double[][] getCvgBackwards() {
-		return Arrays.copyOf(this.cvgBackwards, this.cvgBackwards.length); }
+	public A2aSystemData getA2a() {
+		return new A2aSystemData(this.a2a); }
+	public CvgSystemData getCvg() {
+		return new CvgSystemData(this.cvg); }
 	public double[][] getMojoFm() {
 		return Arrays.copyOf(this.mojoFm, this.mojoFm.length); }
 	//endregion
@@ -215,7 +194,7 @@ public class SystemMetrics implements JsonSerializable {
 		try (FileWriter writer = new FileWriter(
 			dirPath + File.separator + metric + ".csv")) {
 			writer.write("Cluster");
-			for (String version : this.versions)
+			for (Version version : this.versions)
 				writer.write("," + version);
 			writer.write(System.lineSeparator());
 
@@ -257,7 +236,7 @@ public class SystemMetrics implements JsonSerializable {
 
 		try (FileWriter writer = new FileWriter(path)) {
 			writer.write("Metric");
-			for (String version : this.versions)
+			for (Version version : this.versions)
 				writer.write("," + version);
 			writer.write(System.lineSeparator());
 
@@ -294,48 +273,51 @@ public class SystemMetrics implements JsonSerializable {
 	public void writeSystemMetrics(String dirPath) throws IOException {
 		FileUtil.checkDir(dirPath, true, false);
 
-		this.writeSystemMetric(
-			dirPath + File.separator + "a2a.csv", this.a2a);
+		this.a2a.writeFullCsv(dirPath + File.separator + "a2a.csv");
+		this.a2a.writeSubCsv(dirPath + File.separator + "a2aMajor.csv",
+			Version.IncrementType.MAJOR);
+		this.a2a.writeSubCsv(dirPath + File.separator + "a2aMinor.csv",
+			Version.IncrementType.MINOR);
+		this.a2a.writeSubCsv(dirPath + File.separator + "a2aPatch.csv",
+			Version.IncrementType.PATCH);
+		this.a2a.writeSubCsv(dirPath + File.separator + "a2aPatchminor.csv",
+			Version.IncrementType.PATCHMINOR);
+		this.a2a.writeSubCsv(dirPath + File.separator + "a2aPre.csv",
+			Version.IncrementType.SUFFIX);
+		this.a2a.writeMinMajorCsv(dirPath + File.separator + "a2aMinMajor.csv");
+
 		this.writeSystemMetric(
 			dirPath + File.separator + "mojofm.csv", this.mojoFm);
-		this.writeCvg(dirPath + File.separator + "cvg.csv");
+
+		this.cvg.writeFullCsv(dirPath + File.separator + "cvg.csv");
+		this.cvg.writeSubCsv(dirPath + File.separator + "cvgMajor.csv",
+			Version.IncrementType.MAJOR);
+		this.cvg.writeSubCsv(dirPath + File.separator + "cvgMinor.csv",
+			Version.IncrementType.MINOR);
+		this.cvg.writeSubCsv(dirPath + File.separator + "cvgPatch.csv",
+			Version.IncrementType.PATCH);
+		this.cvg.writeSubCsv(dirPath + File.separator + "cvgPatchminor.csv",
+			Version.IncrementType.PATCHMINOR);
+		this.cvg.writeSubCsv(dirPath + File.separator + "cvgPre.csv",
+			Version.IncrementType.SUFFIX);
+		this.cvg.writeMinMajorCsv(dirPath + File.separator + "cvgMinMajor.csv");
 	}
 
 	private void writeSystemMetric(String path, double[][] metric)
 			throws IOException {
 		try (FileWriter writer = new FileWriter(path)) {
-			for (String version : this.versions)
+			for (Version version : this.versions)
 				writer.write("," + version);
 			writer.write(System.lineSeparator());
 
 			for (int i = 0; i < this.versions.length; i++) {
-				writer.write(this.versions[i]);
+				writer.write(this.versions[i].toString());
 				for (int j = 0; j < this.versions.length; j++) {
 					writer.write(",");
 					if (i > j)
 						writer.write(Double.toString(metric[j][i - j - 1]));
 					else if (i < j)
 						writer.write(Double.toString(metric[i][j - i - 1]));
-				}
-				writer.write(System.lineSeparator());
-			}
-		}
-	}
-
-	private void writeCvg(String path) throws IOException {
-		try (FileWriter writer = new FileWriter(path)) {
-			for (String version : this.versions)
-				writer.write("," + version);
-			writer.write(System.lineSeparator());
-
-			for (int i = 0; i < this.versions.length; i++) {
-				writer.write(this.versions[i]);
-				for (int j = 0; j < this.versions.length; j++) {
-					writer.write(",");
-					if (i > j)
-						writer.write(Double.toString(this.cvgBackwards[j][i - j - 1]));
-					else if (i < j)
-						writer.write(Double.toString(this.cvgForwards[i][j - i - 1]));
 				}
 				writer.write(System.lineSeparator());
 			}
@@ -350,12 +332,13 @@ public class SystemMetrics implements JsonSerializable {
 
 	@Override
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
-		generator.writeField("archs", versionMetrics.values());
-		generator.writeField("versions", List.of(versions));
-		generator.writeField("a2a", a2a);
-		generator.writeField("cvgF", cvgForwards);
-		generator.writeField("cvgB", cvgBackwards);
-		generator.writeField("mojo", mojoFm);
+		generator.writeField("archs", this.versionMetrics.values());
+		generator.writeField("versions", Arrays.stream(this.versions)
+			.map(Version::toString).collect(Collectors.toList()));
+		generator.writeField("a2a", this.a2a.a2a);
+		generator.writeField("cvgF", this.cvg.cvgForwards);
+		generator.writeField("cvgB", this.cvg.cvgBackwards);
+		generator.writeField("mojo", this.mojoFm);
 	}
 
 	public static SystemMetrics deserialize(String path) throws IOException {
@@ -368,9 +351,11 @@ public class SystemMetrics implements JsonSerializable {
 			throws IOException {
 		List<ArchitectureMetrics> versionMetricsCollection =
 			new ArrayList<>(parser.parseCollection(ArchitectureMetrics.class));
-		String[] versions = parser.parseStringArray();
+		String[] versionStrings = parser.parseStringArray();
+		Version[] versions = Arrays.stream(versionStrings)
+			.map(Version::new).toArray(Version[]::new);
 
-		Map<String, ArchitectureMetrics> versionMetrics = new TreeMap<>();
+		Map<Version, ArchitectureMetrics> versionMetrics = new TreeMap<>();
 		for (int i = 0; i < versions.length; i++)
 			versionMetrics.put(versions[i], versionMetricsCollection.get(i));
 
@@ -379,8 +364,9 @@ public class SystemMetrics implements JsonSerializable {
 		double[][] cvgBackwards = parser.parseDoubleMatrix();
 		double[][] mojoFm = parser.parseDoubleMatrix();
 
-		return new SystemMetrics(versionMetrics, versions, a2a, cvgForwards,
-			cvgBackwards, mojoFm);
+		return new SystemMetrics(versionMetrics, versions,
+			new A2aSystemData(versions, a2a),
+			new CvgSystemData(versions, cvgForwards, cvgBackwards), mojoFm);
 	}
 	//endregion
 }

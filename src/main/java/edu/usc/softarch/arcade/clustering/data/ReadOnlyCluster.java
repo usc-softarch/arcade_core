@@ -1,7 +1,7 @@
 package edu.usc.softarch.arcade.clustering.data;
 
 import edu.usc.softarch.arcade.clustering.ClusteringAlgorithmType;
-import edu.usc.softarch.arcade.metrics.ClusterMetrics;
+import edu.usc.softarch.arcade.metrics.data.ClusterMetrics;
 import edu.usc.softarch.arcade.topics.Concern;
 import edu.usc.softarch.arcade.topics.DocTopicItem;
 import edu.usc.softarch.arcade.topics.DocTopics;
