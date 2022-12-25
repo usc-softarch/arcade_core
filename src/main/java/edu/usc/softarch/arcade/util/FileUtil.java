@@ -12,13 +12,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Utility class for dealing with {@link File}s and filenames. Partly taken
@@ -150,9 +149,6 @@ public class FileUtil {
 	 *
 	 * The number of positions allowed is also arbitrarily set to four. I have
 	 * not found a need for more than this, and am wary of using (\.\d+)*.
-	 * Likewise, the allowance for only one number after the suffix is due to my
-	 * not having found any lunatic insane enough to create more than 10
-	 * pre-releases of the same suffix.
 	 *
 	 * If there are multiple matches (i.e. there are multiple version strings in
 	 * the name of the file), it will give an incorrect result because you
@@ -160,12 +156,15 @@ public class FileUtil {
 	 *
 	 * @param inList List of Files to sort.
 	 * @param reverse True for descending order, false for ascending.
-	 * @see VersionComparator
+	 * @see Version
 	 */
 	public static List<File> sortFileListByVersion(List<File> inList,
 			boolean reverse) {
-		List<File> outList = new ArrayList<>(inList);
-		outList.sort(new VersionComparator());
+		Map<Version, File> sortedMap = new TreeMap<>();
+		for (File file : inList)
+			sortedMap.put(new Version(file.getName()), file);
+
+		List<File> outList = new ArrayList<>(sortedMap.values());
 
 		if (reverse) Collections.reverse(outList);
 		return outList;
@@ -252,29 +251,6 @@ public class FileUtil {
 	 */
 	public static String extractVersion(String name) {
 		return extractVersion("[0-9]+\\.[0-9]+(\\.[0-9]+)*", name); }
-
-	/**
-	 * Extracts a version {@link String} from a {@link String} representing a
-	 * file name. Includes options for letters and other blasphemies. Correctness
-	 * is dubious, given that versioning schemes are arbitrary.
-	 *
-	 * @param name {@link String} from which to extract version.
-	 */
-	public static String extractVersionForMonsters(String name) {
-		return extractVersion("[0-9]+\\.[0-9]+(\\.[0-9]+)*+(-(RC|ALPHA|BETA" +
-			"|M|Rc|Alpha|Beta|rc|alpha|beta|deb|b|a|final|Final|FINAL)[0-9]+)*",
-			name);
-	}
-
-	/**
-	 * Makes a List by calling "toString" on every item of a collection.
-	 */
-	public static <E> List<String> collectionToString(Collection<E> collection) {
-		return collection.stream()
-			.filter(Objects::nonNull)
-			.map(E::toString)
-			.collect(Collectors.toList());
-	}
 
 	/**
 	 * If a {@link String} represents the name of a Java inner class, returns

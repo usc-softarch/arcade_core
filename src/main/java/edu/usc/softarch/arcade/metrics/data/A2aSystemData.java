@@ -45,6 +45,7 @@ public class A2aSystemData {
 	//region SERIALIZATION
 	void writeFullCsv(String path) throws IOException {
 		try (FileWriter writer = new FileWriter(path)) {
+			writer.write("version");
 			for (Version version : this.versions)
 				writer.write("," + version);
 			writer.write(System.lineSeparator());

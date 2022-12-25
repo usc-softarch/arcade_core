@@ -91,7 +91,7 @@ public class Version implements Comparable<Version> {
 	private static String extractVersion(String s) {
 		// Define the regular expression pattern to match the version string
 		String pattern = "(\\d+(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?"
-			+ "(-?(alpha\\d?|beta\\d?|rc\\d?|pre\\d?)?))";
+			+ "(-?(alpha(\\d+)?|beta(\\d+)?|rc(\\d+)?|pre(\\d+)?)?))";
 
 		// Create a Pattern object
 		Pattern r = Pattern.compile(pattern);
@@ -183,14 +183,14 @@ public class Version implements Comparable<Version> {
 		// equal, then check if either has a suffix. If neither does, they are
 		// equal. If one does and the other does not, the one with a suffix is
 		// placed last.
-		String v1Suffix = getSuffix(this.versionValue);
-		String v2Suffix = getSuffix(otherVersion.versionValue);
+		String v1Suffix = getSuffix(v1Parts[v1Parts.length - 1]);
+		String v2Suffix = getSuffix(v2Parts[v2Parts.length - 1]);
 		if (v1Suffix == null && v2Suffix == null)
 			return 0;
 		else if (v1Suffix == null)
-			return -1;
-		else if (v2Suffix == null)
 			return 1;
+		else if (v2Suffix == null)
+			return -1;
 
 		// If both versions have a suffix, check their types. If they are different,
 		// return their difference, such that alpha comes before beta, beta comes
