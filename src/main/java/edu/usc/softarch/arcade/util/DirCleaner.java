@@ -15,12 +15,16 @@ public class DirCleaner {
 		Queue<File> files = new LinkedList<>();
 		files.add(new File(args[0]));
 		boolean safeMode = Boolean.parseBoolean(args[2]);
+		String[] ignorePatterns = new String[args.length - 3];
+		if (args.length > 3)
+			System.arraycopy(args, 3, ignorePatterns, 0, args.length - 3);
 
 		try (FileWriter writer = new FileWriter(args[1])) {
 			while (!files.isEmpty()) {
 				File currFile = files.poll();
 				if (currFile.isFile()) continue;
-				if (currFile.getName().contains("test")) {
+				if (currFile.getName().contains("test")
+						&& !isIgnored(ignorePatterns, currFile)) {
 					writer.write(currFile.getAbsolutePath() + System.lineSeparator());
 					if (!safeMode)
 						FileUtil.deleteNonEmptyDirectory(currFile);
@@ -29,5 +33,13 @@ public class DirCleaner {
 					files.addAll(Arrays.asList(currFile.listFiles()));
 			}
 		}
+	}
+
+	private static boolean isIgnored(String[] ignorePatterns,
+			File file) {
+		for (String ignorePattern : ignorePatterns)
+			if (file.getAbsolutePath().contains(ignorePattern))
+				return true;
+		return false;
 	}
 }
