@@ -8,7 +8,9 @@ import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
 import edu.usc.softarch.util.LabeledEdge;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
+import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -197,6 +199,52 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 			if (!source.equals(target)
 					&& !result.containsEdge(source.name, target.name))
 				result.addEdge(source.name, target.name);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Builds the weighted cluster-level dependency graph of this architecture.
+	 *
+	 * @param depsPath The path to the dependencies RSF file related to this
+	 *                 architecture. This must be the same file that was used
+	 *                 to originally create this architecture.
+	 * @return The weighted cluster-level dependency graph.
+	 * @throws IOException Thrown if there are any errors in accessing the
+	 * 				 dependencies file.
+	 */
+	public SimpleDirectedWeightedGraph<String, DefaultWeightedEdge>
+			buildWeightedGraph(String depsPath) throws IOException {
+		SimpleDirectedWeightedGraph<String, DefaultWeightedEdge> result =
+			new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
+
+		for (ReadOnlyCluster cluster : this.values())
+			result.addVertex(cluster.name);
+
+		// Sanity check to ensure it's been built
+		getEntityLocationMap();
+
+		DependencyGraph depsGraph = DependencyGraph.readRsf(depsPath);
+		for (Map.Entry<String, String> dependency : depsGraph) {
+			ReadOnlyCluster source =
+				this.entityLocationMap.get(dependency.getKey());
+			ReadOnlyCluster target =
+				this.entityLocationMap.get(dependency.getValue());
+
+			// If either source or target entities are not in the model, skip.
+			if (source == null || target == null) continue;
+
+			if (!source.equals(target)) {
+				if (!result.containsEdge(source.name, target.name)) {
+					result.addEdge(source.name, target.name);
+					result.setEdgeWeight(source.name, target.name, 1);
+				} else {
+					DefaultWeightedEdge edge = result.getEdge(source.name, target.name);
+					double currentWeight = result.getEdgeWeight(edge);
+					result.setEdgeWeight(edge, ++currentWeight);
+				}
+			}
 		}
 
 		return result;

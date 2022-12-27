@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.metrics.data;
 
-import edu.usc.softarch.arcade.metrics.Cvg;
 import edu.usc.softarch.arcade.util.CLI;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.Version;
@@ -50,6 +49,8 @@ public class SystemMetrics implements JsonSerializable {
 
 	private final Version[] versions;
 	private final A2aSystemData a2a;
+	private final EdgeA2aSystemData edgeA2a;
+	private final WeightedEdgeA2aSystemData weightedEdgeA2a;
 	private final CvgSystemData cvg;
 	private final double[][] mojoFm;
 	//endregion
@@ -76,6 +77,11 @@ public class SystemMetrics implements JsonSerializable {
 		// Run a2a
 		this.a2a = new A2aSystemData(this.versions, archFiles);
 
+		// Run Edgea2a
+		this.edgeA2a = new EdgeA2aSystemData(this.versions, archFiles, depsFiles);
+		this.weightedEdgeA2a =
+			new WeightedEdgeA2aSystemData(this.versions, archFiles, depsFiles);
+
 		// Run cvg
 		this.cvg = new CvgSystemData(this.versions, archFiles);
 
@@ -101,11 +107,14 @@ public class SystemMetrics implements JsonSerializable {
 	}
 
 	private SystemMetrics(Map<Version, ArchitectureMetrics> versionMetrics,
-			Version[] versions, A2aSystemData a2a, CvgSystemData cvg,
-			double[][] mojoFm) {
+			Version[] versions, A2aSystemData a2a, EdgeA2aSystemData edgeA2a,
+			WeightedEdgeA2aSystemData weightedEdgeA2a,
+			CvgSystemData cvg, double[][] mojoFm) {
 		this.versionMetrics = versionMetrics;
 		this.versions = versions;
 		this.a2a = a2a;
+		this.edgeA2a = edgeA2a;
+		this.weightedEdgeA2a = weightedEdgeA2a;
 		this.cvg = cvg;
 		this.mojoFm = mojoFm;
 	}
@@ -118,6 +127,10 @@ public class SystemMetrics implements JsonSerializable {
 		return Arrays.copyOf(this.versions, this.versions.length); }
 	public A2aSystemData getA2a() {
 		return new A2aSystemData(this.a2a); }
+	public EdgeA2aSystemData getEdgeA2a() {
+		return new EdgeA2aSystemData(this.edgeA2a); }
+	public WeightedEdgeA2aSystemData getWeightedEdgeA2a() {
+		return new WeightedEdgeA2aSystemData(this.weightedEdgeA2a); }
 	public CvgSystemData getCvg() {
 		return new CvgSystemData(this.cvg); }
 	public double[][] getMojoFm() {
@@ -273,21 +286,10 @@ public class SystemMetrics implements JsonSerializable {
 	public void writeSystemMetrics(String dirPath) throws IOException {
 		FileUtil.checkDir(dirPath, true, false);
 
-		this.a2a.writeFullCsv(dirPath + File.separator + "a2a.csv");
-		this.a2a.writeSubCsv(dirPath + File.separator + "a2aMajor.csv",
-			Version.IncrementType.MAJOR);
-		this.a2a.writeSubCsv(dirPath + File.separator + "a2aMinor.csv",
-			Version.IncrementType.MINOR);
-		this.a2a.writeSubCsv(dirPath + File.separator + "a2aPatch.csv",
-			Version.IncrementType.PATCH);
-		this.a2a.writeSubCsv(dirPath + File.separator + "a2aPatchminor.csv",
-			Version.IncrementType.PATCHMINOR);
-		this.a2a.writeSubCsv(dirPath + File.separator + "a2aPre.csv",
-			Version.IncrementType.SUFFIX);
-		this.a2a.writeMinMajorCsv(dirPath + File.separator + "a2aMinMajor.csv");
-
-		this.writeSystemMetric(
-			dirPath + File.separator + "mojofm.csv", this.mojoFm);
+		writeSystemMetric(this.a2a, "a2a", dirPath);
+		writeSystemMetric(this.edgeA2a, "edgea2a", dirPath);
+		writeSystemMetric(this.weightedEdgeA2a, "weightedEdgea2a", dirPath);
+		writeSystemMetric(dirPath + File.separator + "mojofm.csv", this.mojoFm);
 
 		this.cvg.writeFullCsv(dirPath + File.separator + "cvg.csv");
 		this.cvg.writeSubCsv(dirPath + File.separator + "cvgMajor.csv",
@@ -301,6 +303,22 @@ public class SystemMetrics implements JsonSerializable {
 		this.cvg.writeSubCsv(dirPath + File.separator + "cvgPre.csv",
 			Version.IncrementType.SUFFIX);
 		this.cvg.writeMinMajorCsv(dirPath + File.separator + "cvgMinMajor.csv");
+	}
+
+	private void writeSystemMetric(SystemData data, String name, String dirPath)
+			throws IOException {
+		data.writeFullCsv(dirPath + File.separator + name + ".csv");
+		data.writeSubCsv(dirPath + File.separator + name + "Major.csv",
+			Version.IncrementType.MAJOR);
+		data.writeSubCsv(dirPath + File.separator + name + "Minor.csv",
+			Version.IncrementType.MINOR);
+		data.writeSubCsv(dirPath + File.separator + name + "Patch.csv",
+			Version.IncrementType.PATCH);
+		data.writeSubCsv(dirPath + File.separator + name + "Patchminor.csv",
+			Version.IncrementType.PATCHMINOR);
+		data.writeSubCsv(dirPath + File.separator + name + "Pre.csv",
+			Version.IncrementType.SUFFIX);
+		data.writeMinMajorCsv(dirPath + File.separator + name + "MinMajor.csv");
 	}
 
 	private void writeSystemMetric(String path, double[][] metric)
@@ -335,7 +353,9 @@ public class SystemMetrics implements JsonSerializable {
 		generator.writeField("archs", this.versionMetrics.values());
 		generator.writeField("versions", Arrays.stream(this.versions)
 			.map(Version::toString).collect(Collectors.toList()));
-		generator.writeField("a2a", this.a2a.a2a);
+		generator.writeField("a2a", this.a2a.metric);
+		generator.writeField("edgea2a", this.edgeA2a.metric);
+		generator.writeField("weightedEdgea2a", this.weightedEdgeA2a.metric);
 		generator.writeField("cvgF", this.cvg.cvgForwards);
 		generator.writeField("cvgB", this.cvg.cvgBackwards);
 		generator.writeField("mojo", this.mojoFm);
@@ -360,12 +380,15 @@ public class SystemMetrics implements JsonSerializable {
 			versionMetrics.put(versions[i], versionMetricsCollection.get(i));
 
 		double[][] a2a = parser.parseDoubleMatrix();
+		double[][] edgeA2a = parser.parseDoubleMatrix();
+		double[][] weightedEdgeA2a = parser.parseDoubleMatrix();
 		double[][] cvgForwards = parser.parseDoubleMatrix();
 		double[][] cvgBackwards = parser.parseDoubleMatrix();
 		double[][] mojoFm = parser.parseDoubleMatrix();
 
 		return new SystemMetrics(versionMetrics, versions,
-			new A2aSystemData(versions, a2a),
+			new A2aSystemData(versions, a2a), new EdgeA2aSystemData(versions, edgeA2a),
+			new WeightedEdgeA2aSystemData(versions, weightedEdgeA2a),
 			new CvgSystemData(versions, cvgForwards, cvgBackwards), mojoFm);
 	}
 	//endregion

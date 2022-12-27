@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.metrics;
+package edu.usc.softarch.arcade.metrics.evolution;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,7 @@ import edu.usc.softarch.util.EnhancedSet;
 /**
  * Calculates A2A.
  */
-public class SystemEvo {
+public class A2a {
 	//region PUBLIC INTERFACE
 	public static void main(String[] args) throws IOException {
 		if (args.length > 1)
@@ -26,11 +26,11 @@ public class SystemEvo {
 
 	public static double run(String sourceRsf, String targetRsf)
 			throws IOException {
-		return (new SystemEvo(sourceRsf, targetRsf)).solve();
+		return (new A2a(sourceRsf, targetRsf)).solve();
 	}
 
 	public static double run(File sourceRsf, File targetRsf) throws IOException {
-		return (new SystemEvo(sourceRsf, targetRsf)).solve();
+		return (new A2a(sourceRsf, targetRsf)).solve();
 	}
 
 	public static CentralTendency runBatch(String path) throws IOException {
@@ -59,20 +59,20 @@ public class SystemEvo {
 	//endregion
 
 	//region ATTRIBUTES
-	private double sysEvo;
+	private double a2a;
 	private final ReadOnlyArchitecture sourceClusters;
 	private final ReadOnlyArchitecture targetClusters;
 	//endregion
 
 	//region CONSTRUCTORS
-	public SystemEvo(String sourceRsf, String targetRsf) throws IOException {
-		this.sysEvo = -1;
+	public A2a(String sourceRsf, String targetRsf) throws IOException {
+		this.a2a = -1;
 		this.sourceClusters = ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		this.targetClusters = ReadOnlyArchitecture.readFromRsf(targetRsf);
 	}
 
-	public SystemEvo(File sourceRsf, File targetRsf) throws IOException {
-		this.sysEvo = -1;
+	public A2a(File sourceRsf, File targetRsf) throws IOException {
+		this.a2a = -1;
 		this.sourceClusters = ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		this.targetClusters = ReadOnlyArchitecture.readFromRsf(targetRsf);
 	}
@@ -121,9 +121,9 @@ public class SystemEvo {
 	}
 
 	public double solve() {
-		if (this.sysEvo == -1)
-			this.sysEvo = (1 - numerator() / denominator()) * 100;
-		return this.sysEvo;
+		if (this.a2a == -1)
+			this.a2a = (1 - numerator() / denominator()) * 100;
+		return this.a2a;
 	}
 	//endregion
 }

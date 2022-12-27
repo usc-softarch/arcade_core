@@ -1,4 +1,4 @@
-package edu.usc.softarch.arcade.metrics;
+package edu.usc.softarch.arcade.metrics.evolution;
 
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
@@ -39,6 +39,8 @@ public class Cvg {
 	//region ATTRIBUTES
 	private final ReadOnlyArchitecture sourceArch;
 	private final ReadOnlyArchitecture targetArch;
+	private final Set<ReadOnlyCluster> sourceMatches;
+	private final Set<ReadOnlyCluster> targetMatches;
 	private double cvgSourceToTarget;
 	private double cvgTargetToSource;
 	private final double lowerSimThreshold;
@@ -49,6 +51,8 @@ public class Cvg {
 	public Cvg(ReadOnlyArchitecture sourceArch, ReadOnlyArchitecture targetArch) {
 		this.sourceArch = sourceArch;
 		this.targetArch = targetArch;
+		this.sourceMatches = new HashSet<>();
+		this.targetMatches = new HashSet<>();
 		this.cvgSourceToTarget = 0.0;
 		this.cvgTargetToSource = 0.0;
 		//TODO these two can be parameterized if necessary
@@ -67,29 +71,36 @@ public class Cvg {
 		if (this.cvgTargetToSource == 0.0) compute();
 		return this.cvgTargetToSource;
 	}
+
+	public Set<ReadOnlyCluster> getSourceMatches() {
+		if (this.cvgTargetToSource == 0.0) compute();
+		return new HashSet<>(this.sourceMatches);
+	}
+
+	public Set<ReadOnlyCluster> getTargetMatches() {
+		if (this.cvgTargetToSource == 0.0) compute();
+		return new HashSet<>(this.targetMatches);
+	}
 	//endregion
 
 	//region PROCESSING
 	private void compute() {
-		Set<ReadOnlyCluster> sourceMatches = new HashSet<>();
-		Set<ReadOnlyCluster> targetMatches = new HashSet<>();
-
 		for (ReadOnlyCluster sourceCluster : this.sourceArch.values()) {
 			for (ReadOnlyCluster targetCluster : this.targetArch.values()) {
 				int intersectionSize = sourceCluster.intersectionSize(targetCluster);
 				double sim = (double) intersectionSize /
 					Math.max(sourceCluster.size(), targetCluster.size());
 				if (sim > this.lowerSimThreshold && sim <= this.upperSimThreshold) {
-					sourceMatches.add(sourceCluster);
-					targetMatches.add(targetCluster);
+					this.sourceMatches.add(sourceCluster);
+					this.targetMatches.add(targetCluster);
 				}
 			}
 		}
 
 		this.cvgSourceToTarget =
-			(double) sourceMatches.size() / this.sourceArch.size();
+			(double) this.sourceMatches.size() / this.sourceArch.size();
 		this.cvgTargetToSource =
-			(double) targetMatches.size() / this.targetArch.size();
+			(double) this.targetMatches.size() / this.targetArch.size();
 	}
 	//endregion
 }

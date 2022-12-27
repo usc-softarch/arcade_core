@@ -13,12 +13,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.usc.softarch.arcade.BaseTest;
+import edu.usc.softarch.arcade.metrics.evolution.A2a;
 import edu.usc.softarch.arcade.util.CentralTendency;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-public class SystemEvoTest extends BaseTest {
+public class A2aTest extends BaseTest {
 	private final String resourcesDir = resourcesBase + fs + "SystemEvo";
   private final String outputDirPath = outputBase + fs + "SystemEvoTest";
 
@@ -58,7 +59,7 @@ public class SystemEvoTest extends BaseTest {
 		String clustersDir = resourcesDir + fs + clusterAlgo + fs + projectName;
 
 		CentralTendency outputStats =
-			assertDoesNotThrow(() -> SystemEvo.runBatch(clustersDir));
+			assertDoesNotThrow(() -> A2a.runBatch(clustersDir));
 
     try (BufferedReader br = new BufferedReader(new FileReader(oraclePath))) {
       Map<String, Double> oracleMap = new HashMap<>();

@@ -1,6 +1,5 @@
 package edu.usc.softarch.arcade.metrics.data;
 
-import edu.usc.softarch.arcade.metrics.evolution.Cvg;
 import edu.usc.softarch.arcade.util.Version;
 
 import java.io.File;
@@ -10,46 +9,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CvgSystemData {
+public abstract class SystemData {
 	//region ATTRIBUTES
 	final Version[] versions;
-	final double[][] cvgForwards;
-	final double[][] cvgBackwards;
+	final double[][] metric;
 	//endregion
 
 	//region CONSTRUCTORS
-	public CvgSystemData(Version[] versions, List<File> archFiles)
+	protected SystemData(Version[] versions, List<File>... files)
 			throws IOException {
 		this.versions = versions;
-		this.cvgForwards = new double[this.versions.length - 1][];
-		this.cvgBackwards = new double[this.versions.length - 1][];
-		for (int i = 0; i < this.versions.length - 1; i++) {
-			this.cvgForwards[i] = new double[this.versions.length - 1 - i];
-			this.cvgBackwards[i] = new double[this.versions.length - 1 - i];
-
-			for (int j = i + 1; j < this.versions.length; j++) {
-				this.cvgForwards[i][j - i - 1] =
-					Cvg.run(archFiles.get(i), archFiles.get(j));
-				this.cvgBackwards[i][j - i - 1] =
-					Cvg.run(archFiles.get(j), archFiles.get(i));
-			}
-		}
+		this.metric = new double[this.versions.length - 1][];
+		compute(files);
 	}
 
-	public CvgSystemData(CvgSystemData toCopy) {
+	protected SystemData(SystemData toCopy) {
 		this.versions = Arrays.copyOf(toCopy.versions, toCopy.versions.length);
-		this.cvgForwards = Arrays.stream(toCopy.cvgForwards).map(double[]::clone)
-			.toArray(v -> toCopy.cvgForwards.clone());
-		this.cvgBackwards = Arrays.stream(toCopy.cvgBackwards).map(double[]::clone)
-			.toArray(v -> toCopy.cvgBackwards.clone());
+		this.metric = Arrays.stream(toCopy.metric).map(double[]::clone)
+			.toArray(v -> toCopy.metric.clone());
 	}
 
-	public CvgSystemData(Version[] versions, double[][] cvgForwards,
-			double[][] cvgBackwards) {
+	protected SystemData(Version[] versions, double[][] metric) {
 		this.versions = versions;
-		this.cvgForwards = cvgForwards;
-		this.cvgBackwards = cvgBackwards;
+		this.metric = metric;
 	}
+	//endregion
+
+	//region PROCESSING
+	protected abstract void compute(List<File>... files) throws IOException;
 	//endregion
 
 	//region SERIALIZATION
@@ -65,9 +52,9 @@ public class CvgSystemData {
 				for (int j = 0; j < this.versions.length; j++) {
 					writer.write(",");
 					if (i > j)
-						writer.write(Double.toString(this.cvgBackwards[j][i - j - 1]));
+						writer.write(Double.toString(this.metric[j][i - j - 1]));
 					else if (i < j)
-						writer.write(Double.toString(this.cvgForwards[i][j - i - 1]));
+						writer.write(Double.toString(this.metric[i][j - i - 1]));
 				}
 				writer.write(System.lineSeparator());
 			}
@@ -75,10 +62,9 @@ public class CvgSystemData {
 	}
 
 	void writeSubCsv(String path, Version.IncrementType incrementType)
-			throws IOException {
+		throws IOException {
 		List<String> subVersions = new ArrayList<>();
-		List<Double> forwardsVersionValues = new ArrayList<>();
-		List<Double> backwardsVersionValues = new ArrayList<>();
+		List<Double> versionValues = new ArrayList<>();
 
 		Version currentVersion = this.versions[0];
 		int currentIndex = 0;
@@ -92,24 +78,19 @@ public class CvgSystemData {
 
 			if (increment == incrementType) {
 				subVersions.add(currentVersion + " -> " + iVersion);
-				forwardsVersionValues.add(
-					this.cvgForwards[currentIndex][i - currentIndex - 1]);
-				backwardsVersionValues.add(
-					this.cvgBackwards[currentIndex][i - currentIndex - 1]);
+				versionValues.add(this.metric[currentIndex][i - currentIndex - 1]);
 			}
 
 			currentVersion = iVersion;
 			currentIndex = i;
 		}
 
-		writeSubCsv(path, subVersions,
-			forwardsVersionValues, backwardsVersionValues);
+		writeSubCsv(path, subVersions, versionValues);
 	}
 
 	void writeMinMajorCsv(String path) throws IOException {
 		List<String> subVersions = new ArrayList<>();
-		List<Double> forwardsVersionValues = new ArrayList<>();
-		List<Double> backwardsVersionValues = new ArrayList<>();
+		List<Double> versionValues = new ArrayList<>();
 
 		Version currentVersion = this.versions[0];
 		int currentIndex = 0;
@@ -123,30 +104,24 @@ public class CvgSystemData {
 
 			if (increment == Version.IncrementType.MAJOR) {
 				subVersions.add(currentVersion + " -> " + iVersion);
-				forwardsVersionValues.add(
-					this.cvgForwards[currentIndex][i - currentIndex - 1]);
-				backwardsVersionValues.add(
-					this.cvgBackwards[currentIndex][i - currentIndex - 1]);
+				versionValues.add(this.metric[currentIndex][i - currentIndex - 1]);
 			}
 
 			currentVersion = iVersion;
 			currentIndex = i;
 		}
 
-		writeSubCsv(path, subVersions,
-			forwardsVersionValues, backwardsVersionValues);
+		writeSubCsv(path, subVersions, versionValues);
 	}
 
 	private void writeSubCsv(String path, List<String> subVersions,
-			List<Double> forwardsVersionValues, List<Double> backwardsVersionValues)
-			throws IOException {
+		List<Double> versionValues) throws IOException {
 		try (FileWriter writer = new FileWriter(path)) {
-			writer.write("versionPair,forwardsValue,backwardsValue");
+			writer.write("versionPair,value");
 			writer.write(System.lineSeparator());
 
-			for (int i = 0; i < forwardsVersionValues.size(); i++) {
-				writer.write(subVersions.get(i) + "," + forwardsVersionValues.get(i)
-					+ "," + backwardsVersionValues.get(i));
+			for (int i = 0; i < versionValues.size(); i++) {
+				writer.write(subVersions.get(i) + "," + versionValues.get(i));
 				writer.write(System.lineSeparator());
 			}
 		}
