@@ -60,10 +60,12 @@ public class SimilarityMatrixTest extends BaseTest {
 
 		String depsPath = factsDir + fs + fullProjectName + "_deps.rsf";
 
+		boolean fileLevel = !language.equals("java");
+
 		Architecture concernArch = assertDoesNotThrow(() ->
 			new Architecture(projectName, projectVersion, outputDirPath,
 				SimMeasure.SimMeasureType.JS, depsPath,
-				language, artifactsDir + "/base", packagePrefix));
+				language, artifactsDir + "/base", packagePrefix, fileLevel));
 
 		SimilarityMatrix simMatrix = assertDoesNotThrow(() ->
 			new SimilarityMatrix(SimMeasure.SimMeasureType.JS, concernArch));

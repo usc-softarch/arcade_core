@@ -35,7 +35,7 @@ public class ArchSmellDetector {
 	}
 
 	public SmellCollection run(boolean runStructural, boolean runConcern,
-		boolean runSerialize) throws IOException {
+			boolean runSerialize) throws IOException {
 		// Make sure at least one type of smell detection algorithms was selected
 		if (!runConcern && !runStructural)
 			throw new IllegalArgumentException("At least one type of smell "

@@ -139,16 +139,17 @@ public class Architecture extends TreeMap<String, Cluster>
 	public Architecture(String projectName, String projectVersion,
 			String projectPath, SimMeasure.SimMeasureType simMeasure,
 			String depsPath, String language, String artifactsDir,
-			String packagePrefix)
+			String packagePrefix, boolean fileLevel)
 			throws UnmatchingDocTopicItemsException, IOException {
 		this(projectName, projectVersion, projectPath, simMeasure,
-			depsPath, language, artifactsDir, packagePrefix, false);
+			depsPath, language, artifactsDir, packagePrefix,
+			false, fileLevel);
 	}
 
 	public Architecture(String projectName, String projectVersion,
 			String projectPath, SimMeasure.SimMeasureType simMeasure,
 			String depsPath, String language, String artifactsDir,
-			String packagePrefix, boolean reassignVersion)
+			String packagePrefix, boolean reassignVersion, boolean fileLevel)
 			throws UnmatchingDocTopicItemsException, IOException {
 		this(projectName, projectVersion, projectPath, simMeasure,
 			depsPath, language, packagePrefix);
@@ -165,7 +166,7 @@ public class Architecture extends TreeMap<String, Cluster>
 			// Initialize DocTopics from files
 			try {
 				DocTopics.initializeSingleton(
-					artifactsDir, this.projectName, this.projectVersion);
+					artifactsDir, this.projectName, this.projectVersion, fileLevel);
 				DocTopics.getSingleton(this.projectName, this.projectVersion)
 					.serialize(artifactsDir + File.separator + "docTopics.json");
 			} catch (Exception f) {
@@ -260,8 +261,8 @@ public class Architecture extends TreeMap<String, Cluster>
 
 		// If the source language is Java, add all clusters that match prefix
 		if (language.equalsIgnoreCase("java")
-			&& (packagePrefix.isEmpty()
-			|| cluster.name.startsWith(packagePrefix)))
+				&& (packagePrefix.isEmpty()
+				|| cluster.name.startsWith(packagePrefix)))
 			this.put(cluster.name, cluster);
 	}
 

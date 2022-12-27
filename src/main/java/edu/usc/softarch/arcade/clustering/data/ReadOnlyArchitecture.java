@@ -353,6 +353,12 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 			SimpleDirectedGraph<String, DefaultEdge> graph = buildGraph(depsPath);
 
 			writer.write("digraph G {\n");
+			writer.write("\tlayout=sfdp;\n");
+			writer.write("\toverlap=prism;\n");
+			writer.write("\tK=0.2;\n");
+			writer.write("\tlen=0.1;\n");
+			writer.write("\tsep=\"+2\";\n");
+			writer.write("\trepulsiveforce=2.0;\n");
 
 			for (ReadOnlyCluster cluster : this.values())
 				writer.write("\t\"" + cluster.name + "\"" + ";\n");

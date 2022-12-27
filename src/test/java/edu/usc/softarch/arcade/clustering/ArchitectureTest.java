@@ -56,10 +56,12 @@ public class ArchitectureTest extends BaseTest {
 		// Deserialize FastFeatureVectors oracle
 		String depsPath = factsDir + fs + fullProjectName + "_deps.rsf";
 
+		boolean fileLevel = !language.equalsIgnoreCase("java");
+
 		ArchitectureMock arch = assertDoesNotThrow(() ->
 			new ArchitectureMock(projectName, projectVersion, outputDirPath,
 				SimMeasure.SimMeasureType.IL, depsPath, language,
-				artifactsDir + "/base", packagePrefix));
+				artifactsDir + "/base", packagePrefix, fileLevel));
 
 		// ------------------------- Generate Oracles ------------------------------
 

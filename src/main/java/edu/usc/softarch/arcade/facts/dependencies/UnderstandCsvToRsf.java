@@ -13,7 +13,9 @@ public class UnderstandCsvToRsf {
 		String csvPath = args[0];
 		String rsfPath = args[1];
 		String projectRootName = args[2];
-		boolean fileLevel = Boolean.parseBoolean(args[3]);
+		boolean fileLevel = true;
+		if (args.length > 3)
+			fileLevel = Boolean.parseBoolean(args[3]);
 
 		run(csvPath, rsfPath, projectRootName, fileLevel);
 	}
@@ -30,17 +32,19 @@ public class UnderstandCsvToRsf {
 				if (line.trim().isEmpty() || line.contains("(Anon_")) continue;
 
 				String[] entry = line.split(",");
-				String from = entry[0];
-				String to = entry[1];
+				String from = entry[0].replace("\"", "");
+				String to = entry[1].replace("\"", "");
 				if (!from.contains(projectRootName) || !to.contains(projectRootName))
 					continue; // Skip unrelated dependencies
 
 				if (fileLevel) {
+					if(!new File(from).exists() || !new File(to).exists())
+						continue;
+
 					from = from.split(Pattern.quote(projectRootName + File.separator))[1];
 					to = to.split(Pattern.quote(projectRootName + File.separator))[1];
 				}
-				result.add(from.replace("\"", ""),
-					to.replace("\"", ""));
+				result.add(from, to);
 			}
 		}
 

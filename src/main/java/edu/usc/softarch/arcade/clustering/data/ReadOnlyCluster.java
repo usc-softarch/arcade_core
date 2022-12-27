@@ -298,6 +298,12 @@ public class ReadOnlyCluster {
 			throws IOException {
 		try (FileWriter writer = new FileWriter(outputPath)) {
 			writer.write("digraph \"" + name + "\" {\n");
+			writer.write("\tlayout=sfdp;\n");
+			writer.write("\toverlap=prism;\n");
+			writer.write("\tK=0.2;\n");
+			writer.write("\tlen=0.1;\n");
+			writer.write("\tsep=\"+2\";\n");
+			writer.write("\trepulsiveforce=2.0;\n\n");
 
 			this.writeToDot(graph, arch, writer, name);
 
@@ -341,18 +347,15 @@ public class ReadOnlyCluster {
 		writer.write("\t\tnode [style=filled];\n");
 
 		for (String entity : this.getEntities()) {
-			writer.write(
-				"\t\t\"" + entity.replace("\\", ".") + "\";\n");
+			writer.write("\t\t\"" + cleanNodeName(entity) + "\";\n");
 			clusterEdges.addAll(graph.edgesOf(entity).stream()
 				.filter(e -> e.label.equals("internal"))
 				.collect(Collectors.toSet()));
 		}
 
 		for (LabeledEdge edge : clusterEdges) {
-			String source =
-				graph.getEdgeSource(edge).replace("\\", ".");
-			String target =
-				graph.getEdgeTarget(edge).replace("\\", ".");
+			String source = cleanNodeName(graph.getEdgeSource(edge));
+			String target = cleanNodeName(graph.getEdgeTarget(edge));
 			writer.write("\t\t\"" + source + "\" -> \"" + target + "\";\n");
 		}
 
@@ -374,6 +377,14 @@ public class ReadOnlyCluster {
 			+ "\\nInstability: " + formatter.format(metrics.instability)
 			+ "\";\n");
 		writer.write("\t}\n");
+	}
+
+	private String cleanNodeName(String nodeName) {
+		nodeName = nodeName.replace("\\", ".");
+		if (nodeName.contains("src.main.java"))
+			nodeName = nodeName.split("src\\.main\\.java\\.")[1];
+
+		return nodeName;
 	}
 	//endregion
 }

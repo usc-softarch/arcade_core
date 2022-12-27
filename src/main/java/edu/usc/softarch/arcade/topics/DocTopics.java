@@ -42,11 +42,12 @@ public class DocTopics implements JsonSerializable {
 	/**
 	 * The name of the project to which this DocTopics instance is bound.
 	 */
-	final String projectName;
+	private final String projectName;
 	/**
 	 * The version of the project to which this DocTopics instace is bound.
 	 */
-	final String projectVersion;
+	private final String projectVersion;
+	private final boolean fileLevel;
 	/**
 	 * A map of each {@link DocTopicItem}'s source entity to the
 	 * {@link DocTopicItem} itself.
@@ -65,9 +66,11 @@ public class DocTopics implements JsonSerializable {
 	/**
 	 * Deserialization constructor.
 	 */
-	private DocTopics(String projectName, String projectVersion) {
+	private DocTopics(String projectName, String projectVersion,
+			boolean fileLevel) {
 		this.projectName = projectName;
 		this.projectVersion = projectVersion;
+		this.fileLevel = fileLevel;
 		this.dtItemList = new HashMap<>();
 		this.topicWordLists = new TreeMap<>();
 	}
@@ -94,8 +97,8 @@ public class DocTopics implements JsonSerializable {
 	 * @see MalletRunner
 	 */
 	private DocTopics(String artifactsDir, String projectName,
-			String projectVersion) throws Exception {
-		this(projectName, projectVersion);
+			String projectVersion, boolean fileLevel) throws Exception {
+		this(projectName, projectVersion, fileLevel);
 		// Begin by importing documents from text to feature sequences
 		char fs = File.separatorChar;
 		InstanceList instances = InstanceList.load(
@@ -135,12 +138,13 @@ public class DocTopics implements JsonSerializable {
 	 * @param projectVersion Version of the project for which singleton is to
 	 *                       be initialized.
 	 * @throws Exception It is unknown exactly what causes this exception.
-	 * 									 See {@link #DocTopics(String, String)}.
+	 * 									 See {@link #DocTopics(String, String, boolean)}.
 	 */
 	public static void initializeSingleton(String artifactsDir,
-			String projectName, String projectVersion) throws Exception {
+			String projectName, String projectVersion, boolean fileLevel)
+			throws Exception {
 		mingleton.put(projectName.toLowerCase() + "-" + projectVersion,
-			new DocTopics(artifactsDir, projectName, projectVersion));
+			new DocTopics(artifactsDir, projectName, projectVersion, fileLevel));
 	}
 
 	/**
@@ -190,7 +194,7 @@ public class DocTopics implements JsonSerializable {
 	 * @return The requested singleton instance.
 	 * @throws IllegalStateException Thrown if the requested singleton has not
 	 * 															 been initialized.
-	 * @see #initializeSingleton(String, String, String)
+	 * @see #initializeSingleton(String, String, String, boolean)
 	 * @see #deserialize(String)
 	 * @see #isReady(String, String)
 	 */
@@ -314,15 +318,20 @@ public class DocTopics implements JsonSerializable {
 	 * @see #getDocTopicItem(String, String)
 	 */
 	private DocTopicItem getDocTopicItemForJava(String name) {
-		name = name.replace(".", "/");
+		if (!this.fileLevel)
+			name = name.replace(".", "/");
+		else
+			name = name.replace("\\", "/");
 		DocTopicItem toReturn = null;
 
 		// Attempts to locate a DTI that contains the desired class name
 		for (Map.Entry<String, DocTopicItem> entry : dtItemList.entrySet()) {
 			String dtiSource = entry.getKey();
 			dtiSource = dtiSource.replace("\\", "/")
-				.replace(".java", "")
 				.replace("_temp", "").trim();
+
+			if (!this.fileLevel)
+				dtiSource = dtiSource.replace(".java", "");
 
 			if (dtiSource.endsWith(name) && dtiSource.contains(
 						"/" + this.projectName + "-" + this.projectVersion + "/")) {
@@ -496,8 +505,8 @@ public class DocTopics implements JsonSerializable {
 	 * @param toKeep The collection of {@link DocTopicItem}s which have been
 	 *               validated to be relevant to this particular singleton's
 	 *               project version.
-	 * @see #initializeSingleton(String, String, String)
-	 * @see #DocTopics(String, String)
+	 * @see #initializeSingleton(String, String, String, boolean)
+	 * @see #DocTopics(String, String, boolean)
 	 */
 	public void cleanDocTopics(Collection<DocTopicItem> toKeep) {
 		EnhancedSet<DocTopicItem> toKeepSet = new EnhancedHashSet<>(toKeep);
@@ -521,9 +530,10 @@ public class DocTopics implements JsonSerializable {
 
 	@Override
 	public void serialize(EnhancedJsonGenerator generator) throws IOException {
-		generator.writeField("projectName", projectName);
-		generator.writeField("projectVersion", projectVersion);
-		generator.writeField("dtItemList", dtItemList.values());
+		generator.writeField("projectName", this.projectName);
+		generator.writeField("projectVersion", this.projectVersion);
+		generator.writeField("fileLevel", String.valueOf(this.fileLevel));
+		generator.writeField("dtItemList", this.dtItemList.values());
 		generator.writeField("topicWordLists",
 			topicWordLists, false, "wordList");
 	}
@@ -551,7 +561,9 @@ public class DocTopics implements JsonSerializable {
 		else
 			parser.parseString();
 
-		mingleton.put(name.toLowerCase() + "-" + version, new DocTopics(name, version));
+		boolean fileLevel = Boolean.parseBoolean(parser.parseString());
+
+		mingleton.put(name.toLowerCase() + "-" + version, new DocTopics(name, version, fileLevel));
 		Collection<DocTopicItem> dtis = parser.parseCollection(DocTopicItem.class);
 
 		for (DocTopicItem dti : dtis)

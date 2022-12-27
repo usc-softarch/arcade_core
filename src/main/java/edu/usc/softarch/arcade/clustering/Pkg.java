@@ -14,14 +14,19 @@ public class Pkg {
 	//region PUBLIC INTERFACE
 	public static void main(String[] args) throws IOException {
 		Map<String, String> parsedArgs = CLI.parseArguments(args);
+
+		boolean fileLevel = true;
+		if (parsedArgs.containsKey("filelevel"))
+			fileLevel = Boolean.parseBoolean(parsedArgs.get("filelevel"));
+
 		Architecture result = run(parsedArgs.get("projectname"),
 			parsedArgs.get("projectversion"), parsedArgs.get("projectpath"),
-			parsedArgs.get("depspath"), parsedArgs.get("language"));
+			parsedArgs.get("depspath"), parsedArgs.get("language"), fileLevel);
 		result.writeToRsf(false);
 	}
 
 	public static Architecture run(String projectName, String projectVersion,
-			String projectPath, String depsPath, String language)
+			String projectPath, String depsPath, String language, boolean fileLevel)
 			throws IOException {
 		// Load the deps.rsf and initialize Architecture
 		Architecture arch = new Architecture(projectName, projectVersion,
@@ -31,7 +36,7 @@ public class Pkg {
 		Map<String, Cluster> pkgClusters = new HashMap<>();
 		for (Map.Entry<String, Cluster> entry : arch.entrySet()) {
 			String entityName = entry.getKey();
-			String packageName = identifyPackage(entityName, language);
+			String packageName = identifyPackage(entityName, fileLevel);
 			pkgClusters.putIfAbsent(packageName, new Cluster(packageName));
 			pkgClusters.get(packageName).addEntity(entityName);
 		}
@@ -46,11 +51,11 @@ public class Pkg {
 
 	//region PROCESSING
 	//TODO Fix this so it can take Java class formats too
-	private static String identifyPackage(String entity, String language) {
-		if (language.equals("java"))
-			return identifyPackageAux(entity, ".");
-		else
+	private static String identifyPackage(String entity, boolean fileLevel) {
+		if (fileLevel)
 			return identifyPackageAux(entity, File.separator);
+		else
+			return identifyPackageAux(entity, ".");
 	}
 
 	private static String identifyPackageAux(String entity, String separator) {

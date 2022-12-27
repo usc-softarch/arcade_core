@@ -75,10 +75,11 @@ public class ArcTest extends BaseTest {
 		String resultConcernsFile =
 			outputDirPath + fs + arcFileBase + "concerns.txt";
 
+		boolean fileLevel = !lang.equals("java");
 		Architecture arch = assertDoesNotThrow(() ->
 			new Architecture(systemName, systemVersion, outputDirPath,
 				SimMeasure.SimMeasureType.JS, depsPath, lang,
-				artifactsDir, packagePrefix, false));
+				artifactsDir, packagePrefix, false, fileLevel));
 
 		SerializationCriterion serialCrit =
 			SerializationCriterion.makeSerializationCriterion(

@@ -35,6 +35,7 @@ public class Clusterer {
 	 * artifacts: Path to directory containing auxiliary artifacts.
 	 * reassignversion: Reassign DocTopics
 	 * printdots: Print DOT outputs for each cluster
+	 * filelevel: Dependency type
 	 */
 	public static void main(String[] args)
 			throws IOException, UnmatchingDocTopicItemsException,
@@ -66,7 +67,10 @@ public class Clusterer {
 			String depsPath = args.get("deps");
 			String language = args.get("language");
 			String packagePrefix = "";
-			if (language.equalsIgnoreCase("java"))
+			boolean fileLevel = true;
+			if (args.containsKey("filelevel"))
+				fileLevel = Boolean.parseBoolean(args.get("filelevel"));
+			if (!fileLevel)
 				packagePrefix = args.get("packageprefix");
 
 			if (this.algorithm == ClusteringAlgorithmType.ARC) {
@@ -77,7 +81,7 @@ public class Clusterer {
 
 				this.arch = new Architecture(projname, projversion, projpath,
 					this.simMeasure, depsPath, language, artifacts, packagePrefix,
-					reassignVersion);
+					reassignVersion, fileLevel);
 			} else {
 				this.arch = new Architecture(projname, projversion, projpath,
 					this.simMeasure, depsPath, language, packagePrefix);

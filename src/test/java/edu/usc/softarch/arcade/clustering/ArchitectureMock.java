@@ -17,10 +17,10 @@ public class ArchitectureMock extends Architecture {
 	ArchitectureMock(String projectName, String projectVersion,
 			String projectPath, SimMeasure.SimMeasureType simMeasure,
 			String depsPath, String language, String artifactsDir,
-			String packagePrefix)
+			String packagePrefix, boolean fileLevel)
 			throws UnmatchingDocTopicItemsException, IOException {
 		super(projectName, projectVersion, projectPath, simMeasure, depsPath,
-			language, artifactsDir, packagePrefix);
+			language, artifactsDir, packagePrefix, fileLevel);
 	}
 
 	@Override
