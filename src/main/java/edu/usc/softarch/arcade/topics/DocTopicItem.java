@@ -141,11 +141,9 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 	 * Verifies whether this DocTopicItem is based on a C source entity.
 	 */
 	public boolean isCSourced() {
-		return source.endsWith(".c") || source.endsWith(".h")
-			|| source.endsWith(".tbl") || source.endsWith(".p")
-			|| source.endsWith(".cpp") || source.endsWith(".s")
-			|| source.endsWith(".hpp") || source.endsWith(".icc")
-			|| source.endsWith(".ia");
+		Pattern p = Pattern.compile(
+			"\\.(c|cpp|cxx|cc|include|s|h|hpp|hxx|icc|ia|tbl|p)$");
+		return p.matcher(this.source).find();
 	}
 
 	public boolean isPythonSourced() {

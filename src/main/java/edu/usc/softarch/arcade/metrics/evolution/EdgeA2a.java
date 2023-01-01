@@ -8,6 +8,7 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -66,7 +67,7 @@ public class EdgeA2a {
 		Map<String, ReadOnlyCluster> targetMatchMap = targetMatches.stream()
 			.collect(Collectors.toMap(c -> c.name, c -> c));
 
-		Set<DefaultEdge> targetEdges = this.targetGraph.edgeSet();
+		Set<DefaultEdge> targetEdges = new HashSet<>(this.targetGraph.edgeSet());
 
 		for (DefaultEdge sourceEdge : this.sourceGraph.edgeSet()) {
 			// Get the names of the involved clusters in each versions
