@@ -7,14 +7,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import cc.mallet.topics.TopicInferencer;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import edu.usc.softarch.arcade.clustering.data.Cluster;
 import edu.usc.softarch.arcade.topics.exceptions.UnmatchingDocTopicItemsException;
+import edu.usc.softarch.arcade.util.CLI;
 import edu.usc.softarch.util.EnhancedHashSet;
 import edu.usc.softarch.util.EnhancedSet;
+import edu.usc.softarch.util.Terminal;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
 import edu.usc.softarch.util.json.JsonSerializable;
@@ -32,6 +35,128 @@ import edu.usc.softarch.util.json.JsonSerializable;
  * @see DocTopicItem
  */
 public class DocTopics implements JsonSerializable {
+	//region PUBLIC INTERFACE
+	/**
+	 * Entry point to pre-generate DocTopics, or to debug large DocTopics files
+	 * that can't be opened in text editors. Defaults to generate mode.
+	 *
+	 * mode: "generate" to create a new docTopics file
+	 *       "debug" to run the debugging utility
+	 *
+	 * Each mode has its own arguments.
+	 *
+	 * @see #runGeneration(String, String, String, boolean, boolean)
+	 * @see #runDebugger(String, String)
+	 */
+	public static void main(String[] args) throws IOException {
+		Map<String, String> parsedArgs = CLI.parseArguments(args);
+
+		if (!parsedArgs.containsKey("mode")) runGeneration(parsedArgs);
+
+		switch (parsedArgs.get("mode")) {
+			case "generate":
+				runGeneration(parsedArgs);
+				break;
+
+			case "debug":
+				String docTopicsPath = parsedArgs.get("path");
+				String filter = "";
+				if (parsedArgs.containsKey("filter"))
+					filter = parsedArgs.get("filter");
+				runDebugger(docTopicsPath, filter);
+				break;
+
+			default:
+				throw new IllegalArgumentException(
+					"Unknown DocTopics mode " + parsedArgs.get("mode"));
+		}
+	}
+
+	public static void runGeneration(Map<String, String> args) {
+		String artifactsPath = args.get("artifacts");
+		String projectName = args.get("project");
+		boolean fileLevel = Boolean.parseBoolean(args.get("filelevel"));
+		boolean overwrite = false;
+		if (args.containsKey("overwrite"))
+			overwrite = Boolean.parseBoolean(args.get("overwrite"));
+		String projectVersion = "All";
+		if (args.containsKey("version"))
+			projectVersion = args.get("version");
+		runGeneration(artifactsPath, projectName,
+			projectVersion, fileLevel, overwrite);
+	}
+
+	public static void runGeneration(String artifactsPath, String projectName,
+			boolean fileLevel, boolean overwrite) {
+		runGeneration(artifactsPath, projectName,
+			"All", fileLevel, overwrite);
+	}
+
+	/**
+	 * Generates a DocTopics file from existing artifacts.
+	 *
+	 * artifacts: Path to the artifacts directory.
+	 * project: Name of the project being analyzed.
+	 * version: Version of the project being analyzed.
+	 * filelevel: Whether the artifacts were obtained from file or class level
+	 *            dependencies.
+	 * overwrite: Whether to overwrite existing docTopics.json.
+	 */
+	public static void runGeneration(String artifactsPath, String projectName,
+			String projectVersion, boolean fileLevel, boolean overwrite) {
+		File docTopicsFile =
+			new File(artifactsPath + File.separator + "docTopics.json");
+
+		// Assert permission to overwrite, if file already exists
+		if (docTopicsFile.exists()) {
+			if (overwrite)
+				Terminal.timePrint(
+					"Overwrite flag set to True, overwriting " + docTopicsFile + ".",
+					Terminal.Level.INFO);
+			else
+				throw new AssertionError(
+					"Overwrite flag not set or set to False, cannot overwrite"
+						+ " existing file " + docTopicsFile.getAbsolutePath());
+		}
+
+		Terminal.timePrint("Generating DocTopics.", Terminal.Level.INFO);
+
+		try {
+			DocTopics.initializeSingleton(
+				artifactsPath, projectName, projectVersion, fileLevel);
+			DocTopics.getSingleton(projectName, projectVersion)
+				.serialize(artifactsPath + File.separator + "docTopics.json");
+		} catch (Exception f) {
+			f.printStackTrace();
+		}
+	}
+
+	public static void runDebugger(String docTopicsPath) throws IOException {
+		runDebugger(docTopicsPath, "");
+	}
+
+	/**
+	 * Debugging utility for DocTopics. Currently just reads the file in; use a
+	 * debugger to analyze the file contents by placing a breakpoint at the
+	 * return statement.
+	 *
+	 * path: Path to the docTopics.json file.
+	 * filter: Filter to apply to the DocTopicItem sources.
+	 */
+	public static void runDebugger(String docTopicsPath, String filter)
+			throws IOException {
+		Map<String, DocTopicItem> docTopics =
+			DocTopics.deserialize(docTopicsPath).dtItemList;
+
+		if (!filter.isEmpty())
+			docTopics = docTopics.entrySet().stream()
+				.filter(dti -> dti.getKey().contains(filter))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+		return;
+	}
+	//endregion
+
 	//region ATTRIBUTES
 	/**
 	 * Holds a static map of all analyzed system versions to their respective
