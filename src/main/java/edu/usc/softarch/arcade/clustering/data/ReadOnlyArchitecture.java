@@ -477,9 +477,12 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 		SimpleDirectedGraph<String, LabeledEdge> graph = buildFullGraph(depsPath);
 		FileUtil.checkDir(outputPath, true, false);
 
-		for (ReadOnlyCluster cluster : this.values())
+		for (ReadOnlyCluster cluster : this.values()) {
+			String cleanClusterName = cluster.name
+				.replace('/', '-').replace('\\', '-');
 			cluster.writeToDot(graph, this, outputPath + File.separator
-				+ cluster.name.replace(File.separatorChar, '.') + ".dot");
+				+ cleanClusterName + ".dot");
+		}
 	}
 
 	/**
