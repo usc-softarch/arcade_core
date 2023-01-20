@@ -450,6 +450,13 @@ public class Architecture extends TreeMap<String, Cluster>
 		}
 	}
 
+	public void writeToDot() throws IOException {
+		String fs = File.separator;
+		String path = this.projectPath + fs + this.projectName + "-"
+			+ this.projectVersion + "_" + this.simMeasure + ".dot";
+		writeToDot(path);
+	}
+
 	public void writeToDot(String outputPath)
 			throws IOException {
 		ReadOnlyArchitecture roArch = new ReadOnlyArchitecture(this);

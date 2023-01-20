@@ -253,7 +253,10 @@ public class Clusterer {
 	//region SERIALIZATION
 	public void serialize() throws IOException {
 		this.architecture.writeToRsf();
-		if (printDots) this.architecture.writeToDotClusters();
+		if (printDots) {
+			this.architecture.writeToDotClusters();
+			this.architecture.writeToDot();
+		}
 
 		// Compute DTI word bags if concern-based technique is used
 		if (DocTopics.isReady(
