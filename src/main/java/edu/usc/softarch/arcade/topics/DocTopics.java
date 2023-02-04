@@ -492,8 +492,8 @@ public class DocTopics implements JsonSerializable {
 			if (dti.isCSourced()) {
 				//FIXME Make sure this works on Linux and find a permanent fix
 				strippedSource = dti.source
-					.replace("_temp" + File.separator, File.separator)
 					.replace("\\", "/")
+					.replace("_temp", "")
 					.replace("./", "")
 					// This is a hack to deal with the CSourceToDepsBuilder being bad
 					.replace(".cpp", ".c");
