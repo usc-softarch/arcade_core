@@ -136,7 +136,8 @@ public class ArcTest extends BaseTest {
 		EnhancedSet<String> oracleRsf = new EnhancedHashSet<>(
 			Arrays.asList(oracle.split("\\r?\\n")));
 		assertEquals(oracleRsf, resultRsf);
-		assertEquals(concernsOracle, concerns);
+		assertEquals(concernsOracle.replaceAll("\\r\\n", "\\n"),
+			concerns.replaceAll("\\r\\n", "\\n"));
 
 		//TODO verify that all entities in the dependencies appear in the results
 	}
