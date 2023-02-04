@@ -90,7 +90,8 @@ public class BatchCloneFinderTest extends BaseTest {
 	 */
 	private String cleanAbsolutePaths(String toClean) {
 		return toClean.replaceAll("\\r\\n?", "\n")
-			.replaceAll("path=\\\"[. ]*\\\\subject_systems(_resources)?(\\\\.*\\\\src)?", " ");
+			.replaceAll("path=\\\"[. ]*\\\\subject_systems(_resources)?(\\\\.*\\\\src)?", " ")
+			.replaceAll("<\\?xml version=\".*\" encoding=\".*\"\\?>", "");
 	}
 	
 	/**
