@@ -23,7 +23,8 @@ public class DirCleaner {
 			while (!files.isEmpty()) {
 				File currFile = files.poll();
 				if (currFile.isFile()) continue;
-				if (currFile.getName().contains("test")
+				if ((currFile.getName().contains("test")
+						|| currFile.getName().contains("trunk"))
 						&& !isIgnored(ignorePatterns, currFile)) {
 					writer.write(currFile.getAbsolutePath() + System.lineSeparator());
 					if (!safeMode)
