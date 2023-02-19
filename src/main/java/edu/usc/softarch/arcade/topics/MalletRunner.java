@@ -233,7 +233,7 @@ public class MalletRunner {
 					break;
 				case "c":
 					p = Pattern.compile(
-						"\\.(c|cpp|cxx|cc|include|s|h|hpp|hxx|icc|ia|tbl|p)$");
+						"\\.(c|cpp|cxx|cc|include|s|h|hh|hpp|hxx|m|mm|icc|ia|tbl|p)$");
 					if (p.matcher(file.getName()).find())
 						copyFile(file);
 					break;

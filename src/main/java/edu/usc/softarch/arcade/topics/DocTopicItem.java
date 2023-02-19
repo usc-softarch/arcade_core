@@ -142,7 +142,7 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 	 */
 	public boolean isCSourced() {
 		Pattern p = Pattern.compile(
-			"\\.(c|cpp|cxx|cc|include|s|h|hpp|hxx|icc|ia|tbl|p)$");
+			"\\.(c|cpp|cxx|cc|include|s|h|hh|hpp|hxx|m|mm|icc|ia|tbl|p)$");
 		return p.matcher(this.source).find();
 	}
 
