@@ -247,7 +247,7 @@ public class Architecture extends TreeMap<String, Cluster>
 		// If the source language is C or C++, add only the C-based entities
 		if (language.equalsIgnoreCase("c")) {
 			Pattern p = Pattern.compile(
-				"\\.(c|cpp|cxx|cc|include|s|h|hh|hpp|hxx|m|mm|icc|ia|tbl|p)$");
+				"\\.(c|cpp|cxx|cc|include|s|h|hh|hpp|hxx|ih|m|mm|icc|ia|tbl|p)$");
 			if (!cluster.name.startsWith("/") && p.matcher(cluster.name).find())
 				this.put(cluster.name, cluster);
 		}

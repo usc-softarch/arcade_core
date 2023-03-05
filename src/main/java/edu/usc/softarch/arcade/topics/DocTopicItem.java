@@ -2,7 +2,6 @@ package edu.usc.softarch.arcade.topics;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +141,7 @@ public class DocTopicItem implements Serializable, JsonSerializable {
 	 */
 	public boolean isCSourced() {
 		Pattern p = Pattern.compile(
-			"\\.(c|cpp|cxx|cc|include|s|h|hh|hpp|hxx|m|mm|icc|ia|tbl|p)$");
+			"\\.(c|cpp|cxx|cc|include|s|h|hh|hpp|hxx|ih|m|mm|icc|ia|tbl|p)$");
 		return p.matcher(this.source).find();
 	}
 
