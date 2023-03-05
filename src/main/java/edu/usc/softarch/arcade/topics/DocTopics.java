@@ -531,7 +531,7 @@ public class DocTopics implements JsonSerializable {
 			if (dti.isPythonSourced()) {
 				//FIXME Make sure this works on Linux and find a permanent fix
 				strippedSource = dti.source.replace("\\", "/")
-					.replace("_temp", "")
+					.replace(projectName + "_temp", projectName)
 					.replace("./", "");
 				if (strippedSource.endsWith("/" + nameWithoutQuotations)
 					&& strippedSource.contains(
