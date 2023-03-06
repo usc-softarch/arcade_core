@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.metrics.data;
 
+import edu.usc.softarch.arcade.util.McfpDriver;
 import edu.usc.softarch.arcade.util.Version;
 
 import java.io.File;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public abstract class SystemData {
 	//region ATTRIBUTES
@@ -16,11 +18,11 @@ public abstract class SystemData {
 	//endregion
 
 	//region CONSTRUCTORS
-	protected SystemData(Version[] versions, List<File>... files)
-			throws IOException {
+	protected SystemData(Version[] versions, ExecutorService executor,
+			McfpDriver[][] drivers, List<File>... files) throws IOException {
 		this.versions = versions;
 		this.metric = new double[this.versions.length - 1][];
-		compute(files);
+		compute(executor, drivers, files);
 	}
 
 	protected SystemData(SystemData toCopy) {
@@ -36,7 +38,8 @@ public abstract class SystemData {
 	//endregion
 
 	//region PROCESSING
-	protected abstract void compute(List<File>... files) throws IOException;
+	protected abstract void compute(ExecutorService executor,
+		McfpDriver[][] drivers, List<File>... files) throws IOException;
 	//endregion
 
 	//region SERIALIZATION

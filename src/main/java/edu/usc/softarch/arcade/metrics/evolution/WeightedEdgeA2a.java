@@ -26,6 +26,19 @@ public class WeightedEdgeA2a {
 		return (new WeightedEdgeA2a(
 			sourceRsf, targetRsf, sourceDeps, targetDeps)).solve();
 	}
+
+	public static double run(File sourceRsf, File targetRsf, String sourceDeps,
+			String targetDeps, double simThreshold) throws IOException {
+		return (new WeightedEdgeA2a(sourceRsf, targetRsf,
+			sourceDeps, targetDeps, simThreshold)).solve();
+	}
+
+	public static double run(File sourceRsf, File targetRsf, String sourceDeps,
+			String targetDeps, double simThreshold, McfpDriver driver)
+			throws IOException {
+		return (new WeightedEdgeA2a(sourceRsf, targetRsf,
+			sourceDeps, targetDeps, simThreshold, driver)).solve();
+	}
 	//endregion
 
 	//region ATTRIBUTES
@@ -40,20 +53,39 @@ public class WeightedEdgeA2a {
 
 	//region CONSTRUCTORS
 	public WeightedEdgeA2a(String sourceRsf, String targetRsf,
-		String sourceDeps, String targetDeps) throws IOException {
+			String sourceDeps, String targetDeps) throws IOException {
 		this(new File(sourceRsf), new File(targetRsf), sourceDeps, targetDeps);
 	}
 
 	public WeightedEdgeA2a(File sourceRsf, File targetRsf,
-		String sourceDeps, String targetDeps) throws IOException {
+			String sourceDeps, String targetDeps) throws IOException {
+		this(sourceRsf, targetRsf, sourceDeps, targetDeps, 0.66);
+	}
+
+	public WeightedEdgeA2a(File sourceRsf, File targetRsf, String sourceDeps,
+			String targetDeps, double simThreshold) throws IOException {
 		this.edgea2a = -1;
 		ReadOnlyArchitecture sourceClusters =
 			ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		ReadOnlyArchitecture targetClusters =
 			ReadOnlyArchitecture.readFromRsf(targetRsf);
-		this.cvg = new Cvg(sourceClusters, targetClusters);
+		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
 		this.matches =
 			new McfpDriver(sourceClusters, targetClusters).getMatchSet();
+		this.sourceGraph = sourceClusters.buildWeightedGraph(sourceDeps);
+		this.targetGraph = targetClusters.buildWeightedGraph(targetDeps);
+	}
+
+	public WeightedEdgeA2a(File sourceRsf, File targetRsf, String sourceDeps,
+			String targetDeps, double simThreshold, McfpDriver driver)
+			throws IOException {
+		this.edgea2a = -1;
+		ReadOnlyArchitecture sourceClusters =
+			ReadOnlyArchitecture.readFromRsf(sourceRsf);
+		ReadOnlyArchitecture targetClusters =
+			ReadOnlyArchitecture.readFromRsf(targetRsf);
+		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
+		this.matches = driver.getMatchSet();
 		this.sourceGraph = sourceClusters.buildWeightedGraph(sourceDeps);
 		this.targetGraph = targetClusters.buildWeightedGraph(targetDeps);
 	}

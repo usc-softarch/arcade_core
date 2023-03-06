@@ -49,15 +49,19 @@ public class Cvg {
 
 	//region CONSTRUCTORS
 	public Cvg(ReadOnlyArchitecture sourceArch, ReadOnlyArchitecture targetArch) {
+		this(sourceArch, targetArch, 0.66, 1.0);
+	}
+
+	public Cvg(ReadOnlyArchitecture sourceArch, ReadOnlyArchitecture targetArch,
+			double lowerSimThreshold, double upperSimThreshold) {
 		this.sourceArch = sourceArch;
 		this.targetArch = targetArch;
 		this.sourceMatches = new HashSet<>();
 		this.targetMatches = new HashSet<>();
 		this.cvgSourceToTarget = 0.0;
 		this.cvgTargetToSource = 0.0;
-		//TODO these two can be parameterized if necessary
-		this.lowerSimThreshold = 0.66;
-		this.upperSimThreshold = 1.0;
+		this.lowerSimThreshold = lowerSimThreshold;
+		this.upperSimThreshold = upperSimThreshold;
 	}
 	//endregion
 

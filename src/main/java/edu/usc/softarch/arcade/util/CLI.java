@@ -14,6 +14,9 @@ public class CLI {
 			if (arg.toLowerCase().equals("quiet")) {
 				Terminal.level = Terminal.Level.OFF;
 				continue;
+			} else if (arg.toLowerCase().equals("debug")) {
+				Terminal.level = Terminal.Level.DEBUG;
+				continue;
 			}
 
 			// Argument is a value

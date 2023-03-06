@@ -22,7 +22,26 @@ public class EdgeA2a {
 
 	public static double run(File sourceRsf, File targetRsf,
 			String sourceDeps, String targetDeps) throws IOException {
-		return (new EdgeA2a(sourceRsf, targetRsf, sourceDeps, targetDeps)).solve();
+		try {
+			return (new EdgeA2a(sourceRsf, targetRsf, sourceDeps, targetDeps)).solve();
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Architectures "
+				+ sourceRsf.getAbsolutePath() + " and "
+				+ targetRsf.getAbsolutePath() + " were empty.", e);
+		}
+	}
+
+	public static double run(File sourceRsf, File targetRsf, String sourceDeps,
+			String targetDeps, double simThreshold) throws IOException {
+		return (new EdgeA2a(sourceRsf, targetRsf,
+			sourceDeps, targetDeps, simThreshold)).solve();
+	}
+
+	public static double run(File sourceRsf, File targetRsf, String sourceDeps,
+			String targetDeps, double simThreshold, McfpDriver driver)
+			throws IOException {
+		return (new EdgeA2a(sourceRsf, targetRsf,
+			sourceDeps, targetDeps, simThreshold, driver)).solve();
 	}
 	//endregion
 
@@ -42,14 +61,33 @@ public class EdgeA2a {
 
 	public EdgeA2a(File sourceRsf, File targetRsf,
 			String sourceDeps, String targetDeps) throws IOException {
+		this(sourceRsf, targetRsf, sourceDeps, targetDeps, 0.66);
+	}
+
+	public EdgeA2a(File sourceRsf, File targetRsf, String sourceDeps,
+			String targetDeps, double simThreshold) throws IOException {
 		this.edgea2a = -1;
 		ReadOnlyArchitecture sourceClusters =
 			ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		ReadOnlyArchitecture targetClusters =
 			ReadOnlyArchitecture.readFromRsf(targetRsf);
-		this.cvg = new Cvg(sourceClusters, targetClusters);
+		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
 		this.matches =
 			new McfpDriver(sourceClusters, targetClusters).getMatchSet();
+		this.sourceGraph = sourceClusters.buildGraph(sourceDeps);
+		this.targetGraph = targetClusters.buildGraph(targetDeps);
+	}
+
+	public EdgeA2a(File sourceRsf, File targetRsf, String sourceDeps,
+			String targetDeps, double simThreshold, McfpDriver driver)
+			throws IOException {
+		this.edgea2a = -1;
+		ReadOnlyArchitecture sourceClusters =
+			ReadOnlyArchitecture.readFromRsf(sourceRsf);
+		ReadOnlyArchitecture targetClusters =
+			ReadOnlyArchitecture.readFromRsf(targetRsf);
+		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
+		this.matches = driver.getMatchSet();
 		this.sourceGraph = sourceClusters.buildGraph(sourceDeps);
 		this.targetGraph = targetClusters.buildGraph(targetDeps);
 	}
@@ -110,7 +148,7 @@ public class EdgeA2a {
 				this.edgea2a = (1 - numerator() / denominator) * 100;
 			else
 				throw new IllegalArgumentException(
-					"One of the architectures was empty.");
+					"Both architectures were empty.");
 		}
 		return this.edgea2a;
 	}

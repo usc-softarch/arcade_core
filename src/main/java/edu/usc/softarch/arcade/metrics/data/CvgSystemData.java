@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.metrics.data;
 
 import edu.usc.softarch.arcade.metrics.evolution.Cvg;
 import edu.usc.softarch.arcade.util.Version;
+import edu.usc.softarch.util.Terminal;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public class CvgSystemData {
 	//region ATTRIBUTES
@@ -18,8 +20,8 @@ public class CvgSystemData {
 	//endregion
 
 	//region CONSTRUCTORS
-	public CvgSystemData(Version[] versions, List<File> archFiles)
-			throws IOException {
+	public CvgSystemData(Version[] versions, ExecutorService executor,
+			List<File> archFiles) {
 		this.versions = versions;
 		this.cvgForwards = new double[this.versions.length - 1][];
 		this.cvgBackwards = new double[this.versions.length - 1][];
@@ -28,10 +30,20 @@ public class CvgSystemData {
 			this.cvgBackwards[i] = new double[this.versions.length - 1 - i];
 
 			for (int j = i + 1; j < this.versions.length; j++) {
-				this.cvgForwards[i][j - i - 1] =
-					Cvg.run(archFiles.get(i), archFiles.get(j));
-				this.cvgBackwards[i][j - i - 1] =
-					Cvg.run(archFiles.get(j), archFiles.get(i));
+				int finalI = i;
+				int finalJ = j;
+				executor.submit(() -> {
+					try {
+						this.cvgForwards[finalI][finalJ - finalI - 1] =
+							Cvg.run(archFiles.get(finalI), archFiles.get(finalJ));
+						this.cvgBackwards[finalI][finalJ - finalI - 1] =
+							Cvg.run(archFiles.get(finalJ), archFiles.get(finalI));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					Terminal.timePrint("Finished cvg: " + this.versions[finalI]
+						+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
+				});
 			}
 		}
 	}
