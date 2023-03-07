@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -71,15 +73,17 @@ public class SystemMetrics implements JsonSerializable {
 		ExecutorService executor = Executors.newFixedThreadPool(8);
 
 		// Get and sort the architecture files
-		List<File> archFiles = FileUtil.sortFileListByVersion(
+		List<File> archFilesList = FileUtil.sortFileListByVersion(
 			FileUtil.getFileListing(systemDirPath, ".rsf"));
+		Vector<File> archFiles = new Vector<>(archFilesList);
 
 		// Get and sort the dependency files
-		List<File> depsFiles = List.of(
+		List<File> depsFilesList = List.of(
 			new File(FileUtil.tildeExpandPath(depsDirPath)).listFiles());
-		depsFiles = depsFiles.stream()
+		depsFilesList = depsFilesList.stream()
 			.filter(f -> f.getName().contains(".rsf")).collect(Collectors.toList());
-		depsFiles = FileUtil.sortFileListByVersion(depsFiles);
+		depsFilesList = FileUtil.sortFileListByVersion(depsFilesList);
+		Vector<File> depsFiles = new Vector<>(depsFilesList);
 
 		// Initialize the version list
 		this.versions = new Version[archFiles.size()];
@@ -99,7 +103,7 @@ public class SystemMetrics implements JsonSerializable {
 				int finalJ = j;
 				executor.submit(() -> {
 					try {
-						drivers[finalI][finalJ] = new McfpDriver(
+						drivers[finalI][finalJ - finalI - 1] = new McfpDriver(
 							ReadOnlyArchitecture.readFromRsf(archFiles.get(finalI)),
 							ReadOnlyArchitecture.readFromRsf(archFiles.get(finalJ)));
 					} catch (IOException e) {
@@ -153,15 +157,14 @@ public class SystemMetrics implements JsonSerializable {
 		}
 
 		// Initialize ArchitectureMetrics
-		this.versionMetrics = new TreeMap<>();
+		this.versionMetrics = new ConcurrentSkipListMap<>();
 		for (int i = 0; i < this.versions.length; i++) {
-			List<File> finalDepsFiles = depsFiles;
 			int finalI = i;
 			executor.submit(() -> {
 				try {
 					this.versionMetrics.put(this.versions[finalI],
 						new ArchitectureMetrics(archFiles.get(finalI).getAbsolutePath(),
-						finalDepsFiles.get(finalI).getAbsolutePath()));
+						depsFiles.get(finalI).getAbsolutePath()));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

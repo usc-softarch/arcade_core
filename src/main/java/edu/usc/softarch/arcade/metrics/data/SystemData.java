@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 
 public abstract class SystemData {
@@ -19,7 +20,7 @@ public abstract class SystemData {
 
 	//region CONSTRUCTORS
 	protected SystemData(Version[] versions, ExecutorService executor,
-			McfpDriver[][] drivers, List<File>... files) throws IOException {
+			McfpDriver[][] drivers, Vector<File>... files) throws IOException {
 		this.versions = versions;
 		this.metric = new double[this.versions.length - 1][];
 		compute(executor, drivers, files);
@@ -39,7 +40,7 @@ public abstract class SystemData {
 
 	//region PROCESSING
 	protected abstract void compute(ExecutorService executor,
-		McfpDriver[][] drivers, List<File>... files) throws IOException;
+		McfpDriver[][] drivers, Vector<File>... files) throws IOException;
 	//endregion
 
 	//region SERIALIZATION

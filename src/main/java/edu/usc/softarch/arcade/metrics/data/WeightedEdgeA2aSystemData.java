@@ -7,7 +7,7 @@ import edu.usc.softarch.util.Terminal;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 
 public class WeightedEdgeA2aSystemData extends SystemData {
@@ -16,8 +16,8 @@ public class WeightedEdgeA2aSystemData extends SystemData {
 	//endregion
 
 	//region CONSTRUCTORS
-	public WeightedEdgeA2aSystemData(Version[] versions, List<File> archFiles,
-			List<File> depsFiles, double simThreshold, ExecutorService executor,
+	public WeightedEdgeA2aSystemData(Version[] versions, Vector<File> archFiles,
+			Vector<File> depsFiles, double simThreshold, ExecutorService executor,
 			McfpDriver[][] drivers) throws IOException {
 		super(versions, executor, drivers, archFiles, depsFiles);
 		this.simThreshold = simThreshold;
@@ -36,7 +36,7 @@ public class WeightedEdgeA2aSystemData extends SystemData {
 	@SafeVarargs
 	@Override
 	protected final void compute(ExecutorService executor,
-			McfpDriver[][] drivers, List<File>... files) throws IOException {
+			McfpDriver[][] drivers, Vector<File>... files) throws IOException {
 		for (int i = 0; i < this.versions.length - 1; i++) {
 			super.metric[i] = new double[this.versions.length - 1 - i];
 
@@ -49,7 +49,7 @@ public class WeightedEdgeA2aSystemData extends SystemData {
 							WeightedEdgeA2a.run(files[0].get(finalI),
 							files[0].get(finalJ), files[1].get(finalI).getAbsolutePath(),
 							files[1].get(finalJ).getAbsolutePath(), this.simThreshold,
-							drivers[finalI][finalJ]);
+							drivers[finalI][finalJ - finalI - 1]);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

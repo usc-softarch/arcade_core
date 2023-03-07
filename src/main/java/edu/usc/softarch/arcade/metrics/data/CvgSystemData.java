@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 
 public class CvgSystemData {
@@ -21,7 +22,7 @@ public class CvgSystemData {
 
 	//region CONSTRUCTORS
 	public CvgSystemData(Version[] versions, ExecutorService executor,
-			List<File> archFiles) {
+			Vector<File> archFiles) {
 		this.versions = versions;
 		this.cvgForwards = new double[this.versions.length - 1][];
 		this.cvgBackwards = new double[this.versions.length - 1][];

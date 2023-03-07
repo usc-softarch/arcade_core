@@ -7,13 +7,13 @@ import edu.usc.softarch.util.Terminal;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 
 public final class A2aSystemData extends SystemData {
 	//region CONSTRUCTORS
 	public A2aSystemData(Version[] versions, ExecutorService executor,
-			McfpDriver[][] drivers, List<File> archFiles) throws IOException {
+			McfpDriver[][] drivers, Vector<File> archFiles) throws IOException {
 		super(versions, executor, drivers, archFiles);
 	}
 
@@ -28,7 +28,7 @@ public final class A2aSystemData extends SystemData {
 	@SafeVarargs
 	@Override
 	protected final void compute(ExecutorService executor, McfpDriver[][] drivers,
-			List<File>... files) throws IOException {
+			Vector<File>... files) throws IOException {
 		for (int i = 0; i < this.versions.length - 1; i++) {
 			super.metric[i] = new double[this.versions.length - 1 - i];
 

@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.metrics.evolution;
 
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
+import edu.usc.softarch.arcade.util.CLI;
 import edu.usc.softarch.arcade.util.McfpDriver;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
@@ -15,6 +16,12 @@ import java.util.stream.Collectors;
 
 public class WeightedEdgeA2a {
 	//region PUBLIC INTERFACE
+	public static void main(String[] args) throws IOException {
+		Map<String, String> parsedArgs = CLI.parseArguments(args);
+		run(parsedArgs.get("sourcersf"), parsedArgs.get("targetrsf"),
+			parsedArgs.get("sourcedeps"), parsedArgs.get("targetdeps"));
+	}
+
 	public static double run(String sourceRsf, String targetRsf,
 			String sourceDeps, String targetDeps) throws IOException {
 		return (new WeightedEdgeA2a(

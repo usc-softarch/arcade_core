@@ -126,11 +126,14 @@ public class Version implements Comparable<Version> {
 		}
 	}
 
-	private static String getSuffix(String version) {
-		String[] parts = version.split("\\d+");
-		if (parts.length == 0)
-			return null;
-		return parts[parts.length - 1];
+	private static String getSuffix(String input) {
+		for (int i = 0; i < input.length(); i++) {
+			char c = input.charAt(i);
+			if (Character.isLetter(c)) {
+				return input.substring(i);
+			}
+		}
+		return null;
 	}
 
 	private static int getSuffixType(String suffix) {
@@ -152,7 +155,7 @@ public class Version implements Comparable<Version> {
 		String[] parts = suffix.split("-?[a-zA-Z]+");
 		if (parts.length == 0)
 			return "0";
-		return parts[0];
+		return parts[1];
 	}
 	//endregion
 
