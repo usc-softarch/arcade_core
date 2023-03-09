@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.metrics.data;
 
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.metrics.RenameFixer;
 import edu.usc.softarch.arcade.util.CLI;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.McfpDriver;
@@ -14,6 +15,7 @@ import mojo.MoJoCalculator;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,6 +25,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +80,34 @@ public class SystemMetrics implements JsonSerializable {
 			FileUtil.getFileListing(systemDirPath, ".rsf"));
 		Vector<File> archFiles = new Vector<>(archFilesList);
 
+		// Prep architectures
+		ArchPair[][] architectures = new ArchPair[archFiles.size()][];
+		for (int i = 0; i < archFiles.size(); i++) {
+			architectures[i] = new ArchPair[archFiles.size() - 1 - i];
+			for (int j = i + 1; j < archFiles.size(); j++) {
+				int finalI = i;
+				int finalJ = j;
+				executor.submit(() -> {
+					try {
+						ReadOnlyArchitecture v1 = ReadOnlyArchitecture.readFromRsf(archFiles.get(finalI));
+						ReadOnlyArchitecture v2 = ReadOnlyArchitecture.readFromRsf(archFiles.get(finalJ));
+						RenameFixer.fix(v1, v2);
+						architectures[finalI][finalJ - finalI - 1] = new ArchPair(v1, v2);
+					} catch (IOException | ExecutionException | InterruptedException e) {
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					}
+				});
+			}
+		}
+		executor.shutdown();
+		try {
+			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
+		} catch (InterruptedException e) {
+			e.printStackTrace(); // Dunno why this would happen
+		}
+		executor = Executors.newFixedThreadPool(8);
+
 		// Get and sort the dependency files
 		List<File> depsFilesList = List.of(
 			new File(FileUtil.tildeExpandPath(depsDirPath)).listFiles());
@@ -91,7 +122,7 @@ public class SystemMetrics implements JsonSerializable {
 			this.versions[i] = new Version(archFiles.get(i));
 
 		// Run a2a
-		this.a2a = new A2aSystemData(this.versions, executor, null, archFiles);
+		this.a2a = new A2aSystemData(this.versions, executor, null, architectures);
 
 		// Initialize McfpDrivers
 		McfpDriver[][] drivers = new McfpDriver[this.versions.length - 1][];
@@ -102,13 +133,9 @@ public class SystemMetrics implements JsonSerializable {
 				int finalI = i;
 				int finalJ = j;
 				executor.submit(() -> {
-					try {
-						drivers[finalI][finalJ - finalI - 1] = new McfpDriver(
-							ReadOnlyArchitecture.readFromRsf(archFiles.get(finalI)),
-							ReadOnlyArchitecture.readFromRsf(archFiles.get(finalJ)));
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					ArchPair archPair = architectures[finalI][finalJ - finalI - 1];
+					drivers[finalI][finalJ - finalI - 1] =
+						new McfpDriver(archPair.v1, archPair.v2);
 				});
 			}
 		}
@@ -122,20 +149,20 @@ public class SystemMetrics implements JsonSerializable {
 
 		// Run Edgea2a
 		this.edgeA2a = new EdgeA2aSystemData(
-			this.versions, archFiles, depsFiles, 0.66, executor, drivers);
+			this.versions, architectures, depsFiles, 0.66, executor, drivers);
 		this.weightedEdgeA2a = new WeightedEdgeA2aSystemData(
-			this.versions, archFiles, depsFiles, 0.66, executor, drivers);
+			this.versions, architectures, depsFiles, 0.66, executor, drivers);
 		this.edgeA2a40 = new EdgeA2aSystemData(
-			this.versions, archFiles, depsFiles, 0.4, executor, drivers);
+			this.versions, architectures, depsFiles, 0.4, executor, drivers);
 		this.weightedEdgeA2a40 = new WeightedEdgeA2aSystemData(
-			this.versions, archFiles, depsFiles, 0.4, executor, drivers);
+			this.versions, architectures, depsFiles, 0.4, executor, drivers);
 		this.edgeA2aMin = new EdgeA2aSystemData(
-			this.versions, archFiles, depsFiles, 0.0, executor, drivers);
+			this.versions, architectures, depsFiles, 0.0, executor, drivers);
 		this.weightedEdgeA2aMin = new WeightedEdgeA2aSystemData(
-			this.versions, archFiles, depsFiles, 0.0, executor, drivers);
+			this.versions, architectures, depsFiles, 0.0, executor, drivers);
 
 		// Run cvg
-		this.cvg = new CvgSystemData(this.versions, executor, archFiles);
+		this.cvg = new CvgSystemData(this.versions, executor, architectures);
 
 		// Run MoJoFM
 		this.mojoFm = new double[this.versions.length - 1][];

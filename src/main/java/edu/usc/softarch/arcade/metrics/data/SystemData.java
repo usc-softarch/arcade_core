@@ -26,6 +26,14 @@ public abstract class SystemData {
 		compute(executor, drivers, files);
 	}
 
+	protected SystemData(Version[] versions, ExecutorService executor,
+			McfpDriver[][] drivers, ArchPair[][] architectures, Vector<File>... files)
+			throws IOException {
+		this.versions = versions;
+		this.metric = new double[this.versions.length - 1][];
+		compute(executor, drivers, architectures, files);
+	}
+
 	protected SystemData(SystemData toCopy) {
 		this.versions = Arrays.copyOf(toCopy.versions, toCopy.versions.length);
 		this.metric = Arrays.stream(toCopy.metric).map(double[]::clone)
@@ -41,6 +49,10 @@ public abstract class SystemData {
 	//region PROCESSING
 	protected abstract void compute(ExecutorService executor,
 		McfpDriver[][] drivers, Vector<File>... files) throws IOException;
+
+	protected abstract void compute(ExecutorService executor,
+		McfpDriver[][] drivers, ArchPair[][] architectures, Vector<File>... files)
+		throws IOException;
 	//endregion
 
 	//region SERIALIZATION

@@ -49,6 +49,32 @@ public class CvgSystemData {
 		}
 	}
 
+	public CvgSystemData(Version[] versions, ExecutorService executor,
+			ArchPair[][] architectures) {
+		this.versions = versions;
+		this.cvgForwards = new double[this.versions.length - 1][];
+		this.cvgBackwards = new double[this.versions.length - 1][];
+		for (int i = 0; i < this.versions.length - 1; i++) {
+			this.cvgForwards[i] = new double[this.versions.length - 1 - i];
+			this.cvgBackwards[i] = new double[this.versions.length - 1 - i];
+
+			for (int j = i + 1; j < this.versions.length; j++) {
+				int finalI = i;
+				int finalJ = j;
+				executor.submit(() -> {
+					this.cvgForwards[finalI][finalJ - finalI - 1] =
+						Cvg.run(architectures[finalI][finalJ - finalI - 1].v1,
+							architectures[finalI][finalJ - finalI - 1].v2);
+					this.cvgBackwards[finalI][finalJ - finalI - 1] =
+						Cvg.run(architectures[finalI][finalJ - finalI - 1].v1,
+							architectures[finalI][finalJ - finalI - 1].v2);
+					Terminal.timePrint("Finished cvg: " + this.versions[finalI]
+						+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
+				});
+			}
+		}
+	}
+
 	public CvgSystemData(CvgSystemData toCopy) {
 		this.versions = Arrays.copyOf(toCopy.versions, toCopy.versions.length);
 		this.cvgForwards = Arrays.stream(toCopy.cvgForwards).map(double[]::clone)

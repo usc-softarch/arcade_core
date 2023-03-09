@@ -145,6 +145,9 @@ public class ReadOnlyCluster {
 	public void removeEntities(Set<String> entities) {
 		this.entities.removeAll(entities); }
 
+	public void removeEntities(String entity) {
+		this.entities.remove(entity); }
+
 	/**
 	 * Counts the number of entities in this cluster.
 	 *

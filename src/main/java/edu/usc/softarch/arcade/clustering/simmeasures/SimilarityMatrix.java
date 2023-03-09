@@ -94,7 +94,7 @@ public class SimilarityMatrix {
 	public int size() { return simMatrix.size(); }
 
 	public Collection<Map<Cluster, SimData>> getColumns() {
-		return this.simMatrix.values();	}
+		return this.simMatrix.values(); }
 
 	public void addCluster(Cluster c)
 			throws ExecutionException, InterruptedException {

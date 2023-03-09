@@ -23,6 +23,13 @@ public class WeightedEdgeA2aSystemData extends SystemData {
 		this.simThreshold = simThreshold;
 	}
 
+	public WeightedEdgeA2aSystemData(Version[] versions,
+			ArchPair[][] architectures, Vector<File> depsFiles, double simThreshold,
+			ExecutorService executor, McfpDriver[][] drivers) throws IOException {
+		super(versions, executor, drivers, architectures, depsFiles);
+		this.simThreshold = simThreshold;
+	}
+
 	public WeightedEdgeA2aSystemData(WeightedEdgeA2aSystemData toCopy) {
 		super(toCopy);
 		this.simThreshold = toCopy.simThreshold;
@@ -55,6 +62,35 @@ public class WeightedEdgeA2aSystemData extends SystemData {
 					}
 					Terminal.timePrint("Finished WEa2a: " + this.versions[finalI]
 							+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
+				});
+			}
+		}
+	}
+
+	@SafeVarargs
+	@Override
+	protected final void compute(ExecutorService executor,
+			McfpDriver[][] drivers, ArchPair[][] architectures, Vector<File>... files)
+			throws IOException {
+		for (int i = 0; i < this.versions.length - 1; i++) {
+			super.metric[i] = new double[this.versions.length - 1 - i];
+
+			for (int j = i + 1; j < this.versions.length; j++) {
+				int finalI = i;
+				int finalJ = j;
+				executor.submit(() -> {
+					try {
+						super.metric[finalI][finalJ - finalI - 1] =
+							WeightedEdgeA2a.run(architectures[finalI][finalJ - finalI - 1].v1,
+								architectures[finalI][finalJ - finalI - 1].v2,
+								files[0].get(finalI).getAbsolutePath(),
+								files[0].get(finalJ).getAbsolutePath(), this.simThreshold,
+								drivers[finalI][finalJ - finalI - 1]);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					Terminal.timePrint("Finished WEa2a: " + this.versions[finalI]
+						+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
 				});
 			}
 		}

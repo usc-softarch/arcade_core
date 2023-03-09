@@ -2,11 +2,13 @@ package edu.usc.softarch.arcade.metrics.evolution;
 
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
+import edu.usc.softarch.arcade.metrics.RenameFixer;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 public class Cvg {
 	//region PUBLIC INTERFACE
@@ -56,6 +58,11 @@ public class Cvg {
 			double lowerSimThreshold, double upperSimThreshold) {
 		this.sourceArch = sourceArch;
 		this.targetArch = targetArch;
+		try {
+			RenameFixer.fix(this.sourceArch, this.targetArch);
+		} catch (ExecutionException | InterruptedException e) {
+			throw new RuntimeException(e); //TODO handle it
+		}
 		this.sourceMatches = new HashSet<>();
 		this.targetMatches = new HashSet<>();
 		this.cvgSourceToTarget = 0.0;

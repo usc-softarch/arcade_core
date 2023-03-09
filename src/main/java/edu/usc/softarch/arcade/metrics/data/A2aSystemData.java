@@ -17,6 +17,12 @@ public final class A2aSystemData extends SystemData {
 		super(versions, executor, drivers, archFiles);
 	}
 
+	public A2aSystemData(Version[] versions, ExecutorService executor,
+			McfpDriver[][] drivers, ArchPair[][] architectures)
+			throws IOException {
+		super(versions, executor, drivers, architectures);
+	}
+
 	public A2aSystemData(A2aSystemData toCopy) {
 		super(toCopy); }
 
@@ -42,6 +48,27 @@ public final class A2aSystemData extends SystemData {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+					Terminal.timePrint("Finished a2a: " + this.versions[finalI]
+						+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
+				});
+			}
+		}
+	}
+
+	@SafeVarargs
+	@Override
+	protected final void compute(ExecutorService executor, McfpDriver[][] drivers,
+			ArchPair[][] architectures, Vector<File>... files) throws IOException {
+		for (int i = 0; i < this.versions.length - 1; i++) {
+			super.metric[i] = new double[this.versions.length - 1 - i];
+
+			for (int j = i + 1; j < this.versions.length; j++) {
+				int finalI = i;
+				int finalJ = j;
+				executor.submit(() -> {
+					super.metric[finalI][finalJ - finalI - 1] =
+						A2a.run(architectures[finalI][finalJ - finalI - 1].v1,
+							architectures[finalI][finalJ - finalI - 1].v2);
 					Terminal.timePrint("Finished a2a: " + this.versions[finalI]
 						+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
 				});

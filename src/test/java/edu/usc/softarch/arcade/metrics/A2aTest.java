@@ -71,7 +71,7 @@ public class A2aTest extends BaseTest {
 
       assertAll(
         () -> assertEquals(oracleMap.get("n"),
-					(double)(outputStats.getN()),"N does not match the oracle"),
+					(outputStats.getN()),"N does not match the oracle"),
         () -> assertEquals(oracleMap.get("min"),
 					outputStats.getMin(),"Min does not match the oracle"),
         () -> assertEquals(oracleMap.get("max"),

@@ -2,6 +2,7 @@ package edu.usc.softarch.arcade.metrics.evolution;
 
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyCluster;
+import edu.usc.softarch.arcade.metrics.RenameFixer;
 import edu.usc.softarch.arcade.util.McfpDriver;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class EdgeA2a {
@@ -43,6 +45,13 @@ public class EdgeA2a {
 		return (new EdgeA2a(sourceRsf, targetRsf,
 			sourceDeps, targetDeps, simThreshold, driver)).solve();
 	}
+
+	public static double run(ReadOnlyArchitecture ra1, ReadOnlyArchitecture ra2,
+			String sourceDeps, String targetDeps, double simThreshold,
+			McfpDriver driver) throws IOException {
+		return (new EdgeA2a(ra1, ra2, sourceDeps,
+			targetDeps, simThreshold, driver)).solve();
+	}
 	//endregion
 
 	//region ATTRIBUTES
@@ -71,6 +80,11 @@ public class EdgeA2a {
 			ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		ReadOnlyArchitecture targetClusters =
 			ReadOnlyArchitecture.readFromRsf(targetRsf);
+		try {
+			RenameFixer.fix(sourceClusters, targetClusters);
+		} catch (ExecutionException | InterruptedException e) {
+			throw new RuntimeException(e); //TODO handle it
+		}
 		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
 		this.matches =
 			new McfpDriver(sourceClusters, targetClusters).getMatchSet();
@@ -78,14 +92,29 @@ public class EdgeA2a {
 		this.targetGraph = targetClusters.buildGraph(targetDeps);
 	}
 
+	public EdgeA2a(ReadOnlyArchitecture ra1, ReadOnlyArchitecture ra2,
+			String sourceDeps, String targetDeps, double simThreshold,
+			McfpDriver driver) throws IOException {
+		this.edgea2a = -1;
+		this.cvg = new Cvg(ra1, ra2, simThreshold, 1.0);
+		this.matches = driver.getMatchSet();
+		this.sourceGraph = ra1.buildGraph(sourceDeps);
+		this.targetGraph = ra2.buildGraph(targetDeps);
+	}
+
 	public EdgeA2a(File sourceRsf, File targetRsf, String sourceDeps,
-			String targetDeps, double simThreshold, McfpDriver driver)
-			throws IOException {
+		String targetDeps, double simThreshold, McfpDriver driver)
+		throws IOException {
 		this.edgea2a = -1;
 		ReadOnlyArchitecture sourceClusters =
 			ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		ReadOnlyArchitecture targetClusters =
 			ReadOnlyArchitecture.readFromRsf(targetRsf);
+		try {
+			RenameFixer.fix(sourceClusters, targetClusters);
+		} catch (ExecutionException | InterruptedException e) {
+			throw new RuntimeException(e); //TODO handle it
+		}
 		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
 		this.matches = driver.getMatchSet();
 		this.sourceGraph = sourceClusters.buildGraph(sourceDeps);

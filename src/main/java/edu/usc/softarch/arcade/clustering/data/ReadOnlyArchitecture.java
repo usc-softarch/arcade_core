@@ -347,7 +347,7 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 				ReadOnlyCluster cluster = new ReadOnlyCluster(entry[1]);
 				result.putIfAbsent(entry[1], cluster);
 				result.get(entry[1]).addEntity(entry[2]);
-				result.entityLocationMap.put(entry[2], cluster);
+				result.entityLocationMap.put(entry[2], result.get(entry[1]));
 			}
 		}
 

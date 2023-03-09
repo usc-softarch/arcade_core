@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.metrics.RenameFixer;
 import edu.usc.softarch.arcade.util.CentralTendency;
 import edu.usc.softarch.arcade.util.FileUtil;
 import edu.usc.softarch.arcade.util.McfpDriver;
@@ -31,6 +33,11 @@ public class A2a {
 
 	public static double run(File sourceRsf, File targetRsf) throws IOException {
 		return (new A2a(sourceRsf, targetRsf)).solve();
+	}
+
+	public static double run(ReadOnlyArchitecture sourceRa,
+			ReadOnlyArchitecture targetRa) {
+		return (new A2a(sourceRa, targetRa)).solve();
 	}
 
 	public static CentralTendency runBatch(String path) throws IOException {
@@ -69,12 +76,28 @@ public class A2a {
 		this.a2a = -1;
 		this.sourceClusters = ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		this.targetClusters = ReadOnlyArchitecture.readFromRsf(targetRsf);
+		try {
+			RenameFixer.fix(this.sourceClusters, this.targetClusters);
+		} catch (ExecutionException | InterruptedException e) {
+			throw new RuntimeException(e); //TODO handle it
+		}
 	}
 
 	public A2a(File sourceRsf, File targetRsf) throws IOException {
 		this.a2a = -1;
 		this.sourceClusters = ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		this.targetClusters = ReadOnlyArchitecture.readFromRsf(targetRsf);
+		try {
+			RenameFixer.fix(this.sourceClusters, this.targetClusters);
+		} catch (ExecutionException | InterruptedException e) {
+			throw new RuntimeException(e); //TODO handle it
+		}
+	}
+
+	public A2a(ReadOnlyArchitecture sourceRa, ReadOnlyArchitecture targetRa) {
+		this.a2a = -1;
+		this.sourceClusters = sourceRa;
+		this.targetClusters = targetRa;
 	}
 	//endregion
 
