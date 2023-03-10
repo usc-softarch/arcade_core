@@ -88,8 +88,8 @@ public class EdgeA2a {
 		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
 		this.matches =
 			new McfpDriver(sourceClusters, targetClusters).getMatchSet();
-		this.sourceGraph = sourceClusters.buildGraph(sourceDeps);
-		this.targetGraph = targetClusters.buildGraph(targetDeps);
+		this.sourceGraph = sourceClusters.buildGraph(sourceDeps, true);
+		this.targetGraph = targetClusters.buildGraph(targetDeps, true);
 	}
 
 	public EdgeA2a(ReadOnlyArchitecture ra1, ReadOnlyArchitecture ra2,
@@ -98,8 +98,8 @@ public class EdgeA2a {
 		this.edgea2a = -1;
 		this.cvg = new Cvg(ra1, ra2, simThreshold, 1.0);
 		this.matches = driver.getMatchSet();
-		this.sourceGraph = ra1.buildGraph(sourceDeps);
-		this.targetGraph = ra2.buildGraph(targetDeps);
+		this.sourceGraph = ra1.buildGraph(sourceDeps, true);
+		this.targetGraph = ra2.buildGraph(targetDeps, true);
 	}
 
 	public EdgeA2a(File sourceRsf, File targetRsf, String sourceDeps,
@@ -117,8 +117,8 @@ public class EdgeA2a {
 		}
 		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
 		this.matches = driver.getMatchSet();
-		this.sourceGraph = sourceClusters.buildGraph(sourceDeps);
-		this.targetGraph = targetClusters.buildGraph(targetDeps);
+		this.sourceGraph = sourceClusters.buildGraph(sourceDeps, true);
+		this.targetGraph = targetClusters.buildGraph(targetDeps, true);
 	}
 	//endregion
 

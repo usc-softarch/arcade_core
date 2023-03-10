@@ -15,7 +15,6 @@ import mojo.MoJoCalculator;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,6 +79,14 @@ public class SystemMetrics implements JsonSerializable {
 			FileUtil.getFileListing(systemDirPath, ".rsf"));
 		Vector<File> archFiles = new Vector<>(archFilesList);
 
+		// Get and sort the dependency files
+		List<File> depsFilesList = List.of(
+			new File(FileUtil.tildeExpandPath(depsDirPath)).listFiles());
+		depsFilesList = depsFilesList.stream()
+			.filter(f -> f.getName().contains(".rsf")).collect(Collectors.toList());
+		depsFilesList = FileUtil.sortFileListByVersion(depsFilesList);
+		Vector<File> depsFiles = new Vector<>(depsFilesList);
+
 		// Prep architectures
 		ArchPair[][] architectures = new ArchPair[archFiles.size()][];
 		for (int i = 0; i < archFiles.size(); i++) {
@@ -92,6 +99,8 @@ public class SystemMetrics implements JsonSerializable {
 						ReadOnlyArchitecture v1 = ReadOnlyArchitecture.readFromRsf(archFiles.get(finalI));
 						ReadOnlyArchitecture v2 = ReadOnlyArchitecture.readFromRsf(archFiles.get(finalJ));
 						RenameFixer.fix(v1, v2);
+						v1.buildGraphs(depsFiles.get(finalI).getAbsolutePath());
+						v2.buildGraphs(depsFiles.get(finalJ).getAbsolutePath());
 						architectures[finalI][finalJ - finalI - 1] = new ArchPair(v1, v2);
 					} catch (IOException | ExecutionException | InterruptedException e) {
 						e.printStackTrace();
@@ -107,14 +116,6 @@ public class SystemMetrics implements JsonSerializable {
 			e.printStackTrace(); // Dunno why this would happen
 		}
 		executor = Executors.newFixedThreadPool(8);
-
-		// Get and sort the dependency files
-		List<File> depsFilesList = List.of(
-			new File(FileUtil.tildeExpandPath(depsDirPath)).listFiles());
-		depsFilesList = depsFilesList.stream()
-			.filter(f -> f.getName().contains(".rsf")).collect(Collectors.toList());
-		depsFilesList = FileUtil.sortFileListByVersion(depsFilesList);
-		Vector<File> depsFiles = new Vector<>(depsFilesList);
 
 		// Initialize the version list
 		this.versions = new Version[archFiles.size()];

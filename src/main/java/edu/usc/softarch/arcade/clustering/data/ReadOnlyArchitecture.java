@@ -60,6 +60,9 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 	 * @see #buildGraph(String)
 	 */
 	private final Map<String, ReadOnlyCluster> entityLocationMap;
+	private SimpleDirectedGraph<String, DefaultEdge> graph;
+	private SimpleDirectedWeightedGraph<String, DefaultWeightedEdge> weightedGraph;
+	private SimpleDirectedGraph<String, LabeledEdge> fullGraph;
 	//endregion
 
 	//region CONSTRUCTORS
@@ -186,7 +189,7 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 		// Sanity check to ensure it's been built
 		getEntityLocationMap();
 
-		DependencyGraph depsGraph = DependencyGraph.readRsf(depsPath);
+		DependencyGraph depsGraph = DependencyGraph.readRsf(depsPath, true);
 		for (Map.Entry<String, String> dependency : depsGraph) {
 			ReadOnlyCluster source =
 				this.entityLocationMap.get(dependency.getKey());
@@ -201,6 +204,14 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 				result.addEdge(source.name, target.name);
 		}
 
+		return result;
+	}
+
+	public SimpleDirectedGraph<String, DefaultEdge> buildGraph(
+			String depsPath, boolean keep) throws IOException {
+		if (this.graph != null) return this.graph;
+		SimpleDirectedGraph<String, DefaultEdge> result = buildGraph(depsPath);
+		if (keep) this.graph = result;
 		return result;
 	}
 
@@ -225,7 +236,7 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 		// Sanity check to ensure it's been built
 		getEntityLocationMap();
 
-		DependencyGraph depsGraph = DependencyGraph.readRsf(depsPath);
+		DependencyGraph depsGraph = DependencyGraph.readRsf(depsPath, true);
 		for (Map.Entry<String, String> dependency : depsGraph) {
 			ReadOnlyCluster source =
 				this.entityLocationMap.get(dependency.getKey());
@@ -248,6 +259,53 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 		}
 
 		return result;
+	}
+
+	public SimpleDirectedWeightedGraph<String, DefaultWeightedEdge>
+			buildWeightedGraph(String depsPath, boolean keep) throws IOException {
+		if (this.weightedGraph != null) return this.weightedGraph;
+		SimpleDirectedWeightedGraph<String, DefaultWeightedEdge> result =
+			buildWeightedGraph(depsPath);
+		if (keep) this.weightedGraph = result;
+		return result;
+	}
+
+	public void buildGraphs(String depsPath) throws IOException {
+		this.graph = new SimpleDirectedGraph<>(DefaultEdge.class);
+		this.weightedGraph =
+			new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
+
+		for (ReadOnlyCluster cluster : this.values()) {
+			this.graph.addVertex(cluster.name);
+			this.weightedGraph.addVertex(cluster.name);
+		}
+
+		// Sanity check to ensure it's been built
+		getEntityLocationMap();
+
+		DependencyGraph depsGraph = DependencyGraph.readRsf(depsPath, true);
+		for (Map.Entry<String, String> dependency : depsGraph) {
+			ReadOnlyCluster source =
+				this.entityLocationMap.get(dependency.getKey());
+			ReadOnlyCluster target =
+				this.entityLocationMap.get(dependency.getValue());
+
+			// If either source or target entities are not in the model, skip.
+			if (source == null || target == null) continue;
+
+			if (!source.equals(target)) {
+				if (!this.graph.containsEdge(source.name, target.name)) {
+					this.graph.addEdge(source.name, target.name);
+					this.weightedGraph.addEdge(source.name, target.name);
+					this.weightedGraph.setEdgeWeight(source.name, target.name, 1);
+				} else {
+					DefaultWeightedEdge edge =
+						this.weightedGraph.getEdge(source.name, target.name);
+					double currentWeight = this.weightedGraph.getEdgeWeight(edge);
+					this.weightedGraph.setEdgeWeight(edge, ++currentWeight);
+				}
+			}
+		}
 	}
 
 	/**
@@ -291,6 +349,14 @@ public class ReadOnlyArchitecture extends TreeMap<String, ReadOnlyCluster> {
 					new LabeledEdge("external"));
 		}
 
+		return result;
+	}
+
+	public SimpleDirectedGraph<String, LabeledEdge> buildFullGraph(
+			String depsPath, boolean keep) throws IOException {
+		if (this.fullGraph != null) return this.fullGraph;
+		SimpleDirectedGraph<String, LabeledEdge> result = buildFullGraph(depsPath);
+		if (keep) this.fullGraph = result;
 		return result;
 	}
 

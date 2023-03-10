@@ -6,14 +6,28 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
 public class DependencyGraph extends LinkedHashSet<Map.Entry<String, String>> {
+	//region ATTRIBUTES
+	private static final Map<String, DependencyGraph> loaded = new HashMap<>();
+	//endregion
+
 	//region CONSTRUCTORS
 	public DependencyGraph() { super(); }
+
+	private DependencyGraph(DependencyGraph toClone) {
+		this.addAll(toClone);
+	}
 	//endregion
 
 	//region SERIALIZATION
@@ -50,6 +64,14 @@ public class DependencyGraph extends LinkedHashSet<Map.Entry<String, String>> {
 			}
 		}
 
+		return result;
+	}
+
+	public static DependencyGraph readRsf(String path, boolean keep)
+			throws IOException {
+		if (loaded.containsKey(path)) return loaded.get(path);
+		DependencyGraph result = readRsf(path);
+		if (keep) loaded.put(path, result);
 		return result;
 	}
 	//endregion

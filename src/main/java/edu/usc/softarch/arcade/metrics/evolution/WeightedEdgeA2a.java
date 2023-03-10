@@ -93,8 +93,8 @@ public class WeightedEdgeA2a {
 		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
 		this.matches =
 			new McfpDriver(sourceClusters, targetClusters).getMatchSet();
-		this.sourceGraph = sourceClusters.buildWeightedGraph(sourceDeps);
-		this.targetGraph = targetClusters.buildWeightedGraph(targetDeps);
+		this.sourceGraph = sourceClusters.buildWeightedGraph(sourceDeps, true);
+		this.targetGraph = targetClusters.buildWeightedGraph(targetDeps, true);
 	}
 
 	public WeightedEdgeA2a(ReadOnlyArchitecture ra1, ReadOnlyArchitecture ra2,
@@ -103,8 +103,8 @@ public class WeightedEdgeA2a {
 		this.edgea2a = -1;
 		this.cvg = new Cvg(ra1, ra2, simThreshold, 1.0);
 		this.matches = driver.getMatchSet();
-		this.sourceGraph = ra1.buildWeightedGraph(sourceDeps);
-		this.targetGraph = ra2.buildWeightedGraph(targetDeps);
+		this.sourceGraph = ra1.buildWeightedGraph(sourceDeps, true);
+		this.targetGraph = ra2.buildWeightedGraph(targetDeps, true);
 	}
 
 	public WeightedEdgeA2a(File sourceRsf, File targetRsf, String sourceDeps,
@@ -122,8 +122,8 @@ public class WeightedEdgeA2a {
 		}
 		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
 		this.matches = driver.getMatchSet();
-		this.sourceGraph = sourceClusters.buildWeightedGraph(sourceDeps);
-		this.targetGraph = targetClusters.buildWeightedGraph(targetDeps);
+		this.sourceGraph = sourceClusters.buildWeightedGraph(sourceDeps, true);
+		this.targetGraph = targetClusters.buildWeightedGraph(targetDeps, true);
 	}
 	//endregion
 
