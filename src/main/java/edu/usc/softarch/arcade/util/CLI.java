@@ -10,13 +10,17 @@ public class CLI {
 		Map<String, String> result = new HashMap<>();
 
 		for (String arg : args) {
-			// Set Quiet mode
-			if (arg.toLowerCase().equals("quiet")) {
-				Terminal.level = Terminal.Level.OFF;
-				continue;
-			} else if (arg.toLowerCase().equals("debug")) {
-				Terminal.level = Terminal.Level.DEBUG;
-				continue;
+			// Set Terminal mode
+			switch (arg.toLowerCase()) {
+				case "quiet":
+					Terminal.level = Terminal.Level.OFF;
+					continue;
+				case "debug":
+					Terminal.level = Terminal.Level.DEBUG;
+					continue;
+				case "info":
+					Terminal.level = Terminal.Level.INFO;
+					continue;
 			}
 
 			// Argument is a value
@@ -26,6 +30,8 @@ public class CLI {
 				// Message level argument
 				if (argKeyValue[0].equals("messagelevel"))
 					setMessageLevel(argKeyValue[1]);
+				if (argKeyValue[0].equals("messageperiod"))
+					Terminal.period = Integer.parseInt(argKeyValue[1]);
 
 				// Component argument
 				result.put(argKeyValue[0], argKeyValue[1]);

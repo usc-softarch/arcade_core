@@ -112,6 +112,7 @@
 <!--			<artifactId>darklaf-core</artifactId>-->
 <!--			<version>3.0.2</version>-->
 <!--		</dependency>-->
+		<!-- https://mvnrepository.com/artifact/org.fusesource.jansi/jansi -->
 	</dependencies>
   <build>
     <plugins>

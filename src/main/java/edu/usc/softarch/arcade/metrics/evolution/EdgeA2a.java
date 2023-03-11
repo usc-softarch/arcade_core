@@ -17,6 +17,10 @@ import java.util.stream.Collectors;
 
 public class EdgeA2a {
 	//region PUBLIC INTERFACE
+	public static void main(String[] args) throws IOException {
+		System.out.println(run(args[0], args[1], args[2], args[3]));
+	}
+
 	public static double run(String sourceRsf, String targetRsf,
 			String sourceDeps, String targetDeps) throws IOException {
 		return (new EdgeA2a(sourceRsf, targetRsf, sourceDeps, targetDeps)).solve();

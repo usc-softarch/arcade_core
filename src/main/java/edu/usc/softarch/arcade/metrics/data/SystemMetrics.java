@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class SystemMetrics implements JsonSerializable {
@@ -87,107 +88,77 @@ public class SystemMetrics implements JsonSerializable {
 		depsFilesList = FileUtil.sortFileListByVersion(depsFilesList);
 		Vector<File> depsFiles = new Vector<>(depsFilesList);
 
-		// Prep architectures
-		ArchPair[][] architectures = new ArchPair[archFiles.size()][];
-		for (int i = 0; i < archFiles.size(); i++) {
-			architectures[i] = new ArchPair[archFiles.size() - 1 - i];
-			for (int j = i + 1; j < archFiles.size(); j++) {
-				int finalI = i;
-				int finalJ = j;
-				executor.submit(() -> {
-					try {
-						ReadOnlyArchitecture v1 = ReadOnlyArchitecture.readFromRsf(archFiles.get(finalI));
-						ReadOnlyArchitecture v2 = ReadOnlyArchitecture.readFromRsf(archFiles.get(finalJ));
-						RenameFixer.fix(v1, v2);
-						v1.buildGraphs(depsFiles.get(finalI).getAbsolutePath());
-						v2.buildGraphs(depsFiles.get(finalJ).getAbsolutePath());
-						architectures[finalI][finalJ - finalI - 1] = new ArchPair(v1, v2);
-					} catch (IOException | ExecutionException | InterruptedException e) {
-						e.printStackTrace();
-						throw new RuntimeException(e);
-					}
-				});
-			}
-		}
-		executor.shutdown();
-		try {
-			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
-		} catch (InterruptedException e) {
-			e.printStackTrace(); // Dunno why this would happen
-		}
-		executor = Executors.newFixedThreadPool(8);
-
 		// Initialize the version list
 		this.versions = new Version[archFiles.size()];
 		for (int i = 0; i < archFiles.size(); i++)
 			this.versions[i] = new Version(archFiles.get(i));
 
-		// Run a2a
-		this.a2a = new A2aSystemData(this.versions, executor, null, architectures);
-
-		// Initialize McfpDrivers
-		McfpDriver[][] drivers = new McfpDriver[this.versions.length - 1][];
-		for (int i = 0; i < this.versions.length - 1; i++) {
-			drivers[i] = new McfpDriver[this.versions.length - 1 - i];
-
-			for (int j = i + 1; j < this.versions.length; j++) {
-				int finalI = i;
-				int finalJ = j;
-				executor.submit(() -> {
-					ArchPair archPair = architectures[finalI][finalJ - finalI - 1];
-					drivers[finalI][finalJ - finalI - 1] =
-						new McfpDriver(archPair.v1, archPair.v2);
-				});
-			}
-		}
-		executor.shutdown();
-		try {
-			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
-		} catch (InterruptedException e) {
-			e.printStackTrace(); // Dunno why this would happen
-		}
-		executor = Executors.newFixedThreadPool(8);
-
-		// Run Edgea2a
-		this.edgeA2a = new EdgeA2aSystemData(
-			this.versions, architectures, depsFiles, 0.66, executor, drivers);
-		this.weightedEdgeA2a = new WeightedEdgeA2aSystemData(
-			this.versions, architectures, depsFiles, 0.66, executor, drivers);
-		this.edgeA2a40 = new EdgeA2aSystemData(
-			this.versions, architectures, depsFiles, 0.4, executor, drivers);
-		this.weightedEdgeA2a40 = new WeightedEdgeA2aSystemData(
-			this.versions, architectures, depsFiles, 0.4, executor, drivers);
-		this.edgeA2aMin = new EdgeA2aSystemData(
-			this.versions, architectures, depsFiles, 0.0, executor, drivers);
-		this.weightedEdgeA2aMin = new WeightedEdgeA2aSystemData(
-			this.versions, architectures, depsFiles, 0.0, executor, drivers);
-
-		// Run cvg
-		this.cvg = new CvgSystemData(this.versions, executor, architectures);
-
-		// Run MoJoFM
+		// Initialize metrics objects
+		this.a2a = new A2aSystemData(this.versions);
+		this.edgeA2a = new EdgeA2aSystemData(this.versions, 0.66);
+		this.weightedEdgeA2a =
+			new WeightedEdgeA2aSystemData(this.versions, 0.66);
+		this.edgeA2a40 = new EdgeA2aSystemData(this.versions, 0.4);
+		this.weightedEdgeA2a40 =
+			new WeightedEdgeA2aSystemData(this.versions, 0.4);
+		this.edgeA2aMin = new EdgeA2aSystemData(this.versions, 0.0);
+		this.weightedEdgeA2aMin =
+			new WeightedEdgeA2aSystemData(this.versions, 0.0);
+		this.cvg = new CvgSystemData(this.versions);
 		this.mojoFm = new double[this.versions.length - 1][];
-		for (int i = 0; i < this.versions.length - 1; i++) {
+		for (int i = 0; i < this.versions.length - 1; i++)
 			this.mojoFm[i] = new double[this.versions.length - 1 - i];
+		this.versionMetrics = new ConcurrentSkipListMap<>();
 
-			for (int j = i + 1; j < this.versions.length; j++) {
-				int finalI = i;
+		final int opCount = archFiles.size() * (archFiles.size() - 1) / 2;
+		AtomicInteger evoMetricsCount = new AtomicInteger(1);
+		final int versionCount = this.versions.length;
+		AtomicInteger versionMetricsCount = new AtomicInteger(1);
+		for (int i = 0; i < archFiles.size(); i++) {
+			int finalI = i;
+
+			for (int j = i + 1; j < archFiles.size(); j++) {
 				int finalJ = j;
 				executor.submit(() -> {
-					MoJoCalculator mojoCalc = new MoJoCalculator(
-						archFiles.get(finalI).getAbsolutePath(),
-						archFiles.get(finalJ).getAbsolutePath(), null);
-					this.mojoFm[finalI][finalJ - finalI - 1] = mojoCalc.mojofm();
-					Terminal.timePrint("Finished MojoFM: " + this.versions[finalI]
-						+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
+					try {
+						// Prep inputs
+						ReadOnlyArchitecture v1 =
+							ReadOnlyArchitecture.readFromRsf(archFiles.get(finalI));
+						ReadOnlyArchitecture v2 =
+							ReadOnlyArchitecture.readFromRsf(archFiles.get(finalJ));
+						RenameFixer.fix(v1, v2);
+						v1.buildGraphs(depsFiles.get(finalI).getAbsolutePath());
+						v2.buildGraphs(depsFiles.get(finalJ).getAbsolutePath());
+						McfpDriver driver = new McfpDriver(v1, v2);
+
+						// Run metrics
+						this.a2a.addValue(v1, v2, finalI, finalJ);
+						this.edgeA2a.addValue(v1, v2, depsFiles.get(finalI),
+							depsFiles.get(finalJ), driver, finalI, finalJ);
+						this.weightedEdgeA2a.addValue(v1, v2, depsFiles.get(finalI),
+							depsFiles.get(finalJ), driver, finalI, finalJ);
+						this.edgeA2a40.addValue(v1, v2, depsFiles.get(finalI),
+							depsFiles.get(finalJ), driver, finalI, finalJ);
+						this.weightedEdgeA2a40.addValue(v1, v2, depsFiles.get(finalI),
+							depsFiles.get(finalJ), driver, finalI, finalJ);
+						this.edgeA2aMin.addValue(v1, v2, depsFiles.get(finalI),
+							depsFiles.get(finalJ), driver, finalI, finalJ);
+						this.weightedEdgeA2aMin.addValue(v1, v2, depsFiles.get(finalI),
+							depsFiles.get(finalJ), driver, finalI, finalJ);
+						this.cvg.addValue(v1, v2, finalI, finalJ);
+						MoJoCalculator mojoCalc = new MoJoCalculator(
+							archFiles.get(finalI).getAbsolutePath(),
+							archFiles.get(finalJ).getAbsolutePath(), null);
+						this.mojoFm[finalI][finalJ - finalI - 1] = mojoCalc.mojofm();
+					} catch (IOException | ExecutionException | InterruptedException e) {
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					}
+					Terminal.timePrint(evoMetricsCount.getAndIncrement() + "/"
+						+ opCount + " evolutionary metrics computed.", Terminal.Level.INFO);
 				});
 			}
-		}
 
-		// Initialize ArchitectureMetrics
-		this.versionMetrics = new ConcurrentSkipListMap<>();
-		for (int i = 0; i < this.versions.length; i++) {
-			int finalI = i;
 			executor.submit(() -> {
 				try {
 					this.versionMetrics.put(this.versions[finalI],
@@ -196,8 +167,8 @@ public class SystemMetrics implements JsonSerializable {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				Terminal.timePrint("Finished version metrics: "
-						+ this.versions[finalI], Terminal.Level.DEBUG);
+				Terminal.timePrint(versionMetricsCount.getAndIncrement() + "/"
+					+ versionCount + " version metrics computed.", Terminal.Level.INFO);
 			});
 		}
 		executor.shutdown();

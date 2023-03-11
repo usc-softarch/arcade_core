@@ -1,5 +1,7 @@
 package edu.usc.softarch.arcade.metrics.data;
 
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
+import edu.usc.softarch.arcade.metrics.evolution.A2a;
 import edu.usc.softarch.arcade.metrics.evolution.Cvg;
 import edu.usc.softarch.arcade.util.Version;
 import edu.usc.softarch.util.Terminal;
@@ -12,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CvgSystemData {
 	//region ATTRIBUTES
@@ -26,6 +29,9 @@ public class CvgSystemData {
 		this.versions = versions;
 		this.cvgForwards = new double[this.versions.length - 1][];
 		this.cvgBackwards = new double[this.versions.length - 1][];
+
+		AtomicInteger cvgCount = new AtomicInteger(1);
+		int opCount = this.versions.length * (this.versions.length - 1) / 2;
 		for (int i = 0; i < this.versions.length - 1; i++) {
 			this.cvgForwards[i] = new double[this.versions.length - 1 - i];
 			this.cvgBackwards[i] = new double[this.versions.length - 1 - i];
@@ -44,6 +50,8 @@ public class CvgSystemData {
 					}
 					Terminal.timePrint("Finished cvg: " + this.versions[finalI]
 						+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
+					Terminal.timePrint(cvgCount.getAndIncrement() + "/"
+						+ opCount + " cvg pairs computed.", Terminal.Level.INFO);
 				});
 			}
 		}
@@ -54,6 +62,9 @@ public class CvgSystemData {
 		this.versions = versions;
 		this.cvgForwards = new double[this.versions.length - 1][];
 		this.cvgBackwards = new double[this.versions.length - 1][];
+
+		AtomicInteger cvgCount = new AtomicInteger(1);
+		int opCount = this.versions.length * (this.versions.length - 1) / 2;
 		for (int i = 0; i < this.versions.length - 1; i++) {
 			this.cvgForwards[i] = new double[this.versions.length - 1 - i];
 			this.cvgBackwards[i] = new double[this.versions.length - 1 - i];
@@ -66,10 +77,12 @@ public class CvgSystemData {
 						Cvg.run(architectures[finalI][finalJ - finalI - 1].v1,
 							architectures[finalI][finalJ - finalI - 1].v2);
 					this.cvgBackwards[finalI][finalJ - finalI - 1] =
-						Cvg.run(architectures[finalI][finalJ - finalI - 1].v1,
-							architectures[finalI][finalJ - finalI - 1].v2);
+						Cvg.run(architectures[finalI][finalJ - finalI - 1].v2,
+							architectures[finalI][finalJ - finalI - 1].v1);
 					Terminal.timePrint("Finished cvg: " + this.versions[finalI]
 						+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
+					Terminal.timePrint(cvgCount.getAndIncrement() + "/"
+						+ opCount + " cvg pairs computed.", Terminal.Level.INFO);
 				});
 			}
 		}
@@ -88,6 +101,24 @@ public class CvgSystemData {
 		this.versions = versions;
 		this.cvgForwards = cvgForwards;
 		this.cvgBackwards = cvgBackwards;
+	}
+
+	public CvgSystemData(Version[] versions) {
+		this.versions = versions;
+		this.cvgForwards = new double[this.versions.length - 1][];
+		this.cvgBackwards = new double[this.versions.length - 1][];
+		for (int i = 0; i < this.versions.length - 1; i++) {
+			this.cvgForwards[i] = new double[this.versions.length - 1 - i];
+			this.cvgBackwards[i] = new double[this.versions.length - 1 - i];
+		}
+	}
+	//endregion
+
+	//region ACCESSORS
+	public void addValue(ReadOnlyArchitecture ra1, ReadOnlyArchitecture ra2,
+			int i, int j) {
+		this.cvgForwards[i][j - i - 1] = Cvg.run(ra1, ra2);
+		this.cvgBackwards[i][j - i - 1] = Cvg.run(ra2, ra1);
 	}
 	//endregion
 

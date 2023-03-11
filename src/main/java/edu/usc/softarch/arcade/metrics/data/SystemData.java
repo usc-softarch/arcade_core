@@ -44,6 +44,13 @@ public abstract class SystemData {
 		this.versions = versions;
 		this.metric = metric;
 	}
+
+	protected SystemData(Version[] versions) {
+		this.versions = versions;
+		this.metric = new double[versions.length - 1][];
+		for (int i = 0; i < this.versions.length - 1; i++)
+			this.metric[i] = new double[this.versions.length - 1 - i];
+	}
 	//endregion
 
 	//region PROCESSING

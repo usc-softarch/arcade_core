@@ -1,5 +1,6 @@
 package edu.usc.softarch.arcade.metrics.data;
 
+import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
 import edu.usc.softarch.arcade.metrics.evolution.WeightedEdgeA2a;
 import edu.usc.softarch.arcade.util.McfpDriver;
 import edu.usc.softarch.arcade.util.Version;
@@ -9,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class WeightedEdgeA2aSystemData extends SystemData {
 	//region ATTRIBUTES
@@ -30,6 +32,11 @@ public class WeightedEdgeA2aSystemData extends SystemData {
 		this.simThreshold = simThreshold;
 	}
 
+	public WeightedEdgeA2aSystemData(Version[] versions, double simThreshold) {
+		super(versions);
+		this.simThreshold = simThreshold;
+	}
+
 	public WeightedEdgeA2aSystemData(WeightedEdgeA2aSystemData toCopy) {
 		super(toCopy);
 		this.simThreshold = toCopy.simThreshold;
@@ -39,11 +46,23 @@ public class WeightedEdgeA2aSystemData extends SystemData {
 		super(versions, edgeA2a); }
 	//endregion
 
+	//region ACCESSORS
+	public void addValue(ReadOnlyArchitecture ra1, ReadOnlyArchitecture ra2,
+			File deps1, File deps2, McfpDriver driver, int i, int j)
+			throws IOException {
+		super.metric[i][j - i - 1] = WeightedEdgeA2a.run(ra1, ra2,
+			deps1.getAbsolutePath(), deps2.getAbsolutePath(),
+			this.simThreshold, driver);
+	}
+	//endregion
+
 	//region PROCESSING
 	@SafeVarargs
 	@Override
 	protected final void compute(ExecutorService executor,
 			McfpDriver[][] drivers, Vector<File>... files) throws IOException {
+		AtomicInteger wea2aCount = new AtomicInteger(1);
+		int opCount = this.versions.length * (this.versions.length - 1) / 2;
 		for (int i = 0; i < this.versions.length - 1; i++) {
 			super.metric[i] = new double[this.versions.length - 1 - i];
 
@@ -61,7 +80,10 @@ public class WeightedEdgeA2aSystemData extends SystemData {
 						e.printStackTrace();
 					}
 					Terminal.timePrint("Finished WEa2a: " + this.versions[finalI]
-							+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
+						+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
+					Terminal.timePrint(wea2aCount.getAndIncrement() + "/"
+						+ opCount + " WEa2a " + this.simThreshold + " pairs computed.",
+						Terminal.Level.INFO);
 				});
 			}
 		}
@@ -72,6 +94,8 @@ public class WeightedEdgeA2aSystemData extends SystemData {
 	protected final void compute(ExecutorService executor,
 			McfpDriver[][] drivers, ArchPair[][] architectures, Vector<File>... files)
 			throws IOException {
+		AtomicInteger wea2aCount = new AtomicInteger(1);
+		int opCount = this.versions.length * (this.versions.length - 1) / 2;
 		for (int i = 0; i < this.versions.length - 1; i++) {
 			super.metric[i] = new double[this.versions.length - 1 - i];
 
@@ -91,6 +115,9 @@ public class WeightedEdgeA2aSystemData extends SystemData {
 					}
 					Terminal.timePrint("Finished WEa2a: " + this.versions[finalI]
 						+ "::" + this.versions[finalJ], Terminal.Level.DEBUG);
+					Terminal.timePrint(wea2aCount.getAndIncrement() + "/"
+						+ opCount + " WEa2a " + this.simThreshold + " pairs computed.",
+						Terminal.Level.INFO);
 				});
 			}
 		}

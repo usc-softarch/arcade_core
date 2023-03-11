@@ -1,9 +1,14 @@
 package edu.usc.softarch.util;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class Terminal {
+	private static Instant lastMessage = Instant.MIN;
+	public static long period = 10;
+
 	public enum Level {
 		OFF (null),
 		WARN ("\u001B[31m"),
@@ -27,12 +32,17 @@ public class Terminal {
 		if (level == Level.OFF) return;
 
 		LocalTime time = LocalTime.now();
+
 		System.out.println(dtf.format(time) + ": " + message);
 	}
 
-	public static void timePrint(String message, Level messageLevel) {
-		if (messageLevel.compareTo(level) > 0) return;
+	public static synchronized void timePrint(
+			String message, Level messageLevel) {
+		if ((messageLevel.compareTo(level) > 0)
+				|| Duration.between(lastMessage, Instant.now()).getSeconds() < period)
+			return;
 
+		lastMessage = Instant.now();
 		LocalTime time = LocalTime.now();
 		System.out.println(messageLevel.colorMessage(
 			dtf.format(time) + ": " + message));
