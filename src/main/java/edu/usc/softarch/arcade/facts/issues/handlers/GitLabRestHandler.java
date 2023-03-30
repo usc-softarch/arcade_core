@@ -261,6 +261,7 @@ public class GitLabRestHandler {
 				case "_links":
 				case "references":
 				case "closed_by":
+				case "task_status":
 				case "assignee":
 					skipToNextField(parser);
 					break;
@@ -423,6 +424,8 @@ public class GitLabRestHandler {
 				case "head_pipeline":
 				case "diff_refs":
 				case "merge_error":
+				case "detailed_merge_status":
+				case "squash_on_merge":
 				case "user":
 					skipToNextField(parser);
 					break;
