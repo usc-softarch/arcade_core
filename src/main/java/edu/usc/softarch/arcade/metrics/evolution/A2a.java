@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import edu.usc.softarch.arcade.clustering.data.ReadOnlyArchitecture;
@@ -76,22 +75,14 @@ public class A2a {
 		this.a2a = -1;
 		this.sourceClusters = ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		this.targetClusters = ReadOnlyArchitecture.readFromRsf(targetRsf);
-		try {
-			RenameFixer.fix(this.sourceClusters, this.targetClusters);
-		} catch (ExecutionException | InterruptedException e) {
-			throw new RuntimeException(e); //TODO handle it
-		}
+		RenameFixer.fix(this.sourceClusters, this.targetClusters);
 	}
 
 	public A2a(File sourceRsf, File targetRsf) throws IOException {
 		this.a2a = -1;
 		this.sourceClusters = ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		this.targetClusters = ReadOnlyArchitecture.readFromRsf(targetRsf);
-		try {
-			RenameFixer.fix(this.sourceClusters, this.targetClusters);
-		} catch (ExecutionException | InterruptedException e) {
-			throw new RuntimeException(e); //TODO handle it
-		}
+		RenameFixer.fix(this.sourceClusters, this.targetClusters);
 	}
 
 	public A2a(ReadOnlyArchitecture sourceRa, ReadOnlyArchitecture targetRa) {

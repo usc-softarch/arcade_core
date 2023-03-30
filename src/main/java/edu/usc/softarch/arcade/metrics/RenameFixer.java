@@ -10,7 +10,6 @@ import edu.usc.softarch.util.matrix.FastMatrix;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 public class RenameFixer {
 	static class RFCalculator implements CellValueCalculator<String, Short> {
@@ -42,8 +41,7 @@ public class RenameFixer {
 		}
 	}
 
-	public static void fix(ReadOnlyArchitecture ra1, ReadOnlyArchitecture ra2)
-			throws ExecutionException, InterruptedException {
+	public static void fix(ReadOnlyArchitecture ra1, ReadOnlyArchitecture ra2) {
 		// Remove the matched entites from the analysis
 		EnhancedSet<String> sourceEntities = ra1.getEntities();
 		EnhancedSet<String> targetEntities = ra2.getEntities();

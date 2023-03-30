@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -150,7 +149,7 @@ public class SystemMetrics implements JsonSerializable {
 							archFiles.get(finalI).getAbsolutePath(),
 							archFiles.get(finalJ).getAbsolutePath(), null);
 						this.mojoFm[finalI][finalJ - finalI - 1] = mojoCalc.mojofm();
-					} catch (IOException | ExecutionException | InterruptedException e) {
+					} catch (IOException e) {
 						e.printStackTrace();
 						throw new RuntimeException(e);
 					}

@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 public class Cvg {
 	//region PUBLIC INTERFACE
@@ -58,11 +57,7 @@ public class Cvg {
 			double lowerSimThreshold, double upperSimThreshold) {
 		this.sourceArch = sourceArch;
 		this.targetArch = targetArch;
-		try {
-			RenameFixer.fix(this.sourceArch, this.targetArch);
-		} catch (ExecutionException | InterruptedException e) {
-			throw new RuntimeException(e); //TODO handle it
-		}
+		RenameFixer.fix(this.sourceArch, this.targetArch);
 		this.sourceMatches = new HashSet<>();
 		this.targetMatches = new HashSet<>();
 		this.cvgSourceToTarget = 0.0;

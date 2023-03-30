@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class WeightedEdgeA2a {
@@ -85,11 +84,7 @@ public class WeightedEdgeA2a {
 			ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		ReadOnlyArchitecture targetClusters =
 			ReadOnlyArchitecture.readFromRsf(targetRsf);
-		try {
-			RenameFixer.fix(sourceClusters, targetClusters);
-		} catch (ExecutionException | InterruptedException e) {
-			throw new RuntimeException(e); //TODO handle it
-		}
+		RenameFixer.fix(sourceClusters, targetClusters);
 		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
 		this.matches =
 			new McfpDriver(sourceClusters, targetClusters).getMatchSet();
@@ -115,11 +110,7 @@ public class WeightedEdgeA2a {
 			ReadOnlyArchitecture.readFromRsf(sourceRsf);
 		ReadOnlyArchitecture targetClusters =
 			ReadOnlyArchitecture.readFromRsf(targetRsf);
-		try {
-			RenameFixer.fix(sourceClusters, targetClusters);
-		} catch (ExecutionException | InterruptedException e) {
-			throw new RuntimeException(e); //TODO handle it
-		}
+		RenameFixer.fix(sourceClusters, targetClusters);
 		this.cvg = new Cvg(sourceClusters, targetClusters, simThreshold, 1.0);
 		this.matches = driver.getMatchSet();
 		this.sourceGraph = sourceClusters.buildWeightedGraph(sourceDeps, true);
