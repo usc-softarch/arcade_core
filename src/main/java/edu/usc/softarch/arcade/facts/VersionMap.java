@@ -1,6 +1,7 @@
 package edu.usc.softarch.arcade.facts;
 
 import edu.usc.softarch.arcade.util.FileUtil;
+import edu.usc.softarch.arcade.util.Version;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,7 +38,7 @@ public class VersionMap extends HashMap<String, File> {
 			String fileName = file.getName();
 			if (!fileName.contains(extension)) continue;
 
-			String version = FileUtil.extractVersion(null, fileName);
+			String version = (new Version(fileName)).versionValue;
 
 			if (version == null)
 				throw new IllegalArgumentException("Could not match version scheme "

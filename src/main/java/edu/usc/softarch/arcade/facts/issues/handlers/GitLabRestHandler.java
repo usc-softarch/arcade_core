@@ -267,10 +267,11 @@ public class GitLabRestHandler {
 					break;
 				// Unknown purpose fields
 				case "milestone":
-					String milestone = parser.getText();
-					if (!milestone.equals("null"))
-						throwLocalException("New milestone identified: "
-							+ milestone + ", in issue ID: "	+ issueBuilder.id);
+					skipToNextField(parser);
+//					String milestone = parser.getText();
+//					if (!milestone.equals("null"))
+//						throwLocalException("New milestone identified: "
+//							+ milestone + ", in issue ID: "	+ issueBuilder.id);
 					break;
 				case "issue_type":
 					String issueType = parser.getText();
@@ -291,10 +292,11 @@ public class GitLabRestHandler {
 							+ issueBuilder.type + ", in issue ID: " + issueBuilder.id);
 					break;
 				case "weight":
-					String weight = parser.getText();
-					if (!weight.equals("null"))
-						throwLocalException("New weight identified: "
-							+ weight + ", in issue ID: " + issueBuilder.id);
+					skipToNextField(parser);
+//					String weight = parser.getText();
+//					if (!weight.equals("null"))
+//						throwLocalException("New weight identified: "
+//							+ weight + ", in issue ID: " + issueBuilder.id);
 					break;
 				case "epic":
 					String epic = parser.getText();
@@ -431,10 +433,11 @@ public class GitLabRestHandler {
 					break;
 				// Unknown purpose fields
 				case "milestone":
-					String milestone = parser.getText();
-					if (!milestone.equals("null"))
-						throwLocalException("New milestone identified: "
-							+ milestone	+ ", in issue ID: " + commitBuilder.id);
+//					String milestone = parser.getText();
+//					if (!milestone.equals("null"))
+//						throwLocalException("New milestone identified: "
+//							+ milestone	+ ", in issue ID: " + commitBuilder.id);
+					skipToNextField(parser);
 					break;
 				// Useful fields
 				case "iid":
