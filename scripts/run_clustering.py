@@ -111,7 +111,7 @@ def validate_results_single(system_name: str, version: str):
 
   return result
 			
-def run_clusterer(project_name: str, project_version: str, language: str, measure: str, algorithm: str):
+def run_clusterer(project_name: str, project_version: str, language: str, measure: str, algorithm: str, memory: str):
   """
   Runs the Clusterer interface for the specified project version.
 
@@ -125,7 +125,7 @@ def run_clusterer(project_name: str, project_version: str, language: str, measur
     - reassign_version (bool, optional): Whether to reassign version of the DocTopics for ARC.
   """
   command = (
-    f"java -Xmx8g -cp ARCADE_Core.jar "
+    f"java -Xmx{memory}g -cp ARCADE_Core.jar "
     f"edu.usc.softarch.arcade.clustering.Clusterer "
     f"algo={algorithm} "
     f"language={language} "
@@ -142,7 +142,7 @@ def run_clusterer(project_name: str, project_version: str, language: str, measur
   time_print(f"Running {algorithm} on {project_name}-{project_version}.")
   subprocess.run(shlex.split(command))
 
-def run_structural(project_name: str, project_version: str, language: str, measure: str, algorithm: str):
+def run_structural(project_name: str, project_version: str, language: str, measure: str, algorithm: str, memory: str):
   """
   Runs a structural clustering algorithm (Limbo or WCA) for the specified project.
 
@@ -154,9 +154,9 @@ def run_structural(project_name: str, project_version: str, language: str, measu
     - measure (str): The similarity measure to use with the algorithm.
     - algorithm (str): The clustering algorithm to use.
   """
-  run_clusterer(project_name, project_version, language, measure, algorithm)
+  run_clusterer(project_name, project_version, language, measure, algorithm, memory)
   
-def run_arc(project_name: str, project_version: str, language: str, measure: str):
+def run_arc(project_name: str, project_version: str, language: str, measure: str, memory: str):
   """
   Runs the ARC clustering algorithm for the specified project.
 
@@ -167,7 +167,7 @@ def run_arc(project_name: str, project_version: str, language: str, measure: str
     - language (str): The programming language of the project.
     - measure (str): The similarity measure to use with arc.
   """
-  run_clusterer(project_name, project_version, language, measure, "arc")
+  run_clusterer(project_name, project_version, language, measure, "arc", memory)
 
 def run_acdc(project_name: str, project_version: str):
   """
@@ -211,7 +211,7 @@ def run_pkg(project_name: str, project_version: str, language: str):
   for entry in glob.glob(f"{CLUSTERS_ROOT}/{project_name}/pkg/{project_version}/{project_name}-{project_version}_PKG*_clusters.rsf"):
     shutil.move(entry, f"{CLUSTERS_ROOT}/{project_name}/pkg/{project_version}/{project_name}-{project_version}_PKG_clusters.rsf")
 
-def run_all(project_name: str, project_version: str, language: str):
+def run_all(project_name: str, project_version: str, language: str, memory: str):
   """
   Runs all clustering algorithms for a single version of a system.
 
@@ -222,13 +222,13 @@ def run_all(project_name: str, project_version: str, language: str):
     - language (str): The programming language of the project.
   """
   run_acdc(project_name, project_version)
-  run_arc(project_name, project_version, language, "js")
-  run_structural(project_name, project_version, language, "il", "limbo")
+  run_arc(project_name, project_version, language, "js", memory)
+  run_structural(project_name, project_version, language, "il", "limbo", memory)
   run_pkg(project_name, project_version, language)
   if (not validate_results_single(project_name, project_version)):
     sys.exit(1)
 
-def cluster_system(system_name: str, language: str):
+def cluster_system(system_name: str, language: str, memory: str):
   """
   Clusters the specified system for all available versions.
 
@@ -247,7 +247,7 @@ def cluster_system(system_name: str, language: str):
     version = version.replace("_deps.rsf", "")
 
     time_print(f"Starting clustering for {system_name}-{version}.")
-    run_all(system_name, version, language)
+    run_all(system_name, version, language, memory)
     print()
 
   if (validate_results(system_name)):
@@ -258,5 +258,9 @@ def cluster_system(system_name: str, language: str):
 
 system_name = sys.argv[1]
 language = sys.argv[2]
+if len(sys.argv) > 3:
+    memory = sys.argv[3]
+else:
+    memory = "4"
 
-cluster_system(system_name, language)
+cluster_system(system_name, language, memory)
