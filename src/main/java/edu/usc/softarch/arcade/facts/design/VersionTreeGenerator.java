@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class VersionTreeGenerator {
@@ -19,6 +20,8 @@ public class VersionTreeGenerator {
 
 		for (File archFile : archFiles)
 			versions.add(new Version(archFile.getName()));
+
+		Collections.sort(versions);
 
 		try (FileWriter writer = new FileWriter(outputPath)) {
 			for (int i = 1; i < versions.size(); i++)
