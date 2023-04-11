@@ -7,7 +7,7 @@ from constants import FACTS_ROOT, SUBJECT_SYSTEMS_ROOT, STOPWORDS_DIR_PATH, time
 
 def gen_doc_topics(project_name: str, artifacts_path: str):
   time_print("Generating DocTopics.")
-  subprocess.run(["java", "-Xmx8g", "-cp", "ARCADE_Core.jar", "edu.usc.softarch.arcade.topics.DocTopics", "mode=generate", f"artifacts={artifacts_path}", f"project={project_name}", "filelevel=true"])
+  subprocess.run(["java", "-Xmx8g", "-cp", "ARCADE_Core.jar", "edu.usc.softarch.arcade.topics.DocTopics", "mode=generate", f"artifacts={artifacts_path}", f"project={project_name}", "filelevel=true", "overwrite=true"])
 
 def run_understand(system_name: str, version: str, language: str):
   """

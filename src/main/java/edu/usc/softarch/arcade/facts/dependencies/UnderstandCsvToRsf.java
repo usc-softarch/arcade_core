@@ -37,7 +37,9 @@ public class UnderstandCsvToRsf {
 				if (!from.contains(projectRootName) || !to.contains(projectRootName))
 					continue; // Skip unrelated dependencies
 
-				if (from.endsWith(".xpm") || to.endsWith(".xpm"))
+				if (from.endsWith(".xpm") || to.endsWith(".xpm") ||
+						from.endsWith(".txt") || to.endsWith(".txt") ||
+						from.endsWith(".cP") || to.endsWith(".cP"))
 					continue; // Skip XPM files
 
 				if (fileLevel) {
