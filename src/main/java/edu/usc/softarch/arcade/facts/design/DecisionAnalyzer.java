@@ -43,17 +43,23 @@ public class DecisionAnalyzer {
 
 		for (Change<String> change : changes) {
 			EnhancedSet<String> addedFiles = new EnhancedHashSet<>(
-				issue.getFileChanges().stream()
-					.map(Map.Entry::getValue).collect(Collectors.toList()));
+				issue.getFileChanges().stream().map(Map.Entry::getValue)
+					.map(x -> x.replace("\\", "/"))
+					.collect(Collectors.toList()));
 			EnhancedSet<String> addedChanges =
-				new EnhancedHashSet<>(change.getAddedElements());
+				new EnhancedHashSet<>(change.getAddedElements().stream()
+					.map(x -> x.replace("\\", "/"))
+					.collect(Collectors.toList()));
 			addedElements.addAll(addedFiles.intersection(addedChanges));
 
 			EnhancedSet<String> removedFiles = new EnhancedHashSet<>(
-				issue.getFileChanges().stream()
-					.map(Map.Entry::getKey).collect(Collectors.toList()));
+				issue.getFileChanges().stream().map(Map.Entry::getKey)
+					.map(x -> x.replace("\\", "/"))
+					.collect(Collectors.toList()));
 			EnhancedSet<String> removedChanges =
-				new EnhancedHashSet<>(change.getRemovedElements());
+				new EnhancedHashSet<>(change.getRemovedElements().stream()
+					.map(x -> x.replace("\\", "/"))
+					.collect(Collectors.toList()));
 			removedElements.addAll(removedFiles.intersection(removedChanges));
 		}
 
