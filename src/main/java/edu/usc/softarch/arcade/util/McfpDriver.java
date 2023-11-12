@@ -60,7 +60,8 @@ public class McfpDriver {
 
 		for (Map.Entry<String, ReadOnlyCluster> cluster1 : arch1.entrySet()) {
 			// Create vertex for the source cluster
-			String vertex1 = "source_" + cluster1.getKey();
+			validateClusterName("source_202311111800_", cluster1.getKey());
+			String vertex1 = "source_202311111800_" + cluster1.getKey();
 			graph.addVertex(vertex1);
 
 			//Create edge from source to new vertex1
@@ -72,7 +73,8 @@ public class McfpDriver {
 					cluster1.getValue().symmetricDifferenceSize(cluster2.getValue());
 
 				// Create vertex for the target cluster
-				String vertex2 = "target_" + cluster2.getKey();
+				validateClusterName("target_202311111800_", cluster2.getKey());
+				String vertex2 = "target_202311111800_" + cluster2.getKey();
 				if (firstPass) {
 					graph.addVertex(vertex2);
 					// Create edge to sink if it's the first pass
@@ -124,8 +126,8 @@ public class McfpDriver {
 		Map<String, String> result = new HashMap<>();
 
 		for (DefaultWeightedEdge edge : changeSet) {
-			String source = graph.getEdgeSource(edge).replace("source_", "");
-			String target = graph.getEdgeTarget(edge).replace("target_", "");
+			String source = graph.getEdgeSource(edge).replace("source_202311111800_", "");
+			String target = graph.getEdgeTarget(edge).replace("target_202311111800_", "");
 			result.put(source, target);
 		}
 
@@ -140,6 +142,25 @@ public class McfpDriver {
 
 		for (int i = 0; i < dummyCount; i++)
 			smallerArch.put("dummy" + i, new ReadOnlyCluster("dummy" + i));
+	}
+	/**
+	 * Validate the original name from the project to avoid crashing with the appended prefix in this class.
+	 * E.g, if there is a identical string in the original name of the cluster, the replacement in the bottom of this file will replace the original one in additional to the following appended prefix.
+	 *
+	 * @param prefix The appended prefix in this class.
+	 * @param clusterName The cluster name.
+	 * @return void
+	 */
+	private void validateClusterName(
+			String prefix, String clusterName) {
+
+		try {
+			if (clusterName.contains(prefix)){
+				throw new Exception("Cluster names matches the appended prefix in the ARCADE source code.");
+			}
+		} catch (Exception e) {
+			System.out.println("Exception caught: " + e.getMessage());
+		}
 	}
 	//endregion
 }
