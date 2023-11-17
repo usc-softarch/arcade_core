@@ -299,8 +299,23 @@ def plot_sequence_versions_temp(system_name: str, algo: str, sequence_type: str)
 
   plt.savefig(f"{METRICS_ROOT}/{system_name}/{algo}/a2a{sequence_type}_temp5.png")
   plt.close()
+  
+# CLI arguments, an array
+print("Please give the system name (E.g., 'graphviz")
+print("E.g., 'python smellToCSV.py .graphviz'")
+args = sys.argv
 
-plot_sequence_versions_temp("qbittorrent", "acdc", "Minor")
-plot_sequence_versions_temp("qbittorrent", "arc", "Minor")
-plot_sequence_versions_temp("qbittorrent", "limbo", "Minor")
-plot_sequence_versions_temp("qbittorrent", "pkg", "Minor")
+# print the arguments
+print("Number of arguments:", len(args))
+print("The arguments are:", str(args))
+
+if len(args) == 1:
+    system_name = "graphviz"  # Replace with the path to your specific system
+else:
+    system_name = args[1]
+
+run_all(system_name)
+plot_sequence_versions_temp(system_name, "acdc", "Minor")
+plot_sequence_versions_temp(system_name, "arc", "Minor")
+plot_sequence_versions_temp(system_name, "limbo", "Minor")
+plot_sequence_versions_temp(system_name, "pkg", "Minor")
