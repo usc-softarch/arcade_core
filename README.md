@@ -22,7 +22,7 @@ ARCADE Core is a fork of [ARCADE](https://bitbucket.org/joshuaga/arcade) contain
 
 [**Dr. Duc Minh Le**](https://lemduc.github.io/) is a major contributor to ARCADE, and is responsible for much of its smell detection components.
 
-**Marcelo Schmitt Laser** is the current maintainer of ARCADE, and creator of ARCADE Core.
+[**Marcelo Schmitt Laser**](https://www.linkedin.com/in/marcelo-schmitt-laser/) is the current maintainer of ARCADE, and creator of ARCADE Core.
 
 [**Daye Nam**](https://dayenam.com/) is the creator of [EVA](https://github.com/namdy0429/EVA), a visualization tool that utilizes ARCADE's results to create graphical presentations of architectural information.
 
@@ -48,7 +48,7 @@ ARCADE Core is a fork of [ARCADE](https://bitbucket.org/joshuaga/arcade) contain
 
 ### Get System Source Code from Repositories
 
-Get project sources for different versions: <https://github.com/milvio123/Scraping-Tool>. The script doesn't require any CLI/Bash parameters. Instead, it reads project URL input on running and grab zip files for all versions of the target project.
+Get project sources for different versions: <https://github.com/milvio123/Scraping-Tool>. The script doesn't require any CLI/Bash parameters. Instead, it reads project URL input on running and grab zip files for all versions of the target project. This tool provided for use with ARCADE by [Vidhi Shah](https://github.com/milvio123).
 
 ### Setting up Environment
 
