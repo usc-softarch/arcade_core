@@ -42,28 +42,55 @@ ARCADE Core is a fork of [ARCADE](https://bitbucket.org/joshuaga/arcade) contain
 
 ### Building ARCADE with Maven
 
-- ```mvn clean``` first
-- ```mvn package -Dmaven.test.skip=true ```(This Should be run in pure CMD instead of PowerShell. It will fail in PowerShell, but the reason is not clear.)
-- Rename the built jar file to **ARCADE_Core.jar**.
+- ```mvn clean``` first: This is required to set up the Maven environment on the local machine. Installation of a few dependency packages to the local environment is bound to the clean phase. Failure to run this will result in missing dependencies.
+- ```mvn package "-Dmaven.test.skip=true" ```: Make sure to include the quotation marks around the final argument when running on PowerShell. Due to the way PowerShell parses strings, this command will fail without them.
+- Rename the built jar file to **ARCADE_Core.jar**: The scripts are hardcoded to expect this filename, for simplicity's sake.
 
 ### Get System Source Code from Repositories
 
 Get project sources for different versions: <https://github.com/milvio123/Scraping-Tool>. The script doesn't require any CLI/Bash parameters. Instead, it reads project URL input on running and grab zip files for all versions of the target project.
 
-### Set Environment Variables
+### Setting up Environment
 
-The project folder should be in the data folder, which should be consistent with the one in the **constant.py**. 
-A top-level folder should be named after the project and the sub-directories should be different versions of that project. 
-E.g., An component in a project should be in "data/projects/project_name/version_tag/component_name". 
-And again, the version tags should match the regular expression in the code below.
+The ARCADE scripts are set up to simplify execution, so they expect a few hardcoded structures to function:
+
+- First, create a directory in which to "install" ARCADE; we'll call this the ARCADE directory. This directory should be structured as follows:
+
+```
+ARCADE
+|- ARCADE_Core.jar
+|- constants.py
+|- detect_smells.py
+|- dir_cleaner.py
+|- extract_facts.py
+|- extract_metrics.py
+|- plotter.py
+|- run_clustering.py
+|- stopwords
+|- subject_systems
+```
+
+- All python scripts can be found under ```scripts```.
+- The ```stopwords``` directory should contain the stopword files used to run Mallet, one of the requirements of ARCADE. The stopword files can be found in the repository under ```src\main\resources\res```.
+- The ```subject_systems``` directory should contain all of the subject systems one wishes to analyze. It should be structured as follows:
+
+```
+subject_systems
+|- system1
+   |- version1
+   |- version2
+|- system2
+   |- version1
+   |- version2
+```
 
 ### Rename the Version Folders
 
-**renamer.py**: Rename the version folders to match the regex. This is for source code. This file is [here](\scripts\ARCADE\renamer.py).
+**renamer.py**: Run renamer.py to ensure all version folder match the required format. The format expected by ARCADE for version folders follows the regex ```(\\d+(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?(-?(alpha(\\d+)?|beta(\\d+)?|rc(\\d+)?|pre(\\d+)?)?))*```. Failure to match this regex may result in, at a minimum, the version being ignored by ARCADE, and at worst, a system crash.
 
 ### Clean Up Testing Modules 
 
-**dir_cleaner.py**: This deletes test-related code. It uses string comparison. In the safe mode, we get the list that will be deleted. It's for double check. After that, we can turn off safe mode. If there is something we don't want to delete, there is another parameter for ignore regex. **Parameters**: system_name (E.g., "graphviz"), safe_mode or not ("on" to check OK or "off" to directly remove the files), and ignored_patterns.
+**dir_cleaner.py**: This uses string comparison to delete unwanted files that may otherwise taint the results of ARCADE, specifically test code that should not be considered as part of the system architecture. Because string comparison is highly prone to error and this is a destructive script, first run it in safe mode: this will create a file listing all file paths that would be deleted. If on manual inspection this list seems correct, you may run it with safe mode off; otherwise, you must identify the file paths that are to be kept and provide string patterns for dir_cleaner to ignore. It is recommended that you run dir_cleaner on safe mode again after providing it with ignore patterns, as this will generate a new deletion list that can be re-inspected. **Parameters**: system_name (E.g., "graphviz"), safe_mode or not ("on" to check OK or "off" to directly remove the files), and ignored_patterns.
 
 ### Extract Facts (Dependencies)
 
