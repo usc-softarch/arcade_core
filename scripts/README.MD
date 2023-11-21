@@ -2,7 +2,7 @@
 
 The python scripts in this directory provide the functionalities to run the analysis in batch.
 
-This document explains, **in the order of execution**, how do each file functions. 
+This document explains how do each file functions and how to use them in a correct order. 
 
 ## Available Python Scripts
 
@@ -94,23 +94,53 @@ python run_clustering.py <system_name> <programming_language> <assigned_memory (
 python run_clustering.py “cassandra” “java” 32
 ```
 
-## detect_smells.py
+## 5. detect_smells.py
 
 Detects architectural smells for **ARC**, **ACDC**, **PKG**, and **Limbo** through
 ```edu.usc.softarch.arcade.antipattern.detection.ArchSmellDetector```
 
-### Command
+### 5.1 Command
 
 ```console
 python detect_smells.py <system_name> 
 ```
 
-### Example
+### 5.2 Example
 
 ```console
 python detect_smells.py “cassandra”
 ```
 
-## extract_metrics.py
+## 6. extract_metrics.py
 
-## plotter.py
+**NOTE: This script has been outdated for a while and lack maintenance. It will be correctly documented after it's updated appropriately.**
+
+
+[extract_metrics.py](scripts\extract_metrics.py) runs **ACDC**, **ARC**, **PKG**, and **Limbo** metric extraction, calling the same java component ```edu.usc.softarch.arcade.metrics.data.SystemMetrics```.
+
+### 6.1 Command
+
+To be added.
+
+### 6.2 Example
+
+To be added.
+
+## 7. plotter.py
+
+
+[plotter.py](scripts\plotter.py) runs visualization to generate first .dot data files and then .svg and .png files. 
+For **ACDC**, **ARC**, **PKG**, and **Limbo**, the script calls the same java component ```edu.usc.softarch.arcade.clustering.RsfToDot```, uses the package ```pydot``` to generate charts.
+However, with **Limbo** and **ARC**, it will additionally call ```ARCADE_Core.jar edu.usc.softarch.arcade.clustering.ClusterMatcher``` to match clusters.
+
+### 7.1 Command
+
+```console
+python plotter.py <system_name>
+```
+
+### 7.2 Example
+
+```console
+python plotter.py “cassandra” 
+```
