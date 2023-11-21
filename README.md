@@ -48,7 +48,7 @@ ARCADE Core is a fork of [ARCADE](https://bitbucket.org/joshuaga/arcade) contain
 
 ### Get System Source Code from Repositories
 
-Get project sources for different versions: <https://github.com/milvio123/Scraping-Tool>. The script doesn't require any CLI/Bash parameters. Instead, it reads project URL input on running and grab zip files for all versions of the target project. This tool provided for use with ARCADE by [Vidhi Shah](https://github.com/milvio123).
+Get project sources for different versions: <https://github.com/milvio123/Scraping-Tool>. The script doesn't require any CLI/Bash parameters. Instead, it reads project URL input on running and grab zip files for all versions of the target project. This tool provided for use with ARCADE by [Vidhi Shah](https://www.linkedin.com/in/vidhi-shah-456754217/).
 
 ### Setting up Environment
 
