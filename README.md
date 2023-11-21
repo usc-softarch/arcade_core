@@ -98,7 +98,7 @@ subject_systems
 
 ### Run Clustering for the Architecture
 
-**run_clustering.py**: This generates input for the most following analysis, including smell detection, metrics generation, and design decisions extraction. Give it as much memory as possible. **Parameters**: system_name ("graphviz"), language (c/java/python) and an integer (GBs) to indicate assigned memory.
+**run_clustering.py**: This step generates the clustering results for the various recovery techniques available in ARCADE. These results are representative architectural models of the subject systems, and serve as inputs for the most following analysis, including smell detection, metrics generation, and design decisions extraction. Give it as much memory as possible. **Parameters**: system_name ("graphviz"), language (c/java/python) and an integer (GBs) to indicate assigned memory.
 
 ### Extract Architectural Design Decisions with RecovAr 
 
