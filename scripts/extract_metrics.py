@@ -9,41 +9,41 @@ from constants import CLUSTERS_ROOT, FACTS_ROOT, METRICS_ROOT, time_print
 def plot_a2a_next_version(system_name: str, algo: str):
   data1 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/a2a.csv")
   data2 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2a.csv")
-  # data3 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2a40.csv")
+  data3 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2a40.csv")
   data4 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2aMin.csv")
   data5 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2a.csv")
-  # data6 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2a40.csv")
+  data6 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2a40.csv")
   data7 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2aMin.csv")
   xaxis = data1[data1.columns[0]][1:]
   yaxis1 = []
   yaxis2 = []
-  # yaxis3 = []
+  yaxis3 = []
   yaxis4 = []
   yaxis5 = []
-  # yaxis6 = []
+  yaxis6 = []
   yaxis7 = []
   for i in range(1, len(data1.columns) - 1):
     yaxis1.append(data1[data1.columns[i]][i])
   for i in range(1, len(data2.columns) - 1):
     yaxis2.append(data2[data2.columns[i]][i])
-  # for i in range(1, len(data3.columns) - 1):
-  #   yaxis3.append(data3[data3.columns[i]][i])
+  for i in range(1, len(data3.columns) - 1):
+    yaxis3.append(data3[data3.columns[i]][i])
   for i in range(1, len(data4.columns) - 1):
     yaxis4.append(data4[data4.columns[i]][i])
   for i in range(1, len(data5.columns) - 1):
     yaxis5.append(data5[data5.columns[i]][i])
-  # for i in range(1, len(data6.columns) - 1):
-  #   yaxis6.append(data6[data6.columns[i]][i])
+  for i in range(1, len(data6.columns) - 1):
+    yaxis6.append(data6[data6.columns[i]][i])
   for i in range(1, len(data7.columns) - 1):
     yaxis7.append(data7[data7.columns[i]][i])
 
   plt.figure(figsize=(20, 8))
   plt.plot(xaxis, yaxis1, label="a2a")
   plt.plot(xaxis, yaxis2, label="edgea2a")
-  # plt.plot(xaxis, yaxis3, label="edgea2a40")
+  plt.plot(xaxis, yaxis3, label="edgea2a40")
   plt.plot(xaxis, yaxis4, label="edgea2aMin")
   plt.plot(xaxis, yaxis5, label="WEa2a")
-  # plt.plot(xaxis, yaxis6, label="WEa2a40")
+  plt.plot(xaxis, yaxis6, label="WEa2a40")
   plt.plot(xaxis, yaxis7, label="WEa2aMin")
   plt.title("a2a variant values between every subsequent version.")
   plt.xlabel("Version")
@@ -63,28 +63,28 @@ def plot_a2a_next_version(system_name: str, algo: str):
 def plot_sequence_versions(system_name: str, algo: str, sequence_type: str):
   data1 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/a2a{sequence_type}.csv")
   data2 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2a{sequence_type}.csv")
-  # data3 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2a40{sequence_type}.csv")
+  data3 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2a40{sequence_type}.csv")
   data4 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2aMin{sequence_type}.csv")
   data5 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2a{sequence_type}.csv")
-  # data6 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2a40{sequence_type}.csv")
+  data6 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2a40{sequence_type}.csv")
   data7 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2aMin{sequence_type}.csv")
 
   x1 = data1[data1.columns[0]]
   y1 = data1[data1.columns[1]]
   y2 = data2[data2.columns[1]]
-  # y3 = data3[data3.columns[1]]
+  y3 = data3[data3.columns[1]]
   y4 = data4[data4.columns[1]]
   y5 = data5[data5.columns[1]]
-  # y6 = data6[data6.columns[1]]
+  y6 = data6[data6.columns[1]]
   y7 = data7[data7.columns[1]]
 
   plt.figure(figsize=(20, 8))
   plt.plot(x1, y1, label="a2a")
   plt.plot(x1, y2, label="edgea2a")
-  # plt.plot(x1, y3, label="edgea2a40")
+  plt.plot(x1, y3, label="edgea2a40")
   plt.plot(x1, y4, label="edgea2aMin")
   plt.plot(x1, y5, label="WEa2a")
-  # plt.plot(x1, y6, label="WEa2a40")
+  plt.plot(x1, y6, label="WEa2a40")
   plt.plot(x1, y7, label="WEa2aMin")
   plt.xlabel("Versions")
   plt.ylabel("Similarity")
@@ -98,41 +98,6 @@ def plot_sequence_versions(system_name: str, algo: str, sequence_type: str):
       plt.hlines(y, xmin=min(x1), xmax=max(x1), linestyle='dotted', colors='gray', alpha=0.5)
 
   plt.savefig(f"{METRICS_ROOT}/{system_name}/{algo}/a2a{sequence_type}.png")
-  plt.close()
-
-def plot_sequence_versions_temp(system_name: str, algo: str, sequence_type: str):
-  data1 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/a2a{sequence_type}.csv")
-  # data2 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2a{sequence_type}.csv")
-  # data4 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2aMin{sequence_type}.csv")
-  # data5 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2a{sequence_type}.csv")
-  # data7 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2aMin{sequence_type}.csv")
-
-  x1 = data1[data1.columns[0]]
-  y1 = data1[data1.columns[1]]
-  # y2 = data2[data2.columns[1]]
-  # y4 = data4[data4.columns[1]]
-  # y5 = data5[data5.columns[1]]
-  # y7 = data7[data7.columns[1]]
-
-  plt.figure(figsize=(20, 8))
-  plt.title(f"{algo}")
-  plt.plot(x1, y1, label="a2a")
-  # plt.plot(x1, y2, label="edgea2a")
-  # plt.plot(x1, y4, label="edgea2aMin")
-  # plt.plot(x1, y5, label="WEa2a")
-  # plt.plot(x1, y7, label="WEa2aMin")
-  plt.xlabel("Versions")
-  plt.ylabel("Similarity")
-  plt.ylim(0, 100)
-  plt.yticks(range(0, 101, 10))
-  plt.xticks(rotation=25)
-  plt.legend()
-
-  if len(x1) > 0:
-    for y in range(0, 101, 10):
-      plt.hlines(y, xmin=min(x1), xmax=max(x1), linestyle='dotted', colors='gray', alpha=0.5)
-
-  plt.savefig(f"{METRICS_ROOT}/{system_name}/{algo}/a2a{sequence_type}_temp1.png")
   plt.close()
 
 def plot_minor_difference(system_name: str, algo: str):
@@ -260,47 +225,4 @@ def run_all(system_name: str):
   print()
   time_print(f"Finished calculating metrics for {system_name}.")
 
-# run_all(sys.argv[1])
-
-def plot_sequence_versions_temp(system_name: str, algo: str, sequence_type: str):
-  data1 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/a2a{sequence_type}.csv")
-  data2 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2a{sequence_type}.csv")
-  data4 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/edgea2aMin{sequence_type}.csv")
-  # data5 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2a{sequence_type}.csv")
-  data7 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/weightedEdgea2aMin{sequence_type}.csv")
-  data8 = pandas.read_csv(f"{METRICS_ROOT}/{system_name}/{algo}/cvg{sequence_type}.csv")
-
-  x1 = data1[data1.columns[0]]
-  y1 = data1[data1.columns[1]]
-  y2 = data2[data2.columns[1]]
-  y4 = data4[data4.columns[1]]
-  # y5 = data5[data5.columns[1]]
-  y7 = data7[data7.columns[1]]
-  y8 = data8[data8.columns[1]] * 100
-
-  plt.figure(figsize=(20, 8))
-  plt.title(f"{algo}")
-  plt.plot(x1, y1, label="a2a")
-  plt.plot(x1, y8, label="Forwards CVG")
-  plt.plot(x1, y4, label="edgea2a")
-  plt.plot(x1, y7, label="WEa2a")
-  plt.plot(x1, y2, label="edgea2a_cvg")
-  # plt.plot(x1, y5, label="WEa2a_cvg")
-  plt.xlabel("Versions")
-  plt.ylabel("Similarity")
-  plt.ylim(0, 100)
-  plt.yticks(range(0, 101, 10))
-  plt.xticks(rotation=25)
-  plt.legend()
-
-  if len(x1) > 0:
-    for y in range(0, 101, 10):
-      plt.hlines(y, xmin=min(x1), xmax=max(x1), linestyle='dotted', colors='gray', alpha=0.5)
-
-  plt.savefig(f"{METRICS_ROOT}/{system_name}/{algo}/a2a{sequence_type}_temp5.png")
-  plt.close()
-
-plot_sequence_versions_temp("qbittorrent", "acdc", "Minor")
-plot_sequence_versions_temp("qbittorrent", "arc", "Minor")
-plot_sequence_versions_temp("qbittorrent", "limbo", "Minor")
-plot_sequence_versions_temp("qbittorrent", "pkg", "Minor")
+run_all(sys.argv[1])
