@@ -29,7 +29,6 @@ Here are the fine-grained catalog for the architectural smells that can be detec
 | Scattered Parasitic Funct. (**spf**) | Multiple components responsible for realizing one concern | Changing a feature modifies multiple system parts |
 | Concern Overload (**bco**) | Component implements an excessive number of concerns | Violates separation of concerns |
 
-
 ### 1.2 Additional Notes
 
 For further information about these architectural smells, please see [here](https://dl.acm.org/doi/10.1145/3368089.3417941).
@@ -49,15 +48,37 @@ WIP
 
 ### 2.2 [./Smell.java](./Smell.java)
 
-This class define the basic data structure of "Smell" with following attributes, and provide methods to serialization/deserialzation from and to JSON format:
+Class ```Smell``` define the basic data structure of "Smell" with following attributes, and provide methods to serialization/deserialzation from and to JSON format:
 - **clusters**: The clusters matches the output of the clusterer. Each one in the output means there is a smell detected in the cluster.
 - **smellType**: The smell type can be either of the four bold types in [Section 1.1](./README.MD/#11-table-for-architectural-smells-in-arcade).
 - **topicNum**: The topicNum in smells doesn't have a real meaning. It's only indicates that this data entity is a smell, with a fixed value "-1".
 
 ### 2.3 [./SmellCollection.java](./SmellCollection.java)
 
+Class ```SmellCollection``` extends ```HashSet``` and provides basic methods and JSON serialization/deserialization methods.
+
+## 3. Detection
+
+### 3.1 [ArchSmellDetector.java](./detection/ArchSmellDetector.java)
+
+
+
+### 3.2 [SmellToIssuesCorrelation.java](./detection/SmellToIssuesCorrelation.java)
+
 WIP
 
-# 3.
+### 3.3 [Concern-based Smells](./detection/concern/)
+
+WIP
+
+### 3.4 [Coupling Smells](./detection/coupling/)
+
+WIP
+
+### 3.5 [Dependency Smell](./detection/dependency/)
+
+WIP
+
+### 3.6 [Interface-based Smells](./detection/interfacebased/)
 
 WIP
