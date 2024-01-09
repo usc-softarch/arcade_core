@@ -1,5 +1,11 @@
 # Architectural Smell/Anti-pattern
 
+This document presents the smell detection part of ARCADE.
+It was structured with four sections:
+- [Section 1](./README.MD/#1-overview-of-architectural-smell-detection-in-arcade): Overview of the smell detection in ARCADE
+- [Section 2](./README.MD/#2-interface-and-data-structure-to-access-smell-detection-wip): Interfaces to access detection
+- [Section 3](./README.MD/#3-smell-detection-wip): Detection of different types of architectural smells
+
 ## 1. Overview of Architectural Smell Detection in ARCADE
 
 Different from code smells, architectural smells are at structure level of a system rather than code-level.
@@ -29,56 +35,63 @@ Here are the fine-grained catalog for the architectural smells that can be detec
 | Scattered Parasitic Funct. (**spf**) | Multiple components responsible for realizing one concern | Changing a feature modifies multiple system parts |
 | Concern Overload (**bco**) | Component implements an excessive number of concerns | Violates separation of concerns |
 
-### 1.2 Additional Notes
+### 1.2 Additional Notes on Architectural Smells
 
 For further information about these architectural smells, please see [here](https://dl.acm.org/doi/10.1145/3368089.3417941).
 
 The auto-run script in [detect_smells.py](../../../../../../../../scripts/detect_smells.py) only give the four types of smells that are bold in the table above.
 The reason for this is that the detection for other types of smells only work for Java projects.
 
-## 2. Detection Code Structure
+## 2. Interface and Data Structure to Access Smell Detection \[WIP\]
 
-- [./detection](./detection/)
+The ARCADE architectural smell detection code under directory [antipattern](./) consists of a subdirectory [./detection](./detection/) and two top level interface files to access detection:
+
 - [./Smell.java](./Smell.java)
 - [./SmellCollection.java](./SmellCollection.java)
 
-### 2.1 [./detection](./detection/)
-
-WIP
-
-### 2.2 [./Smell.java](./Smell.java)
+### 2.1 [./Smell.java](./Smell.java)
 
 Class ```Smell``` define the basic data structure of "Smell" with following attributes, and provide methods to serialization/deserialzation from and to JSON format:
 - **clusters**: The clusters matches the output of the clusterer. Each one in the output means there is a smell detected in the cluster.
 - **smellType**: The smell type can be either of the four bold types in [Section 1.1](./README.MD/#11-table-for-architectural-smells-in-arcade).
 - **topicNum**: The topicNum in smells doesn't have a real meaning. It's only indicates that this data entity is a smell, with a fixed value "-1".
 
-### 2.3 [./SmellCollection.java](./SmellCollection.java)
+### 2.2 [./SmellCollection.java](./SmellCollection.java)
 
 Class ```SmellCollection``` extends ```HashSet``` and provides basic methods and JSON serialization/deserialization methods.
 
-## 3. Detection
+## 2.3 Detection and Analysis
 
-### 3.1 [ArchSmellDetector.java](./detection/ArchSmellDetector.java)
+The subdirectory [./detection](./detection/) under [antipattern](.) contains code to detect different types of smells listed in section [1.1](./README.MD/#11-table-for-architectural-smells-in-arcade).
+
+The code consist of two top level interfaces:
+
+- [ArchSmellDetector.java](./detection/ArchSmellDetector.java)
+- [SmellToIssuesCorrelation.java](./detection/SmellToIssuesCorrelation.java)
 
 
-
-### 3.2 [SmellToIssuesCorrelation.java](./detection/SmellToIssuesCorrelation.java)
-
-WIP
-
-### 3.3 [Concern-based Smells](./detection/concern/)
-
-WIP
-
-### 3.4 [Coupling Smells](./detection/coupling/)
+### 2.4 [ArchSmellDetector.java](./detection/ArchSmellDetector.java)
 
 WIP
 
-### 3.5 [Dependency Smell](./detection/dependency/)
+### 2.5 [SmellToIssuesCorrelation.java](./detection/SmellToIssuesCorrelation.java)
 
 WIP
 
-### 3.6 [Interface-based Smells](./detection/interfacebased/)
+## 3. Smell Detection \[WIP\]
+
+### 3.1 [Concern-based Smells](./detection/concern/)
+
+WIP
+
+### 3.2 [Coupling Smells](./detection/coupling/)
+
+WIP
+
+### 3.3 [Dependency Smell](./detection/dependency/)
+
+WIP
+
+### 3.4 [Interface-based Smells](./detection/interfacebased/)
 
 WIP
