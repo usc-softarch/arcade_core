@@ -5,6 +5,8 @@ import edu.usc.softarch.util.Terminal;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO: The arguments are forced to lower cases which causes problems when parsing versions for projects like struts which have upper case version tags.
+
 public class CLI {
 	public static Map<String, String> parseArguments(String[] args) {
 		Map<String, String> result = new HashMap<>();
@@ -24,8 +26,14 @@ public class CLI {
 			}
 
 			// Argument is a value
-			if (arg.contains("=")) {
-				String[] argKeyValue = arg.toLowerCase().split("=");
+			if (arg.contains("=")){
+				String[] argKeyValue = null;
+				if(arg.contains("projversion") || arg.contains("deps") || arg.contains("projpath")){
+					argKeyValue = arg.split("=");
+				}
+				else{
+					argKeyValue = arg.toLowerCase().split("=");
+				}
 
 				// Message level argument
 				if (argKeyValue[0].equals("messagelevel"))
