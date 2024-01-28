@@ -321,8 +321,8 @@ public class GitLabRestHandler {
 					break;
 				// Unknown field
 				default:
-					throwLocalException("New field identified: "
-						+ fieldName + ", in issue ID: " + issueBuilder.id);
+					// skip new field rather than throwing an exception.
+					skipToNextField(parser);
 			}
 		}
 
@@ -461,8 +461,7 @@ public class GitLabRestHandler {
 					break;
 				// Unknown field
 				default:
-					throwLocalException("New field identified: " + fieldName
-						+ ", in issue ID: " + commitBuilder.id);
+					skipToNextField(parser);
 			}
 		}
 
@@ -531,8 +530,7 @@ public class GitLabRestHandler {
 					break;
 				// Unknown field
 				default:
-					throwLocalException("New field identified: " + fieldName
-						+ ", in issue ID: " + idForError);
+					skipToNextField(parser);
 			}
 		}
 
@@ -578,8 +576,7 @@ public class GitLabRestHandler {
 					break;
 				// Unknown field
 				default:
-					throwLocalException("New field identified: " + fieldName
-						+ ", in issue ID: " + shaForError);
+					skipToNextField(parser);
 			}
 		}
 
