@@ -9,6 +9,8 @@ import edu.usc.softarch.arcade.facts.issues.IssueRecord;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
 import edu.usc.softarch.util.json.EnhancedJsonParser;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -16,77 +18,74 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-public class GitLabRestHandler {
+public class GitHubRestHandler {
 	//region EXCEPTION HANDLING
-	public class GitLabRestHandlerException extends Exception {
-		GitLabRestHandlerException(String message, int requestCounter,
+	public class GitHubRestHandlerException extends Exception {
+		GitHubRestHandlerException(String message, int requestCounter,
 								   int issueCounter, String projectId) {
-			super("GitLabRestHandler failed to recover issues "
-					+ "for project with ID " + projectId + " after processing "
-					+ issueCounter + " issues and with a total of " + requestCounter
-					+ " HTTP requests sent. Please report this exception."
-					+ " Local exception message was: " + message);
+			super("GitHubRestHandler failed to recover issues "
+				+ "for project with ID " + projectId + " after processing "
+				+ issueCounter + " issues and with a total of " + requestCounter
+				+ " HTTP requests sent. Please report this exception."
+				+ " Local exception message was: " + message);
 		}
 
-		GitLabRestHandlerException(String message, int requestCounter,
+		GitHubRestHandlerException(String message, int requestCounter,
 								   int issueCounter, String projectId, Exception cause) {
-			super("GitLabRestHandler failed to recover issues "
-					+ "for project with ID " + projectId + " after processing "
-					+ issueCounter + " issues and with a total of " + requestCounter
-					+ " HTTP requests sent. Please report this exception." +
-					" Local exception message was: " + message, cause);
+			super("GitHubRestHandler failed to recover issues "
+				+ "for project with ID " + projectId + " after processing "
+				+ issueCounter + " issues and with a total of " + requestCounter
+				+ " HTTP requests sent. Please report this exception." +
+				" Local exception message was: " + message, cause);
 		}
 	}
 
 	private void throwLocalException(String message)
-			throws GitLabRestHandlerException, IOException {
-		throw new GitLabRestHandlerException(message, this.requestCounter,
-				this.issueCounter, this.projectId);
+			throws GitHubRestHandlerException, IOException {
+		throw new GitHubRestHandlerException(message, this.requestCounter,
+			this.issueCounter, this.projectId);
 	}
 
 	private void throwLocalException(String message, Exception cause)
-			throws GitLabRestHandlerException, IOException {
-		throw new GitLabRestHandlerException(message, this.requestCounter,
-				this.issueCounter, this.projectId, cause);
+			throws GitHubRestHandlerException, IOException {
+		throw new GitHubRestHandlerException(message, this.requestCounter,
+			this.issueCounter, this.projectId, cause);
 	}
 	//endregion
 
 	//region ATTRIBUTES
-	private final String projectId;
+	private final String projectId; // Format: "owner/repo"
 	private final String filePath;
-	private final HttpClient gitlabClient;
+	private final HttpClient githubClient;
 	private final VersionTree versionTree;
 	private Map<Integer, IssueRecord> issueRecords;
 	private int requestCounter;
 	private int issueCounter;
 	private final boolean verbose;
+	private String authToken;
 	//endregion
 
 	//region CONSTRUCTORS
-	public GitLabRestHandler(String projectId, VersionTree versionTree,
-							 String filePath) {
-		this(projectId, versionTree, filePath, false);	}
+	public GitHubRestHandler(String projectId, VersionTree versionTree,
+                             String checkpointFilePath, String authToken) {
+		this(projectId, versionTree, checkpointFilePath, authToken, false);	}
 
-	public GitLabRestHandler(String projectId, VersionTree versionTree,
-							 String filePath, boolean verbose) {
+	public GitHubRestHandler(String projectId, VersionTree versionTree, String checkpointFilePath, String authToken, boolean verbose) {
 		this.projectId = projectId;
-		this.filePath = filePath;
-		this.gitlabClient = HttpClient.newHttpClient();
+		this.filePath = checkpointFilePath;
+		this.githubClient = HttpClient.newHttpClient();
 		this.versionTree = versionTree;
 		this.verbose = verbose;
+		this.authToken = authToken;
 	}
 	//endregion
 
 	//region PUBLIC INTERFACE
 	public static void main(String[] args) throws IOException {
-		GitLabRestHandler handler = new GitLabRestHandler(
-				args[0], VersionTree.deserialize(args[1]), args[2], true);
+		GitHubRestHandler handler = new GitHubRestHandler(
+				args[0], VersionTree.deserialize(args[1]), args[2], args[3], true);
 		Collection<IssueRecord> issues = null;
 		try {
 			issues = handler.getIssueRecords();
@@ -104,10 +103,12 @@ public class GitLabRestHandler {
 				+ issuesWithLinkedCommits + " had a linked commit.");
 	}
 	//region PUBLIC INTERFACE
+	//region ACCESSORS
+
 
 	//region ACCESSORS
 	public Collection<IssueRecord> getIssueRecords()
-			throws IOException, InterruptedException, GitLabRestHandlerException {
+			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
 		if (this.issueRecords == null) {
 			if (this.verbose) {
 				DateTimeFormatter dtf =
@@ -131,57 +132,91 @@ public class GitLabRestHandler {
 
 	//region HTTP
 	private Collection<String> getRawIssues()
-			throws IOException, InterruptedException, GitLabRestHandlerException {
+			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
 		// Create URI and result collection
-		String baseUri = "https://gitlab.com/api/v4/projects/" + this.projectId
-				+ "/issues?per_page=100&page=";
+		String baseUri = "https://api.github.com/repos/" + this.projectId
+				+ "/issues?state=all&per_page=100&page=";
 		Collection<String> issuesJson = new ArrayList<>();
 
 		// Get the page limit from HEAD
 		HttpRequest head = HttpRequest.newBuilder()
 				.method("HEAD", HttpRequest.BodyPublishers.noBody())
-				.uri(URI.create(baseUri + 1)).build();
+				.uri(URI.create(baseUri + 1))
+				.header("Authorization", "token " + this.authToken)
+				.build();
 		HttpResponse<Void> headers =
-				this.gitlabClient.send(head, HttpResponse.BodyHandlers.discarding());
-		int pageLimit = Integer.parseInt(headers.headers().map().get("x-total-pages").get(0));
+				this.githubClient.send(head, HttpResponse.BodyHandlers.discarding());
+		int maxPage = getMaxPageNumber(runHttpRequest(baseUri + 1, 0));
 		int pageStart = (this.issueRecords.size() / 100) + 1;
 
 		// Get the issues
-		for (int i = pageStart; i <= pageLimit; i++)
+		for (int i = pageStart; i <= maxPage; i++)
 			issuesJson.add(runHttpRequest(baseUri + i, 0));
 
 		return issuesJson;
 	}
 
+	private int getMaxPageNumber(String firstPage)
+			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException
+	{
+		int maxPage = 0;
+		JsonFactory factory = new JsonFactory();
+		try {
+			// Create a JsonParser instance
+			JsonParser parser = factory.createParser(firstPage);
+
+			// Check if the first token is the start of an array
+			if (parser.nextToken() == JsonToken.START_ARRAY) {
+				// Iterate over each element in the array (each dictionary)
+				while (parser.nextToken() == JsonToken.START_OBJECT) {
+					// Inside each object, iterate over the fields
+					while (parser.nextToken() != JsonToken.END_OBJECT) {
+						String fieldName = parser.getCurrentName();
+						parser.nextToken();
+						if ("number".equals(fieldName)) {
+							maxPage = Integer.parseInt(parser.getText());
+							return maxPage/100+1;
+						}
+					}
+				}
+			}
+
+			parser.close(); // Close the parser
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return maxPage;
+	}
+
 	private String getRawCommits(String issueId)
-			throws IOException, InterruptedException, GitLabRestHandlerException {
-		String baseUri = "https://gitlab.com/api/v4/projects/" + this.projectId
+			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
+		String baseUri = "https://api.github.com/repos/" + this.projectId
 				+ "/issues/" + issueId + "/related_merge_requests";
 		return runHttpRequest(baseUri, 0);
 	}
 
 	private String getRawCommitChanges(String commitId)
-			throws IOException, InterruptedException, GitLabRestHandlerException {
-		String baseUri = "https://gitlab.com/api/v4/projects/" + this.projectId
+			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
+		String baseUri = "https://api.github.com/repos/" + this.projectId
 				+ "/merge_requests/" + commitId + "/changes";
 		return runHttpRequest(baseUri, 0);
 	}
 
 	private String getRawCommitTags(String commitSha)
-			throws IOException, InterruptedException, GitLabRestHandlerException {
-		String baseUri = "https://gitlab.com/api/v4/projects/" + this.projectId
+			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
+		String baseUri = "https://api.github.com/repos/" + this.projectId
 				+ "/repository/commits/" + commitSha + "/refs?type=tag&per_page=100";
 		return runHttpRequest(baseUri, 0);
 	}
 
 	private String runHttpRequest(String uri, int counter)
-			throws IOException, InterruptedException, GitLabRestHandlerException {
+			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
 		this.requestCounter++;
 
 		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create(uri)).build();
+				.uri(URI.create(uri)).header("Authorization", "token " + this.authToken).build();
 		HttpResponse<String> response =
-				this.gitlabClient.send(request, HttpResponse.BodyHandlers.ofString());
+				this.githubClient.send(request, HttpResponse.BodyHandlers.ofString());
 		if (response.statusCode() != 200 && counter < 10) {
 			switch (response.statusCode()) {
 				case 524:
@@ -208,7 +243,7 @@ public class GitLabRestHandler {
 
 	//region ISSUE PARSER
 	private Map<Integer, IssueRecord> processIssues(Collection<String> rawIssues)
-			throws IOException, InterruptedException, GitLabRestHandlerException {
+			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
 		JsonFactory factory = new JsonFactory();
 
 		for (String rawIssueArray : rawIssues) {
@@ -227,7 +262,7 @@ public class GitLabRestHandler {
 	}
 
 	private IssueRecord parseIssue(JsonParser parser)
-			throws IOException, InterruptedException, GitLabRestHandlerException {
+			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
 		IssueRecordBuilder issueBuilder =
 				new IssueRecordBuilder(DateTimeFormatter.ISO_INSTANT);
 
@@ -236,74 +271,17 @@ public class GitLabRestHandler {
 			parser.nextToken();
 
 			switch (fieldName) {
-				// Useless fields
-				case "id":
-				case "project_id":
-				case "updated_at":
-				case "user_notes_count":
-				case "merge_requests_count":
-				case "upvotes":
-				case "downvotes":
-				case "due_date":
-				case "confidential":
-				case "discussion_locked":
-				case "blocking_issues_count":
-				case "has_tasks":
-				case "moved_to_id":
-				case "service_desk_reply_to":
-				case "epic_iid":
-				case "iteration":
-				case "health_status":
-				case "assignees":
-				case "author":
-				case "time_stats":
-				case "task_completion_status":
-				case "_links":
-				case "references":
-				case "closed_by":
-				case "task_status":
-				case "assignee":
-					skipToNextField(parser);
-					break;
-				// Unknown purpose fields
-				case "milestone":
-					skipToNextField(parser);
-					break;
-				case "issue_type":
-					skipToNextField(parser);
-					break;
-				case "severity":
-					String severity = parser.getText();
-					if (!severity.equals("UNKNOWN"))
-						throwLocalException("New severity identified: "
-								+ severity + ", in issue ID: " + issueBuilder.id);
-					break;
-				case "type":
-					skipToNextField(parser);
-					break;
-				case "weight":
-					skipToNextField(parser);
-					break;
-				case "prepared_at":
-					skipToNextField(parser);
-					break;
-				case "epic":
-					String epic = parser.getText();
-					if (!epic.equals("null"))
-						throwLocalException("New epic identified: "
-								+ epic + ", in issue ID: " + issueBuilder.id);
-					break;
-				// Useful fields
-				case "iid":
+				// Handle fields from GitHub issue JSON
+				case "number": // GitHub uses "number" for the issue number
 					issueBuilder.id = getTextIfNotNull(parser);
 					break;
 				case "title":
 					issueBuilder.summary = getTextIfNotNull(parser);
 					break;
-				case "description":
+				case "body": // GitHub uses "body" for the issue description
 					issueBuilder.description = getTextIfNotNull(parser);
 					break;
-				case "state":
+				case "state": // Open or closed state
 					issueBuilder.status = getTextIfNotNull(parser);
 					break;
 				case "created_at":
@@ -312,20 +290,33 @@ public class GitLabRestHandler {
 				case "closed_at":
 					issueBuilder.resolved = getTextIfNotNull(parser);
 					break;
-				case "web_url":
+				case "html_url": // Web URL of the issue
 					issueBuilder.url = getTextIfNotNull(parser);
 					break;
-				case "labels":
-					while (!parser.nextToken().equals(JsonToken.END_ARRAY))
-						issueBuilder.labels.add(parser.getText());
+				case "labels": // Labels are an array of objects in GitHub
+					List<String> labels = new ArrayList<>();
+					while (parser.nextToken() != JsonToken.END_ARRAY) {
+						if (parser.currentToken() == JsonToken.START_OBJECT) {
+							while (parser.nextToken() != JsonToken.END_OBJECT) {
+								String labelField = parser.getCurrentName();
+								parser.nextToken(); // move to value
+								if ("name".equals(labelField)) {
+									labels.add(parser.getText());
+								}
+							}
+						}
+					}
+					issueBuilder.labels = labels;
 					break;
-				// Unknown field
+				// Skip fields that are not used
 				default:
-					// skip new field rather than throwing an exception.
 					skipToNextField(parser);
 			}
 		}
 
+		// GitHub does not directly link commits to issues in the issue API response,
+		// so you might need to adjust how you handle linkedCommits in GitHub context
+		// issueBuilder.linkedCommits = processCommits(getRawCommits(issueBuilder.id));
 		issueBuilder.linkedCommits = processCommits(getRawCommits(issueBuilder.id));
 		this.issueCounter++;
 
@@ -345,7 +336,7 @@ public class GitLabRestHandler {
 
 	//region COMMIT PARSER
 	private Collection<Commit> processCommits(String rawCommits)
-			throws IOException, InterruptedException, GitLabRestHandlerException {
+			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
 		JsonFactory factory = new JsonFactory();
 		Collection<Commit> result = new ArrayList<>();
 
@@ -360,7 +351,7 @@ public class GitLabRestHandler {
 	}
 
 	private Commit parseCommit(JsonParser parser)
-			throws IOException, InterruptedException, GitLabRestHandlerException {
+			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
 		boolean externalProject = false;
 		CommitBuilder commitBuilder =
 				new CommitBuilder(DateTimeFormatter.ISO_INSTANT);
@@ -479,12 +470,12 @@ public class GitLabRestHandler {
 	//region CHANGES PARSER
 	private Collection<Map.Entry<String, String>> processChanges(
 			String rawChanges, String idForError)
-			throws IOException, GitLabRestHandlerException {
+			throws IOException, GitHubRestHandler.GitHubRestHandlerException {
 		JsonFactory factory = new JsonFactory();
 		Collection<Map.Entry<String, String>> result = new ArrayList<>();
 
 		try (JsonParser parser = factory.createParser(rawChanges)) {
-			/* Unfortunately, the GitLab API for getting an MR's changes also
+			/* Unfortunately, the GitHub API for getting an MR's changes also
 			 * returns the root information about the MR, which we need to skip. */
 			parser.nextToken(); // start parser
 			while (!parser.getText().equals("changes")) parser.nextToken();
@@ -503,7 +494,7 @@ public class GitLabRestHandler {
 
 	private Map.Entry<String, String> parseChange(
 			JsonParser parser, String idForError)
-			throws IOException, GitLabRestHandlerException {
+			throws IOException, GitHubRestHandler.GitHubRestHandlerException {
 		String oldPath = "";
 		String newPath = "";
 
@@ -540,7 +531,7 @@ public class GitLabRestHandler {
 
 	//region TAGS PARSER
 	private Collection<String> processTags(String rawTags, String shaForError)
-			throws IOException, GitLabRestHandlerException {
+			throws IOException, GitHubRestHandler.GitHubRestHandlerException {
 		JsonFactory factory = new JsonFactory();
 		Collection<String> result = new ArrayList<>();
 
@@ -558,7 +549,7 @@ public class GitLabRestHandler {
 	}
 
 	private String parseTag(JsonParser parser, String shaForError)
-			throws IOException, GitLabRestHandlerException {
+			throws IOException, GitHubRestHandler.GitHubRestHandlerException {
 		String result = null;
 
 		while (parser.nextToken().equals(JsonToken.FIELD_NAME)) {
