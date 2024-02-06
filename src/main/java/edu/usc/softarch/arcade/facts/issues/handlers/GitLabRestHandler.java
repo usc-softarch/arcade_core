@@ -128,6 +128,29 @@ public class GitLabRestHandler {
 		return new ArrayList<>(issueRecords.values());
 	}
 	//endregion
+	//region ACCESSORS
+	public Collection<IssueRecord> getGitHubIssueRecords()
+			throws IOException, InterruptedException, GitLabRestHandlerException {
+		if (this.issueRecords == null) {
+			if (this.verbose) {
+				DateTimeFormatter dtf =
+						DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+				LocalDateTime now = LocalDateTime.now();
+				System.out.println(dtf.format(now) + ": Started processing issues for "
+						+ "project ID " + this.projectId);
+			}
+
+			recover();
+
+			if (this.issueRecords.size() % 100 == 0) {
+				this.issueRecords.putAll(processIssues(getRawIssues()));
+				checkpoint();
+			}
+		}
+
+		return new ArrayList<>(issueRecords.values());
+	}
+	//endregion
 
 	//region HTTP
 	private Collection<String> getRawIssues()

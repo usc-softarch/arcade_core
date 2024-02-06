@@ -191,21 +191,21 @@ public class GitHubRestHandler {
 	private String getRawCommits(String issueId)
 			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
 		String baseUri = "https://api.github.com/repos/" + this.projectId
-				+ "/issues/" + issueId + "/related_merge_requests";
+				+ "/pulls/" + issueId + "/related_merge_requests";
 		return runHttpRequest(baseUri, 0);
 	}
 
 	private String getRawCommitChanges(String commitId)
 			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
 		String baseUri = "https://api.github.com/repos/" + this.projectId
-				+ "/merge_requests/" + commitId + "/changes";
+				+ "/pulls/" + commitId + "/changes";
 		return runHttpRequest(baseUri, 0);
 	}
 
 	private String getRawCommitTags(String commitSha)
 			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
 		String baseUri = "https://api.github.com/repos/" + this.projectId
-				+ "/repository/commits/" + commitSha + "/refs?type=tag&per_page=100";
+				+ "/commits/" + commitSha + "/refs?type=tag&per_page=100";
 		return runHttpRequest(baseUri, 0);
 	}
 
@@ -251,7 +251,7 @@ public class GitHubRestHandler {
 				parser.nextToken(); // skip start array
 
 				while (parser.nextToken().equals(JsonToken.START_OBJECT)) {
-					IssueRecord issueRecord = parseIssue(parser);
+					IssueRecord issueRecord = parsePR(parser);
 					if (issueRecord != null)
 						this.issueRecords.put(Integer.parseInt(issueRecord.id), issueRecord);
 				}
@@ -261,7 +261,8 @@ public class GitHubRestHandler {
 		return this.issueRecords;
 	}
 
-	private IssueRecord parseIssue(JsonParser parser)
+	// Change the parseIssue to parsePR to deal with pull requests rather than issues. One reason for this is all issues on GitHub are Pull requests for Apache projects such as Struts and Hadoop. The issues are only on JIRA.
+	private IssueRecord parsePR(JsonParser parser)
 			throws IOException, InterruptedException, GitHubRestHandler.GitHubRestHandlerException {
 		IssueRecordBuilder issueBuilder =
 				new IssueRecordBuilder(DateTimeFormatter.ISO_INSTANT);
