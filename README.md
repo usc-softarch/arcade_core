@@ -22,7 +22,7 @@ ARCADE Core is a fork of [ARCADE](https://bitbucket.org/joshuaga/arcade) contain
 
 [**Dr. Duc Minh Le**](https://lemduc.github.io/) is a major contributor to ARCADE, and is responsible for much of its smell detection components.
 
-[**Marcelo Schmitt Laser**](https://www.linkedin.com/in/marcelo-schmitt-laser/) is the current maintainer of ARCADE, and creator of ARCADE Core.
+[**Marcelo Schmitt Laser**](https://www.linkedin.com/in/marcelo-schmitt-laser/) is the creator of ARCADE Core and maintainer before the end of 2023.
 
 [**Daye Nam**](https://dayenam.com/) is the creator of [EVA](https://github.com/namdy0429/EVA), a visualization tool that utilizes ARCADE's results to create graphical presentations of architectural information.
 
@@ -37,6 +37,8 @@ ARCADE Core is a fork of [ARCADE](https://bitbucket.org/joshuaga/arcade) contain
 [**Gina Yang**](https://www.linkedin.com/in/gina-yang861) developed a large part of the ARCADE Core test suite and was responsible for generating the majority of its test oracles.
 
 **Khoi Pham** developed much of the infrastructure that enabled the integration of ARCADE into SAIN, the Software Architecture Instrument.
+
+[**Jincheng He**](jinchenh@usc.edu) is the current maintainer of ARCADE and extended RecovAr (architectural design decision extraction) to function for GitHub projects.
 
 ## A Brief Manual for ARCADE and RecovAr
 
