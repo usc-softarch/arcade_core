@@ -1,4 +1,6 @@
-Marcelo Schmitt Laser
+# Coding Philosophy
+
+*Authored by Marcelo Schmitt Laser*
 
 This file is meant to explain certain stylistic choices I made during the 
 coding of ARCADE, to hopefully aid in the maintenance and understanding of 

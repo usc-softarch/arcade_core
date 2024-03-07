@@ -1,3 +1,7 @@
+# Clusterer
+
+*Authored by Marcelo Schmitt Laser*
+
 Clusterer is the entry point of ARC, WCA and Limbo. It parameterizes and 
 standardizes all three of them, since they are effectively the same 
 algorithm.
