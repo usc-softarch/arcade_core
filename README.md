@@ -22,7 +22,7 @@ ARCADE Core is a fork of [ARCADE](https://bitbucket.org/joshuaga/arcade) contain
 
 [**Dr. Duc Minh Le**](https://lemduc.github.io/) is a major contributor to ARCADE, and is responsible for much of its smell detection components.
 
-[**Marcelo Schmitt Laser**](https://www.linkedin.com/in/marcelo-schmitt-laser/) is the current maintainer of ARCADE, and creator of ARCADE Core.
+[**Marcelo Schmitt Laser**](https://www.linkedin.com/in/marcelo-schmitt-laser/) is the creator of ARCADE Core and maintainer before the end of 2023.
 
 [**Daye Nam**](https://dayenam.com/) is the creator of [EVA](https://github.com/namdy0429/EVA), a visualization tool that utilizes ARCADE's results to create graphical presentations of architectural information.
 
@@ -38,12 +38,14 @@ ARCADE Core is a fork of [ARCADE](https://bitbucket.org/joshuaga/arcade) contain
 
 **Khoi Pham** developed much of the infrastructure that enabled the integration of ARCADE into SAIN, the Software Architecture Instrument.
 
+[**Jincheng He**](jinchenh@usc.edu) is the current maintainer of ARCADE and extended RecovAr (architectural design decision extraction) to function for GitHub projects.
+
 ## A Brief Manual for ARCADE and RecovAr
 
 ### Building ARCADE with Maven
 
 - ```mvn clean``` first: This is required to set up the Maven environment on the local machine. Installation of a few dependency packages to the local environment is bound to the clean phase. Failure to run this will result in missing dependencies.
-- ```mvn package "-Dmaven.test.skip=true" ```: Make sure to include the quotation marks around the final argument when running on PowerShell. Due to the way PowerShell parses strings, this command will fail without them.
+- ```mvn package "-Dmaven.test.skip=true" ```: Make sure to include the quotation marks around the final argument when running on PowerShell. Due to the way PowerShell parses strings, this command will fail without them. It's better to run in pure CMD rather than PowerShell.
 - Rename the built jar file to **ARCADE_Core.jar**: The scripts are hardcoded to expect this filename, for simplicity's sake.
 
 ### Get System Source Code from Repositories
@@ -90,7 +92,7 @@ subject_systems
 
 ### Clean Up Testing Modules 
 
-**dir_cleaner.py**: This uses string comparison to delete unwanted files that may otherwise taint the results of ARCADE, specifically test code that should not be considered as part of the system architecture. Because string comparison is highly prone to error and this is a destructive script, first run it in safe mode: this will create a file listing all file paths that would be deleted. If on manual inspection this list seems correct, you may run it with safe mode off; otherwise, you must identify the file paths that are to be kept and provide string patterns for dir_cleaner to ignore. It is recommended that you run dir_cleaner on safe mode again after providing it with ignore patterns, as this will generate a new deletion list that can be re-inspected. **Parameters**: system_name (E.g., "graphviz"), safe_mode or not ("on" to check OK or "off" to directly remove the files), and ignored_patterns.
+**dir_cleaner.py**: This uses string comparison to delete unwanted files that may otherwise taint the results of ARCADE, specifically test code that should not be considered as part of the system architecture. Because string comparison is highly prone to error and this is a destructive script, first run it in safe mode: this will create a file listing all file paths that would be deleted. If on manual inspection this list seems correct, you may run it with safe mode off; otherwise, you must identify the file paths that are to be kept and provide string patterns for dir_cleaner to ignore. It is recommended that you run dir_cleaner on safe mode again after providing it with ignore patterns, as this will generate a new deletion list that can be re-inspected. **Parameters**: system_name (E.g., "graphviz"), safe_mode or not ("on" to check OK or "off" to directly remove the files), and ignored_patterns. **Default is "on"**.
 
 ### Extract Facts (Dependencies)
 
