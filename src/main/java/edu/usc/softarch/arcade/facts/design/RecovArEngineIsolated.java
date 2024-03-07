@@ -2,28 +2,14 @@ package edu.usc.softarch.arcade.facts.design;
 
 import edu.usc.softarch.arcade.facts.VersionMap;
 import edu.usc.softarch.arcade.facts.VersionTree;
-import edu.usc.softarch.arcade.facts.issues.Commit;
-import edu.usc.softarch.arcade.facts.issues.IssueComment;
 import edu.usc.softarch.arcade.facts.issues.IssueRecord;
-import edu.usc.softarch.util.json.EnhancedJsonParser;
 import edu.usc.softarch.arcade.facts.issues.handlers.GitLabRestHandler;
 import edu.usc.softarch.util.json.EnhancedJsonGenerator;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.File;
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class RecovArEngineIsolated {
 	//region PUBLIC INTERFACE
@@ -31,19 +17,18 @@ public class RecovArEngineIsolated {
 			throws GitLabRestHandler.GitLabRestHandlerException, IOException,
 			InterruptedException {
 		Collection<CodeElementDecision> result = null;
+
 		if (args.length >= 5)
- 			result = runWithHubLab(args[0], args[1], args[2], args[3]);
+ 			result = runWithGitHub(args[0], args[1], args[2], args[3]);
 		else
 			System.out.println("Usage: java -cp ARCADE_Core.jar edu.usc.softarch.arcade.facts.design.RecovArEngineIsolated <cluster_directory> <versionTree_path> <updated_issue_path> <version_regex> <output_json_path>");
-		System.exit(-1);
 
-		//TODO this is wrong, will fail on args size = 5
-		try (EnhancedJsonGenerator generator = new EnhancedJsonGenerator(args[4])) {
-			generator.writeField("decisions", result);
-		}
+		EnhancedJsonGenerator generator = new EnhancedJsonGenerator(args[4]);
+		generator.writeField("decisions", result);
+		generator.close();
 	}
 
-	public static Collection<CodeElementDecision> runWithHubLab(
+	public static Collection<CodeElementDecision> runWithGitHub(
 			String clusterDirPath, String versionTreePath,
 			String checkpointFilePath, String versionScheme)
 			throws IOException, GitLabRestHandler.GitLabRestHandlerException,

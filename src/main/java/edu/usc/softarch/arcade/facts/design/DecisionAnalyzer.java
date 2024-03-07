@@ -27,27 +27,28 @@ public class DecisionAnalyzer {
 		Collection<CodeElementDecision> result = new ArrayList<>();
 
 		for (IssueRecord issue : this.issues) {
+			// get relevant merges and their version tags if not exists
 			if (issue.getFixVersions().contains(version)) {
 				CodeElementDecision decision = getDecision(version, issue, changes);
 				if (!decision.isEmpty()) result.add(decision);
 			}
 		}
 
-		return result;
-	}
+			return result;
+		}
 
-	private CodeElementDecision getDecision(String version, IssueRecord issue,
-			Collection<Change<String>> changes) {
-		Collection<String> addedElements = new HashSet<>();
-		Collection<String> removedElements = new HashSet<>();
+		private CodeElementDecision getDecision(String version, IssueRecord issue,
+				Collection<Change<String>> changes) {
+			Collection<String> addedElements = new HashSet<>();
+			Collection<String> removedElements = new HashSet<>();
 
-		for (Change<String> change : changes) {
-			EnhancedSet<String> addedFiles = new EnhancedHashSet<>(
-				issue.getFileChanges().stream().map(Map.Entry::getValue)
-					.map(x -> x.replace("\\", "/"))
-					.collect(Collectors.toList()));
-			EnhancedSet<String> addedChanges =
-				new EnhancedHashSet<>(change.getAddedElements().stream()
+			for (Change<String> change : changes) {
+				EnhancedSet<String> addedFiles = new EnhancedHashSet<>(
+						issue.getFileChanges().stream().map(Map.Entry::getValue)
+								.map(x -> x.replace("\\", "/"))
+								.collect(Collectors.toList()));
+				EnhancedSet<String> addedChanges =
+						new EnhancedHashSet<>(change.getAddedElements().stream()
 					.map(x -> x.replace("\\", "/"))
 					.collect(Collectors.toList()));
 			addedElements.addAll(addedFiles.intersection(addedChanges));

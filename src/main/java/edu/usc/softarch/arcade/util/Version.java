@@ -90,7 +90,8 @@ public class Version implements Comparable<Version> {
 	 */
 	private static String extractVersion(String s) {
 		// Define the regular expression pattern to match the version string
-		String pattern = "(\\d+(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?"
+		// group(1) returns the first capturing group in the pattern. If the pattern includes parentheses, group(1) returns the part of the string matched by the content within the first set of parentheses.
+		String pattern = "(v?\\d+(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?"
 			+ "(-?(alpha(\\d+)?|beta(\\d+)?|rc(\\d+)?|pre(\\d+)?)?))";
 
 		// Create a Pattern object

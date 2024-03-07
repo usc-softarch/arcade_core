@@ -80,14 +80,14 @@ public class ArchSmellDetector {
 	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
 			String detectedSmellsFilename) throws IOException {
 		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename, 
-			"", .20,
-			.20);
+			"", .10,
+			.10);
 	}
 
 	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,
 			String detectedSmellsFilename,String docTopicsPathTemporary) throws IOException {
 		this(depsRsfFilename, clustersRsfFilename, detectedSmellsFilename,
-			docTopicsPathTemporary, .20, .20);
+			docTopicsPathTemporary, .10, .10);
 	}
 
 	public ArchSmellDetector(String depsRsfFilename, String clustersRsfFilename,

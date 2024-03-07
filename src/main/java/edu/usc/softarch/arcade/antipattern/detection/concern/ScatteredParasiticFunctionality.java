@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class ScatteredParasiticFunctionality {
 	public static SmellCollection detect(ReadOnlyArchitecture arch) {
-		return detect(arch, .20, .20);
+		return detect(arch, .10, .10);
 	}
 
 	public static SmellCollection detect(ReadOnlyArchitecture arch,

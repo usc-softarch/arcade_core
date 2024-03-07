@@ -141,11 +141,6 @@ public class GitLabRestHandler {
 			}
 
 			recover();
-
-			if (this.issueRecords.size() % 100 == 0) {
-				this.issueRecords.putAll(processIssues(getRawIssues()));
-				checkpoint();
-			}
 		}
 
 		return new ArrayList<>(issueRecords.values());
