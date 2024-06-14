@@ -75,7 +75,7 @@ public class CLI {
 				break;
 			default:
 				throw new IllegalArgumentException(
-					"Unknown messagelevel " + argument);
+						"Unknown messagelevel " + argument);
 		}
 	}
 }
